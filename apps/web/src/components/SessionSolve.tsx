@@ -29,6 +29,19 @@ export function SessionSolve({ sessionId, onExit, onCompleted }: SessionSolvePro
   const queryClient = useQueryClient()
   const [currentIndex, setCurrentIndex] = useState(0)
   const [isMapOpen, setIsMapOpen] = useState(false)
+
+  /**
+   * What the student just tapped, before the server has confirmed it.
+   *
+   * The card used to stay unselected until `submitAnswer` returned and the
+   * session query refetched — a visible pause between the tap and any feedback,
+   * on the one interaction that happens dozens of times per session. This holds
+   * the answer locally so the card lights up on the same frame, and the entry is
+   * dropped once the server row agrees.
+   */
+  const [pending, setPending] = useState<
+    Record<string, { selectedOption: string | null; confidence?: ConfidenceLevel }>
+  >({})
   const questionStartedAtRef = useRef(Date.now())
 
   const submitAnswer = useConvexMutation(api.sessions.submitAnswer)
@@ -40,8 +53,15 @@ export function SessionSolve({ sessionId, onExit, onCompleted }: SessionSolvePro
   const session = data?.session ?? null
   const questions = data?.questions ?? []
 
+  const workRef = useRef<HTMLDivElement | null>(null)
+  const stimulusRef = useRef<HTMLDetailsElement | null>(null)
+
   useEffect(() => {
     questionStartedAtRef.current = Date.now()
+    // Both panels go back to the top on a question change. Keeping the previous
+    // offset opened the next question already scrolled past its own stem.
+    workRef.current?.scrollTo({ top: 0 })
+    stimulusRef.current?.scrollTo({ top: 0 })
   }, [currentIndex])
 
   // Once the session is complete, hand off to the review surface.
@@ -54,6 +74,31 @@ export function SessionSolve({ sessionId, onExit, onCompleted }: SessionSolvePro
   const invalidate = useCallback(async () => {
     await queryClient.invalidateQueries({ queryKey: sessionQuery(sessionId).queryKey })
   }, [queryClient, sessionId])
+
+  // Drop optimistic entries the server has confirmed. Comparing against the
+  // fetched row rather than clearing on success keeps the card from flickering
+  // back to unselected in the gap between the mutation resolving and the query
+  // returning the new value.
+  useEffect(() => {
+    if (questions.length === 0) return
+    setPending((current) => {
+      let changed = false
+      const next = { ...current }
+      for (const question of questions) {
+        const local = next[question.sessionQuestionId]
+        if (local == null) continue
+        const server = question.attempt?.selectedOption ?? null
+        const serverConfidence = (question.attempt?.confidence ?? undefined) as
+          | ConfidenceLevel
+          | undefined
+        if (local.selectedOption === server && local.confidence === serverConfidence) {
+          delete next[question.sessionQuestionId]
+          changed = true
+        }
+      }
+      return changed ? next : current
+    })
+  }, [questions])
 
   const answerMutation = useMutation({
     mutationFn: async (input: { selectedOption: string; confidence?: ConfidenceLevel }) => {
@@ -108,8 +153,14 @@ export function SessionSolve({ sessionId, onExit, onCompleted }: SessionSolvePro
   })
 
   const current = questions[currentIndex]
-  const answeredCount = questions.filter((q) => q.attempt?.selectedOption != null).length
-  const isSaving = answerMutation.isPending || clearMutation.isPending
+  const answeredOf = useCallback(
+    (question: (typeof questions)[number]) =>
+      pending[question.sessionQuestionId]?.selectedOption
+      ?? question.attempt?.selectedOption
+      ?? null,
+    [pending],
+  )
+  const answeredCount = questions.filter((q) => answeredOf(q) != null).length
   const isLast = currentIndex === questions.length - 1
   const isFirst = currentIndex === 0
 
@@ -121,25 +172,33 @@ export function SessionSolve({ sessionId, onExit, onCompleted }: SessionSolvePro
 
   const selectOption = useCallback(
     (label: string) => {
-      const selected = current?.attempt?.selectedOption ?? null
+      const key = current?.sessionQuestionId
+      if (key == null) return
+      const selected = pending[key]?.selectedOption ?? current?.attempt?.selectedOption ?? null
+
       if (selected === label) {
+        setPending((value) => ({ ...value, [key]: { selectedOption: null } }))
         clearMutation.mutate()
       } else {
+        setPending((value) => ({ ...value, [key]: { selectedOption: label } }))
         answerMutation.mutate({ selectedOption: label })
       }
     },
-    [answerMutation, clearMutation, current?.attempt?.selectedOption],
+    [answerMutation, clearMutation, current?.attempt?.selectedOption, current?.sessionQuestionId, pending],
   )
 
   // Declaring confidence re-submits the same answer: one mutation, one source of
   // truth, and no way for the two to drift apart.
   const declareConfidence = useCallback(
     (confidence: ConfidenceLevel) => {
-      const selected = current?.attempt?.selectedOption ?? null
+      const key = current?.sessionQuestionId
+      if (key == null) return
+      const selected = pending[key]?.selectedOption ?? current?.attempt?.selectedOption ?? null
       if (selected == null) return
+      setPending((value) => ({ ...value, [key]: { selectedOption: selected, confidence } }))
       answerMutation.mutate({ selectedOption: selected, confidence })
     },
-    [answerMutation, current?.attempt?.selectedOption],
+    [answerMutation, current?.attempt?.selectedOption, current?.sessionQuestionId, pending],
   )
 
   const finish = useCallback(() => {
@@ -221,8 +280,11 @@ export function SessionSolve({ sessionId, onExit, onCompleted }: SessionSolvePro
   }
 
   const KindIcon = getKindIcon(session.kind)
-  const selectedOption = current.attempt?.selectedOption ?? null
-  const declaredConfidence = (current.attempt?.confidence ?? null) as ConfidenceLevel | null
+  const optimistic = pending[current.sessionQuestionId]
+  const selectedOption = optimistic?.selectedOption ?? current.attempt?.selectedOption ?? null
+  const declaredConfidence = (optimistic?.confidence
+    ?? current.attempt?.confidence
+    ?? null) as ConfidenceLevel | null
   const progress = questions.length === 0 ? 0 : (answeredCount / questions.length) * 100
   const lowTime = timer.timed && timer.remainingMs != null && timer.remainingMs <= 60_000
 
@@ -272,9 +334,11 @@ export function SessionSolve({ sessionId, onExit, onCompleted }: SessionSolvePro
       </header>
 
       <main className={`solve-main${current.group != null ? ' is-split' : ''}`}>
-        {current.group != null ? <SharedStimulus group={current.group} /> : null}
+        {current.group != null ? (
+          <SharedStimulus group={current.group} panelRef={stimulusRef} />
+        ) : null}
 
-        <div className="solve-work">
+        <div className="solve-work" ref={workRef}>
         <article className="solve-question">
           <MarkdownBlock markdown={current.question.bodyMarkdown} />
         </article>
@@ -286,14 +350,14 @@ export function SessionSolve({ sessionId, onExit, onCompleted }: SessionSolvePro
               <button
                 key={option.label}
                 type="button"
-                disabled={isSaving || completeMutation.isPending}
+                disabled={completeMutation.isPending}
                 onClick={() => selectOption(option.label)}
                 className={`option-card solve-option${isSelected ? ' is-selected' : ''}`}
               >
                 <span className="option-label">{option.label}</span>
                 <span className="min-w-0 flex-1 text-left">
                   <MarkdownBlock markdown={option.bodyMarkdown} />
-                  {isSelected ? <span className="solve-option-meta">Respuesta guardada</span> : null}
+
                 </span>
               </button>
             )
@@ -310,7 +374,6 @@ export function SessionSolve({ sessionId, onExit, onCompleted }: SessionSolvePro
                   <button
                     key={option.value}
                     type="button"
-                    disabled={isSaving}
                     onClick={() => declareConfidence(option.value)}
                     className={`confidence-chip${isActive ? ' is-active' : ''}`}
                     aria-pressed={isActive}
@@ -402,7 +465,7 @@ export function SessionSolve({ sessionId, onExit, onCompleted }: SessionSolvePro
                       type="button"
                       className={[
                         'solve-map-cell',
-                        question.attempt?.selectedOption != null ? 'is-answered' : '',
+                        answeredOf(question) != null ? 'is-answered' : '',
                         index === currentIndex ? 'is-current' : '',
                       ]
                         .filter(Boolean)

@@ -2831,13 +2831,6 @@ pre code {
   border-radius: 0.9rem;
 }
 
-.solve-option-meta {
-  display: inline-flex;
-  margin-top: 0.5rem;
-  font-size: 0.72rem;
-  font-weight: 700;
-  color: var(--accent-text);
-}
 
 .solve-hint {
   width: min(100%, 50rem);
@@ -4404,4 +4397,34 @@ pre code {
 
 @media (prefers-reduced-motion: reduce) {
   .solve-map-cell:hover { transform: none; }
+}
+
+
+/* The confidence strip appears the moment an answer is chosen, so it must not
+   shove the options up the page while the student is still looking at them.
+   Reserving its height would waste a band on every unanswered question; growing
+   from zero height instead keeps the options still and the arrival legible. */
+.confidence-strip {
+  animation: confidence-arrive 220ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@keyframes confidence-arrive {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .confidence-strip { animation: none; }
+}
+
+/* Answering is the interaction that happens dozens of times a session, so the
+   selected state has to land on the same frame as the tap. The transition is
+   deliberately short — long enough to read as a response, short enough that it
+   never feels like waiting. */
+.option-card.solve-option {
+  transition:
+    border-color 90ms ease,
+    background-color 90ms ease,
+    box-shadow 90ms ease,
+    transform 90ms ease;
 }

@@ -20,9 +20,16 @@ export interface QuestionGroupContext {
  * exactly what the native element does, and it keeps the text in the DOM for
  * screen readers and find-in-page.
  */
-export function SharedStimulus({ group }: { group: QuestionGroupContext }) {
+export function SharedStimulus({
+  group,
+  panelRef,
+}: {
+  group: QuestionGroupContext
+  /** Lets the solve screen reset the passage scroll when the question changes. */
+  panelRef?: React.Ref<HTMLDetailsElement>
+}) {
   return (
-    <details open className="card-inset shared-stimulus">
+    <details open ref={panelRef} className="card-inset shared-stimulus">
       <summary className="shared-stimulus-summary">
         <span className="kicker">Texto compartido</span>
         <span className="shared-stimulus-count">

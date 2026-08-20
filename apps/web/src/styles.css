@@ -44,7 +44,10 @@
   --ink: #1b1235;
   --text-primary: #1b1235;
   --text-secondary: #5b5473;
-  --text-tertiary: #8e88a3;
+  /* Bumped toward ink: the previous value sat at 3.39:1 on white, under the
+     4.5:1 that small text needs, and it labels most of the app. Still clearly
+     a third step below --text-secondary. */
+  --text-tertiary: #76708b;
   --text-inverted: #ffffff;
 
   /* `--brand` is the real name; `--accent` stays as an alias so the ~200
@@ -122,7 +125,7 @@
   --ink: #05060f;
   --text-primary: #f2f0ff;
   --text-secondary: #a49fc4;
-  --text-tertiary: #736e91;
+  --text-tertiary: #8580a3;
   --text-inverted: #0e1020;
 
   --brand: #9b83ff;
@@ -3733,4 +3736,399 @@ pre code {
     flex-direction: column;
     gap: 0.75rem;
   }
+}
+
+/* ===========================================================================
+   Landing page.
+
+   The one brand-register surface in the product: design IS the deliverable
+   here, so it commits where the app stays restrained. A violet field carries
+   the hero, display type runs at poster scale, and Nico is the protagonist.
+
+   The old version was three identical icon+title+text cards under a centred
+   logo — the shape every edtech landing takes, saying nothing this product does
+   that others don't. Each proof block below is a different shape on purpose:
+   they answer different questions, and three matching boxes would claim they
+   were interchangeable.
+   =========================================================================== */
+
+.landing {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg);
+}
+
+.landing-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  width: min(1180px, calc(100% - 2rem));
+  margin-inline: auto;
+  padding: 1.1rem 0;
+}
+
+.landing-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+}
+
+.landing-bar-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.landing-bar-link {
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+}
+
+.landing-bar-link:hover { color: var(--text-primary); }
+
+/* --- Hero ---------------------------------------------------------------- */
+
+.landing-hero {
+  width: min(1180px, calc(100% - 2rem));
+  margin-inline: auto;
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
+  align-items: center;
+  gap: clamp(2rem, 5vw, 4.5rem);
+  padding: clamp(2.5rem, 7vw, 6rem) 0 clamp(3rem, 8vw, 6.5rem);
+}
+
+/* Poster scale, but capped: past ~4.6rem the page is shouting. Letter-spacing
+   stays above the -0.04em floor so the letters never touch. */
+.landing-title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(2.1rem, 1.2rem + 3.4vw, 4.4rem);
+  font-weight: 800;
+  line-height: 1.02;
+  letter-spacing: -0.035em;
+  color: var(--text-primary);
+  text-wrap: balance;
+}
+
+/* The turn in the argument gets the brand colour and the italic. One emphasis,
+   carrying the whole claim — not a gradient, not a highlighter. */
+.landing-title em {
+  font-style: italic;
+  color: var(--brand);
+}
+
+.landing-lede {
+  max-width: 46ch;
+  margin: 1.4rem 0 0;
+  font-size: clamp(1rem, 0.95rem + 0.25vw, 1.15rem);
+  line-height: 1.6;
+  color: var(--text-secondary);
+  text-wrap: pretty;
+}
+
+.landing-cta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.85rem 1.25rem;
+  margin-top: 2.2rem;
+}
+
+.landing-cta-main {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.95rem 1.6rem;
+  font-size: 1.02rem;
+}
+
+.landing-cta-note {
+  font-size: 0.85rem;
+  color: var(--text-tertiary);
+}
+
+/* Nico sits in a violet field — the Committed colour move the app itself never
+   makes. Radial rather than a flat block so the shape reads as a spotlight on
+   the character instead of a coloured box behind him. */
+.landing-hero-mascot {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.9rem;
+  padding: clamp(1.5rem, 4vw, 3rem);
+  isolation: isolate;
+}
+
+.landing-hero-mascot::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle at 50% 45%,
+    color-mix(in srgb, var(--brand) 26%, transparent),
+    transparent 68%
+  );
+}
+
+.landing-hero-speech {
+  position: relative;
+  padding: 0.6rem 1rem;
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  font-weight: 700;
+  line-height: 1.35;
+  text-align: center;
+  color: var(--text-primary);
+  background: var(--bg-card);
+  border: 2px solid var(--border-hard);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-hard-sm);
+}
+
+/* The tail: two stacked squares rotated, so it reads hand-drawn rather than
+   like a generated tooltip caret. */
+.landing-hero-speech::before {
+  content: "";
+  position: absolute;
+  top: -9px;
+  left: 50%;
+  width: 12px;
+  height: 12px;
+  margin-left: -6px;
+  background: var(--bg-card);
+  border-left: 2px solid var(--border-hard);
+  border-top: 2px solid var(--border-hard);
+  transform: rotate(45deg);
+}
+
+/* --- Proof --------------------------------------------------------------- */
+
+.landing-proof {
+  width: min(1180px, calc(100% - 2rem));
+  margin-inline: auto;
+  padding: clamp(2.5rem, 6vw, 4.5rem) 0;
+  border-top: 2px solid var(--border);
+}
+
+.landing-h2 {
+  margin: 0 0 clamp(1.5rem, 3vw, 2.5rem);
+  font-family: var(--font-display);
+  font-size: clamp(1.5rem, 1.1rem + 1.5vw, 2.3rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: var(--text-primary);
+  text-wrap: balance;
+}
+
+.landing-proof-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr));
+  gap: clamp(1rem, 2.5vw, 1.75rem);
+  align-items: start;
+}
+
+.landing-proof-grid > article {
+  padding: 1.5rem;
+  background: var(--bg-card);
+  border: 2px solid var(--border-hard);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-hard);
+}
+
+.landing-proof-label {
+  margin: 0;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--text-tertiary);
+}
+
+.landing-proof-value {
+  margin: 0.35rem 0 0;
+  font-family: var(--font-display);
+  font-size: 2.35rem;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.03em;
+  color: var(--text-primary);
+}
+
+.landing-proof-value span {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-tertiary);
+}
+
+.landing-proof-note {
+  margin: 0.7rem 0 0;
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+}
+
+.landing-proof-copy {
+  margin: 0.9rem 0 0;
+  padding-top: 0.9rem;
+  border-top: 1px solid var(--border);
+  font-size: 0.85rem;
+  line-height: 1.55;
+  color: var(--text-secondary);
+  text-wrap: pretty;
+}
+
+.landing-levelbar {
+  display: flex;
+  gap: 0.3rem;
+  margin-top: 0.85rem;
+}
+
+.landing-levelbar span {
+  height: 0.55rem;
+  flex: 1;
+  border-radius: var(--radius-pill);
+  background: var(--bg-inset);
+}
+
+.landing-levelbar span.is-on { background: var(--brand); }
+
+.landing-scoretrack {
+  position: relative;
+  height: 0.55rem;
+  margin-top: 0.85rem;
+  border-radius: var(--radius-pill);
+  background: var(--bg-inset);
+}
+
+/* 297–327 of 500 — drawn to scale, because the width of the band IS the claim. */
+.landing-scoretrack-range {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 59.4%;
+  width: 6%;
+  border-radius: var(--radius-pill);
+  background: var(--accent-medium);
+}
+
+.landing-scoretrack-mark {
+  position: absolute;
+  top: -0.18rem;
+  bottom: -0.18rem;
+  left: 62.4%;
+  width: 3px;
+  margin-left: -1.5px;
+  border-radius: var(--radius-pill);
+  background: var(--brand);
+}
+
+.landing-quadrant {
+  display: grid;
+  gap: 0.6rem;
+  margin: 0.9rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.landing-quadrant li {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  padding: 0.65rem 0.8rem;
+  border-radius: var(--radius-md);
+}
+
+.landing-quadrant li.is-danger { background: var(--danger-soft); }
+.landing-quadrant li.is-warn { background: var(--gold-soft); }
+
+.landing-quadrant strong {
+  font-size: 0.85rem;
+  color: var(--text-primary);
+}
+
+.landing-quadrant span {
+  font-size: 0.76rem;
+  line-height: 1.45;
+  color: var(--text-secondary);
+}
+
+/* --- Close --------------------------------------------------------------- */
+
+.landing-close {
+  width: min(46rem, calc(100% - 2rem));
+  margin-inline: auto;
+  padding: clamp(3rem, 7vw, 5rem) 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  border-top: 2px solid var(--border);
+}
+
+.landing-close .landing-h2 { margin: 1rem 0 0; }
+
+.landing-close-copy {
+  max-width: 44ch;
+  margin: 0.8rem 0 1.8rem;
+  font-size: 0.98rem;
+  line-height: 1.6;
+  color: var(--text-secondary);
+  text-wrap: pretty;
+}
+
+.landing-footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  width: min(1180px, calc(100% - 2rem));
+  margin-inline: auto;
+  padding: 1.5rem 0 2rem;
+  border-top: 2px solid var(--border);
+  font-size: 0.78rem;
+  color: var(--text-tertiary);
+}
+
+/* --- Entrance ------------------------------------------------------------
+   One reveal on the hero only. A uniform entrance on every section is the
+   reflex the register warns about, and it makes the page feel like it is
+   loading rather than arriving. */
+@media (prefers-reduced-motion: no-preference) {
+  .landing-hero-copy > * {
+    animation: landing-rise 620ms cubic-bezier(0.22, 1, 0.36, 1) backwards;
+  }
+  .landing-title { animation-delay: 60ms; }
+  .landing-lede { animation-delay: 140ms; }
+  .landing-cta { animation-delay: 220ms; }
+
+  .landing-hero-mascot {
+    animation: landing-rise 700ms cubic-bezier(0.22, 1, 0.36, 1) 180ms backwards;
+  }
+}
+
+@keyframes landing-rise {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: none; }
+}
+
+@media (max-width: 56rem) {
+  .landing-hero {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+  /* Nico leads on a phone: the character is the first thing that lands, and the
+     claim reads better once the eye has something to hold. */
+  .landing-hero-mascot { order: -1; }
+  .landing-lede { max-width: none; }
 }

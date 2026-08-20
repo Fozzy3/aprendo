@@ -1,95 +1,174 @@
 import { Link, createFileRoute } from '@tanstack/react-router'
+import { ArrowRight } from 'lucide-react'
 import { useCurrentStudent } from '../lib/student-session.ts'
 import BrandMark from '../components/BrandMark.tsx'
 import ThemeToggle from '../components/ThemeToggle.tsx'
+import { Mascot } from '../components/Mascot.tsx'
 
 export const Route = createFileRoute('/')({
   component: LandingPage,
 })
 
+/**
+ * The landing page.
+ *
+ * Brand register: this is the one surface where design *is* the product, so it
+ * commits where the app is restrained — a violet field behind the hero, display
+ * type at poster scale, and Nico as the protagonist rather than an ornament.
+ *
+ * The copy deliberately refuses the category script. "Diagnóstico · Seguimiento
+ * · 5 áreas" describes every ICFES app ever built and is therefore worth
+ * nothing; what this one actually does differently is name the level, put an
+ * honest band around the score, and separate knowing from guessing. Those are
+ * the three things on the page.
+ */
 function LandingPage() {
   const { session, isReady } = useCurrentStudent()
+  const isSignedIn = isReady && session != null
 
   return (
-    <div className="flex min-h-screen flex-col bg-[var(--bg)]">
-      {/* Subtle top-right controls */}
-      <div className="flex items-center justify-end px-6 py-4">
-        <ThemeToggle />
-      </div>
+    <div className="landing">
+      <header className="landing-bar">
+        <span className="landing-brand">
+          <BrandMark size={22} strokeWidth={2.4} />
+          Aprendo
+        </span>
+        <div className="landing-bar-actions">
+          <ThemeToggle />
+          {isSignedIn ? null : (
+            <Link to="/login" className="landing-bar-link no-underline">
+              Entrar
+            </Link>
+          )}
+        </div>
+      </header>
 
-      {/* Centered hero */}
-      <main className="flex flex-1 flex-col items-center justify-center px-4 pb-20">
-        <div className="fade-in w-full max-w-lg text-center">
-          {/* Logo mark */}
-          <div className="mx-auto mb-8 flex h-16 w-16 items-center justify-center rounded-full border border-[var(--border-accent)] bg-[var(--accent-soft)]">
-            <BrandMark size={28} strokeWidth={2} />
+      <main>
+        {/* Hero — asymmetric on purpose: the claim leads, Nico answers it. */}
+        <section className="landing-hero">
+          <div className="landing-hero-copy">
+            <h1 className="landing-title">
+              Estudiar más no sube tu puntaje.
+              <em> Estudiar lo que te falta, sí.</em>
+            </h1>
+            <p className="landing-lede">
+              Aprendo mide en qué nivel del ICFES estás, área por área, y te dice qué practicar
+              hoy para subir al siguiente. Con preguntas reales del Saber 11.
+            </p>
+
+            <div className="landing-cta">
+              {isSignedIn ? (
+                <>
+                  <Link to="/app" className="btn-primary landing-cta-main no-underline">
+                    Continuar donde ibas
+                    <ArrowRight size={18} />
+                  </Link>
+                  <span className="landing-cta-note">Sesión activa: {session.email}</span>
+                </>
+              ) : (
+                <>
+                  <Link to="/login" className="btn-primary landing-cta-main no-underline">
+                    Empezar mi nivelación
+                    <ArrowRight size={18} />
+                  </Link>
+                  <span className="landing-cta-note">
+                    15 preguntas de un área. Sin tarjeta, sin trucos.
+                  </span>
+                </>
+              )}
+            </div>
           </div>
 
-          <h1 className="font-display mb-3 text-5xl font-normal tracking-tight text-[var(--text-primary)] sm:text-6xl">
-            Aprendo
-          </h1>
-          <p className="mx-auto mb-10 max-w-sm text-base leading-relaxed text-[var(--text-secondary)]">
-            Prepara tu Saber 11 con diagnosticos reales, seguimiento por materia y practica personalizada.
+          <div className="landing-hero-mascot">
+            <Mascot mood="idle" size="xl" />
+            <p className="landing-hero-speech">
+              Yo soy Nico.<br />
+              Te acompaño.
+            </p>
+          </div>
+        </section>
+
+        {/* What it actually tells you — real product artifacts, not icon cards.
+            Each block is a different shape because each answers a different
+            question; three identical boxes would say they were interchangeable. */}
+        <section className="landing-proof">
+          <h2 className="landing-h2">Lo que vas a saber de ti</h2>
+
+          <div className="landing-proof-grid">
+            <article className="landing-proof-level">
+              <p className="landing-proof-label">Tu nivel oficial, por área</p>
+              <p className="landing-proof-value">Nivel 3</p>
+              <div className="landing-levelbar" role="img" aria-label="Nivel 3 de 4">
+                <span className="is-on" />
+                <span className="is-on" />
+                <span className="is-on" />
+                <span />
+              </div>
+              <p className="landing-proof-note">
+                Te faltan <strong>7 puntos</strong> para Nivel 4 en Matemáticas.
+              </p>
+              <p className="landing-proof-copy">
+                Los mismos cuatro niveles que usa el ICFES y que tu colegio nombra. No un
+                porcentaje inventado.
+              </p>
+            </article>
+
+            <article className="landing-proof-score">
+              <p className="landing-proof-label">Tu puntaje global estimado</p>
+              <p className="landing-proof-value">
+                312 <span>/ 500</span>
+              </p>
+              <div className="landing-scoretrack" role="img" aria-label="Entre 297 y 327 de 500">
+                <span className="landing-scoretrack-range" />
+                <span className="landing-scoretrack-mark" />
+              </div>
+              <p className="landing-proof-note">Rango probable: 297–327</p>
+              <p className="landing-proof-copy">
+                Siempre con su margen. Un estimado hecho con 30 preguntas y uno hecho con 600 no
+                son la misma afirmación, y no te los vamos a mostrar igual.
+              </p>
+            </article>
+
+            <article className="landing-proof-confidence">
+              <p className="landing-proof-label">Qué sabes y qué adivinaste</p>
+              <ul className="landing-quadrant">
+                <li className="is-danger">
+                  <strong>Error de concepto</strong>
+                  <span>Estabas seguro y fallaste. Lo más urgente.</span>
+                </li>
+                <li className="is-warn">
+                  <strong>Frágil</strong>
+                  <span>Acertaste, pero dudando. En el examen puede no repetirse.</span>
+                </li>
+              </ul>
+              <p className="landing-proof-copy">
+                Después de responder te preguntamos si estabas seguro. Así una respuesta con
+                suerte deja de contar como dominio.
+              </p>
+            </article>
+          </div>
+        </section>
+
+        <section className="landing-close">
+          <Mascot mood="cheering" size="lg" />
+          <h2 className="landing-h2">Empieza por un área. Quince preguntas.</h2>
+          <p className="landing-close-copy">
+            No necesitas saber por dónde arrancar — para eso es la nivelación. Al terminar ya
+            tienes tu nivel y tu ruta.
           </p>
-
-          <div className="flex flex-col items-center gap-3">
-            {isReady && session ? (
-              <>
-                <Link
-                  to="/app"
-                  className="btn-primary px-8 py-3 text-base no-underline"
-                >
-                  Continuar
-                </Link>
-                <p className="mt-1 text-sm text-[var(--text-tertiary)]">
-                  Sesion activa: {session.email}
-                </p>
-                <Link
-                  to="/practice"
-                  className="btn-ghost text-sm no-underline"
-                >
-                  Ver practica guiada
-                </Link>
-              </>
-            ) : (
-              <>
-                <Link
-                  to="/login"
-                  className="btn-primary px-8 py-3 text-base no-underline"
-                >
-                  Comenzar
-                </Link>
-                <Link
-                  to="/login"
-                  className="btn-ghost text-sm no-underline"
-                >
-                  Ya tengo una sesion
-                </Link>
-              </>
-            )}
-          </div>
-        </div>
-
-        {/* Feature hints */}
-        <div className="fade-in stagger-2 mt-16 grid w-full max-w-lg gap-3 sm:grid-cols-3">
-          <div className="rounded-[var(--radius-md)] border border-[var(--border)] bg-[var(--bg-card)] px-4 py-3.5 text-center">
-            <p className="mb-1 text-sm font-semibold text-[var(--text-primary)]">Diagnostico</p>
-            <p className="text-xs leading-relaxed text-[var(--text-tertiary)]">Mide tu punto de partida</p>
-          </div>
-          <div className="rounded-[var(--radius-md)] border border-[var(--border)] bg-[var(--bg-card)] px-4 py-3.5 text-center">
-            <p className="mb-1 text-sm font-semibold text-[var(--text-primary)]">Seguimiento</p>
-            <p className="text-xs leading-relaxed text-[var(--text-tertiary)]">Progreso por materia</p>
-          </div>
-          <div className="rounded-[var(--radius-md)] border border-[var(--border)] bg-[var(--bg-card)] px-4 py-3.5 text-center">
-            <p className="mb-1 text-sm font-semibold text-[var(--text-primary)]">5 areas ICFES</p>
-            <p className="text-xs leading-relaxed text-[var(--text-tertiary)]">Cobertura completa</p>
-          </div>
-        </div>
+          <Link
+            to={isSignedIn ? '/app' : '/login'}
+            className="btn-primary landing-cta-main no-underline"
+          >
+            {isSignedIn ? 'Continuar' : 'Empezar ahora'}
+            <ArrowRight size={18} />
+          </Link>
+        </section>
       </main>
 
-      {/* Minimal footer */}
-      <footer className="px-6 pb-6 text-center text-xs text-[var(--text-tertiary)]">
-        Aprendo &mdash; preparacion ICFES Saber 11
+      <footer className="landing-footer">
+        <span>Aprendo · preparación ICFES Saber 11</span>
+        <span>Preguntas oficiales del ICFES</span>
       </footer>
     </div>
   )

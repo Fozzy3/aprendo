@@ -10,3 +10,6 @@ coverage
 apps/web/.tanstack
 apps/web/.vinxi
 packages/ingest/.artifacts
+
+# Source PDFs: public, re-downloadable, ~150MB. See content/MANIFEST.md
+content/**/*.pdf

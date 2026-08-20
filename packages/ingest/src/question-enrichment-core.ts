@@ -6,8 +6,18 @@ const ANSWER_PROMPT_VERSION = '2026-08-20.answer.v3'
 const TAXONOMY_PROMPT_VERSION = '2026-08-17.taxonomy.v2'
 const GOOGLE_MODEL_ID = 'gemini-3-flash-preview'
 
+/**
+ * Option labels the bank actually contains.
+ *
+ * Not just A-D: the official Inglés booklets use 3-option items (A-C) and
+ * matching items where five prompts share eight options (A-H). Capping the enum
+ * at D silently broke enrichment for a large part of Lectura and Inglés — the
+ * model cannot return a label it is not allowed to produce.
+ */
+const OPTION_LABELS = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'] as const
+
 const AnswerResultSchema = z.object({
-  correctOption: z.enum(['A', 'B', 'C', 'D']),
+  correctOption: z.enum(OPTION_LABELS),
   confidence: z.number().min(0).max(1),
   solutionMarkdown: z.string().min(1).optional(),
   /**
@@ -17,7 +27,7 @@ const AnswerResultSchema = z.object({
   distractorRationales: z
     .array(
       z.object({
-        label: z.enum(['A', 'B', 'C', 'D']),
+        label: z.enum(OPTION_LABELS),
         rationaleMarkdown: z.string().min(1),
       }),
     )
@@ -82,7 +92,7 @@ export interface DistractorRationale {
 }
 
 export interface QuestionAnswerResult {
-  correctOption: 'A' | 'B' | 'C' | 'D'
+  correctOption: (typeof OPTION_LABELS)[number]
   confidence: number
   solutionMarkdown?: string
   distractorRationales: DistractorRationale[]
@@ -163,6 +173,9 @@ function buildAnswerPrompt(question: EnrichmentQuestionInput) {
   return [
     'You are solving an ICFES-style multiple-choice question.',
     'Return the most likely correct option and a confidence score between 0 and 1.',
+    'Use ONLY labels that actually appear in the options below. Items are not',
+    'always A-D: the Inglés test uses 3-option items (A-C) and matching items',
+    'where several prompts share up to eight options (A-H).',
     'If the question is ambiguous or low quality, lower the confidence.',
     'Preserve Spanish and math notation when writing the solution.',
     '',

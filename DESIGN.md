@@ -98,9 +98,30 @@ animal. The owl was rejected on purpose — it belongs to Duolingo and is the
 reflex answer for every education product.
 
 Moods: `idle`, `happy`, `thinking`, `cheering`, `sleeping`. Flat shapes on a
-64×64 grid, no gradients, legible at 32px. Its fur uses tokens that belong to no
-other role, so Nico can never be confused with a state or an area. He blinks on
-an irregular cadence — a metronome blink is worse than none.
+64×64 grid, no gradients, verified legible at 40px. He blinks on an irregular
+cadence — a metronome blink is worse than none — and the head animates
+separately from the body, which is the difference between a creature and a
+sticker being waved.
+
+What the first pass got wrong, kept here because each was invisible until the
+SVG was actually rendered:
+
+- **Mid-brown fur.** The most forgettable colour a character can wear, and it
+  made him read as a generic cartoon animal. Now a deep violet-black: close
+  enough to the brand hue to belong here, dark enough to throw the cream
+  markings into hard contrast.
+- **He read as a monkey.** Large round ears perched high plus a wide cream
+  muzzle is monkey grammar. Ears are now set into the top corners and the muzzle
+  is narrower.
+- **The spectacles merged with the muzzle** into one cream mass — losing the
+  only reason this species was chosen. There is now clear fur between them.
+- **No silhouette.** He was a head floating in space; he now has shoulders and a
+  chest crescent, both real markings on the species.
+- The spectacles are **asymmetric**, which is not licence: researchers identify
+  individual spectacled bears by their face markings, no two alike.
+
+Fur, ear, marking and nose tokens belong to no other role, so Nico can never be
+confused with a state or an area.
 
 **Appears at thresholds only.** If Nico is on screen while the student is
 answering or reviewing a question, that is a bug. The review screen in

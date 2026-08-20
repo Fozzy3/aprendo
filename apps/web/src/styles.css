@@ -3615,24 +3615,28 @@ pre code {
 /* ---------------------------------------------------------------------------
    Nico, the spectacled bear.
 
-   Fur is a warm brown that belongs to no other token, so the mascot never gets
-   confused with a state or an area. The spectacle markings and muzzle use the
-   page background, which is what makes the same drawing work in both themes
-   without a second copy.
+   The fur used to be mid-brown, which is the single most forgettable colour a
+   character can wear and made him read as a generic cartoon animal. It is now a
+   deep violet-black: close enough to the brand hue to belong to this product,
+   dark enough to throw the cream markings into hard contrast, and specific
+   enough to be his.
+
+   In dark mode the fur lifts rather than inverting — a near-black bear on a
+   near-black page has no silhouette at all.
    --------------------------------------------------------------------------- */
 :root {
-  --mascot-fur: oklch(0.42 0.055 55);
-  --mascot-fur-dark: oklch(0.32 0.05 50);
-  --mascot-mark: oklch(0.93 0.035 80);
-  --mascot-nose: oklch(0.26 0.03 40);
+  --mascot-fur: oklch(0.34 0.058 300);
+  --mascot-fur-dark: oklch(0.25 0.05 300);
+  --mascot-mark: oklch(0.95 0.035 85);
+  --mascot-nose: oklch(0.17 0.03 300);
 }
 
 :root.dark,
 :root[data-theme="dark"] {
-  --mascot-fur: oklch(0.52 0.055 55);
-  --mascot-fur-dark: oklch(0.40 0.05 50);
-  --mascot-mark: oklch(0.88 0.04 80);
-  --mascot-nose: oklch(0.22 0.03 40);
+  --mascot-fur: oklch(0.47 0.07 300);
+  --mascot-fur-dark: oklch(0.36 0.06 300);
+  --mascot-mark: oklch(0.93 0.04 85);
+  --mascot-nose: oklch(0.15 0.03 300);
 }
 
 .mascot-fur { fill: var(--mascot-fur); }
@@ -3641,43 +3645,65 @@ pre code {
 .mascot-nose { fill: var(--mascot-nose); }
 .mascot-eye { fill: var(--mascot-nose); }
 .mascot-glint { fill: #fff; }
-.mascot-z { fill: var(--text-tertiary); font-family: var(--font-display); font-weight: 700; }
+.mascot-z { fill: var(--text-tertiary); font-family: var(--font-display); font-weight: 800; }
 
 .mascot-line {
   fill: none;
   stroke: var(--mascot-nose);
-  stroke-width: 2;
+  stroke-width: 2.1;
   stroke-linecap: round;
 }
 
 .mascot-line-fill { fill: var(--mascot-nose); }
+
+.mascot-limb {
+  fill: none;
+  stroke: var(--mascot-fur);
+  stroke-width: 8.5;
+  stroke-linecap: round;
+}
 
 /* A blink every few seconds. Irregular on purpose: the eyes shut twice in quick
    succession and then hold, which is how a real blink reads. A metronome blink
    is worse than none. */
 .mascot-eyes {
   animation: mascot-blink 6.5s steps(1, end) infinite;
-  transform-origin: 50% 31px;
+  transform-origin: 50% 25px;
 }
 
 .mascot-thinking .mascot-eyes { animation-duration: 4.5s; }
 
 @keyframes mascot-blink {
   0%, 92%, 95%, 97%, 100% { transform: scaleY(1); }
-  93.5%, 96% { transform: scaleY(0.1); }
+  93.5%, 96% { transform: scaleY(0.08); }
 }
 
-/* Idle breathing. Slow and small enough to register as alive rather than as an
-   animation demanding attention — this sits behind real content. */
-.mascot-idle,
-.mascot-thinking {
+/* The head moves and the body stays put. Animating the whole SVG made him look
+   like a sticker being waved; separating the two is what reads as a creature. */
+.mascot-idle .mascot-head-group {
   animation: mascot-breathe 4.5s ease-in-out infinite;
-  transform-origin: 50% 80%;
+  transform-origin: 50% 70%;
 }
 
-.mascot-cheering {
-  animation: mascot-hop 1.6s cubic-bezier(0.22, 1, 0.36, 1) infinite;
-  transform-origin: 50% 90%;
+/* Thinking tilts the head and holds, rather than bobbing. */
+.mascot-thinking .mascot-head-group {
+  animation: mascot-ponder 3.6s ease-in-out infinite;
+  transform-origin: 50% 78%;
+}
+
+.mascot-cheering .mascot-head-group,
+.mascot-cheering .mascot-body-group {
+  animation: mascot-hop 1.5s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+  transform-origin: 50% 95%;
+}
+
+/* The head lags a beat behind the body on the way up. That delay is the whole
+   difference between a jump and a lurch. */
+.mascot-cheering .mascot-head-group { animation-delay: 60ms; }
+
+.mascot-sleeping .mascot-head-group {
+  animation: mascot-doze 4.8s ease-in-out infinite;
+  transform-origin: 50% 82%;
 }
 
 .mascot-sleeping .mascot-zzz {
@@ -3685,28 +3711,40 @@ pre code {
 }
 
 @keyframes mascot-breathe {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.025); }
+  0%, 100% { transform: scale(1) translateY(0); }
+  50% { transform: scale(1.022) translateY(-0.5px); }
+}
+
+@keyframes mascot-ponder {
+  0%, 100% { transform: rotate(0deg); }
+  45%, 65% { transform: rotate(-5deg); }
 }
 
 @keyframes mascot-hop {
   0%, 55%, 100% { transform: translateY(0); }
-  25% { transform: translateY(-6%); }
+  25% { transform: translateY(-7%); }
+}
+
+@keyframes mascot-doze {
+  0%, 100% { transform: rotate(-3deg) translateY(0); }
+  50% { transform: rotate(-3deg) translateY(1.5px); }
 }
 
 @keyframes mascot-drift {
-  0%, 100% { opacity: 0.35; transform: translate(0, 0); }
-  50% { opacity: 1; transform: translate(1px, -2px); }
+  0%, 100% { opacity: 0.3; transform: translate(0, 0); }
+  50% { opacity: 1; transform: translate(1.5px, -2.5px); }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .mascot-idle,
-  .mascot-thinking,
-  .mascot-cheering,
+  .mascot-head-group,
+  .mascot-body-group,
   .mascot-eyes,
-  .mascot-sleeping .mascot-zzz {
-    animation: none;
+  .mascot-zzz {
+    animation: none !important;
   }
+  /* The one mood that would otherwise lose its meaning: keep the tilt, drop the
+     movement. */
+  .mascot-sleeping .mascot-head-group { transform: rotate(-3deg); }
 }
 
 /* The standard empty-state arrangement, so no screen invents its own. */

@@ -164,6 +164,31 @@ blue in an app whose brand is violet. `.chip-success` likewise had a literal
 green border beside a tokenised background, so the border would not have followed
 a palette change the other two properties did.
 
+## Solve screen
+
+**A question with a shared passage renders as two panels, not stacked.** Stacked,
+the student scrolled away from the text to reach the options and back up again —
+for every question, on a test where looking between the two *is* the task.
+
+Both panels scroll independently and both are capped at a readable measure. The
+passage gets the wider half (`1.12fr` against `1fr`): it is the harder read, and
+a 50/50 split rendered the options wider than the text they refer to. Below
+68rem the split collapses to stacked with the passage collapsible.
+
+Prose caps at ~68ch here as everywhere. Before this the passage ran the full
+viewport — about 170 characters a line at 1900px, where the eye loses the return
+sweep. On a reading-comprehension test that is not cosmetic; it decides whether
+the text can be read at all.
+
+**Options are one column.** Two columns made the reading order zigzag (A, across
+to B, back to C, across to D) and these options routinely wrap to four lines.
+
+**The question map is a panel, not a strip.** One dot per question worked at 15
+and fell apart past that — a simulacro is 120-134 questions, where a single row
+of dots is neither scannable nor clickable. It opens on demand as a numbered
+grid; the header already carries progress, so nothing is lost by keeping it
+closed.
+
 ## Containers
 
 - Student shell: `min(1320px, 100% - 2rem)`

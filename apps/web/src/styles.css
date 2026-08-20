@@ -2817,11 +2817,12 @@ pre code {
   gap: 0.7rem;
 }
 
-@container solvemain (min-width: 42rem) {
-  .solve-options {
-    grid-template-columns: 1fr 1fr;
-  }
-}
+/* Options stay in one column.
+
+   Two columns made the reading order zigzag — A then across to B, back to C,
+   across to D — and options on this test routinely wrap to four lines. Worse,
+   the split layout halves the available width, so a two-column grid there would
+   leave each option about 20 characters wide. */
 
 .solve-option {
   align-items: flex-start;
@@ -2915,44 +2916,7 @@ pre code {
   cursor: not-allowed;
 }
 
-.solve-map {
-  display: flex;
-  align-items: center;
-  gap: 0.32rem;
-  min-width: 0;
-  overflow-x: auto;
-  scrollbar-width: none;
-  padding: 0.2rem;
-}
 
-.solve-map::-webkit-scrollbar {
-  display: none;
-}
-
-.solve-map-dot {
-  width: 0.85rem;
-  height: 0.85rem;
-  flex-shrink: 0;
-  border-radius: 999px;
-  border: 1px solid var(--border-strong);
-  background: var(--bg-inset);
-  cursor: pointer;
-  transition: transform 140ms ease, background 140ms ease, border-color 140ms ease;
-}
-
-.solve-map-dot:hover {
-  transform: scale(1.15);
-}
-
-.solve-map-dot.is-answered {
-  background: var(--accent);
-  border-color: var(--accent);
-}
-
-.solve-map-dot.is-current {
-  outline: 2px solid var(--accent);
-  outline-offset: 2px;
-}
 
 /* ═══════════════════════════════════════════════════════════════
    Unified sessions — diagnostic gate hosts the solve surface
@@ -3220,9 +3184,11 @@ pre code {
   margin-top: 0.75rem;
   padding-top: 0.75rem;
   border-top: 1px solid var(--border);
-  /* Long passages (Lectura Crítica) shouldn't push the options off-screen. */
-  max-height: 22rem;
   overflow-y: auto;
+  /* 68ch, not the full viewport. At 1900px the passage ran ~170 characters per
+     line and the eye lost the return sweep — on a reading-comprehension test
+     that is not a cosmetic problem, it decides whether the text can be read. */
+  max-width: 68ch;
 }
 
 /* Label in front of a chip group, e.g. "Examen completo" / "Por área". */
@@ -4253,4 +4219,189 @@ pre code {
 
 @media (prefers-reduced-motion: reduce) {
   .page-loader-dots span { animation: none; opacity: 0.7; }
+}
+
+
+/* ---------------------------------------------------------------------------
+   Solve screen: passage beside the question, not above it.
+
+   Stacked, the student scrolled away from the text to reach the options and
+   back up again for every single question — on a reading test, where looking
+   between the two is the actual task. Two panels, each scrolling on its own,
+   each capped at a readable measure.
+   --------------------------------------------------------------------------- */
+.solve-main.is-split {
+  display: grid;
+  /* The passage gets the wider half. It is the harder read and the one the
+     student returns to; a 50/50 split rendered the options *wider* than the
+     text they refer to, which is backwards. */
+  grid-template-columns: minmax(0, 1.12fr) minmax(0, 1fr);
+  gap: 0;
+  overflow: hidden;
+}
+
+/* Both columns hold a comfortable measure. Inside the split the panel is about
+   half as wide as the page, so the 50rem cap the stacked layout uses no longer
+   binds and the text would run the full panel. */
+.solve-main.is-split .solve-question,
+.solve-main.is-split .solve-options {
+  max-width: 38rem;
+}
+
+.solve-main.is-split > .shared-stimulus {
+  margin: 0;
+  min-height: 0;
+  overflow-y: auto;
+  border: 0;
+  border-right: 2px solid var(--border);
+  border-radius: 0;
+  padding: 1.25rem clamp(1rem, 2.5vw, 2rem);
+  background: var(--bg-warm);
+}
+
+.solve-main.is-split > .shared-stimulus .shared-stimulus-body {
+  max-height: none;
+  overflow: visible;
+  margin-inline: auto;
+}
+
+.solve-main.is-split > .solve-work {
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding-bottom: 1rem;
+}
+
+.solve-work { min-width: 0; }
+
+/* Below this the two panels are each too narrow to read, so it goes back to
+   stacked — with the passage collapsible, which is what `<details>` already
+   gives us. */
+@media (max-width: 68rem) {
+  .solve-main.is-split {
+    display: block;
+    overflow-y: auto;
+  }
+  .solve-main.is-split > .shared-stimulus {
+    border-right: 0;
+    border-bottom: 2px solid var(--border);
+  }
+  .solve-main.is-split > .shared-stimulus .shared-stimulus-body {
+    max-height: 40vh;
+    overflow-y: auto;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Question map.
+
+   One dot per question is fine at 15 and unusable at 134, which is what a
+   simulacro actually is. Numbers in a grid can be read and hit; a strip of 134
+   dots can be neither. It opens on demand — the header already carries
+   progress, so nothing is lost by keeping it closed.
+   --------------------------------------------------------------------------- */
+.solve-map-wrap { position: relative; }
+
+.solve-map-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.45rem 0.8rem;
+  font-size: 0.8125rem;
+  color: var(--text-secondary);
+  background: var(--bg-inset);
+  border: 2px solid transparent;
+  border-radius: var(--radius-pill);
+}
+
+.solve-map-toggle:hover { color: var(--text-primary); }
+.solve-map-toggle[aria-expanded='true'] {
+  color: var(--text-primary);
+  border-color: var(--accent);
+}
+.solve-map-toggle strong { color: var(--text-primary); }
+
+/* Sits above the footer and closes on an outside click. */
+.solve-map-scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  background: transparent;
+  cursor: default;
+}
+
+.solve-map-panel {
+  position: absolute;
+  bottom: calc(100% + 0.6rem);
+  left: 50%;
+  z-index: 41;
+  width: min(28rem, calc(100vw - 2rem));
+  transform: translateX(-50%);
+  padding: 0.9rem;
+  background: var(--bg-card);
+  border: 2px solid var(--border-hard);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+}
+
+.solve-map-legend {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin-bottom: 0.6rem;
+  font-size: 0.7rem;
+  color: var(--text-tertiary);
+}
+
+.solve-map-key {
+  display: inline-block;
+  height: 0.6rem;
+  width: 0.6rem;
+  margin-left: 0.5rem;
+  border-radius: 0.18rem;
+  border: 1px solid var(--border-strong);
+  background: var(--bg-inset);
+}
+.solve-map-legend .solve-map-key:first-child { margin-left: 0; }
+.solve-map-key.is-answered { background: var(--accent); border-color: var(--accent); }
+
+.solve-map-grid {
+  display: grid;
+  /* Fixed track width so the columns stay aligned whether there are 15 cells
+     or 134, and the whole grid scrolls rather than shrinking the cells. */
+  grid-template-columns: repeat(auto-fill, minmax(2.1rem, 1fr));
+  gap: 0.3rem;
+  max-height: 42vh;
+  overflow-y: auto;
+}
+
+.solve-map-cell {
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  background: var(--bg-inset);
+  border: 1px solid var(--border-strong);
+  /* A fixed small radius, not --radius-sm: on a 34px cell that token rounds
+     almost to a circle, and circles read as a scatter rather than as a grid. */
+  border-radius: 0.35rem;
+  transition: transform 120ms ease;
+}
+
+.solve-map-cell:hover { transform: translateY(-1px); color: var(--text-primary); }
+.solve-map-cell.is-answered {
+  color: var(--text-inverted);
+  background: var(--accent);
+  border-color: var(--accent);
+}
+.solve-map-cell.is-current {
+  outline: 2px solid var(--text-primary);
+  outline-offset: 1px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .solve-map-cell:hover { transform: none; }
 }

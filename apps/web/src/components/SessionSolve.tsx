@@ -1,6 +1,6 @@
 import { useConvexMutation } from '@convex-dev/react-query'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { ChevronLeft, ChevronRight, Hourglass, Timer, X } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Hourglass, LayoutGrid, Timer, X } from 'lucide-react'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { api } from '@aprendo/convex/api'
 import MarkdownBlock from './MarkdownBlock.tsx'
@@ -28,6 +28,7 @@ type SessionSolveProps = {
 export function SessionSolve({ sessionId, onExit, onCompleted }: SessionSolveProps) {
   const queryClient = useQueryClient()
   const [currentIndex, setCurrentIndex] = useState(0)
+  const [isMapOpen, setIsMapOpen] = useState(false)
   const questionStartedAtRef = useRef(Date.now())
 
   const submitAnswer = useConvexMutation(api.sessions.submitAnswer)
@@ -167,6 +168,11 @@ export function SessionSolve({ sessionId, onExit, onCompleted }: SessionSolvePro
       ) {
         return
       }
+      if (event.key === 'Escape' && isMapOpen) {
+        event.preventDefault()
+        setIsMapOpen(false)
+        return
+      }
       if (event.key === 'ArrowLeft') {
         goPrev()
         return
@@ -186,7 +192,7 @@ export function SessionSolve({ sessionId, onExit, onCompleted }: SessionSolvePro
     }
     window.addEventListener('keydown', handler)
     return () => window.removeEventListener('keydown', handler)
-  }, [current, goNext, goPrev, selectOption])
+  }, [current, goNext, goPrev, isMapOpen, selectOption])
 
   if (query.isPending || session == null) {
     return (
@@ -265,9 +271,10 @@ export function SessionSolve({ sessionId, onExit, onCompleted }: SessionSolvePro
         </div>
       </header>
 
-      <main className="solve-main">
+      <main className={`solve-main${current.group != null ? ' is-split' : ''}`}>
         {current.group != null ? <SharedStimulus group={current.group} /> : null}
 
+        <div className="solve-work">
         <article className="solve-question">
           <MarkdownBlock markdown={current.question.bodyMarkdown} />
         </article>
@@ -338,6 +345,7 @@ export function SessionSolve({ sessionId, onExit, onCompleted }: SessionSolvePro
           <kbd>→</kbd>
           <span>navegar</span>
         </p>
+        </div>
       </main>
 
       <footer className="solve-footer">
@@ -351,24 +359,69 @@ export function SessionSolve({ sessionId, onExit, onCompleted }: SessionSolvePro
           <span className="max-sm:hidden">Anterior</span>
         </button>
 
-        <nav className="solve-map" aria-label={`${answeredCount} de ${questions.length} respondidas`}>
-          {questions.map((question, index) => (
-            <button
-              key={question.sessionQuestionId}
-              type="button"
-              className={[
-                'solve-map-dot',
-                question.attempt?.selectedOption != null ? 'is-answered' : '',
-                index === currentIndex ? 'is-current' : '',
-              ]
-                .filter(Boolean)
-                .join(' ')}
-              onClick={() => setCurrentIndex(index)}
-              aria-label={`Ir a la pregunta ${index + 1}`}
-              aria-current={index === currentIndex ? 'true' : undefined}
-            />
-          ))}
-        </nav>
+        {/* A dot per question worked at 15 and fell apart past that; a simulacro
+            runs 120-134, where a single row of dots is neither scannable nor
+            clickable. The map moves into a panel that only opens on demand, as
+            a numbered grid — 134 numbers in a grid can be read, 134 dots in a
+            strip cannot. Progress itself already lives in the header. */}
+        <div className="solve-map-wrap">
+          <button
+            type="button"
+            className="solve-map-toggle"
+            onClick={() => setIsMapOpen((open) => !open)}
+            aria-expanded={isMapOpen}
+            aria-controls="solve-map-panel"
+          >
+            <LayoutGrid size={15} />
+            <span>
+              <strong>{answeredCount}</strong>/{questions.length}
+            </span>
+            <span className="max-sm:hidden">respondidas</span>
+          </button>
+
+          {isMapOpen ? (
+            <>
+              <button
+                type="button"
+                className="solve-map-scrim"
+                aria-label="Cerrar el mapa de preguntas"
+                onClick={() => setIsMapOpen(false)}
+              />
+              <div className="solve-map-panel" id="solve-map-panel">
+                <p className="solve-map-legend">
+                  <span className="solve-map-key is-answered" aria-hidden /> respondida
+                  <span className="solve-map-key" aria-hidden /> sin responder
+                </p>
+                <nav
+                  className="solve-map-grid"
+                  aria-label={`${answeredCount} de ${questions.length} respondidas`}
+                >
+                  {questions.map((question, index) => (
+                    <button
+                      key={question.sessionQuestionId}
+                      type="button"
+                      className={[
+                        'solve-map-cell',
+                        question.attempt?.selectedOption != null ? 'is-answered' : '',
+                        index === currentIndex ? 'is-current' : '',
+                      ]
+                        .filter(Boolean)
+                        .join(' ')}
+                      onClick={() => {
+                        setCurrentIndex(index)
+                        setIsMapOpen(false)
+                      }}
+                      aria-label={`Ir a la pregunta ${index + 1}`}
+                      aria-current={index === currentIndex ? 'true' : undefined}
+                    >
+                      {index + 1}
+                    </button>
+                  ))}
+                </nav>
+              </div>
+            </>
+          ) : null}
+        </div>
 
         {isLast ? (
           <button

@@ -1,0 +1,173 @@
+{
+  "name": "saber11_performance_levels",
+  "version": "2026-08-17",
+  "release": "v1",
+  "notes": [
+    "Official ICFES Saber 11 performance levels, expressed as cut points over the 0-100 per-area score.",
+    "Lectura Critica, Matematicas, Sociales y Ciudadanas and Ciencias Naturales use levels 1-4.",
+    "Ingles uses the CEFR-aligned bands Pre A1, A1, A2 and B1 (B1 is the highest the test reports).",
+    "VERIFIED 2026-08-19 against the official ICFES level sheets published 2025-09-22 at",
+    "https://www.icfes.gov.co/wp-content/uploads/2025/09/22-septiembre-nd-prueba-<area>-saber-11.pdf",
+    "(lectura-critica 0-35/36-50/51-65/66-100, matematicas 0-35/36-50/51-70/71-100,",
+    "ciencias-naturales and sociales-y-ciudadanas 0-40/41-55/56-70/71-100, ingles 0-36/37-57/58-70/71-100).",
+    "Re-verify when ICFES publishes a new level sheet.",
+    "They live here, and not in code, precisely so they can be corrected without a code change.",
+    "`minScore` is inclusive. Bands must be listed in ascending order and cover 0-100 with no gaps.",
+    "`evidence.minAttempts` is the number of graded attempts required in an area before a level is claimed at all."
+  ],
+  "evidence": {
+    "minAttempts": 12
+  },
+  "subjects": [
+    {
+      "id": "lectura_critica",
+      "scale": "numeric_1_4",
+      "bands": [
+        {
+          "id": "1",
+          "label_es": "Nivel 1",
+          "minScore": 0,
+          "descriptor_es": "Identificas información explícita en textos cortos y sencillos, pero todavía te cuesta relacionar ideas o interpretar lo que el texto sugiere."
+        },
+        {
+          "id": "2",
+          "label_es": "Nivel 2",
+          "minScore": 36,
+          "descriptor_es": "Comprendes el sentido general de un texto y reconoces su tema, aunque aún se te escapan las relaciones entre partes y las intenciones del autor."
+        },
+        {
+          "id": "3",
+          "label_es": "Nivel 3",
+          "minScore": 51,
+          "descriptor_es": "Interpretas el texto más allá de lo literal: infieres, relacionas ideas entre párrafos y reconoces la postura de quien escribe."
+        },
+        {
+          "id": "4",
+          "label_es": "Nivel 4",
+          "minScore": 66,
+          "descriptor_es": "Evalúas y contrastas textos: valoras argumentos, detectas supuestos y reflexionas críticamente sobre lo que lees."
+        }
+      ]
+    },
+    {
+      "id": "matematicas",
+      "scale": "numeric_1_4",
+      "bands": [
+        {
+          "id": "1",
+          "label_es": "Nivel 1",
+          "minScore": 0,
+          "descriptor_es": "Resuelves operaciones directas y lees datos sencillos de una tabla, pero todavía no traduces situaciones a lenguaje matemático."
+        },
+        {
+          "id": "2",
+          "label_es": "Nivel 2",
+          "minScore": 36,
+          "descriptor_es": "Usas procedimientos conocidos en situaciones familiares y comparas cantidades, aunque los problemas de varios pasos aún se te complican."
+        },
+        {
+          "id": "3",
+          "label_es": "Nivel 3",
+          "minScore": 51,
+          "descriptor_es": "Modelas situaciones con expresiones y gráficas, y resuelves problemas que requieren encadenar varios pasos."
+        },
+        {
+          "id": "4",
+          "label_es": "Nivel 4",
+          "minScore": 71,
+          "descriptor_es": "Justificas tus procedimientos, validas resultados y resuelves problemas no rutinarios combinando distintas herramientas matemáticas."
+        }
+      ]
+    },
+    {
+      "id": "ciencias_naturales",
+      "scale": "numeric_1_4",
+      "bands": [
+        {
+          "id": "1",
+          "label_es": "Nivel 1",
+          "minScore": 0,
+          "descriptor_es": "Reconoces conceptos científicos básicos y lees datos de un gráfico simple, pero todavía no los usas para explicar fenómenos."
+        },
+        {
+          "id": "2",
+          "label_es": "Nivel 2",
+          "minScore": 41,
+          "descriptor_es": "Relacionas conceptos con situaciones cotidianas e interpretas representaciones sencillas de un fenómeno."
+        },
+        {
+          "id": "3",
+          "label_es": "Nivel 3",
+          "minScore": 56,
+          "descriptor_es": "Explicas fenómenos usando modelos científicos y analizas datos experimentales para sacar conclusiones."
+        },
+        {
+          "id": "4",
+          "label_es": "Nivel 4",
+          "minScore": 71,
+          "descriptor_es": "Evalúas diseños experimentales, distingues causa de correlación y argumentas con evidencia científica."
+        }
+      ]
+    },
+    {
+      "id": "sociales_ciudadanas",
+      "scale": "numeric_1_4",
+      "bands": [
+        {
+          "id": "1",
+          "label_es": "Nivel 1",
+          "minScore": 0,
+          "descriptor_es": "Reconoces derechos, deberes e instituciones básicas, pero aún no relacionas un hecho social con su contexto."
+        },
+        {
+          "id": "2",
+          "label_es": "Nivel 2",
+          "minScore": 41,
+          "descriptor_es": "Ubicas situaciones en su contexto histórico o social e identificas a quiénes afectan."
+        },
+        {
+          "id": "3",
+          "label_es": "Nivel 3",
+          "minScore": 56,
+          "descriptor_es": "Analizas problemas sociales desde varias perspectivas y reconoces los intereses detrás de cada postura."
+        },
+        {
+          "id": "4",
+          "label_es": "Nivel 4",
+          "minScore": 71,
+          "descriptor_es": "Evalúas argumentos sobre asuntos públicos, detectas falacias y valoras las consecuencias de distintas decisiones."
+        }
+      ]
+    },
+    {
+      "id": "ingles",
+      "scale": "cefr",
+      "bands": [
+        {
+          "id": "PreA1",
+          "label_es": "Pre A1",
+          "minScore": 0,
+          "descriptor_es": "Reconoces vocabulario básico de tu entorno y entiendes oraciones, preguntas o instrucciones muy simples."
+        },
+        {
+          "id": "A1",
+          "label_es": "A1",
+          "minScore": 37,
+          "descriptor_es": "Entiendes enunciados sencillos sobre situaciones cotidianas: información personal, saludos, indicaciones de lugares y avisos cortos."
+        },
+        {
+          "id": "A2",
+          "label_es": "A2",
+          "minScore": 58,
+          "descriptor_es": "Comprendes información específica en textos informativos y descriptivos sencillos sobre personas, lugares o situaciones familiares."
+        },
+        {
+          "id": "B1",
+          "label_es": "B1",
+          "minScore": 71,
+          "descriptor_es": "Comprendes textos sobre temas generales y específicos, infieres el significado de palabras desconocidas por el contexto y captas puntos de vista."
+        }
+      ]
+    }
+  ]
+}

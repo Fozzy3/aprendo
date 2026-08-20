@@ -1,0 +1,520 @@
+{
+  "taxonomy_name": "saber11_question_taxonomy",
+  "taxonomy_version": "2026-03-14",
+  "taxonomy_release": "v1_minimal",
+  "source_research_document": "docs/taxonomy-research.md",
+  "levels": ["subject", "category", "subtopic"],
+  "tagging_rules": {
+    "primary_subtopic_required": true,
+    "max_secondary_subtopics": 2,
+    "secondary_subtopics_optional": true,
+    "secondary_dimensions_optional": true
+  },
+  "subjects": [
+    {
+      "id": "lectura_critica",
+      "label_es": "Lectura Critica",
+      "slug_en": "critical_reading",
+      "origin": "official",
+      "categories": [
+        {
+          "id": "lectura_critica.literal_comprehension",
+          "label_es": "Comprension literal",
+          "slug_en": "literal_comprehension",
+          "origin": "derived",
+          "subtopics": [
+            {
+              "id": "lectura_critica.literal_comprehension.word_phrase_meaning",
+              "label_es": "Significado de palabras y expresiones",
+              "slug_en": "word_phrase_meaning",
+              "origin": "derived"
+            },
+            {
+              "id": "lectura_critica.literal_comprehension.explicit_details",
+              "label_es": "Hechos y detalles explicitos",
+              "slug_en": "explicit_details",
+              "origin": "derived"
+            }
+          ]
+        },
+        {
+          "id": "lectura_critica.structure_cohesion_multimodal",
+          "label_es": "Estructura, cohesion y textos discontinuos",
+          "slug_en": "structure_cohesion_multimodal",
+          "origin": "derived",
+          "subtopics": [
+            {
+              "id": "lectura_critica.structure_cohesion_multimodal.text_structure_parts",
+              "label_es": "Estructura y funcion de partes",
+              "slug_en": "text_structure_parts",
+              "origin": "derived"
+            },
+            {
+              "id": "lectura_critica.structure_cohesion_multimodal.logical_links_connectors",
+              "label_es": "Relaciones logicas y conectores",
+              "slug_en": "logical_links_connectors",
+              "origin": "derived"
+            }
+          ]
+        },
+        {
+          "id": "lectura_critica.voices_perspective",
+          "label_es": "Voces y perspectiva",
+          "slug_en": "voices_perspective",
+          "origin": "derived",
+          "subtopics": [
+            {
+              "id": "lectura_critica.voices_perspective.voices_speakers",
+              "label_es": "Identificacion de voces/enunciadores",
+              "slug_en": "voices_speakers",
+              "origin": "official"
+            }
+          ]
+        },
+        {
+          "id": "lectura_critica.critical_evaluation",
+          "label_es": "Evaluacion critica del contenido",
+          "slug_en": "critical_evaluation",
+          "origin": "derived",
+          "subtopics": [
+            {
+              "id": "lectura_critica.critical_evaluation.validity_implications",
+              "label_es": "Validez e implicaciones de enunciados",
+              "slug_en": "validity_implications",
+              "origin": "official"
+            },
+            {
+              "id": "lectura_critica.critical_evaluation.evaluative_content_bias",
+              "label_es": "Contenidos valorativos y sesgo",
+              "slug_en": "evaluative_content_bias",
+              "origin": "official"
+            }
+          ]
+        },
+        {
+          "id": "lectura_critica.context_intertextuality",
+          "label_es": "Contexto e intertextualidad",
+          "slug_en": "context_intertextuality",
+          "origin": "derived",
+          "subtopics": [
+            {
+              "id": "lectura_critica.context_intertextuality.contextualization",
+              "label_es": "Contextualizacion historica/cultural/situacional",
+              "slug_en": "contextualization",
+              "origin": "official"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "matematicas",
+      "label_es": "Matematicas",
+      "slug_en": "mathematics",
+      "origin": "official",
+      "categories": [
+        {
+          "id": "matematicas.number_proportionality",
+          "label_es": "Numero y proporcionalidad",
+          "slug_en": "number_proportionality",
+          "origin": "derived",
+          "subtopics": [
+            {
+              "id": "matematicas.number_proportionality.ratios_proportions_percent",
+              "label_es": "Razones, proporciones y porcentajes",
+              "slug_en": "ratios_proportions_percent",
+              "origin": "derived"
+            }
+          ]
+        },
+        {
+          "id": "matematicas.algebra_equations",
+          "label_es": "Algebra y ecuaciones",
+          "slug_en": "algebra_equations",
+          "origin": "derived",
+          "subtopics": [
+            {
+              "id": "matematicas.algebra_equations.equations_inequalities",
+              "label_es": "Ecuaciones e inecuaciones",
+              "slug_en": "equations_inequalities",
+              "origin": "derived"
+            }
+          ]
+        },
+        {
+          "id": "matematicas.functions_variation",
+          "label_es": "Funciones y variacion",
+          "slug_en": "functions_variation",
+          "origin": "derived",
+          "subtopics": [
+            {
+              "id": "matematicas.functions_variation.functions_graphs",
+              "label_es": "Funciones y graficas",
+              "slug_en": "functions_graphs",
+              "origin": "derived"
+            }
+          ]
+        },
+        {
+          "id": "matematicas.geometry_measurement",
+          "label_es": "Geometria y medicion",
+          "slug_en": "geometry_measurement",
+          "origin": "derived",
+          "subtopics": [
+            {
+              "id": "matematicas.geometry_measurement.plane_geometry",
+              "label_es": "Geometria plana",
+              "slug_en": "plane_geometry",
+              "origin": "derived"
+            },
+            {
+              "id": "matematicas.geometry_measurement.perimeter_area_volume",
+              "label_es": "Perimetro, area y volumen",
+              "slug_en": "perimeter_area_volume",
+              "origin": "derived"
+            }
+          ]
+        },
+        {
+          "id": "matematicas.data_statistics_chance",
+          "label_es": "Datos, estadistica y azar",
+          "slug_en": "data_statistics_chance",
+          "origin": "derived",
+          "subtopics": [
+            {
+              "id": "matematicas.data_statistics_chance.tables_graphs_interpretation",
+              "label_es": "Interpretacion de tablas y graficas",
+              "slug_en": "tables_graphs_interpretation",
+              "origin": "derived"
+            },
+            {
+              "id": "matematicas.data_statistics_chance.probability_counting",
+              "label_es": "Probabilidad y conteo",
+              "slug_en": "probability_counting",
+              "origin": "derived"
+            }
+          ]
+        },
+        {
+          "id": "matematicas.modeling_verification",
+          "label_es": "Modelacion y verificacion",
+          "slug_en": "modeling_verification",
+          "origin": "product_specific",
+          "subtopics": [
+            {
+              "id": "matematicas.modeling_verification.modeling_word_problems",
+              "label_es": "Modelacion de situaciones",
+              "slug_en": "modeling_word_problems",
+              "origin": "derived"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ciencias_naturales",
+      "label_es": "Ciencias Naturales",
+      "slug_en": "natural_sciences",
+      "origin": "official",
+      "categories": [
+        {
+          "id": "ciencias_naturales.biology_component",
+          "label_es": "Componente biologico",
+          "slug_en": "biology_component",
+          "origin": "official",
+          "subtopics": [
+            {
+              "id": "ciencias_naturales.biology_component.ecology_evolution_biodiversity",
+              "label_es": "Ecologia, evolucion y biodiversidad",
+              "slug_en": "ecology_evolution_biodiversity",
+              "origin": "derived"
+            }
+          ]
+        },
+        {
+          "id": "ciencias_naturales.physics_component",
+          "label_es": "Componente fisico",
+          "slug_en": "physics_component",
+          "origin": "official",
+          "subtopics": [
+            {
+              "id": "ciencias_naturales.physics_component.motion_forces_dynamics",
+              "label_es": "Movimiento, fuerzas y dinamica",
+              "slug_en": "motion_forces_dynamics",
+              "origin": "derived"
+            },
+            {
+              "id": "ciencias_naturales.physics_component.energy_heat_transformations",
+              "label_es": "Energia, calor y transformaciones",
+              "slug_en": "energy_heat_transformations",
+              "origin": "derived"
+            }
+          ]
+        },
+        {
+          "id": "ciencias_naturales.chemistry_component",
+          "label_es": "Componente quimico",
+          "slug_en": "chemistry_component",
+          "origin": "official",
+          "subtopics": [
+            {
+              "id": "ciencias_naturales.chemistry_component.chemical_changes_reactions",
+              "label_es": "Cambios quimicos y reacciones",
+              "slug_en": "chemical_changes_reactions",
+              "origin": "derived"
+            }
+          ]
+        },
+        {
+          "id": "ciencias_naturales.science_tech_society",
+          "label_es": "Ciencia, tecnologia y sociedad",
+          "slug_en": "science_tech_society",
+          "origin": "official",
+          "subtopics": [
+            {
+              "id": "ciencias_naturales.science_tech_society.environment_sustainability",
+              "label_es": "Ambiente y sostenibilidad",
+              "slug_en": "environment_sustainability",
+              "origin": "derived"
+            }
+          ]
+        },
+        {
+          "id": "ciencias_naturales.scientific_skills",
+          "label_es": "Habilidades cientificas",
+          "slug_en": "scientific_skills",
+          "origin": "product_specific",
+          "subtopics": [
+            {
+              "id": "ciencias_naturales.scientific_skills.data_interpretation_conclusions",
+              "label_es": "Interpretacion de datos y conclusiones",
+              "slug_en": "data_interpretation_conclusions",
+              "origin": "official"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "sociales_ciudadanas",
+      "label_es": "Sociales y Ciudadanas",
+      "slug_en": "social_and_civic",
+      "origin": "official",
+      "categories": [
+        {
+          "id": "sociales_ciudadanas.history_temporality",
+          "label_es": "Historia y temporalidades",
+          "slug_en": "history_temporality",
+          "origin": "derived",
+          "subtopics": [
+            {
+              "id": "sociales_ciudadanas.history_temporality.historical_causality_consequences",
+              "label_es": "Causalidad historica y consecuencias",
+              "slug_en": "historical_causality_consequences",
+              "origin": "derived"
+            }
+          ]
+        },
+        {
+          "id": "sociales_ciudadanas.state_democracy_participation",
+          "label_es": "Estado, democracia y participacion",
+          "slug_en": "state_democracy_participation",
+          "origin": "derived",
+          "subtopics": [
+            {
+              "id": "sociales_ciudadanas.state_democracy_participation.social_rule_of_law_constitution",
+              "label_es": "Estado Social de Derecho y Constitucion",
+              "slug_en": "social_rule_of_law_constitution",
+              "origin": "official"
+            },
+            {
+              "id": "sociales_ciudadanas.state_democracy_participation.state_branches_accountability",
+              "label_es": "Organizacion del Estado y control ciudadano",
+              "slug_en": "state_branches_accountability",
+              "origin": "official"
+            }
+          ]
+        },
+        {
+          "id": "sociales_ciudadanas.sources_perspectives_argumentation",
+          "label_es": "Fuentes, perspectivas y argumentacion social",
+          "slug_en": "sources_perspectives_argumentation",
+          "origin": "derived",
+          "subtopics": [
+            {
+              "id": "sociales_ciudadanas.sources_perspectives_argumentation.primary_secondary_sources",
+              "label_es": "Fuentes primarias y secundarias",
+              "slug_en": "primary_secondary_sources",
+              "origin": "official"
+            },
+            {
+              "id": "sociales_ciudadanas.sources_perspectives_argumentation.actor_group_perspectives",
+              "label_es": "Perspectivas de actores y grupos",
+              "slug_en": "actor_group_perspectives",
+              "origin": "official"
+            }
+          ]
+        },
+        {
+          "id": "sociales_ciudadanas.systems_thinking_decisions",
+          "label_es": "Pensamiento sistemico y decisiones",
+          "slug_en": "systems_thinking_decisions",
+          "origin": "derived",
+          "subtopics": [
+            {
+              "id": "sociales_ciudadanas.systems_thinking_decisions.cross_dimension_relations",
+              "label_es": "Relaciones entre dimensiones de un problema",
+              "slug_en": "cross_dimension_relations",
+              "origin": "official"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ingles",
+      "label_es": "Ingles",
+      "slug_en": "english",
+      "origin": "official",
+      "categories": [
+        {
+          "id": "ingles.lexis",
+          "label_es": "Lexico",
+          "slug_en": "lexis",
+          "origin": "derived",
+          "subtopics": [
+            {
+              "id": "ingles.lexis.vocab_definitions",
+              "label_es": "Vocabulario y definiciones",
+              "slug_en": "vocab_definitions",
+              "origin": "derived"
+            }
+          ]
+        },
+        {
+          "id": "ingles.grammar_language_use",
+          "label_es": "Gramatica y uso del lenguaje",
+          "slug_en": "grammar_language_use",
+          "origin": "derived",
+          "subtopics": [
+            {
+              "id": "ingles.grammar_language_use.verb_tenses_forms",
+              "label_es": "Tiempos verbales y formas verbales",
+              "slug_en": "verb_tenses_forms",
+              "origin": "derived"
+            }
+          ]
+        },
+        {
+          "id": "ingles.pragmatics_functions",
+          "label_es": "Pragmatica y funciones comunicativas",
+          "slug_en": "pragmatics_functions",
+          "origin": "derived",
+          "subtopics": [
+            {
+              "id": "ingles.pragmatics_functions.notices_instructions_signage",
+              "label_es": "Avisos, instrucciones y senaletica",
+              "slug_en": "notices_instructions_signage",
+              "origin": "derived"
+            }
+          ]
+        },
+        {
+          "id": "ingles.reading_literal",
+          "label_es": "Comprension lectora literal",
+          "slug_en": "reading_literal",
+          "origin": "derived",
+          "subtopics": [
+            {
+              "id": "ingles.reading_literal.explicit_info_paraphrase",
+              "label_es": "Informacion explicita y parafraseo",
+              "slug_en": "explicit_info_paraphrase",
+              "origin": "derived"
+            }
+          ]
+        },
+        {
+          "id": "ingles.reading_inferential",
+          "label_es": "Comprension lectora inferencial",
+          "slug_en": "reading_inferential",
+          "origin": "derived",
+          "subtopics": [
+            {
+              "id": "ingles.reading_inferential.inferences_conclusions",
+              "label_es": "Inferencias y conclusiones",
+              "slug_en": "inferences_conclusions",
+              "origin": "derived"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "secondary_dimensions": {
+    "competencia_oficial": {
+      "description": "Single-select tags that preserve official ICFES competency reporting. Not part of the 3-level taxonomy.",
+      "values": {
+        "matematicas": [
+          "interpretacion_representacion",
+          "formulacion_ejecucion",
+          "argumentacion"
+        ],
+        "sociales_ciudadanas": [
+          "pensamiento_social",
+          "analisis_perspectivas",
+          "pensamiento_reflexivo_sistemico"
+        ],
+        "ciencias_naturales": [
+          "uso_comprensivo",
+          "explicacion_fenomenos",
+          "indagacion"
+        ],
+        "lectura_critica": [
+          "afirmacion_1_local",
+          "afirmacion_2_global",
+          "afirmacion_3_critica"
+        ],
+        "ingles": [
+          "linguistica",
+          "pragmatica",
+          "sociolinguistica"
+        ]
+      }
+    },
+    "stimulus_type": {
+      "description": "Multi-select. Useful for recommendations and error diagnosis across subjects.",
+      "values": [
+        "texto_continuo",
+        "texto_discontinuo",
+        "texto_mixto",
+        "tabla",
+        "grafica",
+        "diagrama_geometrico",
+        "mapa",
+        "caricatura_comic",
+        "experimento_descripcion",
+        "fuente_primaria_excerpt",
+        "fuente_secundaria_excerpt",
+        "aviso_sign_notice",
+        "dialogo",
+        "articulo"
+      ]
+    },
+    "reading_load": {
+      "description": "Single-select. Approximate based on word count and syntactic complexity.",
+      "values": ["baja", "media", "alta"]
+    },
+    "calculation_load": {
+      "description": "Single-select for Math and Science. Captures arithmetic burden separate from concept difficulty.",
+      "values": ["baja", "media", "alta"]
+    },
+    "multi_step_reasoning": {
+      "description": "Single-select. Indicates if more than one inferential step is needed.",
+      "values": ["uno", "dos_o_mas"]
+    },
+    "cefr_band": {
+      "description": "English-only, derived. Optional coarse placement for sequencing.",
+      "values": ["pre_a1", "a1", "a2", "b1_o_mas"]
+    }
+  }
+}

@@ -1,0 +1,12 @@
+node_modules
+bun.lockb
+.turbo
+dist
+.DS_Store
+.env
+.env.local
+.env.*.local
+coverage
+apps/web/.tanstack
+apps/web/.vinxi
+packages/ingest/.artifacts

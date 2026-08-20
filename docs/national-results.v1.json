@@ -1,0 +1,95 @@
+{
+  "name": "saber11_national_results",
+  "version": "2026-08-20",
+  "release": "v1",
+  "source": {
+    "title": "Informe nacional de resultados del examen Saber 11.° - 2024",
+    "publisher": "ICFES",
+    "url": "https://www.icfes.gov.co/wp-content/uploads/2025/09/INFORME_NACIONAL_RESULTADOS_SABER_11_2024.pdf",
+    "calendar": "A",
+    "year": 2024
+  },
+  "notes": [
+    "How much of the country sits at each ICFES performance level, per area.",
+    "Used to tell a student where they stand nationally — a public, verifiable fact,",
+    "not an invented leaderboard among Aprendo users.",
+    "",
+    "COVERAGE IS DELIBERATELY PARTIAL. The full per-level distributions live in the",
+    "report's bar charts (figures 14b, 18b, 22b, 26b), which are images: their numbers",
+    "are not extractable from the PDF text layer. Only the shares stated in prose, and",
+    "pinned to a specific year, are recorded here. Everything else is left out rather",
+    "than guessed, because a fabricated national comparison is worse than none.",
+    "",
+    "`complete: false` means the shares below do not sum to 100 and NO percentile may",
+    "be derived — only the single statements that are present. `getNationalShare`",
+    "returns null for anything not listed, and the UI renders nothing for it.",
+    "",
+    "TO COMPLETE: read the four bar charts off the report by eye, or derive the",
+    "distributions from the Saber 11 microdata published on datos.gov.co. Set",
+    "`complete: true` for a subject only once its shares cover all bands and sum to 100.",
+    "",
+    "Band ids must match `docs/levels.v1.json` for the same subject."
+  ],
+  "subjects": [
+    {
+      "id": "lectura_critica",
+      "complete": false,
+      "shares": [
+        {
+          "bandId": "2",
+          "percent": 48,
+          "year": 2024,
+          "source": "figura 14b, stated in prose: 'la mayor parte de los estudiantes se sitúo en el nivel 2, con un 48 %'"
+        }
+      ]
+    },
+    {
+      "id": "matematicas",
+      "complete": false,
+      "shares": [
+        {
+          "bandId": "3",
+          "percent": 50,
+          "year": 2024,
+          "source": "figura 18b, stated in prose: nivel 3 'entre el 46 % (2021) y el 50 % (2019, 2020 y 2024)'"
+        },
+        {
+          "bandId": "4",
+          "percent": 8,
+          "year": 2024,
+          "source": "figura 18b, stated in prose: nivel 4 'con el 7 % y el 8 %' para 2023 y 2024"
+        }
+      ]
+    },
+    {
+      "id": "ciencias_naturales",
+      "complete": false,
+      "shares": [
+        {
+          "bandId": "1",
+          "percent": 18,
+          "year": 2024,
+          "source": "figura 22b, stated in prose: 'más de la mitad de los estudiantes se situó entre los niveles 1 (18 %) y 2 (47 %)'"
+        },
+        {
+          "bandId": "2",
+          "percent": 47,
+          "year": 2024,
+          "source": "figura 22b, stated in prose, same sentence as nivel 1"
+        }
+      ]
+    },
+    {
+      "id": "sociales_ciudadanas",
+      "complete": false,
+      "shares": [],
+      "gapReason": "The report states only multi-year ranges for this area (nivel 2 'entre el 41 % y el 42 %' and nivel 1 'entre el 27 % y el 33 %' for 2019-2024), never a 2024 figure. A range is not a share; recorded as a gap."
+    },
+    {
+      "id": "ingles",
+      "complete": false,
+      "shares": [],
+      "gapReason": "The English distribution appears only in the figure image; no CEFR band share is stated in prose."
+    }
+  ]
+}

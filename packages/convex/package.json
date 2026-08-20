@@ -1,0 +1,44 @@
+{
+  "name": "@aprendo/convex",
+  "private": true,
+  "version": "0.0.0",
+  "scripts": {
+    "dev": "convex dev",
+    "predev": "convex dev --until-success",
+    "logs": "convex logs",
+    "test": "bun test",
+    "lint": "tsc -p convex && eslint . --report-unused-disable-directives --max-warnings 0"
+  },
+  "exports": {
+    "./api": "./src/_generated/api.js",
+    "./dataModel": "./src/_generated/dataModel.js",
+    "./sessionKinds": "./src/sessionKinds.ts",
+    "./levels": "./src/levels.ts",
+    "./globalScore": "./src/globalScore.ts",
+    "./confidence": "./src/confidence.ts",
+    "./examPlan": "./src/examPlan.ts",
+    "./elo": "./src/elo.ts"
+  },
+  "dependencies": {
+    "@ai-sdk/google": "^3.0.54",
+    "@aprendo/ingest": "workspace:*",
+    "@convex-dev/agent": "^0.6.1",
+    "@convex-dev/better-auth": "^0.12.2",
+    "@openrouter/ai-sdk-provider": "^2.9.0",
+    "ai": "^6.0.168",
+    "better-auth": "~1.6.9",
+    "convex": "^1.33.0",
+    "zod": "^3.25.76"
+  },
+  "devDependencies": {
+    "@convex-dev/eslint-plugin": "^1.1.1",
+    "@eslint/eslintrc": "^3.3.5",
+    "@eslint/js": "^9.39.4",
+    "@types/node": "^24.12.0",
+    "@typescript-eslint/eslint-plugin": "^8.57.0",
+    "@typescript-eslint/parser": "^8.57.0",
+    "eslint": "^9.39.4",
+    "globals": "^17.4.0",
+    "typescript": "^5.9.3"
+  }
+}

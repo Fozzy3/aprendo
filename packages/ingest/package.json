@@ -1,0 +1,29 @@
+{
+  "name": "@aprendo/ingest",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "build": "tsc --project tsconfig.json",
+    "typecheck": "tsc --project tsconfig.json --noEmit",
+    "test": "bun test",
+    "ingest": "bun run src/ingest.ts"
+  },
+  "dependencies": {
+    "@ai-sdk/google": "^3.0.43",
+    "@effect/platform": "^0.94.5",
+    "@effect/platform-node": "^0.104.1",
+    "@mistralai/mistralai": "^1.14.1",
+    "ai": "^6.0.116",
+    "effect": "^3.19.19",
+    "zod": "^4.3.6"
+  },
+  "devDependencies": {
+    "@types/node": "^24.3.1",
+    "tsx": "^4.20.5",
+    "typescript": "^5.9.2"
+  }
+}

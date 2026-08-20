@@ -69,11 +69,18 @@
   --danger-text: #d63535;
 
   /* One colour per ICFES area. Consumed through lib/subject-theme.ts. */
-  --subject-lectura_critica: #ff6b6b;
-  --subject-matematicas: #4d7cfe;
-  --subject-ciencias_naturales: #21c08b;
-  --subject-sociales_ciudadanas: #ff9f43;
-  --subject-ingles: #a66bff;
+  /* Area identity ramp. One family by construction: identical lightness and
+     chroma, hue is the only variable. Hues sit in the gaps between the semantic
+     anchors (danger 24°, gold 86°, success 164°, brand 285°) — the old ramp put
+     Ciencias Naturales at hue 164, byte-identical to --success, and Lectura
+     Crítica at 23, one degree from --danger, so a green chip could mean "you
+     got it right" or "this is a science question".
+     These are marks, never text: see the note on `.subject-dot`. */
+  --subject-lectura_critica: oklch(0.60 0.15 350);
+  --subject-matematicas: oklch(0.60 0.15 250);
+  --subject-ciencias_naturales: oklch(0.60 0.15 195);
+  --subject-sociales_ciudadanas: oklch(0.60 0.15 55);
+  --subject-ingles: oklch(0.60 0.15 315);
 
   --border: rgba(27, 18, 53, 0.1);
   --border-strong: rgba(27, 18, 53, 0.16);
@@ -135,11 +142,12 @@
   --danger-soft: rgba(255, 125, 125, 0.16);
   --danger-text: #ff9b9b;
 
-  --subject-lectura_critica: #ff8b8b;
-  --subject-matematicas: #7b9dff;
-  --subject-ciencias_naturales: #3fd8a4;
-  --subject-sociales_ciudadanas: #ffb56b;
-  --subject-ingles: #c194ff;
+  /* Same hues, lifted for a dark ground. */
+  --subject-lectura_critica: oklch(0.76 0.13 350);
+  --subject-matematicas: oklch(0.76 0.13 250);
+  --subject-ciencias_naturales: oklch(0.76 0.13 195);
+  --subject-sociales_ciudadanas: oklch(0.76 0.13 55);
+  --subject-ingles: oklch(0.76 0.13 315);
 
   --border: rgba(255, 255, 255, 0.1);
   --border-strong: rgba(255, 255, 255, 0.18);
@@ -582,9 +590,19 @@ pre code {
   padding: 1.25rem 0 2rem;
 }
 
+/* The intro is the only thing inside `.diagnostic-solve-main` that needs a
+   container: `SessionSolve` runs full-bleed on purpose, so the main element
+   carries no width or padding of its own. Without this the heading sat flush
+   against the viewport edge and each area card stretched to ~940px for two
+   lines of text. Narrower than the 1180px shell container because this screen
+   asks for exactly one decision. */
 .diagnostic-intro {
-  margin-bottom: 1rem;
-  padding: 0.25rem 0;
+  width: min(54rem, calc(100% - 2rem));
+  margin-inline: auto;
+  /* Centres the block in the tall shell; collapses to normal flow as soon as
+     the content is taller than the viewport, so nothing gets cut off. */
+  margin-block: auto;
+  padding: 2.5rem 0;
 }
 
 .diagnostic-intro-title {
@@ -3563,3 +3581,156 @@ pre code {
 }
 .confidence-card-note { margin-top: 0.6rem; font-size: 0.7rem; color: var(--text-tertiary); }
 .confidence-card-empty { margin-top: 0.3rem; font-size: 0.8125rem; color: var(--text-secondary); }
+
+
+/* ---------------------------------------------------------------------------
+   Area identity.
+
+   The decision: an area is marked by a dot, never by a coloured border or fill.
+   Before this, five saturated borders competed on one screen and two of them
+   were the same colours as "correct" and "wrong". Colour now means state;
+   shape and position mean identity.
+
+   Never use a subject token for text. At L 0.60 on white it lands near 3.5:1 —
+   fine for a 7px mark, short of the 4.5:1 body text needs. Labels stay
+   --text-primary and let the dot carry the identity.
+   --------------------------------------------------------------------------- */
+.subject-dot {
+  display: inline-block;
+  height: 0.5rem;
+  width: 0.5rem;
+  flex-shrink: 0;
+  border-radius: var(--radius-pill);
+  background: var(--subject-color, var(--brand));
+}
+
+.subject-dot-lg {
+  height: 0.6rem;
+  width: 0.6rem;
+}
+
+/* ---------------------------------------------------------------------------
+   Nico, the spectacled bear.
+
+   Fur is a warm brown that belongs to no other token, so the mascot never gets
+   confused with a state or an area. The spectacle markings and muzzle use the
+   page background, which is what makes the same drawing work in both themes
+   without a second copy.
+   --------------------------------------------------------------------------- */
+:root {
+  --mascot-fur: oklch(0.42 0.055 55);
+  --mascot-fur-dark: oklch(0.32 0.05 50);
+  --mascot-mark: oklch(0.93 0.035 80);
+  --mascot-nose: oklch(0.26 0.03 40);
+}
+
+:root.dark,
+:root[data-theme="dark"] {
+  --mascot-fur: oklch(0.52 0.055 55);
+  --mascot-fur-dark: oklch(0.40 0.05 50);
+  --mascot-mark: oklch(0.88 0.04 80);
+  --mascot-nose: oklch(0.22 0.03 40);
+}
+
+.mascot-fur { fill: var(--mascot-fur); }
+.mascot-ear-inner { fill: var(--mascot-fur-dark); }
+.mascot-mark { fill: var(--mascot-mark); }
+.mascot-nose { fill: var(--mascot-nose); }
+.mascot-eye { fill: var(--mascot-nose); }
+.mascot-glint { fill: #fff; }
+.mascot-z { fill: var(--text-tertiary); font-family: var(--font-display); font-weight: 700; }
+
+.mascot-line {
+  fill: none;
+  stroke: var(--mascot-nose);
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+
+.mascot-line-fill { fill: var(--mascot-nose); }
+
+/* Idle breathing. Slow and small enough to register as alive rather than as an
+   animation demanding attention — this sits behind real content. */
+.mascot-idle,
+.mascot-thinking {
+  animation: mascot-breathe 4.5s ease-in-out infinite;
+  transform-origin: 50% 80%;
+}
+
+.mascot-cheering {
+  animation: mascot-hop 1.6s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+  transform-origin: 50% 90%;
+}
+
+.mascot-sleeping .mascot-zzz {
+  animation: mascot-drift 3s ease-in-out infinite;
+}
+
+@keyframes mascot-breathe {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.025); }
+}
+
+@keyframes mascot-hop {
+  0%, 55%, 100% { transform: translateY(0); }
+  25% { transform: translateY(-6%); }
+}
+
+@keyframes mascot-drift {
+  0%, 100% { opacity: 0.35; transform: translate(0, 0); }
+  50% { opacity: 1; transform: translate(1px, -2px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mascot-idle,
+  .mascot-thinking,
+  .mascot-cheering,
+  .mascot-sleeping .mascot-zzz {
+    animation: none;
+  }
+}
+
+/* The standard empty-state arrangement, so no screen invents its own. */
+.mascot-message {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 2.5rem 1rem;
+  text-align: center;
+}
+
+.mascot-message-title {
+  margin-top: 0.6rem;
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  text-wrap: balance;
+}
+
+.mascot-message-copy {
+  max-width: 34ch;
+  font-size: 0.85rem;
+  line-height: 1.6;
+  color: var(--text-secondary);
+  text-wrap: pretty;
+}
+
+.mascot-message-action { margin-top: 0.9rem; }
+
+/* Nico sits beside the heading rather than above it: the student's eye lands on
+   the question, and the bear reads as a companion in the margin instead of a
+   splash screen they have to scroll past. Stacks on narrow viewports. */
+.diagnostic-intro-head {
+  display: flex;
+  align-items: flex-start;
+  gap: 1.25rem;
+}
+
+@media (max-width: 34rem) {
+  .diagnostic-intro-head {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+}

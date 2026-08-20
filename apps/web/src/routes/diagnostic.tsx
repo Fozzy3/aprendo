@@ -2,10 +2,11 @@ import { useConvexMutation } from '@convex-dev/react-query'
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { Link, createFileRoute, useNavigate } from '@tanstack/react-router'
 import { Check } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, type CSSProperties } from 'react'
 import { api } from '@aprendo/convex/api'
 import { SESSION_KIND_CONFIG } from '@aprendo/convex/sessionKinds'
 import BrandMark from '../components/BrandMark.tsx'
+import { Mascot } from '../components/Mascot.tsx'
 import { SessionSolve } from '../components/SessionSolve.tsx'
 import ThemeToggle from '../components/ThemeToggle.tsx'
 import { studentAppStateQuery } from '../lib/student-queries.ts'
@@ -97,14 +98,19 @@ function PlacementPage() {
           />
         ) : (
           <div className="diagnostic-intro fade-in">
-            <h1 className="diagnostic-intro-title">
-              {hasAnyPlacement ? 'Nivela otra área' : '¿En qué nivel estás?'}
-            </h1>
-            <p className="diagnostic-intro-copy">
+            <div className="diagnostic-intro-head">
+              <Mascot mood={hasAnyPlacement ? 'happy' : 'idle'} size="lg" />
+              <div>
+                <h1 className="diagnostic-intro-title">
+                  {hasAnyPlacement ? 'Nivela otra área' : '¿En qué nivel estás?'}
+                </h1>
+                <p className="diagnostic-intro-copy">
               {hasAnyPlacement
                 ? 'Ya conoces tu nivel en al menos un área. Nivela las demás cuando quieras.'
                 : `Elige un área y responde ${NIVELACION.totalQuestions} preguntas sin ayuda. Con eso ubicamos tu nivel ICFES y armamos tu ruta. Puedes nivelar las demás áreas después.`}
-            </p>
+                </p>
+              </div>
+            </div>
 
             {createMutation.error != null && (
               <p className="mt-4 text-sm text-[var(--danger-text)]">
@@ -124,9 +130,17 @@ function PlacementPage() {
                       disabled={createMutation.isPending}
                       onClick={() => createMutation.mutate(subject.id)}
                       className="launch-card w-full p-4 text-left"
-                      style={{ borderColor: subject.color }}
                     >
                       <span className="flex items-center gap-3">
+                        {/* The area's colour lives here and nowhere else on the
+                            card. Painting the whole border with it put five
+                            saturated outlines on one screen, two of which were
+                            the same colours as "correct" and "wrong". */}
+                        <span
+                          aria-hidden="true"
+                          className="subject-dot subject-dot-lg"
+                          style={{ '--subject-color': subject.color } as CSSProperties}
+                        />
                         <span aria-hidden="true" className="text-2xl">
                           {subject.emoji}
                         </span>

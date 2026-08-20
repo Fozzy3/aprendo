@@ -27,8 +27,27 @@ const fetchAuthToken = createServerFn({ method: 'GET' }).handler(async () => {
 export const Route = createRootRouteWithContext<{
   queryClient: QueryClient
   convexQueryClient: ConvexQueryClient
+  /** Set by `beforeLoad` during SSR and carried through hydration. */
+  token?: string | null
 }>()({
   beforeLoad: async (ctx) => {
+    // Server-side only.
+    //
+    // This exists so the very first render already has a token: during SSR it
+    // reads the auth cookie and hands it to Convex's HTTP client. After
+    // hydration `ConvexBetterAuthProvider` and `authClient` own the token, and
+    // there is nothing here worth repeating.
+    //
+    // It used to run on every pass of the router, on the client too. Because it
+    // both mutated the Convex client and returned a fresh `{ token }` into route
+    // context, each run could provoke the next: the app fired the same
+    // `_serverFn` request dozens of times over a few seconds, never settled, and
+    // any page you navigated to stayed blank — which read as "the nav is
+    // broken" rather than as a request loop.
+    if (typeof document !== 'undefined') {
+      return { token: ctx.context.token ?? null }
+    }
+
     const token = await fetchAuthToken()
     if (token) {
       const httpClient = (ctx.context.convexQueryClient as unknown as {

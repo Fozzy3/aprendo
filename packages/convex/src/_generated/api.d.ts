@@ -10,6 +10,7 @@
 
 import type * as aiCache from "../aiCache.js";
 import type * as auth from "../auth.js";
+import type * as booklets from "../booklets.js";
 import type * as coach from "../coach.js";
 import type * as colombiaTime from "../colombiaTime.js";
 import type * as confidence from "../confidence.js";
@@ -47,6 +48,7 @@ import type {
 declare const fullApi: ApiFromModules<{
   aiCache: typeof aiCache;
   auth: typeof auth;
+  booklets: typeof booklets;
   coach: typeof coach;
   colombiaTime: typeof colombiaTime;
   confidence: typeof confidence;

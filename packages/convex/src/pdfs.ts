@@ -1,5 +1,5 @@
 import { mutation, query, internalMutation, internalQuery } from './_generated/server'
-import { v } from 'convex/values'
+import { ConvexError, v } from 'convex/values'
 import { internal } from './_generated/api'
 import type { Doc, Id } from './_generated/dataModel'
 import { slugify } from '../../ingest/src/slug'
@@ -71,11 +71,11 @@ export const retryPdfUpload = mutation({
     await requireAdminStudentId(ctx)
     const upload = await ctx.db.get(args.pdfUploadId)
     if (upload == null) {
-      throw new Error('PDF upload not found.')
+      throw new ConvexError('PDF upload not found.')
     }
 
     if (upload.status === 'processing' || upload.status === 'enriching') {
-      throw new Error('PDF is already processing.')
+      throw new ConvexError('PDF is already processing.')
     }
 
     await ctx.db.patch(args.pdfUploadId, {

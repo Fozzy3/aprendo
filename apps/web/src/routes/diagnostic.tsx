@@ -13,6 +13,7 @@ import { studentAppStateQuery } from '../lib/student-queries.ts'
 import { useCurrentStudent } from '../lib/student-session.ts'
 import { getAllSubjectThemes } from '../lib/subject-theme.ts'
 import { FullScreenLoader } from '../components/FullScreenLoader.tsx'
+import { readConvexError } from '../lib/convex-error.ts'
 
 export const Route = createFileRoute('/diagnostic')({
   component: PlacementPage,
@@ -113,9 +114,7 @@ function PlacementPage() {
 
             {createMutation.error != null && (
               <p className="mt-4 text-sm text-[var(--danger-text)]">
-                {createMutation.error instanceof Error
-                  ? createMutation.error.message
-                  : 'No pudimos iniciar la nivelación.'}
+                {readConvexError(createMutation.error, 'No pudimos iniciar la nivelación.')}
               </p>
             )}
 

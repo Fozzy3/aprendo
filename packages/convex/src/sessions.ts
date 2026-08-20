@@ -1,9 +1,9 @@
 import { internal } from './_generated/api'
 import { mutation, query, type MutationCtx, type QueryCtx } from './_generated/server'
-import { v } from 'convex/values'
+import { ConvexError, v } from 'convex/values'
 import type { Doc, Id } from './_generated/dataModel'
 import { assertOwnsStudent } from './auth'
-import { SUBJECT_IDS, getSubjectIdForSubtopic } from './taxonomy'
+import { SUBJECT_IDS, getSubjectIdForSubtopic, getSubjectLabel } from './taxonomy'
 import {
   getSimulacroSubjectTarget,
   getSimulacroSubjectTargets,
@@ -147,7 +147,7 @@ function getSimulacroSessionConfig(
     (candidate) => candidate.sessionNumber === targetSessionNumber,
   )
   if (simulacroSession == null) {
-    throw new Error('Selecciona una sesión válida del simulacro.')
+    throw new ConvexError('Selecciona una sesión válida del simulacro.')
   }
   return simulacroSession
 }
@@ -421,7 +421,7 @@ async function buildSelection(
       // one sitting, instead of the two full mixed sittings.
       if (subjectId != null) {
         const target = getSimulacroSubjectTarget(subjectId)
-        if (target == null) throw new Error('Selecciona un área válida para el simulacro.')
+        if (target == null) throw new ConvexError('Selecciona un área válida para el simulacro.')
         return selectSubjectTargets(
           ctx,
           config,
@@ -438,7 +438,7 @@ async function buildSelection(
       )
     }
     case 'topic':
-      if (subjectId == null) throw new Error('Topic practice requires a subject.')
+      if (subjectId == null) throw new ConvexError('Topic practice requires a subject.')
       return selectTopic(ctx, config, studentId, subjectId, subtopicId)
     case 'recommended':
       return selectRecommended(ctx, config, studentId)
@@ -471,7 +471,7 @@ export const createSession = mutation({
     )
 
     if (config.requiresDiagnostic && !(await hasCompletedPlacement(ctx, args.studentId))) {
-      throw new Error('Nivélate en al menos un área antes de iniciar esta práctica.')
+      throw new ConvexError('Nivélate en al menos un área antes de iniciar esta práctica.')
     }
 
     // A subtopic is only meaningful for topic practice. When given, validate it
@@ -481,10 +481,10 @@ export const createSession = mutation({
     if (subtopicId != null) {
       const parentSubjectId = getSubjectIdForSubtopic(subtopicId)
       if (parentSubjectId == null) {
-        throw new Error('Selecciona un subtema válido para esta práctica.')
+        throw new ConvexError('Selecciona un subtema válido para esta práctica.')
       }
       if (subjectId != null && subjectId !== parentSubjectId) {
-        throw new Error('El subtema no pertenece a la asignatura seleccionada.')
+        throw new ConvexError('El subtema no pertenece a la asignatura seleccionada.')
       }
       subjectId = parentSubjectId
     }
@@ -493,16 +493,16 @@ export const createSession = mutation({
     // a subject and a sitting number is contradictory.
     if (args.kind === 'simulacro' && subjectId != null) {
       if (!SUBJECT_IDS.includes(subjectId)) {
-        throw new Error('Selecciona un área válida para el simulacro.')
+        throw new ConvexError('Selecciona un área válida para el simulacro.')
       }
       if (args.simulacroSessionNumber != null) {
-        throw new Error('Un simulacro por área no tiene sesiones 1 y 2.')
+        throw new ConvexError('Un simulacro por área no tiene sesiones 1 y 2.')
       }
     }
 
     if (config.requiresSubject) {
       if (subjectId == null || !SUBJECT_IDS.includes(subjectId)) {
-        throw new Error('Selecciona una asignatura válida para esta práctica.')
+        throw new ConvexError('Selecciona una asignatura válida para esta práctica.')
       }
     }
 
@@ -538,7 +538,15 @@ export const createSession = mutation({
       args.simulacroSessionNumber,
     )
     if (selected.length === 0) {
-      throw new Error('No hay preguntas disponibles para esta práctica.')
+      // Naming the area matters: "no hay preguntas" reads as "the app is
+      // broken", while "no hay preguntas de Matemáticas todavía" reads as
+      // "this part isn't loaded yet", which is what is actually true.
+      const areaLabel = subjectId == null ? null : getSubjectLabel(subjectId)
+      throw new ConvexError(
+        areaLabel == null
+          ? 'Todavía no hay preguntas cargadas. Vuelve a intentarlo más tarde.'
+          : `Todavía no hay preguntas de ${areaLabel} cargadas. Prueba con otra área.`,
+      )
     }
 
     const now = Date.now()
@@ -820,20 +828,20 @@ export const submitAnswer = mutation({
   handler: async (ctx, args) => {
     const session = await ctx.db.get(args.sessionId)
     if (session == null) {
-      throw new Error('Sesión no encontrada.')
+      throw new ConvexError('Sesión no encontrada.')
     }
     if (session.status === 'completed' || session.status === 'abandoned') {
-      throw new Error('La sesión ya no está activa.')
+      throw new ConvexError('La sesión ya no está activa.')
     }
 
     const sessionQuestion = await ctx.db.get(args.sessionQuestionId)
     if (sessionQuestion == null || sessionQuestion.sessionId !== args.sessionId) {
-      throw new Error('Pregunta de la sesión no encontrada.')
+      throw new ConvexError('Pregunta de la sesión no encontrada.')
     }
 
     const question = await ctx.db.get(sessionQuestion.questionId)
     if (question == null || question.answerCorrectOption == null) {
-      throw new Error('La respuesta correcta no está disponible.')
+      throw new ConvexError('La respuesta correcta no está disponible.')
     }
 
     const existing = await ctx.db
@@ -890,15 +898,15 @@ export const clearAnswer = mutation({
   handler: async (ctx, args) => {
     const session = await ctx.db.get(args.sessionId)
     if (session == null) {
-      throw new Error('Sesión no encontrada.')
+      throw new ConvexError('Sesión no encontrada.')
     }
     if (session.status !== 'in_progress' && session.status !== 'created') {
-      throw new Error('La sesión no está activa.')
+      throw new ConvexError('La sesión no está activa.')
     }
 
     const sessionQuestion = await ctx.db.get(args.sessionQuestionId)
     if (sessionQuestion == null || sessionQuestion.sessionId !== args.sessionId) {
-      throw new Error('Pregunta de la sesión no encontrada.')
+      throw new ConvexError('Pregunta de la sesión no encontrada.')
     }
 
     const existing = await ctx.db
@@ -923,7 +931,7 @@ export const completeSession = mutation({
   handler: async (ctx, args) => {
     const session = await ctx.db.get(args.sessionId)
     if (session == null) {
-      throw new Error('Sesión no encontrada.')
+      throw new ConvexError('Sesión no encontrada.')
     }
     if (session.status === 'completed') {
       return summarize(session)

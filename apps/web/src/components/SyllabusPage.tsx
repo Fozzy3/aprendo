@@ -9,6 +9,7 @@ import { RingProgress } from './RingProgress.tsx'
 import { syllabusQuery } from '../lib/student-queries.ts'
 import { formatMasteryPercent, getSyllabusStatus } from '../lib/syllabus-status.ts'
 import { PageLoader } from '../components/FullScreenLoader.tsx'
+import { readConvexError } from '../lib/convex-error.ts'
 
 // The syllabus shape is defined once, in the `getSyllabus` query — derive the
 // node types from its inferred return so backend and UI can't drift.
@@ -118,9 +119,7 @@ export function SyllabusPage({ studentId }: { studentId: string }) {
 
       {startMutation.error ? (
         <div className="stage-alert">
-          {startMutation.error instanceof Error
-            ? startMutation.error.message
-            : 'No se pudo iniciar la práctica.'}
+          {readConvexError(startMutation.error, 'No se pudo iniciar la práctica.')}
         </div>
       ) : null}
     </div>

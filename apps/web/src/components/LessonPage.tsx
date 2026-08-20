@@ -10,6 +10,7 @@ import { buildDemoDocument } from '../lib/demo-document.ts'
 import { conceptLessonQuery } from '../lib/student-queries.ts'
 import { getSubjectIdForSubtopic, getSubjectLabel, getSubtopicLabel } from '../lib/taxonomy.ts'
 import { useResolvedTheme } from '../lib/use-resolved-theme.ts'
+import { readConvexError } from '../lib/convex-error.ts'
 
 /** Shown while the text sections are still being drafted (no content yet). */
 function WritingSkeleton() {
@@ -169,9 +170,7 @@ export function LessonPage({ subtopicId, studentId }: { subtopicId: string; stud
 
       {practiceMutation.error ? (
         <div className="stage-alert">
-          {practiceMutation.error instanceof Error
-            ? practiceMutation.error.message
-            : 'No se pudo iniciar la práctica.'}
+          {readConvexError(practiceMutation.error, 'No se pudo iniciar la práctica.')}
         </div>
       ) : null}
 

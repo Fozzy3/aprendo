@@ -5,7 +5,7 @@ import { z } from 'zod'
 import { internal } from './_generated/api'
 import { action, internalMutation, internalQuery, mutation, query } from './_generated/server'
 import { components } from './_generated/api'
-import { v } from 'convex/values'
+import { ConvexError, v } from 'convex/values'
 import { paginationOptsValidator } from 'convex/server'
 import type { Doc, Id } from './_generated/dataModel'
 import { getSubjectLabel, getSubtopicLabel } from './taxonomy'
@@ -120,7 +120,7 @@ const createArtifactTool = createTool({
     description: string
   }> => {
     if (ctx.threadId == null || ctx.userId == null) {
-      throw new Error('create_artifact requires a thread and user context.')
+      throw new ConvexError('create_artifact requires a thread and user context.')
     }
     const messageId = ctx.messageId ?? null
     const result: { artifactId: Id<'practiceTutorArtifacts'> } = await ctx.runMutation(
@@ -245,10 +245,10 @@ async function requireOwnedPracticeSession(
   // status, not by kind.
   const session = await ctx.db.get(args.practiceSessionId)
   if (session == null) {
-    throw new Error('Session not found.')
+    throw new ConvexError('Session not found.')
   }
   if (session.studentId !== args.studentId) {
-    throw new Error('Session does not belong to this student.')
+    throw new ConvexError('Session does not belong to this student.')
   }
   return session
 }
@@ -336,7 +336,7 @@ export const clearPracticeTutorChat = mutation({
       .withIndex('by_practiceSessionId', (q) => q.eq('practiceSessionId', args.practiceSessionId))
       .unique()
     if (mapping == null) {
-      throw new Error('Tutor thread not found for this practice session.')
+      throw new ConvexError('Tutor thread not found for this practice session.')
     }
 
     const oldThreadId = mapping.threadId
@@ -427,7 +427,7 @@ export const listPracticeTutorMessages = query({
       .withIndex('by_practiceSessionId', (q) => q.eq('practiceSessionId', args.practiceSessionId))
       .unique()
     if (mapping == null) {
-      throw new Error('Tutor thread not found for this practice session.')
+      throw new ConvexError('Tutor thread not found for this practice session.')
     }
     // If the requested threadId doesn't match the current mapping, the client
     // is mid-transition (e.g. the chat was just cleared and the thread was
@@ -532,7 +532,7 @@ export const sendPracticeTutorMessage = action({
       studentId: args.studentId,
     })
     if (mapping == null) {
-      throw new Error('Tutor thread not found for this practice session.')
+      throw new ConvexError('Tutor thread not found for this practice session.')
     }
 
     const questionContext = args.questionId != null
@@ -638,7 +638,7 @@ export const persistArtifact = internalMutation({
       .filter((q) => q.eq(q.field('threadId'), args.threadId))
       .unique()
     if (mapping == null) {
-      throw new Error('Tutor thread not found for this student.')
+      throw new ConvexError('Tutor thread not found for this student.')
     }
 
     await requireOwnedPracticeSession(ctx, {
@@ -670,7 +670,7 @@ export const getArtifact = query({
     const artifact = await ctx.db.get(args.artifactId)
     if (artifact == null) return null
     if (artifact.studentId !== args.studentId) {
-      throw new Error('Artifact does not belong to this student.')
+      throw new ConvexError('Artifact does not belong to this student.')
     }
     return artifact
   },

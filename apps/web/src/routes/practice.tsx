@@ -25,6 +25,7 @@ import { useCurrentStudent } from '../lib/student-session.ts'
 import { getSubjectLabel, getSubtopicLabel, subjectIds } from '../lib/taxonomy.ts'
 import { FullScreenLoader } from '../components/FullScreenLoader.tsx'
 import { MascotMessage } from '../components/Mascot.tsx'
+import { readConvexError } from '../lib/convex-error.ts'
 
 export const Route = createFileRoute('/practice')({
   component: PracticeHubPage,
@@ -253,9 +254,7 @@ function PracticeHubPage() {
 
         {startMutation.error ? (
           <div className="stage-alert">
-            {startMutation.error instanceof Error
-              ? startMutation.error.message
-              : 'No se pudo iniciar la sesión.'}
+            {readConvexError(startMutation.error, 'No se pudo iniciar la sesión.')}
           </div>
         ) : null}
 

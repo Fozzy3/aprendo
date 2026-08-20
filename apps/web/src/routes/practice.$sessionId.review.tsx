@@ -45,6 +45,7 @@ import { getKindLabel } from '../lib/session-display.ts'
 import { useCurrentStudent } from '../lib/student-session.ts'
 import { getSubjectLabel, getSubtopicLabel } from '../lib/taxonomy.ts'
 import { FullScreenLoader } from '../components/FullScreenLoader.tsx'
+import { readConvexError } from '../lib/convex-error.ts'
 
 type ChatRole = 'assistant' | 'user'
 
@@ -164,7 +165,7 @@ function ReviewPage() {
       })
       .catch((error: unknown) => {
         setHasEnsuredTutorThread(true)
-        setTutorThreadError(error instanceof Error ? error.message : 'No se pudo iniciar el tutor.')
+        setTutorThreadError(readConvexError(error, 'No se pudo iniciar el tutor.'))
       })
   }, [createTutorThread, hasEnsuredTutorThread, sessionDoc, studentId])
 
@@ -706,10 +707,10 @@ function ReviewPage() {
       </PromptInput>
       {tutorThreadError ? <div className="tutor-alert">{tutorThreadError}</div> : null}
       {tutorMutation.error ? (
-        <div className="tutor-alert">{tutorMutation.error instanceof Error ? tutorMutation.error.message : 'No se pudo enviar el mensaje al tutor.'}</div>
+        <div className="tutor-alert">{readConvexError(tutorMutation.error, 'No se pudo enviar el mensaje al tutor.')}</div>
       ) : null}
       {clearTutorMutation.error ? (
-        <div className="tutor-alert">{clearTutorMutation.error instanceof Error ? clearTutorMutation.error.message : 'No se pudo borrar la conversación.'}</div>
+        <div className="tutor-alert">{readConvexError(clearTutorMutation.error, 'No se pudo borrar la conversación.')}</div>
       ) : null}
     </aside>
   )

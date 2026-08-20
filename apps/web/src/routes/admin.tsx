@@ -16,6 +16,7 @@ import { pdfUploadsQuery, questionBrowserQuery } from '../lib/pdf-queries.ts'
 import { uploadPdfToConvex } from '../lib/pdf-upload.ts'
 import ThemeToggle from '../components/ThemeToggle.tsx'
 import { FullScreenLoader } from '../components/FullScreenLoader.tsx'
+import { readConvexError } from '../lib/convex-error.ts'
 
 type AdminTab = 'uploads' | 'questions'
 
@@ -214,7 +215,7 @@ function UploadsTab() {
     },
     onError: (error) => {
       setUploadingFileName(null)
-      setErrorMessage(error instanceof Error ? error.message : String(error))
+      setErrorMessage(readConvexError(error, 'No se pudo subir el PDF.'))
     },
     onSuccess: async () => {
       setErrorMessage(null)
@@ -229,7 +230,7 @@ function UploadsTab() {
       await retryPdfUpload({ pdfUploadId: pdfUploadId as never })
     },
     onError: (error) => {
-      setErrorMessage(error instanceof Error ? error.message : String(error))
+      setErrorMessage(readConvexError(error, 'No se pudo reprocesar el PDF.'))
     },
   })
 

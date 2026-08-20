@@ -11,6 +11,7 @@ import { getKindIcon, getKindLabel } from '../lib/session-display.ts'
 import { formatClock, useSessionTimer } from '../lib/useSessionTimer.ts'
 import { getSubjectLabel } from '../lib/taxonomy.ts'
 import { MascotMessage } from './Mascot.tsx'
+import { readConvexError } from '../lib/convex-error.ts'
 
 type SessionSolveProps = {
   sessionId: string
@@ -319,9 +320,10 @@ export function SessionSolve({ sessionId, onExit, onCompleted }: SessionSolvePro
 
         {answerMutation.error || clearMutation.error || completeMutation.error ? (
           <div className="stage-alert">
-            {(answerMutation.error || clearMutation.error || completeMutation.error) instanceof Error
-              ? (answerMutation.error || clearMutation.error || completeMutation.error)!.message
-              : 'No se pudo guardar el progreso.'}
+            {readConvexError(
+              answerMutation.error || clearMutation.error || completeMutation.error,
+              'No se pudo guardar el progreso.',
+            )}
           </div>
         ) : null}
 

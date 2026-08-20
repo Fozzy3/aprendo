@@ -19,6 +19,7 @@ import { getKindIcon } from '../lib/session-display.ts'
 import { formatMasteryPercent, getSyllabusStatus } from '../lib/syllabus-status.ts'
 import { getSubjectLabel } from '../lib/taxonomy.ts'
 import { PageLoader } from '../components/FullScreenLoader.tsx'
+import { readConvexError } from '../lib/convex-error.ts'
 
 function greeting(): string {
   const hour = new Date().getHours()
@@ -164,9 +165,7 @@ export function TodayPage({ studentId }: { studentId: string }) {
 
           {startMutation.error ? (
             <p className="mt-3 text-sm text-[var(--accent-text)]">
-              {startMutation.error instanceof Error
-                ? startMutation.error.message
-                : 'No se pudo iniciar la práctica.'}
+              {readConvexError(startMutation.error, 'No se pudo iniciar la práctica.')}
             </p>
           ) : null}
         </div>

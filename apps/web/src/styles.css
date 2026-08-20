@@ -2258,8 +2258,15 @@ pre code {
 
 .hub-launch {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+  /* 22rem, not 15. At 15 the cards packed four across on a wide screen and the
+     copy inside each one wrapped to two or three words a line, which is what
+     made the whole hub feel chopped up. */
+  grid-template-columns: repeat(auto-fit, minmax(22rem, 1fr));
   gap: 0.85rem;
+  /* Cards keep their own height. Stretching meant that expanding one card — the
+     nivelación picker opens five area chips — dragged every sibling to the same
+     height and left them mostly empty. */
+  align-items: start;
 }
 
 .launch-card {
@@ -4485,4 +4492,26 @@ pre code {
     max-height: 38vh;
     overflow-y: auto;
   }
+}
+
+
+/* ---------------------------------------------------------------------------
+   Word breaking.
+
+   `overflow-wrap: anywhere` used to sit on <body>, so every element in the app
+   was allowed to split a word at any character to avoid an overflow — that is
+   how "Práctica recomendada" ended up rendering as "recomendad / a".
+
+   It is only needed where genuinely unbreakable strings turn up: a long formula,
+   a URL, an identifier inside question content. Scoped there, and with
+   `break-word` rather than `anywhere`, which only breaks a word that cannot fit
+   on a line of its own.
+   --------------------------------------------------------------------------- */
+.markdown-body,
+.option-card,
+.shared-stimulus-body,
+.tutor-message,
+code,
+pre {
+  overflow-wrap: break-word;
 }

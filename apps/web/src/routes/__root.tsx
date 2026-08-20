@@ -93,7 +93,7 @@ function RootComponent() {
           <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
           <HeadContent />
         </head>
-        <body className="font-sans antialiased [overflow-wrap:anywhere] selection:bg-[var(--accent-soft)]">
+        <body className="font-sans antialiased selection:bg-[var(--accent-soft)]">
           <TooltipProvider>
             <Outlet />
           </TooltipProvider>

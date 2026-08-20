@@ -154,7 +154,7 @@ export function LessonPage({ subtopicId, studentId }: { subtopicId: string; stud
       {/* Practice CTA — always available, independent of lesson state */}
       <div className="card flex flex-col items-center gap-3 p-6 text-center sm:flex-row sm:justify-between sm:text-left">
         <div>
-          <p className="text-base font-semibold text-[var(--text-primary)]">¿List@ para practicar?</p>
+          <p className="text-base font-semibold text-[var(--text-primary)]">¿Todo listo para practicar?</p>
           <p className="text-sm text-[var(--text-secondary)]">Pon a prueba este tema con preguntas reales.</p>
         </div>
         <button

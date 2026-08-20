@@ -10,14 +10,39 @@ export const Route = createFileRoute('/login')({
 
 type AuthMode = 'sign-in' | 'sign-up'
 
+/**
+ * Pull something readable out of whatever the auth client threw.
+ *
+ * Better Auth rejects with a plain object shaped like
+ * `{ code, message?, status, statusText }` — not an `Error`, and often with no
+ * `message` at all. Falling through to `String(error)` on that object is how a
+ * student ended up staring at "[object Object]" instead of being told what went
+ * wrong, so every branch here has to produce real words or give up and return
+ * null (the caller then supplies a sensible Spanish default).
+ */
 function readErrorMessage(error: unknown) {
   if (error == null) return null
-  if (typeof error === 'object' && 'message' in error) {
-    const message = (error as { message?: unknown }).message
-    if (typeof message === 'string' && message.trim().length > 0) return message
-  }
+  if (typeof error === 'string') return error.trim().length > 0 ? error : null
   if (error instanceof Error) return error.message
-  return String(error)
+
+  if (typeof error === 'object') {
+    const candidate = error as {
+      message?: unknown
+      code?: unknown
+      statusText?: unknown
+      error?: unknown
+    }
+    for (const value of [candidate.message, candidate.statusText, candidate.code]) {
+      if (typeof value === 'string' && value.trim().length > 0) return value
+    }
+    // Some shapes nest the real payload one level down.
+    if (candidate.error != null && candidate.error !== error) {
+      return readErrorMessage(candidate.error)
+    }
+    return null
+  }
+
+  return null
 }
 
 function LoginPage() {
@@ -58,11 +83,11 @@ function LoginPage() {
     setErrorMessage(null)
     const trimmedEmail = email.trim()
     if (trimmedEmail.length === 0) {
-      setErrorMessage('Ingresa tu correo electronico.')
+      setErrorMessage('Ingresa tu correo electrónico.')
       return
     }
     if (password.length < 8) {
-      setErrorMessage('La contrasena debe tener al menos 8 caracteres.')
+      setErrorMessage('La contraseña debe tener al menos 8 caracteres.')
       return
     }
 
@@ -74,7 +99,7 @@ function LoginPage() {
           password,
         })
         if (error) {
-          setErrorMessage(readErrorMessage(error) ?? 'No pudimos iniciar sesion.')
+          setErrorMessage(readErrorMessage(error) ?? 'No pudimos iniciar sesión.')
           return
         }
       } else {
@@ -90,7 +115,7 @@ function LoginPage() {
       }
       await navigate({ to: '/app' })
     } catch (error) {
-      setErrorMessage(readErrorMessage(error) ?? 'Ocurrio un error inesperado.')
+      setErrorMessage(readErrorMessage(error) ?? 'Ocurrió un error inesperado.')
     } finally {
       setIsSubmitting(false)
     }
@@ -124,14 +149,14 @@ function LoginPage() {
           </h1>
           <p className="mb-6 text-center text-sm text-[var(--text-tertiary)]">
             {mode === 'sign-in'
-              ? 'Inicia sesion con tu correo y contrasena.'
+              ? 'Inicia sesión con tu correo y contraseña.'
               : 'Te crearemos una cuenta para guardar tu progreso.'}
           </p>
 
           <form onSubmit={handleSubmit}>
             <label className="mb-4 block">
               <span className="mb-1.5 block text-sm font-medium text-[var(--text-secondary)]">
-                Correo electronico
+                Correo electrónico
               </span>
               <input
                 type="email"
@@ -146,13 +171,13 @@ function LoginPage() {
 
             <label className="mb-4 block">
               <span className="mb-1.5 block text-sm font-medium text-[var(--text-secondary)]">
-                Contrasena
+                Contraseña
               </span>
               <input
                 type="password"
                 value={password}
                 onChange={(event) => setPassword(event.target.value)}
-                placeholder="Minimo 8 caracteres"
+                placeholder="Mínimo 8 caracteres"
                 className="input"
                 autoComplete={mode === 'sign-in' ? 'current-password' : 'new-password'}
                 minLength={8}
@@ -165,13 +190,13 @@ function LoginPage() {
               className="btn-primary w-full justify-center py-3"
             >
               {isSubmitting
-                ? mode === 'sign-in' ? 'Entrando...' : 'Creando cuenta...'
+                ? mode === 'sign-in' ? 'Entrando…' : 'Creando cuenta…'
                 : mode === 'sign-in' ? 'Entrar' : 'Crear cuenta'}
             </button>
           </form>
 
           {errorMessage ? (
-            <p className="mt-4 text-center text-sm font-medium text-[var(--accent-text)]">
+            <p role="alert" className="mt-4 text-center text-sm font-medium text-[var(--danger-text)]">
               {errorMessage}
             </p>
           ) : null}
@@ -185,8 +210,8 @@ function LoginPage() {
             className="mt-6 w-full text-center text-sm text-[var(--text-tertiary)] underline-offset-2 hover:text-[var(--text-secondary)] hover:underline"
           >
             {mode === 'sign-in'
-              ? '¿Aun no tienes cuenta? Crea una'
-              : '¿Ya tienes cuenta? Inicia sesion'}
+              ? '¿Aún no tienes cuenta? Crea una'
+              : '¿Ya tienes cuenta? Inicia sesión'}
           </button>
         </div>
       </div>

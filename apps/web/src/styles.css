@@ -3076,9 +3076,9 @@ pre code {
 }
 
 @container stage (min-width: 34rem) {
-  .review-options {
-    grid-template-columns: 1fr 1fr;
-  }
+  /* One column, like the solve screen. Two made the reading order zigzag, and in
+   review the options also carry the "Respuesta correcta" / "Tu respuesta"
+   markers, which have to be scanned in order to be understood. */
 }
 
 .review-option {
@@ -4427,4 +4427,62 @@ pre code {
     background-color 90ms ease,
     box-shadow 90ms ease,
     transform 90ms ease;
+}
+
+
+/* ---------------------------------------------------------------------------
+   Review: the passage sits beside the question, exactly as in solve.
+
+   Stacked, the answers were an entire passage's worth of scrolling below the
+   text — the student could not tell they were down there at all, which is the
+   complaint that prompted this. Reviewing means comparing your answer against
+   the passage, so the two have to be on screen together.
+   --------------------------------------------------------------------------- */
+.stage-scroll.is-split {
+  display: grid;
+  grid-template-columns: minmax(0, 1.12fr) minmax(0, 1fr);
+  overflow: hidden;
+}
+
+.stage-scroll.is-split > .shared-stimulus {
+  margin: 0;
+  min-height: 0;
+  overflow-y: auto;
+  border: 0;
+  border-right: 2px solid var(--border);
+  border-radius: 0;
+  padding: 1.25rem clamp(1rem, 2.5vw, 2rem);
+  background: var(--bg-warm);
+}
+
+.stage-scroll.is-split > .shared-stimulus .shared-stimulus-body {
+  max-height: none;
+  overflow: visible;
+  margin-inline: auto;
+}
+
+.stage-scroll.is-split > .stage-question {
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  width: 100%;
+  max-width: 38rem;
+  margin-inline: auto;
+}
+
+/* The tutor panel already takes a share of the width, so the split gives up
+   sooner here than on the solve screen. */
+@media (max-width: 86rem) {
+  .stage-scroll.is-split {
+    display: block;
+    overflow-y: auto;
+  }
+  .stage-scroll.is-split > .shared-stimulus {
+    border-right: 0;
+    border-bottom: 2px solid var(--border);
+  }
+  .stage-scroll.is-split > .shared-stimulus .shared-stimulus-body {
+    max-height: 38vh;
+    overflow-y: auto;
+  }
 }

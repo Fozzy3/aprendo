@@ -14,7 +14,12 @@ import { type ActiveStudentSession, useCurrentStudent } from './student-session.
  */
 export type StudentGuard =
   | { status: 'loading'; session: null }
-  | { status: 'redirecting'; session: ActiveStudentSession | null }
+  | {
+      status: 'redirecting'
+      session: ActiveStudentSession | null
+      /** Why, in words the student can read. Never redirect without one. */
+      reason: string
+    }
   | { status: 'ready'; session: ActiveStudentSession }
 
 export function useStudentGuard(): StudentGuard {
@@ -39,10 +44,22 @@ export function useStudentGuard(): StudentGuard {
   }, [appStateQuery.data, isReady, navigate, session])
 
   if (!isReady) return { status: 'loading', session: null }
-  if (session == null) return { status: 'redirecting', session: null }
+  if (session == null) {
+    return {
+      status: 'redirecting',
+      session: null,
+      reason: 'Tu sesión se cerró. Te llevamos al inicio de sesión.',
+    }
+  }
   if (appStateQuery.isPending) return { status: 'loading', session: null }
   if (appStateQuery.data != null && !appStateQuery.data.hasCompletedDiagnostic) {
-    return { status: 'redirecting', session }
+    // A redirect that happens with no explanation reads as the app ignoring the
+    // tap. Saying why costs one sentence and turns a dead end into a step.
+    return {
+      status: 'redirecting',
+      session,
+      reason: 'Primero nivélate en un área. Con eso se abre el resto de la app.',
+    }
   }
   return { status: 'ready', session }
 }

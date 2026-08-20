@@ -513,7 +513,9 @@ function ReviewPage() {
           <ChevronLeft size={20} />
         </button>
 
-        <div className="stage-scroll">
+        <div
+          className={`stage-scroll${currentQuestion.group != null ? ' is-split' : ''}`}
+        >
           {currentQuestion.group != null ? (
             <SharedStimulus group={currentQuestion.group} />
           ) : null}

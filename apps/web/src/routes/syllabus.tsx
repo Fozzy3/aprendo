@@ -10,6 +10,7 @@ export const Route = createFileRoute('/syllabus')({
 
 function SyllabusRoutePage() {
   const guard = useStudentGuard()
+  if (guard.status === 'redirecting') return <FullScreenLoader message={guard.reason} />
   if (guard.status !== 'ready') return <FullScreenLoader />
 
   return (

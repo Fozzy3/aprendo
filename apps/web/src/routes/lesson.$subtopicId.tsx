@@ -11,6 +11,7 @@ export const Route = createFileRoute('/lesson/$subtopicId')({
 function LessonRoutePage() {
   const { subtopicId } = Route.useParams()
   const guard = useStudentGuard()
+  if (guard.status === 'redirecting') return <FullScreenLoader message={guard.reason} />
   if (guard.status !== 'ready') return <FullScreenLoader />
 
   return (

@@ -50,6 +50,9 @@ export function Mascot({
       aria-label="Nico, el oso de anteojos"
       className={`mascot mascot-${mood} ${className}`.trim()}
       style={{ overflow: 'visible' }}
+      // The drawing is decorative wherever a real label already names the
+      // state; callers that rely on it for meaning pass their own copy.
+      focusable="false"
     >
       {/* Ears — behind the head so the outline reads as one silhouette. */}
       <circle cx="16" cy="15" r="7" className="mascot-fur" />
@@ -78,8 +81,13 @@ export function Mascot({
         </>
       ) : (
         <>
-          <circle cx="24" cy={mood === 'thinking' ? 30 : 31} r="3.4" className="mascot-eye" />
-          <circle cx="40" cy={mood === 'thinking' ? 30 : 31} r="3.4" className="mascot-eye" />
+          {/* Grouped so one blink drives both eyes. A character that never
+              blinks reads as a sticker; this is the cheapest signal of life
+              there is, and it costs one keyframe. */}
+          <g className="mascot-eyes">
+            <circle cx="24" cy={mood === 'thinking' ? 30 : 31} r="3.4" className="mascot-eye" />
+            <circle cx="40" cy={mood === 'thinking' ? 30 : 31} r="3.4" className="mascot-eye" />
+          </g>
           {/* Catchlights. Without them the eyes read as buttons, not as alive. */}
           <circle cx="25.3" cy={(mood === 'thinking' ? 30 : 31) - 1.2} r="1.15" className="mascot-glint" />
           <circle cx="41.3" cy={(mood === 'thinking' ? 30 : 31) - 1.2} r="1.15" className="mascot-glint" />

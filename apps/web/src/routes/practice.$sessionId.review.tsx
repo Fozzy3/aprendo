@@ -44,6 +44,7 @@ import { sessionQuery, practiceTutorThreadQuery } from '../lib/student-queries.t
 import { getKindLabel } from '../lib/session-display.ts'
 import { useCurrentStudent } from '../lib/student-session.ts'
 import { getSubjectLabel, getSubtopicLabel } from '../lib/taxonomy.ts'
+import { FullScreenLoader } from '../components/FullScreenLoader.tsx'
 
 type ChatRole = 'assistant' | 'user'
 
@@ -359,9 +360,7 @@ function ReviewPage() {
 
   if (!isReady || session == null || reviewQuery.isPending || sessionDoc == null) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[var(--bg)]">
-        <p className="text-sm text-[var(--text-tertiary)]">Preparando tu revisión…</p>
-      </div>
+      <FullScreenLoader message="Preparando tu revisión…" />
     )
   }
 

@@ -8,6 +8,7 @@ import { SESSION_KINDS, type SessionKind } from '@aprendo/convex/sessionKinds'
 import { activitySummaryQuery } from '../lib/student-queries.ts'
 import { getKindIcon, getKindLabel } from '../lib/session-display.ts'
 import { getSubjectTheme } from '../lib/subject-theme.ts'
+import { MascotMessage } from './Mascot.tsx'
 
 const CALENDAR_WEEKS = 16
 const PAGE_SIZE = 20
@@ -100,12 +101,19 @@ export function HistoryPage({ studentId }: { studentId: string }) {
         {history.status === 'LoadingFirstPage' ? (
           <div className="h-40 animate-pulse rounded-[var(--radius-lg)] bg-[var(--bg-inset)]" />
         ) : history.results.length === 0 ? (
-          <div className="card p-8 text-center">
-            <p className="text-sm text-[var(--text-secondary)]">
+          <div className="card">
+            <MascotMessage
+              mood="sleeping"
+              title={
+                kindFilter === 'all'
+                  ? 'Tu historial está vacío'
+                  : 'Nada de este tipo todavía'
+              }
+            >
               {kindFilter === 'all'
-                ? 'Todavía no has completado ninguna sesión.'
-                : 'No hay sesiones de este tipo todavía.'}
-            </p>
+                ? 'Cuando termines tu primera sesión, va a aparecer acá con lo que respondiste.'
+                : 'Prueba con otro filtro, o haz una sesión de este tipo.'}
+            </MascotMessage>
           </div>
         ) : (
           <>

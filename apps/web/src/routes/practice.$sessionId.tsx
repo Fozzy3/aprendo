@@ -3,6 +3,7 @@ import { useEffect } from 'react'
 import { SessionSolve } from '../components/SessionSolve.tsx'
 import { StudentAppShell } from '../components/StudentAppShell.tsx'
 import { useCurrentStudent } from '../lib/student-session.ts'
+import { FullScreenLoader } from '../components/FullScreenLoader.tsx'
 
 export const Route = createFileRoute('/practice/$sessionId')({
   component: PracticeSolvePage,
@@ -29,9 +30,7 @@ function PracticeSolvePage() {
 
   if (!isReady || session == null) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[var(--bg)]">
-        <p className="text-sm text-[var(--text-tertiary)]">Cargando…</p>
-      </div>
+      <FullScreenLoader />
     )
   }
 

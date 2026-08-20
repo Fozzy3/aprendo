@@ -12,6 +12,7 @@ import ThemeToggle from '../components/ThemeToggle.tsx'
 import { studentAppStateQuery } from '../lib/student-queries.ts'
 import { useCurrentStudent } from '../lib/student-session.ts'
 import { getAllSubjectThemes } from '../lib/subject-theme.ts'
+import { FullScreenLoader } from '../components/FullScreenLoader.tsx'
 
 export const Route = createFileRoute('/diagnostic')({
   component: PlacementPage,
@@ -57,9 +58,7 @@ function PlacementPage() {
 
   if (!isReady || session == null || appStateQuery.isPending) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[var(--bg)]">
-        <p className="text-sm text-[var(--text-tertiary)]">Cargando…</p>
-      </div>
+      <FullScreenLoader />
     )
   }
 

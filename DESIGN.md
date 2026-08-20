@@ -99,10 +99,49 @@ reflex answer for every education product.
 
 Moods: `idle`, `happy`, `thinking`, `cheering`, `sleeping`. Flat shapes on a
 64×64 grid, no gradients, legible at 32px. Its fur uses tokens that belong to no
-other role, so Nico can never be confused with a state or an area.
+other role, so Nico can never be confused with a state or an area. He blinks on
+an irregular cadence — a metronome blink is worse than none.
 
-Appears at thresholds only. If Nico is on screen while the student is answering
-a question, that is a bug.
+**Appears at thresholds only.** If Nico is on screen while the student is
+answering or reviewing a question, that is a bug. The review screen in
+particular is work, not a moment, and deliberately has no mascot.
+
+Where he does belong, and nowhere else:
+
+| Surface | Mood |
+|---|---|
+| Landing hero / close | `idle` / `cheering` |
+| Nivelación intro | `idle`, or `happy` once an area is placed |
+| Route loading (`FullScreenLoader`) | `thinking` |
+| Empty state, nothing yet | `sleeping` |
+| Empty state, something went wrong | `idle` |
+
+## Loading and empty states
+
+There are exactly **two** loading components, and the split is not stylistic:
+
+- **`FullScreenLoader`** — the guard resolving before the shell exists. Once per
+  visit, nothing else on screen, so Nico is welcome.
+- **`PageLoader`** — content arriving inside a shell that is already painted.
+  Fires on every navigation, so it gets three pulsing dots and no character. A
+  cartoon on every tab change is choreography the student did not ask for.
+
+Empty states all go through **`MascotMessage`**, so no screen invents its own
+arrangement.
+
+This replaced 20 loading states written 12 different ways (`Cargando…`,
+`Preparando…`, `Cargando admin...`, `Preparando tu ruta...`, two of them with
+three dots instead of an ellipsis), each with hand-rolled markup — and a
+`MascotMessage` component that nothing used.
+
+## Colour hygiene
+
+No hex or rgb literals outside the token blocks, and **no fallbacks inside
+`var()`**. `var(--accent, #2563eb)` appeared five times: the fallback never fires
+while the token exists, and the day someone renames the token, five rules turn
+blue in an app whose brand is violet. `.chip-success` likewise had a literal
+green border beside a tokenised background, so the border would not have followed
+a palette change the other two properties did.
 
 ## Containers
 

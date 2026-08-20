@@ -6,6 +6,8 @@ import { getSubjectTheme } from '../lib/subject-theme.ts'
 import { GlobalScoreCard } from './GlobalScoreCard.tsx'
 import { ConfidenceBreakdownCard } from './ConfidenceBreakdownCard.tsx'
 import { getSubjectLabel, getSubtopicLabel } from '../lib/taxonomy.ts'
+import { PageLoader } from '../components/FullScreenLoader.tsx'
+import { MascotMessage } from './Mascot.tsx'
 
 function formatPercent(value: number) {
   return `${Math.round(value * 100)}%`
@@ -83,9 +85,7 @@ export function StudentProgressPage({ studentId }: { studentId: string }) {
 
   if (progressQuery.isPending || trendsQuery.isPending) {
     return (
-      <div className="fade-in mx-auto max-w-xl py-12 text-center">
-        <p className="text-sm text-[var(--text-tertiary)]">Preparando tu resumen…</p>
-      </div>
+      <PageLoader message="Preparando tu resumen…" />
     )
   }
 
@@ -105,18 +105,17 @@ export function StudentProgressPage({ studentId }: { studentId: string }) {
         <div className="card relative overflow-hidden p-8 text-center">
           <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top,var(--accent-soft),transparent_65%)]" />
           <div className="relative">
-            <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full border border-[var(--border)] bg-[var(--bg-inset)] text-[var(--text-tertiary)]">
-              <TrendingUp size={24} />
-            </div>
-            <h2 className="mb-2 font-display text-2xl italic text-[var(--text-primary)]">
-              Aún no hay progreso que mostrar
-            </h2>
-            <p className="mx-auto mb-6 max-w-xs text-sm text-[var(--text-secondary)]">
-              Completa el diagnóstico y practica para empezar a medir cuánto avanzas.
-            </p>
-            <Link to="/diagnostic" className="btn-primary no-underline">
-              Ir al diagnóstico
-            </Link>
+            <MascotMessage
+              mood="idle"
+              title="Todavía no puedo medir nada"
+              action={
+                <Link to="/diagnostic" className="btn-primary no-underline">
+                  Nivelar un área
+                </Link>
+              }
+            >
+              Nivélate en un área y desde ahí empiezo a seguir cuánto avanzas.
+            </MascotMessage>
           </div>
         </div>
       </div>

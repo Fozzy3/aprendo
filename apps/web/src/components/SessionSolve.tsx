@@ -10,6 +10,7 @@ import { sessionQuery } from '../lib/student-queries.ts'
 import { getKindIcon, getKindLabel } from '../lib/session-display.ts'
 import { formatClock, useSessionTimer } from '../lib/useSessionTimer.ts'
 import { getSubjectLabel } from '../lib/taxonomy.ts'
+import { MascotMessage } from './Mascot.tsx'
 
 type SessionSolveProps = {
   sessionId: string
@@ -197,10 +198,17 @@ export function SessionSolve({ sessionId, onExit, onCompleted }: SessionSolvePro
   if (current == null) {
     return (
       <div className="solve-loading">
-        <p>No hay preguntas disponibles para esta sesión.</p>
-        <button type="button" className="btn-primary mt-4" onClick={onExit}>
-          Volver
-        </button>
+        <MascotMessage
+          mood="idle"
+          title="No pudimos armar esta sesión"
+          action={
+            <button type="button" className="btn-primary" onClick={onExit}>
+              Volver
+            </button>
+          }
+        >
+          No hay preguntas disponibles para esta combinación todavía.
+        </MascotMessage>
       </div>
     )
   }

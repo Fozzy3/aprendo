@@ -7,6 +7,7 @@ import { api } from '@aprendo/convex/api'
 import { learningPathQuery, pathSubjectsQuery } from '../lib/student-queries.ts'
 import { getSubjectTheme } from '../lib/subject-theme.ts'
 import { getSyllabusStatus } from '../lib/syllabus-status.ts'
+import { MascotMessage } from './Mascot.tsx'
 
 const DEFAULT_SUBJECT_ID = 'lectura_critica'
 
@@ -194,10 +195,11 @@ function PathTrack({
 
   if (nodes.length === 0) {
     return (
-      <div className="card p-8 text-center">
-        <p className="text-sm text-[var(--text-secondary)]">
-          Todavía no hay temas disponibles en esta área.
-        </p>
+      <div className="card">
+        <MascotMessage mood="sleeping" title="Esta área aún no tiene temas">
+          Todavía no hay preguntas cargadas para esta materia. Prueba con otra
+          mientras tanto.
+        </MascotMessage>
       </div>
     )
   }

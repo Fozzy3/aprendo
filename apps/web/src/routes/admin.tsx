@@ -15,6 +15,7 @@ import MarkdownBlock from '../components/MarkdownBlock.tsx'
 import { pdfUploadsQuery, questionBrowserQuery } from '../lib/pdf-queries.ts'
 import { uploadPdfToConvex } from '../lib/pdf-upload.ts'
 import ThemeToggle from '../components/ThemeToggle.tsx'
+import { FullScreenLoader } from '../components/FullScreenLoader.tsx'
 
 type AdminTab = 'uploads' | 'questions'
 
@@ -64,9 +65,7 @@ export const Route = createFileRoute('/admin')({
 
 function AdminPending() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-[var(--bg)]">
-      <p className="text-sm text-[var(--text-tertiary)]">Cargando admin...</p>
-    </div>
+    <FullScreenLoader message="Cargando el panel…" />
   )
 }
 
@@ -286,7 +285,7 @@ function UploadsTab() {
             onClick={() => uploadMutation.mutate(selectedFiles)}
             className="btn-primary"
           >
-            {uploadMutation.isPending ? 'Uploading...' : 'Upload PDFs'}
+            {uploadMutation.isPending ? 'Subiendo…' : 'Upload PDFs'}
           </button>
         </div>
 
@@ -473,7 +472,7 @@ function QuestionViewer({ pdfUploadId, sequence }: { pdfUploadId: string; sequen
   if (browserQuery.isPending) {
     return (
       <div className="card p-6 text-center">
-        <p className="text-sm text-[var(--text-tertiary)]">Loading question...</p>
+        <p className="text-sm text-[var(--text-tertiary)]">Cargando pregunta…</p>
       </div>
     )
   }

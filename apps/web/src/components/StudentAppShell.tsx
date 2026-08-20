@@ -106,7 +106,7 @@ export function StudentAppShell({
               onClick={() => { void handleSignOut() }}
               className="btn-ghost text-xs"
             >
-              {isSigningOut ? 'Saliendo...' : 'Salir'}
+              {isSigningOut ? 'Saliendo…' : 'Salir'}
             </button>
           </div>
         </div>

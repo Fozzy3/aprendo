@@ -23,6 +23,8 @@ import {
 import { sessionHistoryQuery, studentAppStateQuery } from '../lib/student-queries.ts'
 import { useCurrentStudent } from '../lib/student-session.ts'
 import { getSubjectLabel, getSubtopicLabel, subjectIds } from '../lib/taxonomy.ts'
+import { FullScreenLoader } from '../components/FullScreenLoader.tsx'
+import { MascotMessage } from '../components/Mascot.tsx'
 
 export const Route = createFileRoute('/practice')({
   component: PracticeHubPage,
@@ -117,9 +119,7 @@ function PracticeHubPage() {
 
   if (!isReady || session == null || appStateQuery.isPending || historyQuery.isPending) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[var(--bg)]">
-        <p className="text-sm text-[var(--text-tertiary)]">Cargando…</p>
-      </div>
+      <FullScreenLoader />
     )
   }
 
@@ -357,11 +357,19 @@ function PracticeHubPage() {
             </div>
           ) : (
             <div className="hub-history-empty">
-              <p>
+              <MascotMessage
+                mood="sleeping"
+                size="md"
+                title={
+                  filter === 'all'
+                    ? 'Todavía no has practicado'
+                    : 'Nada de este tipo todavía'
+                }
+              >
                 {filter === 'all'
-                  ? 'Aún no tienes sesiones completadas. Inicia una práctica arriba.'
-                  : 'No tienes sesiones de este tipo todavía.'}
-              </p>
+                  ? 'Elige una práctica arriba y tu primera sesión aparecerá acá.'
+                  : 'Prueba con otro filtro.'}
+              </MascotMessage>
             </div>
           )}
         </section>

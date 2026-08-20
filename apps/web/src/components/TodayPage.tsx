@@ -18,6 +18,7 @@ import {
 import { getKindIcon } from '../lib/session-display.ts'
 import { formatMasteryPercent, getSyllabusStatus } from '../lib/syllabus-status.ts'
 import { getSubjectLabel } from '../lib/taxonomy.ts'
+import { PageLoader } from '../components/FullScreenLoader.tsx'
 
 function greeting(): string {
   const hour = new Date().getHours()
@@ -58,9 +59,7 @@ export function TodayPage({ studentId }: { studentId: string }) {
 
   if (dashboard.isPending || progress.isPending) {
     return (
-      <div className="fade-in mx-auto max-w-xl py-12 text-center">
-        <p className="text-sm text-[var(--text-tertiary)]">Preparando tu día…</p>
-      </div>
+      <PageLoader message="Preparando tu día…" />
     )
   }
 

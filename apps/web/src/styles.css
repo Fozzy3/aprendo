@@ -518,7 +518,7 @@ pre code {
 }
 
 .chip-success {
-  border-color: rgba(76, 175, 125, 0.28);
+  border-color: color-mix(in srgb, var(--success) 28%, transparent);
   background: var(--success-soft);
   color: var(--success-text);
 }
@@ -1827,9 +1827,9 @@ pre code {
   margin-top: 0.55rem;
   padding: 0.45rem 0.75rem;
   border-radius: 0.55rem;
-  border: 1px solid var(--border-accent, #2563eb);
-  background: color-mix(in srgb, var(--accent, #2563eb) 8%, transparent);
-  color: var(--accent-text, #2563eb);
+  border: 1px solid var(--border-accent);
+  background: color-mix(in srgb, var(--accent) 8%, transparent);
+  color: var(--accent-text);
   font-size: 0.82rem;
   font-weight: 600;
   cursor: pointer;
@@ -1837,12 +1837,12 @@ pre code {
 }
 
 .tutor-artifact-cta:hover {
-  background: color-mix(in srgb, var(--accent, #2563eb) 14%, transparent);
+  background: color-mix(in srgb, var(--accent) 14%, transparent);
   transform: translateX(1px);
 }
 
 .tutor-artifact-cta:focus-visible {
-  outline: 2px solid var(--accent, #2563eb);
+  outline: 2px solid var(--accent);
   outline-offset: 2px;
 }
 
@@ -1850,7 +1850,7 @@ pre code {
   display: inline-flex;
   margin-top: 0.45rem;
   font-size: 0.78rem;
-  color: var(--text-tertiary, #6b7280);
+  color: var(--text-tertiary);
 }
 
 /* Composer */
@@ -3652,6 +3652,21 @@ pre code {
 
 .mascot-line-fill { fill: var(--mascot-nose); }
 
+/* A blink every few seconds. Irregular on purpose: the eyes shut twice in quick
+   succession and then hold, which is how a real blink reads. A metronome blink
+   is worse than none. */
+.mascot-eyes {
+  animation: mascot-blink 6.5s steps(1, end) infinite;
+  transform-origin: 50% 31px;
+}
+
+.mascot-thinking .mascot-eyes { animation-duration: 4.5s; }
+
+@keyframes mascot-blink {
+  0%, 92%, 95%, 97%, 100% { transform: scaleY(1); }
+  93.5%, 96% { transform: scaleY(0.1); }
+}
+
 /* Idle breathing. Slow and small enough to register as alive rather than as an
    animation demanding attention — this sits behind real content. */
 .mascot-idle,
@@ -3688,6 +3703,7 @@ pre code {
   .mascot-idle,
   .mascot-thinking,
   .mascot-cheering,
+  .mascot-eyes,
   .mascot-sleeping .mascot-zzz {
     animation: none;
   }
@@ -4131,4 +4147,72 @@ pre code {
      claim reads better once the eye has something to hold. */
   .landing-hero-mascot { order: -1; }
   .landing-lede { max-width: none; }
+}
+
+
+/* ---------------------------------------------------------------------------
+   Shared loading and empty states.
+
+   Before this the app had 20 loading states written 12 different ways, and a
+   `MascotMessage` component nobody used. The split below is deliberate:
+
+   - `.route-loader` (full screen, with Nico) is for the guard resolving before
+     the shell exists. It happens once per visit and a character is welcome.
+   - `.page-loader` (in-shell, no mascot) is for content arriving inside a shell
+     that is already painted. It fires on every navigation, and a cartoon on
+     every tab change is choreography the student did not ask for — the product
+     register is explicit that delight belongs to moments, not transitions.
+   --------------------------------------------------------------------------- */
+
+.route-loader {
+  display: flex;
+  min-height: 100dvh;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.9rem;
+  background: var(--bg);
+}
+
+.route-loader-text {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.page-loader {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  padding: 3rem 1rem;
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+}
+
+/* Three dots that fill in sequence. Carries "working" without the spinner the
+   product register rules out for content. */
+.page-loader-dots {
+  display: inline-flex;
+  gap: 0.22rem;
+}
+
+.page-loader-dots span {
+  height: 0.32rem;
+  width: 0.32rem;
+  border-radius: var(--radius-pill);
+  background: var(--brand);
+  animation: page-loader-pulse 1.1s ease-in-out infinite;
+}
+
+.page-loader-dots span:nth-child(2) { animation-delay: 0.15s; }
+.page-loader-dots span:nth-child(3) { animation-delay: 0.3s; }
+
+@keyframes page-loader-pulse {
+  0%, 100% { opacity: 0.25; }
+  50% { opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .page-loader-dots span { animation: none; opacity: 0.7; }
 }

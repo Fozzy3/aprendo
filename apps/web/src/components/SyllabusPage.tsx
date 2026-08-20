@@ -8,6 +8,7 @@ import { api } from '@aprendo/convex/api'
 import { RingProgress } from './RingProgress.tsx'
 import { syllabusQuery } from '../lib/student-queries.ts'
 import { formatMasteryPercent, getSyllabusStatus } from '../lib/syllabus-status.ts'
+import { PageLoader } from '../components/FullScreenLoader.tsx'
 
 // The syllabus shape is defined once, in the `getSyllabus` query — derive the
 // node types from its inferred return so backend and UI can't drift.
@@ -43,9 +44,7 @@ export function SyllabusPage({ studentId }: { studentId: string }) {
 
   if (syllabus.isPending) {
     return (
-      <div className="fade-in mx-auto max-w-xl py-12 text-center">
-        <p className="text-sm text-[var(--text-tertiary)]">Cargando el temario…</p>
-      </div>
+      <PageLoader message="Cargando el temario…" />
     )
   }
 

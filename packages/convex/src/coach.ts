@@ -1,4 +1,3 @@
-import { createOpenRouter } from '@openrouter/ai-sdk-provider'
 import { generateText } from 'ai'
 import { v } from 'convex/values'
 import { internal } from './_generated/api'
@@ -14,12 +13,9 @@ import { assertOwnsStudent } from './auth'
 import { decideClaim } from './aiCache'
 import { colombiaDayNumber, colombiaWeekIndex } from './colombiaTime'
 import { getSubjectLabel } from './taxonomy'
+import { APRENDO_MODEL_ID, aprendoModel } from './aiProvider'
 
-const openrouter = createOpenRouter({
-  apiKey: process.env.OPENROUTER_API_KEY,
-})
-
-const COACH_MODEL = 'deepseek/deepseek-v4-pro'
+const COACH_MODEL = APRENDO_MODEL_ID
 const PROMPT_VERSION = 'v1'
 
 export const getWeeklyCoachSummary = query({
@@ -196,7 +192,7 @@ export const generateWeeklyCoachSummary = internalAction({
             ].join('\n')
 
       const { text } = await generateText({
-        model: openrouter(COACH_MODEL),
+        model: aprendoModel(COACH_MODEL),
         system: COACH_SYSTEM,
         prompt,
         maxOutputTokens: 600,

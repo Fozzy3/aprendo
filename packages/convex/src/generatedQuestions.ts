@@ -1,4 +1,3 @@
-import { createOpenRouter } from '@openrouter/ai-sdk-provider'
 import { generateObject } from 'ai'
 import { z } from 'zod'
 import { ConvexError, v } from 'convex/values'
@@ -8,12 +7,9 @@ import taxonomyContract from '../../../docs/taxonomy.v1.json'
 import { requireAuthenticatedStudentId } from './auth'
 import { getSubtopicContext } from './taxonomy'
 import { questionOptionValidator } from './validators'
+import { APRENDO_MODEL_ID, aprendoModel } from './aiProvider'
 
-const openrouter = createOpenRouter({
-  apiKey: process.env.OPENROUTER_API_KEY,
-})
-
-const GENERATION_MODEL = 'deepseek/deepseek-v4-pro'
+const GENERATION_MODEL = APRENDO_MODEL_ID
 const AI_UPLOAD_SLUG = 'ai-generated'
 const TAXONOMY_VERSION = taxonomyContract.taxonomy_version
 const TAXONOMY_RELEASE = taxonomyContract.taxonomy_release
@@ -146,7 +142,7 @@ export const generateSubtopicQuestions = action({
     const count = Math.min(Math.max(args.count ?? 5, 1), MAX_QUESTIONS)
 
     const { object } = await generateObject({
-      model: openrouter(GENERATION_MODEL),
+      model: aprendoModel(GENERATION_MODEL),
       schema: generationSchema,
       system: GENERATION_SYSTEM,
       prompt: [

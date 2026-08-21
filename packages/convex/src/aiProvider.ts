@@ -13,10 +13,9 @@ import { createOpenRouter } from '@openrouter/ai-sdk-provider'
  * lessons go through `generateObject` with a Zod schema. A cheaper model without
  * both would not be a substitute at any price.
  *
- * DeepInfra was wired here first and reverted: its OpenAI-compatible provider
- * builds against `@ai-sdk/provider@4` while this repo's `ai@6` and
- * `@ai-sdk/google` are on `@3`, so the model types did not line up. OpenRouter
- * serves the same model, is already a dependency, and quoted slightly cheaper.
+ * OpenRouter rather than calling the vendor directly: its provider is already a
+ * dependency and matches this repo's `ai@6` types, and it quoted the same model
+ * slightly cheaper.
  */
 
 /** Swapping this is the whole migration if a better option turns up. */

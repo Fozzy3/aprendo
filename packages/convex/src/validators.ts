@@ -84,6 +84,17 @@ export const questionDocumentValidator = v.object({
   difficultyRating: v.optional(v.number()),
   difficultyAttemptCount: v.optional(v.number()),
   difficultyUpdatedAt: v.optional(v.number()),
+  /**
+   * The stem rendered exactly as it appears on the printed booklet, figure
+   * included.
+   *
+   * The diagrams, tables and typeset equations in these PDFs are vector art, so
+   * the text layer carries the words and loses the picture — which is why a
+   * third of the bank had to be discarded as unanswerable. This is the page
+   * region cut from the question's own heading to its first option: the student
+   * reads what the exam actually shows, and still answers with real buttons.
+   */
+  renderedStemImageId: v.optional(v.id('_storage')),
   taxonomyStatus: v.optional(processingStatusValidator),
   taxonomyVersion: v.optional(v.string()),
   taxonomyRelease: v.optional(v.string()),
@@ -113,6 +124,8 @@ export const questionGroupDocumentValidator = v.object({
   contextKey: v.string(),
   contextMarkdown: v.string(),
   contextImages: v.optional(v.array(v.string())),
+  /** The shared stimulus rendered from the page, for tables and diagrams. */
+  renderedContextImageId: v.optional(v.id('_storage')),
   /** Range from the source instruction, e.g. 4 and 7. */
   firstNumber: v.number(),
   lastNumber: v.number(),

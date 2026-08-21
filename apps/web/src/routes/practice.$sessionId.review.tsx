@@ -522,7 +522,19 @@ function ReviewPage() {
 
           <article className="stage-question">
             <div className="stage-question-body">
-              <MarkdownBlock markdown={currentQuestion.question.bodyMarkdown} />
+              {currentQuestion.stemImageUrl != null ? (
+                <>
+                  <img
+                    src={currentQuestion.stemImageUrl}
+                    alt=""
+                    className="question-scan"
+                    loading="lazy"
+                  />
+                  <span className="sr-only">{currentQuestion.question.bodyMarkdown}</span>
+                </>
+              ) : (
+                <MarkdownBlock markdown={currentQuestion.question.bodyMarkdown} />
+              )}
             </div>
 
             <div className="review-options">

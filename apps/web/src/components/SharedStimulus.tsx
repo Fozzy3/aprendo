@@ -3,6 +3,8 @@ import MarkdownBlock from './MarkdownBlock.tsx'
 export interface QuestionGroupContext {
   id: string
   contextMarkdown: string
+  /** The passage or table rendered from the booklet, when one was captured. */
+  imageUrl?: string | null
   memberCount: number
   /** 1-based position of the current question within the group. */
   position: number
@@ -37,7 +39,14 @@ export function SharedStimulus({
         </span>
       </summary>
       <div className="shared-stimulus-body">
-        <MarkdownBlock markdown={group.contextMarkdown} />
+        {group.imageUrl != null ? (
+          <>
+            <img src={group.imageUrl} alt="" className="question-scan" loading="lazy" />
+            <span className="sr-only">{group.contextMarkdown}</span>
+          </>
+        ) : (
+          <MarkdownBlock markdown={group.contextMarkdown} />
+        )}
       </div>
     </details>
   )

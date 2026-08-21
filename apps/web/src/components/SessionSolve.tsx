@@ -340,7 +340,23 @@ export function SessionSolve({ sessionId, onExit, onCompleted }: SessionSolvePro
 
         <div className="solve-work" ref={workRef}>
         <article className="solve-question">
-          <MarkdownBlock markdown={current.question.bodyMarkdown} />
+          {current.stemImageUrl != null ? (
+            /* The stem as the booklet prints it, diagram included. The markdown
+               stays in the DOM but visually hidden: it is what a screen reader
+               announces, what find-in-page matches, and what the tutor is given
+               as context — the image only replaces the *look*. */
+            <>
+              <img
+                src={current.stemImageUrl}
+                alt=""
+                className="question-scan"
+                loading="lazy"
+              />
+              <span className="sr-only">{current.question.bodyMarkdown}</span>
+            </>
+          ) : (
+            <MarkdownBlock markdown={current.question.bodyMarkdown} />
+          )}
         </article>
 
         <div className="solve-options" role="group" aria-label="Opciones de respuesta">

@@ -13,3 +13,5 @@ packages/ingest/.artifacts
 
 # Source PDFs: public, re-downloadable, ~150MB. See content/MANIFEST.md
 content/**/*.pdf
+
+content/crops/

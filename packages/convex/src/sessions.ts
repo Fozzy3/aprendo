@@ -771,6 +771,27 @@ export const getSession = query({
         .map((group) => [group._id, group]),
     )
 
+    // Storage ids are not URLs, so they are resolved here rather than leaving
+    // the client to make a round trip per question.
+    const stemImageUrls = new Map<string, string>()
+    await Promise.all(
+      questions.map(async (question) => {
+        const id = question?.renderedStemImageId
+        if (id == null) return
+        const url = await ctx.storage.getUrl(id)
+        if (url != null) stemImageUrls.set(id, url)
+      }),
+    )
+    const contextImageUrls = new Map<string, string>()
+    await Promise.all(
+      [...groupById.values()].map(async (group) => {
+        const id = group.renderedContextImageId
+        if (id == null) return
+        const url = await ctx.storage.getUrl(id)
+        if (url != null) contextImageUrls.set(id, url)
+      }),
+    )
+
     // Answers and explanations are only disclosed once the session is complete.
     const canReviewAnswers = session.status === 'completed'
 
@@ -796,6 +817,12 @@ export const getSession = query({
             selectionReason: sessionQuestion.selectionReason,
             selectionMetadata: sessionQuestion.selectionMetadata ?? null,
             question: displayQuestion,
+            // The stem as printed, figure included. Null for questions whose
+            // text layer already carries everything.
+            stemImageUrl:
+              question.renderedStemImageId == null
+                ? null
+                : stemImageUrls.get(question.renderedStemImageId) ?? null,
             // The shared text this question depends on, plus where it sits in
             // the group ("Pregunta 2 de 4 de este texto").
             group:
@@ -804,6 +831,10 @@ export const getSession = query({
                 : {
                     id: group._id,
                     contextMarkdown: group.contextMarkdown,
+                    imageUrl:
+                      group.renderedContextImageId == null
+                        ? null
+                        : contextImageUrls.get(group.renderedContextImageId) ?? null,
                     memberCount: group.memberCount,
                     position: (question.groupPosition ?? 0) + 1,
                   },

@@ -1,4 +1,4 @@
-import { internalAction, internalMutation } from './_generated/server'
+import { internalAction, internalMutation, internalQuery } from './_generated/server'
 import { internal } from './_generated/api'
 import { v } from 'convex/values'
 import type { Id } from './_generated/dataModel'
@@ -228,4 +228,78 @@ export const grantAdmin = internalMutation({
     await ctx.db.patch(student._id, { isAdmin: true, updatedAt: Date.now() })
     return { granted: true, studentId: student._id }
   },
+})
+
+/**
+ * A batch of upload URLs.
+ *
+ * One per call meant spawning the Convex CLI once per file — 418 process
+ * starts. Sending the images as base64 arguments instead hit ARG_MAX and threw
+ * `E2BIG`, which the uploader swallowed: it reported 418 files handled and
+ * attached none. Handing back a batch of URLs keeps the bytes on an HTTP PUT
+ * where they belong and costs one call per twenty files.
+ */
+export const generateCropUploadUrls = internalMutation({
+  args: { count: v.number() },
+  handler: async (ctx, args): Promise<string[]> => {
+    const urls: string[] = []
+    for (let i = 0; i < Math.min(args.count, 40); i += 1) {
+      urls.push(await ctx.storage.generateUploadUrl())
+    }
+    return urls
+  },
+})
+
+/**
+ * Attach rendered page crops to the questions and groups of one booklet.
+ *
+ * Matched by question number within the upload, which is the only stable key:
+ * the crop comes from the PDF and the row comes from the parser, and neither
+ * knows the other's id.
+ */
+export const attachCrops = internalMutation({
+  args: {
+    pdfUploadId: v.id('pdfUploads'),
+    questions: v.array(v.object({ number: v.number(), storageId: v.id('_storage') })),
+    groups: v.array(
+      v.object({ first: v.number(), last: v.number(), storageId: v.id('_storage') }),
+    ),
+  },
+  handler: async (ctx, args) => {
+    const rows = await ctx.db
+      .query('questions')
+      .withIndex('by_pdfUploadId', (q) => q.eq('pdfUploadId', args.pdfUploadId))
+      .collect()
+    const byNumber = new Map(rows.map((row) => [row.questionNumber, row]))
+
+    let attached = 0
+    for (const crop of args.questions) {
+      const row = byNumber.get(crop.number)
+      if (row == null) continue
+      await ctx.db.patch(row._id, { renderedStemImageId: crop.storageId })
+      attached += 1
+    }
+
+    const groupRows = await ctx.db
+      .query('questionGroups')
+      .withIndex('by_pdfUploadId', (q) => q.eq('pdfUploadId', args.pdfUploadId))
+      .collect()
+    let attachedGroups = 0
+    for (const crop of args.groups) {
+      const row = groupRows.find(
+        (g) => g.firstNumber === crop.first && g.lastNumber === crop.last,
+      )
+      if (row == null) continue
+      await ctx.db.patch(row._id, { renderedContextImageId: crop.storageId })
+      attachedGroups += 1
+    }
+
+    return { attached, attachedGroups, skipped: args.questions.length - attached }
+  },
+})
+
+/** Public URL for a stored crop, resolved at read time. */
+export const cropUrl = internalQuery({
+  args: { storageId: v.id('_storage') },
+  handler: async (ctx, args) => ctx.storage.getUrl(args.storageId),
 })

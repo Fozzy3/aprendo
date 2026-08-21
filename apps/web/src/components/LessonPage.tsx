@@ -1,8 +1,7 @@
 import { useConvexMutation } from '@convex-dev/react-query'
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { Link, useNavigate } from '@tanstack/react-router'
-import { useAction } from 'convex/react'
-import { ArrowLeft, Lightbulb, Loader2, Play, Sparkles } from 'lucide-react'
+import { ArrowLeft, Lightbulb, Loader2, Play } from 'lucide-react'
 import { useEffect, useRef } from 'react'
 import { api } from '@aprendo/convex/api'
 import MarkdownBlock from './MarkdownBlock.tsx'
@@ -61,9 +60,6 @@ export function LessonPage({ subtopicId, studentId }: { subtopicId: string; stud
       await navigate({ to: '/practice/$sessionId', params: { sessionId } })
     },
   })
-
-  const generate = useAction(api.generatedQuestions.generateSubtopicQuestions)
-  const generateMutation = useMutation({ mutationFn: async () => generate({ subtopicId, count: 5 }) })
 
   // Kick off generation once when the subtopic has no cached lesson yet.
   const requestedRef = useRef<string | null>(null)
@@ -173,27 +169,6 @@ export function LessonPage({ subtopicId, studentId }: { subtopicId: string; stud
           {readConvexError(practiceMutation.error, 'No se pudo iniciar la práctica.')}
         </div>
       ) : null}
-
-      {/* AI question generation (thin inventory) */}
-      <div className="flex flex-col items-center gap-2 text-center">
-        <button
-          type="button"
-          disabled={generateMutation.isPending}
-          onClick={() => generateMutation.mutate()}
-          className="btn-ghost inline-flex items-center gap-1.5 text-sm"
-        >
-          <Sparkles size={14} />
-          {generateMutation.isPending ? 'Generando preguntas…' : 'Generar más práctica con IA'}
-        </button>
-        {generateMutation.data != null ? (
-          <p className="text-xs text-[var(--success-text)]">
-            Se añadieron {generateMutation.data.inserted} preguntas nuevas a este tema.
-          </p>
-        ) : null}
-        {generateMutation.error ? (
-          <p className="text-xs text-[var(--accent-text)]">No se pudieron generar preguntas.</p>
-        ) : null}
-      </div>
     </div>
   )
 }

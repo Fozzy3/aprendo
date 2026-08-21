@@ -1,5 +1,4 @@
 import { abortStream, Agent, createTool, extractText, listMessages, listStreams, syncStreams, vStreamArgs, vStreamMessagesReturnValue } from '@convex-dev/agent'
-import { createOpenRouter } from '@openrouter/ai-sdk-provider'
 import { stepCountIs } from 'ai'
 import { z } from 'zod'
 import { internal } from './_generated/api'
@@ -9,12 +8,9 @@ import { ConvexError, v } from 'convex/values'
 import { paginationOptsValidator } from 'convex/server'
 import type { Doc, Id } from './_generated/dataModel'
 import { getSubjectLabel, getSubtopicLabel } from './taxonomy'
+import { aprendoModel } from './aiProvider'
 
 const agentComponent = (components as Record<string, unknown>).agent as ConstructorParameters<typeof Agent>[0]
-
-const openrouter = createOpenRouter({
-  apiKey: process.env.OPENROUTER_API_KEY,
-})
 
 const BASE_TUTOR_INSTRUCTIONS = [
   'Eres un tutor breve y claro para estudiantes preparando Saber 11.',
@@ -144,7 +140,7 @@ const createArtifactTool = createTool({
 
 const tutorAgent = new Agent(agentComponent, {
   name: 'Tutor',
-  languageModel: openrouter('deepseek/deepseek-v4-pro'),
+  languageModel: aprendoModel(),
   instructions: [
     BASE_TUTOR_INSTRUCTIONS,
     'Si no recibes contexto sobre la pregunta actual, dilo claramente y pide la información necesaria.',

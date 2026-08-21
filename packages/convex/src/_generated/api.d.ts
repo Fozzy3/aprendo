@@ -8,6 +8,7 @@
  * @module
  */
 
+import type * as _count from "../_count.js";
 import type * as aiCache from "../aiCache.js";
 import type * as aiProvider from "../aiProvider.js";
 import type * as auth from "../auth.js";
@@ -47,6 +48,7 @@ import type {
 } from "convex/server";
 
 declare const fullApi: ApiFromModules<{
+  _count: typeof _count;
   aiCache: typeof aiCache;
   aiProvider: typeof aiProvider;
   auth: typeof auth;

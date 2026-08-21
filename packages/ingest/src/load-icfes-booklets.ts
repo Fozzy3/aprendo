@@ -17,12 +17,42 @@ import { CONFIDENT_AT, guessSubtopic } from './icfes-subtopic-guess'
 const REPO = resolve(import.meta.dirname, '../../..')
 const CONVEX_DIR = resolve(REPO, 'packages/convex')
 
-/** Inglés is absent on purpose: its booklet uses a different item format. */
+/**
+ * Every booklet whose questions this parser can read.
+ *
+ * Inglés is absent on purpose, and not only because its item formats differ:
+ * its reading passages are images, so even a parser for those formats would
+ * produce questions no one could answer.
+ */
 const BOOKLETS: Array<{ file: string; subjectId: string; label: string }> = [
-  { file: '02_practica_lectura', subjectId: 'lectura_critica', label: 'Lectura Crítica' },
-  { file: '04_practica_matematicas', subjectId: 'matematicas', label: 'Matemáticas' },
-  { file: '06_practica_sociales', subjectId: 'sociales_ciudadanas', label: 'Sociales y Ciudadanas' },
-  { file: '08_practica_ciencias', subjectId: 'ciencias_naturales', label: 'Ciencias Naturales' },
+  // Práctica booklets: answer key as a two-column table at the end.
+  { file: '02_practica_lectura', subjectId: 'lectura_critica', label: 'Lectura Crítica · práctica' },
+  { file: '04_practica_matematicas', subjectId: 'matematicas', label: 'Matemáticas · práctica' },
+  { file: '06_practica_sociales', subjectId: 'sociales_ciudadanas', label: 'Sociales · práctica' },
+  { file: '08_practica_ciencias', subjectId: 'ciencias_naturales', label: 'Ciencias Naturales · práctica' },
+
+  // Official exam booklets. Same question layout, but the key is a
+  // three-column table listing the competency assessed for each item.
+  {
+    file: '16-feb-cuadernillo-de-preguntas-lectura-critica-saber-11-2026',
+    subjectId: 'lectura_critica',
+    label: 'Lectura Crítica · examen 2026',
+  },
+  {
+    file: '09-marzo_cuadernillo-de-preguntas-matematicas-saber-11-2026',
+    subjectId: 'matematicas',
+    label: 'Matemáticas · examen 2026',
+  },
+  {
+    file: '24-feb-cuadernillo-preguntas-ciencias-naturales-saber-11-2026',
+    subjectId: 'ciencias_naturales',
+    label: 'Ciencias Naturales · examen 2026',
+  },
+  {
+    file: '22-diciembre-cuadernillo-de-preguntas-ciencias-naturales-saber-11-2025',
+    subjectId: 'ciencias_naturales',
+    label: 'Ciencias Naturales · examen 2025',
+  },
 ]
 
 const dryRun = process.argv.includes('--dry')

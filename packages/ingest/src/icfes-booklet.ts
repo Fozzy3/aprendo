@@ -89,8 +89,21 @@ export function referencesArtwork(text: string): boolean {
  * level after each. Only the tail of the document is scanned: `3 B` shaped
  * fragments occur inside question bodies too.
  */
+/** Headings the booklets put above their answer key, in every format seen. */
+const KEY_HEADING =
+  /(Tabla de respuestas correctas|Respuestas? correctas?|Clave de respuestas|Posición\s+Afirmación)/gi
+
 export function parseAnswerKey(text: string): Map<number, { option: string; level?: string }> {
-  const tail = text.slice(-6000)
+  // Scan from the key's own heading rather than from a fixed tail.
+  //
+  // The 2026 booklets print the key as a three-column table with the assessed
+  // statement in the middle, so one entry spans about five lines and a 50-entry
+  // key runs well past any fixed window. A 6000-character tail saw the last
+  // fourteen rows of Ciencias Naturales and silently dropped the other
+  // thirty-two.
+  const headings = [...text.matchAll(KEY_HEADING)]
+  const from = headings.length > 0 ? headings[0]!.index! : Math.max(0, text.length - 6000)
+  const tail = text.slice(from)
   const key = new Map<number, { option: string; level?: string }>()
 
   for (const line of tail.split('\n')) {

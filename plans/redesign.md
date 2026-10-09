@@ -244,6 +244,128 @@ sacó 30% veía "Nivel 4" como su punto de partida y por tanto que había empeor
 - Módulos puros nuevos exportados en `package.json` (`./globalScore`, `./confidence`, `./examPlan`,
   `./elo`) y registrados a mano en `_generated/api.d.ts` (`convex codegen` exige `CONVEX_DEPLOYMENT`).
 
+---
+
+## Aprendo v3 — imitar el ecosistema SAT (Fases 14-18)
+
+Origen: el socio pidió llevar a Aprendo lo que hace a Khan Academy, Bluebook, UWorld/Magoosh, PrepScholar
+y Princeton/Kaplan, los referentes del SAT. Análisis de brechas (2026-10-08): 30 brechas (G01-G30) y 13 bugs
+verificados contra el código, más investigación ICFES/mercado.
+
+**Restricciones que cambian la traducción SAT → ICFES** (verificadas en la guía 2026-2):
+- Saber 11 2026 es **papel**, forma fija, IRT 3PL, dos sesiones de 4 h 30 el mismo día, **sin calculadora**
+  ni hoja de fórmulas (solo hoja de operaciones). ⇒ No Desmos, no hoja de fórmulas, no simulacro adaptativo.
+- Las herramientas de Bluebook se traducen al papel: marcar para revisar = encerrar el número en el
+  cuadernillo; tachar opciones = tachar a lápiz; pausa entre módulos = Sesión 1 / Sesión 2.
+- **ICFES prohíbe el uso con ánimo de lucro y la transformación de sus ítems.** Decisión del usuario:
+  ICFES solo en nivel gratis con atribución + banco original (IA + verificación + revisión) para el pago.
+- Modelo: **B2C primero** (pase único hasta el día del examen), gating listo sin pasarela real.
+
+### Fase 14 — Integridad y bugs (fundamentos para cobrar)  · estado: ✅ completada
+- [x] G01: dueño de la sesión en createSession/submitAnswer/clearAnswer/completeSession; `getSession` sella
+      la correctitud hasta `completed` (`sessionIntegrity.ts`: clave, solución, distractores, dificultad,
+      `isCorrect`). Respuestas cortadas a `expiresAt` + 60 s; la entrega acepta hasta + 5 min (señal móvil).
+- [x] Tutor autenticado por identidad, ligado a las preguntas de su sesión y cerrado mientras haya un examen
+      cronometrado en vivo (`isLiveTimedExam`). Presupuesto diario por estudiante (`llmBudget.ts`, tabla
+      `llmUsage`). `generateSubtopicQuestions` pasa a internal. `myFunctions.ts` borrado.
+- [x] Simulacros: `simulacroForm.ts` — primero lo nunca visto, luego lo visto hace más tiempo, semilla por
+      estudiante+intento, grupos enteros, Sesión 2 excluye la 1. Por área guarda su `subjectId`.
+      El puntaje divide por lo servido (`scoreSimulacroSubjects`), no por el total oficial.
+- [x] Sesión vencida ⇒ `abandoned` en `createSession`; `getActiveSession` ya no ofrece retomarla.
+- [x] Cuadernillos: recarga idempotente (upsert por número; lo que desaparece se **retira** como `excluded`,
+      nunca se borra) y grupos calculados sobre el cuadernillo entero (`planBookletFinish`).
+- [x] Coach con semanas lunes-domingo y refresco si hubo actividad; Ruta usa el mismo nivel que Progreso;
+      lecciones obsoletas se regeneran mostrando el texto anterior.
+- [x] Móvil: solve con flex + dvh, una fila de cabecera y barra inferior en teléfono, intro antes de un
+      examen cronometrado (`TimedSessionIntro`), aviso al salir, aria-labels, tutor lazy (`ReviewTutor`).
+
+**Aprendizajes / decisiones**
+- **Una mutation de Convex que lanza revierte todas sus escrituras**: no sirve "marcar abandonada y lanzar".
+  La sesión vencida se cierra en el siguiente `createSession`.
+- **Sellar `getSession` no basta**: cualquier query que cuente aciertos de sesiones abiertas (cola de repaso,
+  historial, tendencias) filtra la clave. Regla: solo `settledAttempts` (intentos de sesiones `completed`)
+  alimentan conteos de aciertos.
+- **Banco pequeño ⇒ simulacro corto**: Matemáticas tiene ~44 preguntas usables contra 25 + 25. La Sesión 2
+  sale corta hasta que crezca el banco (Fase 17, banco original).
+- Verificación: convex tsc 0, web/ingest typecheck 0; tests convex 160, ingest 36, web 11.
+
+### Fase 15 — Herramientas de examen (Bluebook)  · estado: ✅ completada
+- [x] G11/G12: `questionAttempts.flagged` / `eliminatedOptions` / `timeSpentMs` (opcionales) +
+      `setQuestionFlag`, `setEliminatedOptions`, `recordQuestionTime`; guarda común `loadOpenSessionQuestion`.
+      `clearAnswer` ya no borra la fila (conserva marca, tachadas y tiempo).
+- [x] Solve: navegador en hoja inferior (respondida / sin responder / marcada / actual), "Revisa antes de
+      entregar", reloj ocultable con aviso a los 5 min (+ vibración), chip de ritmo, tamaño de texto A-/A+,
+      cola de respuestas offline con reintentos (`localStorage`), estado "Esta sesión venció".
+- [x] G13 día de examen: Sesión 1 → pantalla de descanso → Sesión 2.
+- [x] G27 `pacing.ts`: ritmo oficial por sesión (S1 135 s, S2 ≈121 s), estado en vivo y promedio por área.
+- [x] G02 `getNivelacionResult` + pantalla de nivel con descriptor oficial y el del nivel siguiente.
+- [x] G09 `getSimulacroReport` (`examReport.ts`): S1+S2 combinadas, global 0-500 con banda o lo que falta,
+      por área nivel/ritmo/subtemas/marcadas-y-falladas/confianza/delta vs el anterior.
+- [x] "Reportar un problema" (`questionReports.ts`), permitido en examen; lista y cierre solo admin.
+- [x] Limpieza 14b: historial, tendencias y agregados solo cuentan `settledAttempts`; coach conserva el
+      último resumen bueno; un formateador de tiempo; borrador del tutor no se pierde al rechazarse.
+
+**Aprendizajes / decisiones**
+- **El lint de convex llevaba tiempo mudo**: `eslint.config.mjs` apuntaba a `convex/`, carpeta que ya no
+  existe. Al apuntarlo a `src/` salieron 64 errores; 55 eran `explicit-table-ids` (`db.get('tabla', id)`,
+  soportado desde Convex 1.31) y se arreglaron con `--fix`.
+- **Bug destapado por el lint**: los prompts de lecciones y tutor decían `\( \)` dentro de un template
+  literal, que JS convierte en `( )`, y además el render (remark-math) solo entiende `$…$`/`$$…$$`.
+  Ahora piden `$`. `PROMPT_VERSION` de lecciones → `v7`.
+- **Web y convex no tienen el mismo tsconfig**: la web activa `noUncheckedIndexedAccess` y typechequea los
+  `.ts` de convex que importa; convex no. Un archivo puede pasar en convex y fallar en la web.
+- `pacing` y `sessionIntegrity` se exportan del paquete convex: la web los importa en vez de copiarlos.
+- vitest no salía por el plugin `nitro()`; se omite cuando `process.env.VITEST` está definido.
+- **Pendiente**: `viewport-fit=cover` espera a que `.tutor-sheet-panel`/`.tutor-fab` rellenen el
+  safe-area; aviso de 30 min (G13) no construido; ninguna pantalla se vio en un navegador todavía.
+- Verificación: convex tsc 0 + eslint 0; web tsc 0; ingest tsc 0. Tests convex 221, web 69, ingest 36.
+
+### Fase 16 — Ciclo de aprendizaje (Khan)  · estado: ✅ completada
+- [x] G26 `mastery.ts`: sin_empezar → intentado (<70%) → familiar (70-99%) → competente (100% en ≥4) →
+      dominado (solo en sesiones mixtas). La práctica enfocada solo sube hasta competente; las mixtas
+      (simulacro, nivelación, recomendada con ≥3 subtemas, diagnóstico) suben con todo bien y bajan con un
+      fallo. Sin decaimiento por tiempo. Puntos 0/0/50/80/100. Se aplica una vez por sesión en `completeSession`.
+- [x] G25 `adaptive.ts`: tema y recomendada priorizan preguntas con éxito esperado ≈70% (Elo). La nivelación
+      queda fuera a propósito (adaptarla sesgaría todas las ubicaciones hacia 70%).
+- [x] G16 kind `personalizada` + `practiceBuilder.ts` (área, subtemas, Básico/Medio/Avanzado por tercios
+      de `difficultyRating`, todas/no vistas/falladas/marcadas, 5-30, con o sin reloj) + conteo en vivo.
+- [x] G15 `feedbackMode: 'inmediata'` + `checkAnswer` (bloquea la respuesta y revela solo esa pregunta);
+      nunca en exámenes ni en el reto.
+- [x] Reto de dominio (kind `reto`, Khan Mastery Challenge): 6 preguntas, 2 de cada uno de 3 subtemas.
+- [x] G05 "Repetir las que fallé" (`repaso` + `retryFromSessionId`) · G06 todas las opciones explicadas
+      · G08 `% eligió cada opción` + mediana de tiempo, ocultos con muestra < 20 (`answerStats.ts`).
+- [x] G17 `studyPlan.ts` plan del día por ganancia esperada en puntos globales · G03 brecha a la meta
+      (veredicto solo con ≥3 semanas de estimados) · G07 `studyTime.ts` + meta semanal (`setWeeklyGoal`).
+- [x] G14 `explanations.ts` `backfillExplanations` (internal, **no ejecutado**): genera solución y
+      justificación por opción con `explanationSource: 'ai_generated'`; si el modelo contradice la clave
+      oficial no guarda nada y la marca para el admin.
+
+**Pendiente del dueño (despliegue)**: tras desplegar el schema, correr una vez
+`bunx convex run sessions:backfillQuestionAnswerStats` y, con `GEMINI_API_KEY` en el deployment,
+`explanations:backfillExplanations` (comandos en el reporte de la fase).
+
+**Aprendizajes / decisiones**
+- El estudiante previo a la Fase 16 no tiene `masteryLevel`: se muestra un respaldo (máx. familiar según
+  precisión) hasta su siguiente sesión del subtema. Sin migración.
+- Deuda: `today.ts` copia la selección de puntaje de área de `progress.ts` y la regla de "pendiente de
+  repaso" de `sessions.ts` (ambas privadas). Exportarlas en una limpieza.
+- No hay intro cronometrada para la práctica personalizada con reloj; el modo inmediato solo se elige en
+  el constructor; reto sin enfriamiento (Khan usa 12 h).
+- Verificación: convex tsc 0 + eslint 0, web tsc 0, ingest tsc 0. Tests convex 367, web 124, ingest 36.
+
+### Fase 17 — Capa comercial (B2C)  · estado: ⏳
+G04 procedencia del contenido + nivel gratis ICFES · G28 banco original con verificación y cola de revisión
+· G30 gating por pase · G21 prueba sin registro · G22 reporte para acudiente · G24 meta por universidad
+· G23 simulacro imprimible + hoja de respuestas · recuperación de contraseña · términos y privacidad (Ley 1581).
+
+### Fase 18 — Panel de colegios (B2B)  · estado: ⏳
+G29 rol docente/coordinador, grupos con código de invitación, estudiantes en riesgo, reporte por competencia.
+
+**No construir (con razón):** Desmos/hoja de fórmulas (prohibidos en Saber 11), simulacro adaptativo
+(forma fija), videos (sin contenido ni datos móviles baratos), garantía de puntaje (sin predictor validado),
+foros (menores de edad, moderación), leaderboards (desanima), flashcards propias (el repaso ya cubre),
+subrayado de pasajes (los estímulos son imágenes desde 9687840).
+
 ### Hallazgo de seguridad (durante la Fase 7)
 Ninguna query de lectura de `sessions.ts` validaba propiedad: `getSession`, `getActiveSession`, `listSessions`,
 `getReviewQueue`, `getLatestDiagnostic`, `getLatestSimulacroScore` — ni `progress.getStudentProgress`.

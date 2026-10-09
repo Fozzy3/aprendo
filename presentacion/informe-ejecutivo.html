@@ -1,0 +1,213 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Aprendo — Documento ejecutivo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#182230;      /* texto principal */
+    --soft:#454f5e;     /* secundario */
+    --mute:#77808f;     /* terciario */
+    --line:#dfe3ea;     /* hairlines */
+    --line-soft:#eef1f5;
+    --paper:#ffffff;
+    --accent:#6c4cf1;   /* violeta de marca, 5.3:1 sobre blanco */
+    --accent-deep:#4d33bd;
+    --panel:#f8f6ff;    /* tinte frío muy sutil */
+    --panel-line:#e0d9fb;
+    --serif:"Source Serif 4",Georgia,"Times New Roman",serif;
+    --mono:"IBM Plex Mono",ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+    --s:18px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{background:#e7ebf1}
+  body{font-family:var(--serif);color:var(--ink);line-height:1.5;
+    font-size:13.5px;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+  ::selection{background:rgba(108,76,241,.16)}
+
+  .page{
+    width:210mm;min-height:296mm;margin:16px auto;background:var(--paper);
+    padding:12mm 12mm;box-shadow:0 20px 64px -34px rgba(20,30,50,.55);
+    position:relative;display:flex;flex-direction:column;
+  }
+
+  /* ---------- masthead ---------- */
+  .mast{display:flex;justify-content:space-between;align-items:baseline;
+    padding-bottom:11px;border-bottom:1px solid var(--ink);margin-bottom:24px}
+  .wordmark{font-family:var(--mono);font-weight:600;font-size:14px;letter-spacing:.01em;color:var(--ink)}
+  .wordmark .v{color:var(--accent)}
+  .meta{font-family:var(--mono);font-size:9.5px;letter-spacing:.16em;
+    text-transform:uppercase;color:var(--mute)}
+
+  /* ---------- titular ---------- */
+  .title{font-family:var(--serif);font-weight:700;font-size:30px;line-height:1.1;
+    letter-spacing:-.012em;max-width:19ch;margin-bottom:13px;text-wrap:balance}
+  .title em{font-style:normal;color:var(--accent)}
+  .lead{font-size:14.5px;line-height:1.55;color:var(--soft);margin-bottom:4px}
+  .lead b{color:var(--ink);font-weight:600}
+
+  /* ---------- secciones ---------- */
+  section.block{margin-top:var(--s)}
+  h2{font-family:var(--serif);font-weight:600;font-size:15.5px;color:var(--ink);
+    letter-spacing:-.005em;padding-bottom:6px;margin-bottom:11px;
+    border-bottom:1px solid var(--line);position:relative}
+  h2::after{content:"";position:absolute;left:0;bottom:-1px;width:38px;height:2px;background:var(--accent)}
+  p{color:var(--soft);margin-bottom:7px}
+  p:last-child{margin-bottom:0}
+  p b{color:var(--ink);font-weight:600}
+
+  /* ---------- lista de definición (único recurso estructural) ---------- */
+  .dl{display:grid;grid-template-columns:158px 1fr;column-gap:26px}
+  .dl > div{display:contents}
+  .dl dt{font-weight:600;color:var(--ink);padding:6px 0;
+    border-top:1px solid var(--line-soft)}
+  .dl dd{color:var(--soft);padding:6px 0;border-top:1px solid var(--line-soft);line-height:1.42}
+  .dl > div:first-child dt,.dl > div:first-child dd{border-top:none}
+
+  /* ---------- panel de honestidad (acento único de página) ---------- */
+  .note{background:var(--panel);border:1px solid var(--panel-line);border-radius:4px;
+    padding:15px 20px;margin-top:12px}
+  .note h3{font-family:var(--mono);font-weight:600;font-size:10px;letter-spacing:.14em;
+    text-transform:uppercase;color:var(--accent-deep);margin-bottom:7px}
+  .note p{color:#4b4270;max-width:none;font-size:12.5px;line-height:1.5}
+  .note b{color:#362f57}
+
+  /* ---------- cierre ---------- */
+  .close{margin-top:auto;padding-top:18px}
+  .close-band{background:var(--ink);color:#fff;border-radius:6px;padding:20px 26px}
+  .close-band .h{font-family:var(--serif);font-weight:700;font-size:19px;line-height:1.25;letter-spacing:-.01em}
+  .close-band .h em{font-style:normal;color:#b9a6ff}
+  .close-band .p{color:#c3ccd9;font-size:12.5px;margin-top:8px;max-width:58ch;line-height:1.5}
+
+  .foot{margin-top:14px;padding-top:10px;border-top:1px solid var(--line);
+    display:flex;justify-content:space-between;font-family:var(--mono);
+    font-size:9px;letter-spacing:.05em;color:var(--mute)}
+
+  @page{size:A4;margin:0}
+  @media print{
+    html{background:#fff}
+    .page{margin:0;box-shadow:none;width:auto;min-height:0;padding:12mm 12mm;display:block}
+    .page + .page{page-break-before:always}
+    .close{margin-top:26px}
+    *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+    .note,.close-band,.dl > div{break-inside:avoid}
+  }
+</style>
+</head>
+<body>
+
+<!-- ================= PÁGINA 1 ================= -->
+<section class="page">
+  <div class="mast">
+    <div class="wordmark">Apren<span class="v">do</span></div>
+    <div class="meta">Documento ejecutivo</div>
+  </div>
+
+  <h1 class="title">Sepa qué le falta a un estudiante <em>antes</em> del examen.</h1>
+  <p class="lead">Aprendo prepara para el ICFES Saber 11 con <b>preguntas oficiales del propio examen</b>.
+  Convierte cada respuesta en un diagnóstico —qué tema exactamente y a qué nivel ICFES— y lo resume en
+  el número que piden las universidades: un <b>puntaje global estimado de 0 a 500</b>, con qué estudiar
+  hoy para subirlo.</p>
+
+  <section class="block">
+    <h2>El problema que resuelve</h2>
+    <p>El Saber 11 decide el cupo universitario y la beca, y la mayoría de estudiantes llega a él
+    preparándose a ciegas. Un simulacro entrega un número al final y nada más: dice <b>cuánto</b> sacó,
+    nunca <b>en qué</b> falló ni qué hacer el lunes. Un banco de preguntas infinito tampoco lo dice. Y
+    el material gratuito que circula suele traer respuestas equivocadas: quien estudia con una clave mal
+    inferida <b>aprende mal</b>.</p>
+    <p>Aprendo cierra esa brecha: mide el punto de partida real, señala el tema exacto donde se pierde
+    puntaje y convierte el tiempo que queda hasta el examen en un plan para hoy.</p>
+  </section>
+
+  <section class="block">
+    <h2>Cómo funciona</h2>
+    <p>El uso es deliberadamente corto. <b>El estudiante indica</b> su fecha de examen y responde un
+    diagnóstico de veinte preguntas repartidas entre las cinco áreas. <b>El sistema mide</b> su nivel
+    ICFES área por área y arma una ruta a partir de sus temas más débiles. De ahí en adelante
+    <b>practica en sesiones de diez preguntas</b> —caben en el celular, entre clase y clase— declarando
+    en cada una si estaba seguro, dudó o adivinó. Cada sesión actualiza el diagnóstico.</p>
+  </section>
+
+  <section class="block">
+    <h2>Qué mide</h2>
+    <p>No mide «cuántas buenas». Mide las seis cosas que de verdad cambian una decisión de estudio:</p>
+    <dl class="dl">
+      <div><dt>Nivel por área</dt><dd>El nivel ICFES oficial (1 a 4; Pre A1 a B1 en Inglés) en cada una de las cinco áreas del examen.</dd></div>
+      <div><dt>Tema exacto</dt><dd>Ubica la falla en uno de 33 subtemas, no en «matemáticas»: ahí es donde se puede actuar.</dd></div>
+      <div><dt>Seguridad al responder</dt><dd>Distingue el acierto del golpe de suerte, y el descuido del concepto mal aprendido.</dd></div>
+      <div><dt>Puntaje global</dt><dd>La estimación de 0 a 500 con la ponderación oficial, y con su margen de error declarado.</dd></div>
+      <div><dt>Posición nacional</dt><dd>Dónde queda frente a la distribución real del país, publicada por el ICFES.</dd></div>
+      <div><dt>Ritmo vs. fecha</dt><dd>Si el ritmo actual de estudio alcanza para llegar a la meta antes del día del examen.</dd></div>
+    </dl>
+  </section>
+
+  <div class="foot">
+    <span>Aprendo — Preparación diagnóstica para el ICFES Saber 11</span>
+    <span>1 / 2</span>
+  </div>
+</section>
+
+<!-- ================= PÁGINA 2 ================= -->
+<section class="page">
+  <div class="mast">
+    <div class="wordmark">Apren<span class="v">do</span></div>
+    <div class="meta">Documento ejecutivo</div>
+  </div>
+
+  <section class="block" style="margin-top:0">
+    <h2>Por qué conviene</h2>
+    <dl class="dl">
+      <div><dt>Preguntas reales</dt><dd>Salen de los cuadernillos oficiales del ICFES, con la clave de respuesta que publica el propio ICFES.</dd></div>
+      <div><dt>Sin números inventados</dt><dd>Un nivel se retiene hasta que haya evidencia suficiente. Un número seguro y equivocado es peor que un espacio en blanco.</dd></div>
+      <div><dt>Enseña, no responde</dt><dd>El tutor da una pista antes de contestar y, después, explica primero por qué la opción elegida parecía correcta.</dd></div>
+      <div><dt>Cabe en el día</dt><dd>Sesiones de diez preguntas en el celular, retomables tras una interrupción. Sin rachas que culpen por fallar un día.</dd></div>
+      <div><dt>Avance medible</dt><dd>El puntaje y los niveles se recalculan con cada sesión, así que la mejora se demuestra en vez de suponerse.</dd></div>
+    </dl>
+  </section>
+
+  <section class="block">
+    <h2>De dónde salen los números</h2>
+    <p>Cada cifra que el estudiante va a creer tiene una fuente pública detrás. Los <b>cortes de
+    nivel</b> por área salen de las fichas oficiales que el ICFES publicó en septiembre de 2025; la
+    <b>comparación nacional</b>, del Informe nacional de resultados Saber 11 de 2024; y las
+    <b>preguntas</b>, de los cuadernillos que el ICFES publica con su clave de respuestas oficial.</p>
+
+    <div class="note">
+      <h3>Honestidad de los datos</h3>
+      <p>Esas tres fuentes viven en archivos versionados con su URL y su fecha de verificación, aparte
+      del código, para corregirlas el día que el ICFES publique una actualización. Lo mismo con la
+      cobertura: hoy <b>19 de los 33 subtemas</b> tienen preguntas suficientes para sostener un
+      diagnóstico, y en los demás el producto <b>lo dice en lugar de estimar igual</b>. Inglés es el
+      caso pendiente y ya está identificado: sus textos vienen como imagen en los cuadernillos.</p>
+    </div>
+  </section>
+
+  <section class="block">
+    <h2>Qué recibe el estudiante</h2>
+    <p>De cada sesión resultan tres cosas complementarias: un <b>diagnóstico actualizado</b>, con su
+    nivel por área, su puntaje global y el margen de esa estimación; una <b>ruta de estudio</b> que
+    ordena los subtemas por lo que más puntaje le devuelve, con una lección escrita para cada uno; y un
+    <b>plan para hoy</b>, derivado de los días que faltan y del ritmo que realmente lleva. A eso se suma
+    el simulacro completo con la distribución oficial de dos sesiones.</p>
+  </section>
+
+  <div class="close">
+    <div class="close-band">
+      <div class="h">Mida el punto de partida. <em>Sepa qué estudiar hoy.</em></div>
+      <div class="p">Un diagnóstico de veinte preguntas basta para entregar el nivel por área, el
+      puntaje global estimado y la primera ruta de estudio hasta el día del examen.</div>
+    </div>
+    <div class="foot">
+      <span>Aprendo — Julian Cadena · Carlos Mora</span>
+      <span>2 / 2</span>
+    </div>
+  </div>
+</section>
+
+<script>window.addEventListener("load",()=>{const p=[...document.querySelectorAll(".page")].map(e=>Math.round(e.getBoundingClientRect().height));document.title="H="+p.join(",")+"|limite=1122";});</script></body>
+</html>

@@ -14,6 +14,8 @@ import { DEFAULT_RATING, expectedScore } from './elo'
 import { estimateGlobalScore, highestLeverageSubject } from './globalScore'
 import { getNationalPercentileAtOrBelow, getNationalShare } from './national'
 import { summarizeConfidence, type ConfidenceLevel } from './confidence'
+import { settledAttempts } from './sessionIntegrity'
+import { RETO_SUBTOPIC_COUNT, masteryLevelOf, orderRetoCandidates } from './mastery'
 
 const RECENT_WINDOW_SIZE = 5
 
@@ -116,12 +118,20 @@ export const rebuildStudentProgress = internalMutation({
       .query('questionAttempts')
       .withIndex('by_studentId', (q) => q.eq('studentId', args.studentId))
       .collect()
+    const sessions = await ctx.db
+      .query('sessions')
+      .withIndex('by_studentId', (q) => q.eq('studentId', args.studentId))
+      .collect()
 
-    const completedAttempts = attempts.filter(
+    // Only finished sittings: an open one would leak its grades through the
+    // area accuracy, and an abandoned one was never evidence.
+    const completedAttempts = settledAttempts(attempts, sessions).filter(
       (attempt) => attempt.isCorrect != null && attempt.answeredAt != null,
     )
     const questionIds = [...new Set(completedAttempts.map((attempt) => attempt.questionId))]
-    const questions = await Promise.all(questionIds.map((questionId) => ctx.db.get(questionId)))
+    const questions = await Promise.all(
+      questionIds.map((questionId) => ctx.db.get('questions', questionId)),
+    )
     const questionById = new Map(
       questions
         .filter((question): question is NonNullable<typeof question> => question != null)
@@ -182,15 +192,23 @@ export const rebuildStudentProgress = internalMutation({
       .withIndex('by_studentId', (q) => q.eq('studentId', args.studentId))
       .collect()
     for (const aggregate of existingSubjectAggregates) {
-      await ctx.db.delete(aggregate._id)
+      await ctx.db.delete('learnerSubjectAggregates', aggregate._id)
     }
 
     const existingSubtopicAggregates = await ctx.db
       .query('learnerSubtopicAggregates')
       .withIndex('by_studentId', (q) => q.eq('studentId', args.studentId))
       .collect()
+    // Mastery levels are not derived from the attempts here: each session moved
+    // them once (`sessions.completeSession`), so they survive the rebuild.
+    const masteryBySubtopicId = new Map(
+      existingSubtopicAggregates.map((aggregate) => [
+        aggregate.subtopicId,
+        { masteryLevel: aggregate.masteryLevel, masteryUpdatedAt: aggregate.masteryUpdatedAt },
+      ]),
+    )
     for (const aggregate of existingSubtopicAggregates) {
-      await ctx.db.delete(aggregate._id)
+      await ctx.db.delete('learnerSubtopicAggregates', aggregate._id)
     }
 
     const now = Date.now()
@@ -241,6 +259,7 @@ export const rebuildStudentProgress = internalMutation({
         masteryScore: summary.masteryScore,
         evidenceLevel: summary.evidenceLevel,
         updatedAt: now,
+        ...masteryBySubtopicId.get(summary.subtopicId),
       })
     }
 
@@ -249,7 +268,7 @@ export const rebuildStudentProgress = internalMutation({
       .withIndex('by_studentId', (q) => q.eq('studentId', args.studentId))
       .unique()
     if (existingSnapshot) {
-      await ctx.db.delete(existingSnapshot._id)
+      await ctx.db.delete('learnerProfileSnapshots', existingSnapshot._id)
     }
 
     const overallSummary = summarizeAttempts(overallAttempts)
@@ -319,7 +338,7 @@ export const getStudentProgress = query({
         q.eq('studentId', args.studentId).eq('kind', 'nivelacion'),
       )
       .collect()
-    const student = await ctx.db.get(args.studentId)
+    const student = await ctx.db.get('students', args.studentId)
 
     const subjectLevels = buildSubjectLevels(
       subjectAggregates,
@@ -336,6 +355,20 @@ export const getStudentProgress = query({
       weakestSubtopics: [...subtopicAggregates]
         .sort((a, b) => a.masteryScore - b.masteryScore)
         .slice(0, 8),
+      /**
+       * Every practiced subtopic's level (see `mastery.ts`); a subtopic not
+       * listed is `sin_empezar`. Points and % via `summarizeMastery` on the web.
+       */
+      subtopicMastery: subtopicAggregates
+        .filter((aggregate) => aggregate.subtopicId != null)
+        .map((aggregate) => ({
+          subtopicId: aggregate.subtopicId!,
+          subjectId: aggregate.subjectId,
+          masteryLevel: masteryLevelOf(aggregate),
+          masteryUpdatedAt: aggregate.masteryUpdatedAt ?? null,
+        })),
+      /** Whether a reto can be assembled: three practiced subtopics (`orderRetoCandidates`). */
+      retoReady: orderRetoCandidates(subtopicAggregates).length >= RETO_SUBTOPIC_COUNT,
     }
   },
 })
@@ -398,22 +431,26 @@ function buildGlobalScore(
  *
  * Falls back to raw accuracy while evidence is thin, so a new student still sees
  * a number instead of a blank.
+ *
+ * Every surface that shows an area level (Progreso, Hoy, Ruta) goes through
+ * this, so the same area never lands in two different bands.
  */
-function areaScore(args: {
-  accuracy: number
-  abilityRating: number | undefined
-  abilityAttemptCount: number | undefined
-}): { score: number; isCalibrated: boolean } {
+export function areaScore(
+  subjectId: string,
+  accuracy: number,
+  student: Pick<Doc<'students'>, 'abilityBySubject' | 'abilityAttemptsBySubject'> | null,
+): { score: number; isCalibrated: boolean } {
+  const abilityRating = student?.abilityBySubject?.[subjectId]
   if (
-    args.abilityRating != null
-    && (args.abilityAttemptCount ?? 0) >= MIN_ATTEMPTS_FOR_LEVEL
+    abilityRating != null
+    && (student?.abilityAttemptsBySubject?.[subjectId] ?? 0) >= MIN_ATTEMPTS_FOR_LEVEL
   ) {
     return {
-      score: Math.round(expectedScore(args.abilityRating, DEFAULT_RATING) * 100),
+      score: Math.round(expectedScore(abilityRating, DEFAULT_RATING) * 100),
       isCalibrated: true,
     }
   }
-  return { score: estimatedScoreFromAccuracy(args.accuracy), isCalibrated: false }
+  return { score: estimatedScoreFromAccuracy(accuracy), isCalibrated: false }
 }
 
 /**
@@ -463,14 +500,7 @@ function buildSubjectLevels(
     const attemptCount = aggregate?.attemptCount ?? 0
     const hasEnoughEvidence = attemptCount >= MIN_ATTEMPTS_FOR_LEVEL
 
-    const scored =
-      aggregate == null
-        ? null
-        : areaScore({
-            accuracy: aggregate.accuracy,
-            abilityRating: student?.abilityBySubject?.[subjectId],
-            abilityAttemptCount: student?.abilityAttemptsBySubject?.[subjectId],
-          })
+    const scored = aggregate == null ? null : areaScore(subjectId, aggregate.accuracy, student)
     const currentScore = scored?.score ?? null
     const baselineScore =
       placementBySubjectId.get(subjectId) ?? diagnosticBySubjectId.get(subjectId) ?? null
@@ -538,52 +568,71 @@ export const getProgressTrends = query({
       .query('questionAttempts')
       .withIndex('by_studentId', (q) => q.eq('studentId', args.studentId))
       .collect()
+    const sessions = await ctx.db
+      .query('sessions')
+      .withIndex('by_studentId', (q) => q.eq('studentId', args.studentId))
+      .collect()
 
-    const weekBuckets = new Map<number, { attempts: number; correct: number }>()
-    const activeDays = new Set<number>()
-    let totalAttempts = 0
-    let totalCorrect = 0
-    let firstActivityAt: number | null = null
-
-    // Piggybacks on this scan rather than adding a second one; `getStudentProgress`
-    // deliberately reads only aggregates and must stay cheap for the "Hoy" page.
-    const confidence = summarizeConfidence(
-      attempts.map((attempt) => ({
-        confidence: attempt.confidence as ConfidenceLevel | undefined,
-        isCorrect: attempt.isCorrect,
-      })),
-    )
-
-    for (const attempt of attempts) {
-      if (attempt.answeredAt == null || attempt.isCorrect == null) continue
-      const answeredAt = attempt.answeredAt
-      totalAttempts += 1
-      if (attempt.isCorrect) totalCorrect += 1
-      activeDays.add(colombiaDayNumber(answeredAt))
-      if (firstActivityAt == null || answeredAt < firstActivityAt) firstActivityAt = answeredAt
-
-      const weekIndex = colombiaWeekIndex(answeredAt)
-      const bucket = weekBuckets.get(weekIndex) ?? { attempts: 0, correct: 0 }
-      bucket.attempts += 1
-      if (attempt.isCorrect) bucket.correct += 1
-      weekBuckets.set(weekIndex, bucket)
-    }
-
-    const weekly = [...weekBuckets.entries()]
-      .sort((a, b) => a[0] - b[0])
-      .map(([weekIndex, bucket]) => ({
-        weekStartMs: colombiaWeekStartMs(weekIndex),
-        attempts: bucket.attempts,
-        accuracy: bucket.attempts === 0 ? 0 : bucket.correct / bucket.attempts,
-      }))
-
-    return {
-      weekly,
-      totalAttempts,
-      totalCorrect,
-      activeDays: activeDays.size,
-      firstActivityAt,
-      confidence,
-    }
+    return summarizeTrends(attempts, sessions)
   },
 })
+
+/**
+ * Every answer counts as activity; only answers of finished sittings feed the
+ * accuracy trend, the correct count and the confidence breakdown. An open
+ * simulacro grades each answer as it is saved, so any of those built from it
+ * would leak the key one changed answer at a time (see `settledAttempts`).
+ */
+export function summarizeTrends(
+  attempts: {
+    sessionId: string
+    answeredAt?: number
+    isCorrect?: boolean
+    confidence?: ConfidenceLevel
+  }[],
+  sessions: { _id: string; status: string }[],
+) {
+  const settled = settledAttempts(attempts, sessions)
+  const weekBuckets = new Map<number, { attempts: number; correct: number }>()
+  const activeDays = new Set<number>()
+  let totalAttempts = 0
+  let totalCorrect = 0
+  let firstActivityAt: number | null = null
+
+  for (const attempt of attempts) {
+    if (attempt.answeredAt == null || attempt.isCorrect == null) continue
+    totalAttempts += 1
+    activeDays.add(colombiaDayNumber(attempt.answeredAt))
+    if (firstActivityAt == null || attempt.answeredAt < firstActivityAt) {
+      firstActivityAt = attempt.answeredAt
+    }
+  }
+
+  for (const attempt of settled) {
+    if (attempt.answeredAt == null || attempt.isCorrect == null) continue
+    if (attempt.isCorrect) totalCorrect += 1
+
+    const weekIndex = colombiaWeekIndex(attempt.answeredAt)
+    const bucket = weekBuckets.get(weekIndex) ?? { attempts: 0, correct: 0 }
+    bucket.attempts += 1
+    if (attempt.isCorrect) bucket.correct += 1
+    weekBuckets.set(weekIndex, bucket)
+  }
+
+  const weekly = [...weekBuckets.entries()]
+    .sort((a, b) => a[0] - b[0])
+    .map(([weekIndex, bucket]) => ({
+      weekStartMs: colombiaWeekStartMs(weekIndex),
+      attempts: bucket.attempts,
+      accuracy: bucket.attempts === 0 ? 0 : bucket.correct / bucket.attempts,
+    }))
+
+  return {
+    weekly,
+    totalAttempts,
+    totalCorrect,
+    activeDays: activeDays.size,
+    firstActivityAt,
+    confidence: summarizeConfidence(settled),
+  }
+}

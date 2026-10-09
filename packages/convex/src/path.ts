@@ -2,12 +2,8 @@ import { v } from 'convex/values'
 import taxonomyContract from '../../../docs/taxonomy.v1.json'
 import { query } from './_generated/server'
 import { assertOwnsStudent } from './auth'
-import {
-  LEVELLED_SUBJECT_IDS,
-  MIN_ATTEMPTS_FOR_LEVEL,
-  estimatedScoreFromAccuracy,
-  getLevelForScore,
-} from './levels'
+import { LEVELLED_SUBJECT_IDS, MIN_ATTEMPTS_FOR_LEVEL, getLevelForScore } from './levels'
+import { areaScore } from './progress'
 import { collectUsableQuestionsBySubject } from './questionPool'
 import type { QuestionEligibilityPool } from './sessionKinds'
 
@@ -60,7 +56,8 @@ export const getLearningPath = query({
       .collect()
     const subtopicsWithLesson = new Set(readyLessons.map((lesson) => lesson.subtopicId))
 
-    const [subjectAggregates, subtopicAggregates] = await Promise.all([
+    const [student, subjectAggregates, subtopicAggregates] = await Promise.all([
+      ctx.db.get("students", args.studentId),
       ctx.db
         .query('learnerSubjectAggregates')
         .withIndex('by_studentId_subjectId', (q) =>
@@ -104,7 +101,7 @@ export const getLearningPath = query({
       subjectId: subject.id,
       subjectLabel: subject.label_es,
       nodes,
-      level: buildSubjectLevel(subject.id, subjectAggregate),
+      level: buildSubjectLevel(subject.id, subjectAggregate, student),
     }
   },
 })
@@ -122,6 +119,7 @@ export const listPathSubjects = query({
       .withIndex('by_studentId', (q) => q.eq('studentId', args.studentId))
       .collect()
     const aggregateBySubjectId = new Map(aggregates.map((agg) => [agg.subjectId, agg]))
+    const student = await ctx.db.get("students", args.studentId)
 
     return LEVELLED_SUBJECT_IDS.map((subjectId) => {
       const subject = taxonomyContract.subjects.find((item) => item.id === subjectId)
@@ -130,7 +128,7 @@ export const listPathSubjects = query({
         subjectId,
         label: subject?.label_es ?? subjectId,
         mastery: aggregate?.masteryScore ?? null,
-        level: buildSubjectLevel(subjectId, aggregate),
+        level: buildSubjectLevel(subjectId, aggregate, student),
       }
     })
   },
@@ -138,11 +136,13 @@ export const listPathSubjects = query({
 
 /**
  * Current ICFES level for an area, or null while there isn't enough evidence to
- * claim one. Mirrors the rule in `progress.buildSubjectLevels`.
+ * claim one. Scored by `progress.areaScore`, the same function Progreso and Hoy
+ * use, so the path never shows a different level for the same area.
  */
-function buildSubjectLevel(
+export function buildSubjectLevel(
   subjectId: string,
   aggregate: { accuracy: number; attemptCount: number } | null,
+  student: Parameters<typeof areaScore>[2],
 ) {
   if (aggregate == null || aggregate.attemptCount < MIN_ATTEMPTS_FOR_LEVEL) {
     return {
@@ -154,7 +154,7 @@ function buildSubjectLevel(
     }
   }
 
-  const score = estimatedScoreFromAccuracy(aggregate.accuracy)
+  const { score } = areaScore(subjectId, aggregate.accuracy, student)
   return {
     hasEnoughEvidence: true,
     attemptCount: aggregate.attemptCount,

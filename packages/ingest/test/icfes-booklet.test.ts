@@ -1,5 +1,6 @@
 import { describe, expect, test } from 'bun:test'
 import {
+  groupSlots,
   parseAnswerKey,
   parseBooklet,
   referencesArtwork,
@@ -182,6 +183,40 @@ describe('usableQuestions', () => {
   test('drops a question with no printed answer at all', () => {
     const broken = [{ ...questions[0]!, correctOption: undefined }]
     expect(usableQuestions(broken)).toHaveLength(0)
+  })
+})
+
+describe('groupSlots', () => {
+  // The loader ships questions to Convex in slices of twenty. Working groups
+  // out per slice split a passage over questions 19-22 into two groups of two.
+  test('a passage that straddles a slice boundary stays one group', () => {
+    const questions = [17, 18, 19, 20, 21, 22, 23].map((number) => ({
+      number,
+      contextKey: number >= 19 && number <= 22 ? 'g19-22' : undefined,
+    }))
+    const slots = groupSlots(questions)
+
+    expect(slots.slice(0, 2)).toEqual([null, null])
+    expect(slots[6]).toBeNull()
+    expect(slots.slice(2, 6)).toEqual([19, 20, 21, 22].map((_, position) => ({
+      key: 'g19-22',
+      firstNumber: 19,
+      lastNumber: 22,
+      memberCount: 4,
+      position,
+    })))
+  })
+
+  // An item can be unusable (no key, needs a figure) and dropped from the run,
+  // so the range is the members that remain, not the printed heading.
+  test('counts only the members that are actually present', () => {
+    const slots = groupSlots([
+      { number: 4, contextKey: 'g4-7' },
+      { number: 6, contextKey: 'g4-7' },
+      { number: 7, contextKey: 'g4-7' },
+    ])
+    expect(slots.map((slot) => [slot?.firstNumber, slot?.lastNumber, slot?.memberCount, slot?.position]))
+      .toEqual([[4, 7, 3, 0], [4, 7, 3, 1], [4, 7, 3, 2]])
   })
 })
 

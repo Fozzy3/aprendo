@@ -767,13 +767,97 @@ pre code {
   padding: 1.75rem 0 2.25rem;
 }
 
-.student-shell-main-immersive {
+/* Solve and review own the viewport. This used to be
+   `height: calc(100vh - 4.1rem)`, which assumed a one-row header: wherever the
+   header grew, or Android's 100vh ran past the URL bar, the solve footer —
+   Anterior, Siguiente, Terminar — ended up below the fold of a surface that
+   cannot scroll. Flex down from 100dvh instead; the header takes what it takes
+   and the page gets the rest, whatever that is. */
+.student-shell.is-immersive,
+.diagnostic-shell.is-immersive {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  height: 100dvh;
+  /* The shells' base `min-height: 100vh` would win over the height above, and
+     on Android 100vh is the viewport with the URL bar hidden. */
+  min-height: 0;
+  overflow: hidden;
+}
+
+.student-shell.is-immersive > .student-topbar {
+  flex-shrink: 0;
+}
+
+.student-shell.is-immersive > .student-shell-main {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
   width: 100%;
-  max-width: none;
-  height: calc(100vh - 4.1rem);
-  margin-inline: 0;
+  margin: 0;
   padding: 0;
   overflow: hidden;
+}
+
+.student-shell.is-immersive > .student-shell-main > * {
+  flex: 1;
+  min-height: 0;
+}
+
+/* Phones only — see the 780px block. */
+.student-tabbar {
+  display: none;
+}
+
+.student-tabbar-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.2rem;
+  min-height: 3.25rem;
+  border-radius: var(--radius-md);
+  color: var(--text-secondary);
+  text-decoration: none;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.student-tabbar-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 3.1rem;
+  height: 1.9rem;
+  border-radius: var(--radius-pill);
+  /* Reserved so the active outline doesn't shift the label. */
+  border: 2px solid transparent;
+  transition: background 160ms ease, color 160ms ease, transform 120ms ease;
+}
+
+.student-tabbar-item.is-active {
+  color: var(--text-primary);
+}
+
+/* The same pressable pill as the active top-nav tab. */
+.student-tabbar-item.is-active .student-tabbar-icon {
+  background: var(--brand);
+  color: var(--text-inverted);
+  border-color: var(--border-hard);
+  box-shadow: var(--shadow-hard-sm);
+}
+
+.student-tabbar-item:active .student-tabbar-icon {
+  transform: translateY(2px);
+  box-shadow: none;
+}
+
+.student-tabbar-item:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: -2px;
 }
 
 /* ─────────────────────────────────────────────────────────────
@@ -2034,19 +2118,15 @@ pre code {
     width: min(100%, calc(100% - 2rem));
   }
 
-  .student-topbar-inner {
-    grid-template-columns: 1fr;
-    justify-items: stretch;
-    padding: 0.5rem 0;
+  /* The header used to stack into three rows here (~150px). What forced the
+     wrap was the email pill; without it brand, tabs and actions fit on one row
+     down to the phone breakpoint. */
+  .student-session-identity {
+    display: none;
   }
 
-  .student-topnav {
-    justify-self: start;
-  }
-
-  .student-topbar-actions {
-    justify-content: space-between;
-    flex-wrap: wrap;
+  .student-topnav-item {
+    min-width: 5rem;
   }
 
   .stage-rail {
@@ -2076,26 +2156,43 @@ pre code {
     padding: 0.7rem 0;
   }
 
+  /* One compact row: brand on the left, theme and Salir on the right. The four
+     sections move to the bottom tab bar, inside thumb reach. */
+  .student-topbar-inner {
+    grid-template-columns: 1fr auto;
+    gap: 0.5rem;
+  }
+
+  .student-topnav,
+  .student-brand-subtitle {
+    display: none;
+  }
+
   .student-brand {
-    justify-content: center;
-  }
-
-  .student-topnav {
-    width: 100%;
-    justify-content: space-between;
-  }
-
-  .student-topnav-item {
-    min-width: 0;
-    flex: 1;
+    gap: 0.6rem;
   }
 
   .student-topbar-actions {
-    justify-content: center;
+    gap: 0.25rem;
   }
 
-  .student-session-identity {
-    display: none;
+  .student-tabbar {
+    position: fixed;
+    inset-inline: 0;
+    bottom: 0;
+    z-index: 30;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 0.25rem;
+    padding: 0.35rem 0.5rem max(0.35rem, env(safe-area-inset-bottom));
+    border-top: 2px solid var(--border);
+    background: color-mix(in srgb, var(--bg-card) 94%, transparent);
+    backdrop-filter: blur(18px);
+  }
+
+  /* Room for the fixed tab bar under the last thing on the page. */
+  .student-shell-main {
+    padding-bottom: calc(6.25rem + env(safe-area-inset-bottom));
   }
 
   .stage-edge-nav {
@@ -2111,6 +2208,17 @@ pre code {
   .stage-question-body .markdown-body {
     font-size: 1rem;
     line-height: 1.6;
+  }
+}
+
+/* While solving or reviewing on a phone — portrait, or landscape where height
+   is the scarce axis — the app header goes entirely. The solve topbar and the
+   review rail each carry their own exit, and every row they give back is a row
+   of the question. */
+@media (max-width: 780px), (max-height: 32rem) {
+  .student-shell.is-immersive > .student-topbar,
+  .diagnostic-shell.is-immersive > .diagnostic-topbar {
+    display: none;
   }
 }
 
@@ -2261,7 +2369,7 @@ pre code {
   /* 22rem, not 15. At 15 the cards packed four across on a wide screen and the
      copy inside each one wrapped to two or three words a line, which is what
      made the whole hub feel chopped up. */
-  grid-template-columns: repeat(auto-fit, minmax(22rem, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(22rem, 100%), 1fr));
   gap: 0.85rem;
   /* Cards keep their own height. Stretching meant that expanding one card — the
      nivelación picker opens five area chips — dragged every sibling to the same
@@ -2884,7 +2992,7 @@ pre code {
   align-items: center;
   justify-content: space-between;
   gap: 0.75rem;
-  padding: 0.7rem 1.1rem;
+  padding: 0.7rem 1.1rem max(0.7rem, env(safe-area-inset-bottom));
   border-top: 1px solid color-mix(in srgb, var(--border) 80%, transparent);
   background: color-mix(in srgb, var(--bg-card) 78%, transparent);
   backdrop-filter: blur(8px);
@@ -2916,6 +3024,43 @@ pre code {
   cursor: not-allowed;
 }
 
+/* A 360px phone cannot fit kind, area, progress, clock and exit on one row.
+   The kind goes first (the student picked it a minute ago), then the progress
+   track (the footer already counts answered questions). The area chip stays,
+   and truncates instead of being clipped mid-letter. */
+@media (max-width: 30rem) {
+  .solve-topbar,
+  .solve-footer {
+    gap: 0.6rem;
+    padding-inline: 0.75rem;
+  }
+
+  .solve-kind,
+  .solve-progress-track {
+    display: none;
+  }
+
+  .solve-meta .chip {
+    display: block;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+
+/* On touch, every control in the solve chrome is at least 44px. */
+@media (pointer: coarse) {
+  .solve-icon-btn {
+    width: 2.75rem;
+    height: 2.75rem;
+  }
+
+  .solve-nav-btn,
+  .solve-map-toggle {
+    min-height: 2.75rem;
+  }
+}
+
 
 
 /* ═══════════════════════════════════════════════════════════════
@@ -2937,6 +3082,109 @@ pre code {
 
 .diagnostic-solve-main > .solve {
   flex: 1;
+}
+
+/* ─── Timed session intro (nivelación, simulacro) ─── */
+.timed-intro {
+  display: grid;
+  gap: 1rem;
+  max-width: 34rem;
+}
+
+.timed-intro-title {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(1.35rem, 1.15rem + 0.8vw, 1.9rem);
+  line-height: 1.08;
+  letter-spacing: -0.03em;
+  text-wrap: balance;
+  color: var(--text-primary);
+}
+
+.timed-intro-facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.1rem;
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-primary);
+}
+
+.timed-intro-facts span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.timed-intro-facts svg {
+  color: var(--accent-text);
+}
+
+.timed-intro-rules {
+  display: grid;
+  gap: 0.75rem;
+  margin: 0;
+  padding: 1rem 0 0;
+  list-style: none;
+  border-top: 2px solid var(--border);
+}
+
+.timed-intro-rules li {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: start;
+  gap: 0.7rem;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: var(--text-secondary);
+}
+
+.timed-intro-rules svg {
+  margin-top: 0.1rem;
+  color: var(--text-primary);
+}
+
+.timed-intro-rules strong {
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.timed-intro-error {
+  margin: 0;
+  padding: 0.65rem 0.85rem;
+  border-radius: var(--radius-sm);
+  background: var(--danger-soft);
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--danger-text);
+}
+
+.timed-intro-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  padding-top: 0.25rem;
+}
+
+/* Inside an expanded launch card it takes the place of the chip pickers, so it
+   keeps their inset. */
+.launch-card > .timed-intro {
+  max-width: none;
+  padding: 0 1.1rem 1.1rem;
+}
+
+@media (max-width: 30rem) {
+  .timed-intro-actions > * {
+    flex: 1 1 100%;
+    justify-content: center;
+    min-height: 2.75rem;
+  }
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -3104,7 +3352,7 @@ pre code {
 }
 
 .review-option-meta.is-correct { color: var(--success-text); }
-.review-option-meta.is-incorrect { color: var(--accent-text); }
+.review-option-meta.is-incorrect { color: var(--danger-text); }
 
 .review-explanation {
   margin-top: 0.4rem;
@@ -4300,8 +4548,6 @@ pre code {
    dots can be neither. It opens on demand — the header already carries
    progress, so nothing is lost by keeping it closed.
    --------------------------------------------------------------------------- */
-.solve-map-wrap { position: relative; }
-
 .solve-map-toggle {
   display: inline-flex;
   align-items: center;
@@ -4315,76 +4561,64 @@ pre code {
 }
 
 .solve-map-toggle:hover { color: var(--text-primary); }
-.solve-map-toggle[aria-expanded='true'] {
-  color: var(--text-primary);
-  border-color: var(--accent);
-}
 .solve-map-toggle strong { color: var(--text-primary); }
-
-/* Sits above the footer and closes on an outside click. */
-.solve-map-scrim {
-  position: fixed;
-  inset: 0;
-  z-index: 40;
-  background: transparent;
-  cursor: default;
-}
-
-.solve-map-panel {
-  position: absolute;
-  bottom: calc(100% + 0.6rem);
-  left: 50%;
-  z-index: 41;
-  width: min(28rem, calc(100vw - 2rem));
-  transform: translateX(-50%);
-  padding: 0.9rem;
-  background: var(--bg-card);
-  border: 2px solid var(--border-hard);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-lg);
-}
 
 .solve-map-legend {
   display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.3rem 0.9rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 0.72rem;
+  color: var(--text-secondary);
+}
+
+.solve-map-legend li {
+  display: inline-flex;
   align-items: center;
   gap: 0.35rem;
-  margin-bottom: 0.6rem;
-  font-size: 0.7rem;
-  color: var(--text-tertiary);
 }
 
 .solve-map-key {
   display: inline-block;
-  height: 0.6rem;
-  width: 0.6rem;
-  margin-left: 0.5rem;
+  height: 0.7rem;
+  width: 0.7rem;
   border-radius: 0.18rem;
   border: 1px solid var(--border-strong);
   background: var(--bg-inset);
 }
-.solve-map-legend .solve-map-key:first-child { margin-left: 0; }
 .solve-map-key.is-answered { background: var(--accent); border-color: var(--accent); }
+.solve-map-key.is-current {
+  background: transparent;
+  outline: 2px solid var(--text-primary);
+  outline-offset: 1px;
+}
 
+/* Flex rather than grid so a shared text's questions can sit in one bracket.
+   Cells keep a fixed size, so the columns still line up at 15 cells or 134;
+   the sheet scrolls, the cells never shrink. */
 .solve-map-grid {
-  display: grid;
-  /* Fixed track width so the columns stay aligned whether there are 15 cells
-     or 134, and the whole grid scrolls rather than shrinking the cells. */
-  grid-template-columns: repeat(auto-fill, minmax(2.1rem, 1fr));
-  gap: 0.3rem;
-  max-height: 42vh;
-  overflow-y: auto;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
 }
 
 .solve-map-cell {
+  position: relative;
+  width: 2.5rem;
   aspect-ratio: 1;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.72rem;
+  font-size: 0.78rem;
   font-weight: 700;
+  font-variant-numeric: tabular-nums;
   color: var(--text-secondary);
   background: var(--bg-inset);
   border: 1px solid var(--border-strong);
+  cursor: pointer;
   /* A fixed small radius, not --radius-sm: on a 34px cell that token rounds
      almost to a circle, and circles read as a scatter rather than as a grid. */
   border-radius: 0.35rem;
@@ -4559,4 +4793,827 @@ pre {
   clip-path: inset(50%);
   white-space: nowrap;
   border: 0;
+}
+
+
+/* ---------------------------------------------------------------------------
+   Exam tools — the paper habits of Saber 11 on a phone.
+
+   Marking a question is circling its number in the booklet; crossing out an
+   option is a pencil stroke; the map is flipping through the cuadernillo; the
+   hidden clock is a watch in a pocket. Each sits where the thumb already is.
+   --------------------------------------------------------------------------- */
+.solve {
+  position: relative;
+  --solve-text-scale: 1;
+}
+
+/* A−/A+ scales the question, the options and the shared text together. Scans
+   are pictures of the booklet, so they zoom too, and their panel scrolls
+   sideways past 100% rather than squeezing the figure back. */
+.solve .markdown-body {
+  font-size: calc(0.9375rem * var(--solve-text-scale));
+}
+
+.solve .question-scan {
+  width: calc(100% * var(--solve-text-scale));
+  max-width: calc(46rem * var(--solve-text-scale));
+}
+
+.solve-question,
+.solve .shared-stimulus-body {
+  overflow-x: auto;
+}
+
+/* The clock is also its own hide/show switch. */
+button.solve-clock {
+  font-family: inherit;
+  cursor: pointer;
+  transition: border-color 150ms ease;
+}
+button.solve-clock:hover:not(:disabled) { border-color: var(--border-strong); }
+button.solve-clock:disabled { cursor: default; }
+
+.solve-offline {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  margin: 0;
+  padding: 0.35rem 1rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  background: var(--bg-inset);
+  border-bottom: 1px solid var(--border);
+}
+
+.solve-toast {
+  position: absolute;
+  top: 3.75rem;
+  left: 50%;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  width: min(27rem, 100% - 2rem);
+  padding: 0.55rem 0.4rem 0.55rem 0.9rem;
+  font-size: 0.85rem;
+  line-height: 1.45;
+  color: var(--text-primary);
+  background: var(--bg-card);
+  border: 2px solid var(--border-hard);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+  transform: translateX(-50%);
+  animation: solve-toast-in 260ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.solve-toast > svg { flex-shrink: 0; color: var(--accent-text); }
+.solve-toast > span { flex: 1; min-width: 0; }
+
+@keyframes solve-toast-in {
+  from { opacity: 0; transform: translate(-50%, -8px); }
+  to { opacity: 1; transform: translate(-50%, 0); }
+}
+
+/* Above the stem: the live pace on the left, text size on the right. */
+.solve-qbar {
+  width: min(100%, 50rem);
+  margin: 0 auto;
+  padding: 0.75rem clamp(1rem, 4cqi, 2.5rem) 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.solve-qbar + .solve-question { padding-top: 0.75rem; }
+.solve-main.is-split .solve-qbar { max-width: 38rem; }
+
+.solve-pace {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.25rem 0.65rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-secondary);
+  background: var(--bg-inset);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-pill);
+  white-space: nowrap;
+}
+
+/* Only "behind" is a state to act on, so only it takes a colour. */
+.solve-pace.is-atrasado {
+  color: var(--danger-text);
+  background: var(--danger-soft);
+  border-color: color-mix(in srgb, var(--danger) 30%, transparent);
+}
+
+.solve-textsize { display: inline-flex; gap: 0.15rem; }
+
+.solve-icon-btn:disabled {
+  opacity: 0.35;
+  cursor: default;
+  background: transparent;
+  border-color: transparent;
+}
+
+/* Option + its "tachar" switch. A button cannot hold another button. */
+.solve-option-row {
+  display: flex;
+  align-items: stretch;
+  gap: 0.4rem;
+}
+
+.solve-option-row > .solve-option {
+  flex: 1;
+  min-width: 0;
+  /* Long-press crosses an option out; it must not open the text-selection
+     handles or the image menu instead. */
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+
+.solve-option.is-eliminated {
+  opacity: 0.55;
+  border-style: dashed;
+  box-shadow: none;
+}
+
+.solve-option.is-eliminated .solve-option-body {
+  text-decoration: line-through;
+  text-decoration-thickness: 2px;
+  text-decoration-color: var(--text-primary);
+}
+
+.solve-option.is-eliminated .option-label {
+  background: transparent;
+  text-decoration: line-through;
+  text-decoration-thickness: 2px;
+}
+
+.solve-strike {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  border: 1px solid transparent;
+  border-radius: 0.9rem;
+  background: transparent;
+  color: var(--text-tertiary);
+  cursor: pointer;
+  transition: color 150ms ease, background 150ms ease, border-color 150ms ease;
+}
+
+.solve-strike:hover:not(:disabled) {
+  color: var(--text-primary);
+  background: var(--bg-inset);
+}
+
+.solve-strike.is-active {
+  color: var(--text-primary);
+  background: var(--bg-inset);
+  border-color: var(--border-strong);
+}
+
+.solve-strike:disabled { opacity: 0.35; cursor: default; }
+
+.solve-question-foot {
+  width: min(100%, 50rem);
+  margin: 1rem auto 1.5rem;
+  padding-inline: clamp(1rem, 4cqi, 2.5rem);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem 1rem;
+}
+
+.solve-main.is-split .solve-question-foot { max-width: 38rem; }
+
+.solve-question-foot .solve-hint {
+  width: auto;
+  margin: 0;
+  padding: 0;
+}
+
+.solve-report-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin-left: auto;
+  padding: 0.4rem 0.25rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-tertiary);
+  background: none;
+  border: 0;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+.solve-report-link:hover { color: var(--text-secondary); }
+
+.solve-footer-tools {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.solve-flag-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.45rem 0.8rem;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  background: var(--bg-inset);
+  border: 2px solid transparent;
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+  transition: color 150ms ease, border-color 150ms ease, background 150ms ease;
+}
+
+.solve-flag-btn:hover:not(:disabled) { color: var(--text-primary); }
+
+.solve-flag-btn.is-active {
+  color: var(--text-primary);
+  background: var(--gold-soft);
+  border-color: var(--border-hard);
+}
+
+/* A marked question carries a gold flag outlined in ink, here and in the map. */
+.solve-flag-btn.is-active svg,
+.solve-map-flag,
+.solve-map-flag-key {
+  fill: var(--gold);
+  color: var(--border-hard);
+}
+
+.solve-flag-btn:disabled { opacity: 0.4; cursor: default; }
+
+.solve-map-flag {
+  position: absolute;
+  top: -0.35rem;
+  right: -0.3rem;
+}
+
+/* A shared text's questions in one bracket. Drawn as a ring, not a border, so
+   the bracket never pushes its cells off the grid's columns. */
+.solve-map-run {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  border-radius: 0.55rem;
+  background: var(--bg-warm);
+  box-shadow: 0 0 0 0.2rem var(--bg-warm), 0 0 0 calc(0.2rem + 1px) var(--border-strong);
+}
+
+/* Bottom sheets (question map, report). Radix portals them to <body>: the
+   solve chrome uses backdrop-filter, which would trap a fixed sheet inside it. */
+.solve-sheet-scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  background: color-mix(in srgb, var(--ink) 35%, transparent);
+  animation: solve-sheet-fade 180ms ease-out both;
+}
+
+.solve-sheet {
+  position: fixed;
+  z-index: 61;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+  max-height: 85dvh;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 0.5rem 1rem max(1rem, env(safe-area-inset-bottom));
+  color: var(--text-primary);
+  background: var(--bg-card);
+  border-top: 2px solid var(--border-hard);
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  box-shadow: var(--shadow-lg);
+  animation: solve-sheet-up 280ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.solve-sheet:focus { outline: none; }
+
+.solve-sheet-handle {
+  align-self: center;
+  flex-shrink: 0;
+  width: 2.5rem;
+  height: 4px;
+  border-radius: var(--radius-pill);
+  background: var(--border-strong);
+}
+
+.solve-sheet-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.solve-sheet-title {
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+}
+
+.solve-sheet-sub {
+  margin-top: 0.15rem;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  font-variant-numeric: tabular-nums;
+}
+
+.solve-sheet-cta {
+  flex-shrink: 0;
+  justify-content: center;
+  width: 100%;
+}
+
+@keyframes solve-sheet-up {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
+@keyframes solve-sheet-fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Desktop: a panel floating over the footer, where the map toggle is. */
+@media (min-width: 48rem) {
+  .solve-sheet {
+    left: 50%;
+    right: auto;
+    bottom: 5rem;
+    width: min(30rem, 100vw - 2rem);
+    max-height: min(70dvh, 40rem);
+    padding: 1rem 1.1rem 1.1rem;
+    border: 2px solid var(--border-hard);
+    border-radius: var(--radius-lg);
+    transform: translateX(-50%);
+    animation: solve-sheet-pop 200ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  .solve-sheet-handle { display: none; }
+}
+
+@keyframes solve-sheet-pop {
+  from { opacity: 0; transform: translate(-50%, 8px); }
+  to { opacity: 1; transform: translate(-50%, 0); }
+}
+
+/* "Revisa antes de entregar". */
+.solve-check {
+  width: min(100%, 40rem);
+  margin: 0 auto;
+  padding: 1.75rem clamp(1rem, 4cqi, 2.5rem) 2rem;
+  display: grid;
+  gap: 1.1rem;
+}
+
+.solve-check-title {
+  font-family: var(--font-display);
+  font-size: clamp(1.35rem, 1.1rem + 1.2cqi, 1.75rem);
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+  text-wrap: balance;
+  color: var(--text-primary);
+}
+
+.solve-check-title:focus { outline: none; }
+
+.solve-check-lead {
+  font-size: 1rem;
+  color: var(--text-secondary);
+}
+
+.solve-check-lead strong {
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+.solve-check-group {
+  display: grid;
+  gap: 0.4rem;
+  padding: 1rem;
+  border: 2px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--bg-card);
+}
+
+.solve-check-group h3 {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.solve-check-group p,
+.solve-check-done {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.solve-check-cells {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 0.35rem;
+}
+
+.solve-check-note {
+  font-size: 0.8rem;
+  color: var(--text-tertiary);
+}
+
+/* Report form. */
+.solve-report-form { display: grid; gap: 0.9rem; }
+
+.solve-report-reasons {
+  display: grid;
+  gap: 0.45rem;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.solve-report-reason {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  min-height: 2.75rem;
+  padding: 0.5rem 0.8rem;
+  font-size: 0.88rem;
+  line-height: 1.35;
+  color: var(--text-primary);
+  border: 2px solid var(--border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: border-color 150ms ease, background 150ms ease;
+}
+
+.solve-report-reason.is-active {
+  border-color: var(--brand);
+  background: var(--accent-soft);
+}
+
+.solve-report-reason input {
+  flex-shrink: 0;
+  width: 1.05rem;
+  height: 1.05rem;
+  accent-color: var(--brand);
+}
+
+.solve-report-reason:has(input:focus-visible) {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+}
+
+.solve-report-note {
+  display: grid;
+  gap: 0.35rem;
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+}
+
+.solve-report-note textarea {
+  width: 100%;
+  resize: vertical;
+  padding: 0.6rem 0.75rem;
+  font: inherit;
+  font-size: 0.9rem;
+  color: var(--text-primary);
+  background: var(--bg-card);
+  border: 2px solid var(--border);
+  border-radius: var(--radius-sm);
+}
+
+.solve-report-note textarea:focus {
+  outline: none;
+  border-color: var(--brand);
+}
+
+.solve-report-note small {
+  justify-self: end;
+  font-size: 0.72rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-tertiary);
+}
+
+.solve-report-done {
+  display: grid;
+  justify-items: start;
+  gap: 0.9rem;
+  font-size: 0.92rem;
+}
+
+/* The break between Sesión 1 and Sesión 2. Brings its own container: the
+   immersive main is full-bleed for the solve screen. */
+.exam-break {
+  width: min(34rem, 100% - 2rem);
+  margin: auto;
+  padding-block: 2rem;
+  display: grid;
+  justify-items: center;
+  gap: 0.25rem;
+}
+
+.exam-break .mascot-message { padding-bottom: 1rem; }
+.exam-break .mascot-message-copy { max-width: 42ch; }
+
+.exam-break-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.exam-break-facts { justify-content: center; }
+
+/* Hub: the exam-day chip is the recommended way in, so it is the pressable one. */
+.topic-chip.is-featured {
+  border: 2px solid var(--border-hard);
+  background: var(--bg-card);
+  box-shadow: var(--shadow-hard-sm);
+}
+
+.topic-chip.is-featured:active:not(:disabled) {
+  transform: translateY(2px);
+  box-shadow: none;
+}
+
+button.resume-row {
+  width: 100%;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+button.resume-row:disabled { opacity: 0.6; cursor: default; }
+
+/* Keyboard hints are noise on a phone. Every tap target here reaches 44px. */
+@media (pointer: coarse) {
+  .solve-hint { display: none; }
+
+  .solve-strike { width: 2.75rem; }
+
+  .solve-flag-btn,
+  .solve-report-link {
+    min-height: 2.75rem;
+  }
+
+  .solve-map-cell { width: 2.75rem; }
+}
+
+@media (max-width: 30rem) {
+  .solve-flag-btn { padding-inline: 0.75rem; }
+  .solve-toast { top: 3.4rem; }
+}
+
+/* ---------------------------------------------------------------------------
+   "Arma tu práctica": the builder opens inside its hub card. Open, it takes the
+   whole row so the chips are not squeezed into one column of a wide grid.
+   --------------------------------------------------------------------------- */
+.launch-card.is-builder.is-expanded { grid-column: 1 / -1; }
+
+.builder {
+  display: grid;
+  gap: 1.1rem;
+  padding: 0 1.1rem 1.1rem;
+}
+
+.builder-fields {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(20rem, 100%), 1fr));
+  gap: 1rem 1.5rem;
+}
+
+.builder-field {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.builder-legend {
+  margin-bottom: 0.45rem;
+  padding: 0;
+  font-size: 0.8rem;
+  font-weight: 800;
+  color: var(--text-primary);
+}
+
+.builder-choices {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.builder-choices .topic-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  min-height: 2.5rem;
+}
+
+.builder-help {
+  margin-top: 0.4rem;
+  font-size: 0.78rem;
+  line-height: 1.4;
+  color: var(--text-secondary);
+}
+
+.builder-count {
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  color: var(--text-tertiary);
+}
+
+.topic-chip[aria-pressed='true'] {
+  border-color: var(--border-accent);
+  background: var(--accent-soft);
+  color: var(--accent-text);
+}
+
+.topic-chip[aria-pressed='true'] .builder-count { color: inherit; }
+
+.topic-chip:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+}
+
+.builder-foot {
+  display: grid;
+  gap: 0.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border);
+}
+
+.builder-available {
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-primary);
+}
+
+.builder-note {
+  font-size: 0.84rem;
+  line-height: 1.45;
+  color: var(--text-secondary);
+}
+
+.builder-start { justify-content: center; }
+
+@media (min-width: 40rem) {
+  .builder-foot {
+    grid-template-columns: 1fr auto;
+    align-items: center;
+  }
+  .builder-foot > :not(.builder-start) { grid-column: 1; }
+  .builder-start { grid-column: 2; grid-row: 1 / span 3; }
+}
+
+@media (pointer: coarse) {
+  .builder-choices .topic-chip { min-height: 2.75rem; }
+}
+
+/* ---------------------------------------------------------------------------
+   Immediate feedback on the solve screen: "Comprobar", then the verdict.
+   Correct and incorrect speak in the semantic tokens, never the brand.
+   --------------------------------------------------------------------------- */
+.solve-verify {
+  width: min(100%, 50rem);
+  margin: 1rem auto 0;
+  padding-inline: clamp(1rem, 4cqi, 2.5rem);
+  display: flex;
+  justify-content: flex-end;
+}
+
+.solve-option:disabled { cursor: default; }
+
+.option-card.solve-option:disabled:not(.is-correct):not(.is-incorrect):hover {
+  border-color: var(--border-strong);
+  background: var(--bg-card);
+}
+
+.answer-feedback {
+  width: min(100%, 50rem);
+  margin: 1.1rem auto 0;
+  padding-inline: clamp(1rem, 4cqi, 2.5rem);
+  display: grid;
+  gap: 0.6rem;
+  scroll-margin-top: 4.5rem;
+  animation: confidence-arrive 220ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.answer-verdict {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.25rem 0.5rem;
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius-md);
+  font-size: 0.95rem;
+}
+
+.answer-verdict strong {
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+}
+
+.answer-verdict.is-correct {
+  background: var(--success-soft);
+  color: var(--success-text);
+}
+
+.answer-verdict.is-incorrect {
+  background: var(--danger-soft);
+  color: var(--danger-text);
+}
+
+.answer-verdict span { color: var(--text-primary); }
+
+.answer-feedback-heading {
+  margin-bottom: 0.4rem;
+  font-size: 0.8rem;
+  font-weight: 800;
+  color: var(--text-primary);
+}
+
+.answer-feedback-others {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--bg-card);
+}
+
+.answer-feedback-others > summary {
+  min-height: 2.75rem;
+  display: flex;
+  align-items: center;
+  padding: 0.5rem 1rem;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  cursor: pointer;
+}
+
+.answer-feedback-others > summary:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+  border-radius: var(--radius-md);
+}
+
+.answer-feedback-other {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  border-top: 1px solid var(--border);
+}
+
+.answer-feedback-other .option-label {
+  width: 1.75rem;
+  height: 1.75rem;
+  font-size: 0.75rem;
+}
+
+.answer-feedback-note {
+  font-size: 0.78rem;
+  color: var(--text-tertiary);
+}
+
+.answer-feedback-next {
+  justify-self: end;
+  margin-top: 0.25rem;
+}
+
+@media (max-width: 30rem) {
+  .solve-verify .btn-primary,
+  .answer-feedback-next {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .answer-feedback { animation: none; }
 }

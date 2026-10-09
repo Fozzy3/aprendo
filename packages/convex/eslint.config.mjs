@@ -19,7 +19,7 @@ const compat = new FlatCompat({
 
 export default defineConfig([
   {
-    files: ["convex/**/*.ts"],
+    files: ["src/**/*.ts"],
     languageOptions: {
       globals: {
         ...globals.browser,
@@ -29,7 +29,7 @@ export default defineConfig([
       parser: tsParser,
 
       parserOptions: {
-        project: join(__dirname, "convex", "tsconfig.json"),
+        project: join(__dirname, "src", "tsconfig.json"),
       },
     },
 
@@ -57,6 +57,11 @@ export default defineConfig([
       "@typescript-eslint/require-await": "off",
     },
   },
-  globalIgnores(["convex/_generated"]),
-  ...convexPlugin.configs.recommended,
+  globalIgnores(["src/_generated"]),
+  // The plugin targets a `convex/` folder; this package keeps its functions in
+  // `src/` (see convex.json), so point its rules there.
+  ...convexPlugin.configs.recommended.map((config) => ({
+    ...config,
+    files: ["src/**/*.ts"],
+  })),
 ]);

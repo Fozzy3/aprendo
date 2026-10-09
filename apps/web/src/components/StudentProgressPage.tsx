@@ -1,11 +1,23 @@
 import { useQuery } from '@tanstack/react-query'
 import { Link } from '@tanstack/react-router'
 import { ArrowRight, BookOpen, Minus, TrendingDown, TrendingUp } from 'lucide-react'
-import { progressTrendsQuery, studentProgressQuery } from '../lib/student-queries.ts'
+import type { CSSProperties } from 'react'
+import { MASTERY_LEVEL_LABELS, type MasteryLevel } from '@aprendo/convex/mastery'
+import { progressTrendsQuery, studentProgressQuery, syllabusQuery } from '../lib/student-queries.ts'
 import { getSubjectTheme } from '../lib/subject-theme.ts'
 import { GlobalScoreCard } from './GlobalScoreCard.tsx'
+import { MASTERY_LEVEL_COLOR, MasteryBadge } from './MasteryBadge.tsx'
+import {
+  countByLevel,
+  countedSubtopics,
+  levelFor,
+  masteryLevelMap,
+  subjectSubtopics,
+} from '../lib/mastery-display.ts'
 import { ConfidenceBreakdownCard } from './ConfidenceBreakdownCard.tsx'
 import { getSubjectLabel, getSubtopicLabel } from '../lib/taxonomy.ts'
+import type { FunctionReturnType } from 'convex/server'
+import type { api } from '@aprendo/convex/api'
 import { PageLoader } from '../components/FullScreenLoader.tsx'
 import { MascotMessage } from './Mascot.tsx'
 
@@ -82,8 +94,9 @@ function TrendChart({ points }: { points: Array<{ weekStartMs: number; accuracy:
 export function StudentProgressPage({ studentId }: { studentId: string }) {
   const progressQuery = useQuery({ ...studentProgressQuery(studentId), enabled: true })
   const trendsQuery = useQuery({ ...progressTrendsQuery(studentId), enabled: true })
+  const syllabus = useQuery({ ...syllabusQuery(studentId), enabled: true })
 
-  if (progressQuery.isPending || trendsQuery.isPending) {
+  if (progressQuery.isPending || trendsQuery.isPending || syllabus.isPending) {
     return (
       <PageLoader message="Preparando tu resumen…" />
     )
@@ -97,6 +110,8 @@ export function StudentProgressPage({ studentId }: { studentId: string }) {
   const subjectAggregates = progress?.subjectAggregates ?? []
   const subjectLevels = progress?.subjectLevels ?? []
   const weakestSubtopics = progress?.weakestSubtopics ?? []
+  const subtopicMastery = progress?.subtopicMastery ?? []
+  const levels = masteryLevelMap(subtopicMastery)
   const weekly = trends?.weekly ?? []
 
   if (overallSummary == null) {
@@ -278,6 +293,8 @@ export function StudentProgressPage({ studentId }: { studentId: string }) {
         </div>
       </div>
 
+      {syllabus.data != null ? <MasteryOverview subjects={syllabus.data.subjects} levels={levels} /> : null}
+
       {trends?.confidence != null ? (
         <ConfidenceBreakdownCard breakdown={trends.confidence} />
       ) : null}
@@ -352,15 +369,90 @@ export function StudentProgressPage({ studentId }: { studentId: string }) {
                     {getSubtopicLabel(agg.subtopicId ?? 'sin_subtema')}
                   </p>
                   <p className="text-[0.6875rem] text-[var(--text-tertiary)]">
-                    {getSubjectLabel(agg.subjectId)} · {formatPercent(agg.masteryScore)} de dominio
+                    {getSubjectLabel(agg.subjectId)}
                   </p>
                 </div>
+                <MasteryBadge level={levelFor(levels, agg.subtopicId ?? '')} />
                 <ArrowRight size={16} className="shrink-0 text-[var(--text-tertiary)]" />
               </Link>
             ))}
           </div>
         </div>
       ) : null}
+    </div>
+  )
+}
+
+/** Best level first, so the bar fills from the left as the student advances. */
+const OVERVIEW_ORDER: MasteryLevel[] = ['dominado', 'competente', 'familiar', 'intentado', 'sin_empezar']
+
+/**
+ * How many subtopics of each area sit at each Khan level, linking to the
+ * Temario — counted over the same subtopics the Temario counts.
+ */
+function MasteryOverview({
+  subjects,
+  levels,
+}: {
+  subjects: FunctionReturnType<typeof api.syllabus.getSyllabus>['subjects']
+  levels: Map<string, MasteryLevel>
+}) {
+  return (
+    <div className="card overflow-hidden">
+      <div className="flex items-baseline justify-between gap-2 border-b border-[var(--border)] px-5 py-3">
+        <h3 className="text-sm font-semibold text-[var(--text-primary)]">Tu dominio por área</h3>
+        <Link to="/syllabus" className="text-xs font-semibold no-underline">
+          Ver el temario
+        </Link>
+      </div>
+      <div className="divide-y divide-[var(--border)]">
+        {subjects.map((subject) => {
+          const subjectId = subject.id
+          const theme = getSubjectTheme(subjectId)
+          const counted = countedSubtopics(subjectSubtopics(subject, levels))
+          const total = counted.length
+          const counts = countByLevel(
+            counted.map((subtopic) => subtopic.level),
+            total,
+          )
+          const competentOrAbove = counts.competente + counts.dominado
+          return (
+            <Link
+              key={subjectId}
+              to="/syllabus"
+              className="block px-5 py-3.5 no-underline transition-colors hover:bg-[var(--bg-inset)]"
+            >
+              <div className="mb-2 flex items-center justify-between gap-2">
+                <p className="flex min-w-0 items-center gap-2 text-sm font-semibold text-[var(--text-primary)]">
+                  <span
+                    aria-hidden
+                    className="subject-dot"
+                    style={{ '--subject-color': theme.color } as CSSProperties}
+                  />
+                  <span className="truncate">{theme.label}</span>
+                </p>
+                <span className="shrink-0 text-xs tabular-nums text-[var(--text-tertiary)]">
+                  {competentOrAbove} de {total} en Competente o más
+                </span>
+              </div>
+              <div className="flex h-2 overflow-hidden rounded-full bg-[var(--bg-inset)]" aria-hidden>
+                {OVERVIEW_ORDER.filter((level) => level !== 'sin_empezar' && counts[level] > 0).map((level) => (
+                  <span
+                    key={level}
+                    className="h-full"
+                    style={{ width: `${(counts[level] / Math.max(total, 1)) * 100}%`, background: MASTERY_LEVEL_COLOR[level] }}
+                  />
+                ))}
+              </div>
+              <p className="mt-1.5 text-[0.6875rem] tabular-nums text-[var(--text-tertiary)]">
+                {OVERVIEW_ORDER.filter((level) => counts[level] > 0)
+                  .map((level) => `${counts[level]} ${MASTERY_LEVEL_LABELS[level]}`)
+                  .join(' · ')}
+              </p>
+            </Link>
+          )
+        })}
+      </div>
     </div>
   )
 }

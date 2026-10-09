@@ -362,3 +362,44 @@ export function usableQuestions(questions: ParsedQuestion[]): ParsedQuestion[] {
       && question.options.some((option) => option.label === question.correctOption),
   )
 }
+
+export interface BookletGroupSlot {
+  /** The group's `contextKey`. */
+  key: string
+  firstNumber: number
+  lastNumber: number
+  memberCount: number
+  /** 0-based position of this question within its group. */
+  position: number
+}
+
+/**
+ * Each question's place in its stimulus group, worked out over the whole
+ * booklet. The loader sends questions to Convex in slices; computing this per
+ * slice split a passage that straddled two slices into two groups.
+ */
+export function groupSlots(
+  questions: Array<Pick<ParsedQuestion, 'number' | 'contextKey'>>,
+): Array<BookletGroupSlot | null> {
+  const numbersByKey = new Map<string, number[]>()
+  for (const question of questions) {
+    if (question.contextKey == null) continue
+    numbersByKey.set(question.contextKey, [
+      ...(numbersByKey.get(question.contextKey) ?? []),
+      question.number,
+    ])
+  }
+  for (const numbers of numbersByKey.values()) numbers.sort((a, b) => a - b)
+
+  return questions.map((question) => {
+    if (question.contextKey == null) return null
+    const numbers = numbersByKey.get(question.contextKey)!
+    return {
+      key: question.contextKey,
+      firstNumber: numbers[0]!,
+      lastNumber: numbers[numbers.length - 1]!,
+      memberCount: numbers.length,
+      position: numbers.indexOf(question.number),
+    }
+  })
+}

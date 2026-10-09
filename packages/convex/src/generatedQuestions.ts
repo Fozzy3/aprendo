@@ -2,9 +2,8 @@ import { generateObject } from 'ai'
 import { z } from 'zod'
 import { ConvexError, v } from 'convex/values'
 import { internal } from './_generated/api'
-import { action, internalMutation, internalQuery } from './_generated/server'
+import { internalAction, internalMutation, internalQuery } from './_generated/server'
 import taxonomyContract from '../../../docs/taxonomy.v1.json'
-import { requireAuthenticatedStudentId } from './auth'
 import { getSubtopicContext } from './taxonomy'
 import { questionOptionValidator } from './validators'
 import { APRENDO_MODEL_ID, aprendoModel } from './aiProvider'
@@ -127,14 +126,16 @@ export const insertGeneratedQuestions = internalMutation({
  * (as `practice_only`, attached to a synthetic "AI generated" upload so they
  * flow through the normal selection/session machinery). Used when a subtopic's
  * inventory is thin.
+ *
+ * Internal: the model vouches for its own answers and these rows land in the
+ * shared bank, so no account may trigger it until it sits behind verification.
  */
-export const generateSubtopicQuestions = action({
+export const generateSubtopicQuestions = internalAction({
   args: {
     subtopicId: v.string(),
     count: v.optional(v.number()),
   },
   handler: async (ctx, args): Promise<{ inserted: number }> => {
-    await requireAuthenticatedStudentId(ctx)
     const context = getSubtopicContext(args.subtopicId)
     if (context == null) {
       throw new ConvexError('Subtema no válido.')

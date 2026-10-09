@@ -1,25 +1,24 @@
 import { useConvexMutation } from '@convex-dev/react-query'
-import { useMutation, useQuery } from '@tanstack/react-query'
-import { Link, useNavigate } from '@tanstack/react-router'
-import { ArrowRight, Flame, Play, RotateCcw, Sparkles, Target, TrendingUp } from 'lucide-react'
-import { useEffect, useRef } from 'react'
+import { useQuery } from '@tanstack/react-query'
+import { Link } from '@tanstack/react-router'
+import { ArrowRight, Flame, Play, Target, TrendingUp } from 'lucide-react'
+import { useEffect, useRef, type CSSProperties } from 'react'
 import { api } from '@aprendo/convex/api'
-import { SESSION_KIND_CONFIG, getConfiguredQuestionCount } from '@aprendo/convex/sessionKinds'
+import { SESSION_KIND_CONFIG } from '@aprendo/convex/sessionKinds'
 import MarkdownBlock from './MarkdownBlock.tsx'
-import { ExamCountdown } from './ExamCountdown.tsx'
-import { RingProgress } from './RingProgress.tsx'
+import { DailyPlan } from './DailyPlan.tsx'
+import { ExamCountdown, TargetGap } from './ExamCountdown.tsx'
+import { StudyTimeCard } from './StudyTimeCard.tsx'
 import {
   activeSessionQuery,
   coachSummaryQuery,
-  reviewQueueQuery,
   studentProgressQuery,
   todayDashboardQuery,
 } from '../lib/student-queries.ts'
-import { getKindIcon } from '../lib/session-display.ts'
-import { formatMasteryPercent, getSyllabusStatus } from '../lib/syllabus-status.ts'
-import { getSubjectLabel } from '../lib/taxonomy.ts'
-import { PageLoader } from '../components/FullScreenLoader.tsx'
 import { readConvexError } from '../lib/convex-error.ts'
+import { getKindIcon } from '../lib/session-display.ts'
+import { getSubjectTheme } from '../lib/subject-theme.ts'
+import { PageLoader } from '../components/FullScreenLoader.tsx'
 
 function greeting(): string {
   const hour = new Date().getHours()
@@ -28,24 +27,11 @@ function greeting(): string {
   return 'Buenas noches'
 }
 
-const RECOMMENDED_COUNT = getConfiguredQuestionCount(SESSION_KIND_CONFIG.recommended)
-
 export function TodayPage({ studentId }: { studentId: string }) {
-  const navigate = useNavigate()
   const dashboard = useQuery({ ...todayDashboardQuery(studentId), enabled: true })
   const progress = useQuery({ ...studentProgressQuery(studentId), enabled: true })
   const active = useQuery({ ...activeSessionQuery(studentId), enabled: true })
-  const reviewQueue = useQuery({ ...reviewQueueQuery(studentId), enabled: true })
   const coachSummary = useQuery({ ...coachSummaryQuery(studentId), enabled: true })
-
-  const createSession = useConvexMutation(api.sessions.createSession)
-  const startMutation = useMutation({
-    mutationFn: async (kind: 'recommended' | 'repaso') =>
-      createSession({ studentId: studentId as never, kind }),
-    onSuccess: async (sessionId) => {
-      await navigate({ to: '/practice/$sessionId', params: { sessionId } })
-    },
-  })
 
   // Generate this week's coach summary once, only if the student studied this week.
   const requestSummary = useConvexMutation(api.coach.requestWeeklyCoachSummary)
@@ -87,7 +73,7 @@ export function TodayPage({ studentId }: { studentId: string }) {
       ? `Te faltan ${weakestSubjectLevel.current.pointsToNextBand} puntos para ${weakestSubjectLevel.current.nextBand.labelEs}`
       : 'Sigue tu ruta en esta área'
   const activeSession = active.data ?? null
-  const reviewDueCount = reviewQueue.data?.dueCount ?? 0
+  const weakestTheme = weakestSubject == null ? null : getSubjectTheme(weakestSubject.subjectId)
 
   return (
     <div className="fade-in mx-auto max-w-4xl space-y-5">
@@ -117,83 +103,33 @@ export function TodayPage({ studentId }: { studentId: string }) {
         </div>
       </div>
 
-      <ExamCountdown
-        studentId={studentId}
-        examDate={dashboard.data?.examDate ?? null}
-        plan={dashboard.data?.examPlan ?? null}
-      />
-
-      {/* Plan de hoy */}
-      <div className="card relative overflow-hidden p-6">
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,var(--accent-soft),transparent_60%)]" />
-        <div className="relative">
-          <div className="mb-4 flex items-center justify-between">
-            <p className="kicker">Tu plan de hoy</p>
-            <span className="text-xs font-medium text-[var(--text-tertiary)]">~15 min</span>
-          </div>
-
-          <div className="flex items-start gap-3.5">
-            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[var(--accent)] text-[var(--text-inverted)]">
-              <Sparkles size={18} />
-            </span>
-            <div className="min-w-0 flex-1">
-              <p className="text-base font-semibold text-[var(--text-primary)]">
-                Práctica recomendada
-              </p>
-              <p className="text-sm text-[var(--text-secondary)]">
-                {RECOMMENDED_COUNT} preguntas enfocadas en tus áreas más débiles.
-              </p>
-            </div>
-          </div>
-
-          <div className="mt-5 flex flex-wrap items-center gap-3">
-            <button
-              type="button"
-              disabled={startMutation.isPending}
-              onClick={() => startMutation.mutate('recommended')}
-              className="btn-primary"
-            >
-              <Play size={16} />
-              {startMutation.isPending && startMutation.variables === 'recommended'
-                ? 'Preparando…'
-                : 'Empezar sesión de hoy'}
-            </button>
-            <Link to="/syllabus" className="btn-ghost text-sm no-underline">
-              Explorar el temario
-            </Link>
-          </div>
-
-          {startMutation.error ? (
-            <p className="mt-3 text-sm text-[var(--accent-text)]">
-              {readConvexError(startMutation.error, 'No se pudo iniciar la práctica.')}
-            </p>
-          ) : null}
-        </div>
-      </div>
-
-      {/* Repaso de errores (spaced review) */}
-      {reviewDueCount > 0 ? (
-        <div className="card flex items-center gap-3.5 p-5">
-          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[var(--accent-soft)] text-[var(--accent-text)]">
-            <RotateCcw size={18} />
-          </span>
-          <div className="min-w-0 flex-1">
-            <p className="text-sm font-semibold text-[var(--text-primary)]">Repaso de errores</p>
-            <p className="text-xs text-[var(--text-tertiary)]">
-              {reviewDueCount} {reviewDueCount === 1 ? 'pregunta' : 'preguntas'} que fallaste, list
-              {reviewDueCount === 1 ? 'a' : 'as'} para reforzar.
-            </p>
-          </div>
-          <button
-            type="button"
-            disabled={startMutation.isPending}
-            onClick={() => startMutation.mutate('repaso')}
-            className="btn-ghost shrink-0 text-sm"
-          >
-            {startMutation.isPending && startMutation.variables === 'repaso'
-              ? 'Preparando…'
-              : 'Repasar'}
-          </button>
+      {dashboard.data != null ? (
+        <>
+          <DailyPlan studentId={studentId} tasks={dashboard.data.plan.tasks} />
+          <ExamCountdown
+            studentId={studentId}
+            examDate={dashboard.data.examDate}
+            plan={dashboard.data.examPlan}
+          />
+          <TargetGap
+            data={dashboard.data.globalScore}
+            daysRemaining={dashboard.data.examPlan?.daysRemaining ?? null}
+          />
+          <StudyTimeCard studentId={studentId} studyTime={dashboard.data.studyTime} />
+        </>
+      ) : dashboard.isError ? (
+        // The plan needs this query; without it Hoy still offers a way in.
+        <div role="alert" className="card p-5">
+          <p className="text-sm font-semibold text-[var(--text-primary)]">
+            No pudimos armar tu plan de hoy
+          </p>
+          <p className="mt-0.5 text-sm text-[var(--text-secondary)]">
+            {readConvexError(dashboard.error, 'Intenta recargar la página en un momento.')}
+          </p>
+          <Link to="/practice" className="btn-primary mt-4 w-full justify-center no-underline sm:w-auto">
+            <Play size={16} />
+            Elegir una práctica
+          </Link>
         </div>
       ) : null}
 
@@ -204,31 +140,19 @@ export function TodayPage({ studentId }: { studentId: string }) {
             <Target size={15} className="text-[var(--text-tertiary)]" />
             <p className="kicker">Foco de la semana</p>
           </div>
-          {weakestSubject != null ? (
+          {weakestSubject != null && weakestTheme != null ? (
             <Link
               to="/path"
               className="flex items-center gap-3.5 no-underline"
             >
-              <div className="relative shrink-0">
-                <RingProgress
-                  value={weakestSubject.masteryScore}
-                  size={44}
-                  strokeWidth={6}
-                  color={
-                    getSyllabusStatus({
-                      questionCount: 1,
-                      attemptCount: weakestSubject.attemptCount,
-                      mastery: weakestSubject.masteryScore,
-                    }).color
-                  }
-                />
-                <span className="absolute inset-0 flex items-center justify-center text-[11px] font-bold tabular-nums text-[var(--text-primary)]">
-                  {formatMasteryPercent(weakestSubject.masteryScore)}
-                </span>
-              </div>
+              <span
+                aria-hidden
+                className="subject-dot subject-dot-lg"
+                style={{ '--subject-color': weakestTheme.color } as CSSProperties}
+              />
               <div className="min-w-0 flex-1">
                 <p className="text-sm font-semibold text-[var(--text-primary)]">
-                  {getSubjectLabel(weakestSubject.subjectId)}
+                  {weakestTheme.label}
                 </p>
                 <p className="text-xs text-[var(--text-tertiary)]">{weakestSubjectHint}</p>
               </div>
@@ -267,7 +191,7 @@ export function TodayPage({ studentId }: { studentId: string }) {
             </Link>
           ) : (
             <p className="text-sm text-[var(--text-tertiary)]">
-              No tienes sesiones en curso. ¡Empieza una arriba!
+              No tienes sesiones en curso. Empieza tu plan de hoy.
             </p>
           )}
         </div>

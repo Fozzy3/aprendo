@@ -39,7 +39,7 @@ export const authComponent = createClient<DataModel>(components.betterAuth, {
 
         if (existing) {
           await authComponent.setUserId(ctx, authUser._id, existing._id)
-          await ctx.db.patch(existing._id, {
+          await ctx.db.patch("students", existing._id, {
             email,
             updatedAt: now,
             lastSeenAt: now,
@@ -60,7 +60,7 @@ export const authComponent = createClient<DataModel>(components.betterAuth, {
         if (oldUser.email === newUser.email) return
         if (!newUser.userId) return
         const email = (newUser.email ?? '').toString()
-        await ctx.db.patch(newUser.userId as Id<'students'>, {
+        await ctx.db.patch("students", newUser.userId as Id<'students'>, {
           email,
           normalizedEmail: normalizeEmail(email),
           updatedAt: Date.now(),
@@ -69,8 +69,8 @@ export const authComponent = createClient<DataModel>(components.betterAuth, {
       onDelete: async (ctx, authUser) => {
         if (!authUser.userId) return
         const studentId = authUser.userId as Id<'students'>
-        const student = await ctx.db.get(studentId)
-        if (student) await ctx.db.delete(studentId)
+        const student = await ctx.db.get("students", studentId)
+        if (student) await ctx.db.delete("students", studentId)
       },
     },
   },
@@ -96,7 +96,7 @@ export const getCurrentStudent = query({
   handler: async (ctx) => {
     const authUser = await authComponent.safeGetAuthUser(ctx)
     if (!authUser?.userId) return null
-    const student = await ctx.db.get(authUser.userId as Id<'students'>)
+    const student = await ctx.db.get("students", authUser.userId as Id<'students'>)
     if (!student) return null
     return {
       _id: student._id,
@@ -111,7 +111,7 @@ export const getCurrentAdmin = query({
   handler: async (ctx) => {
     const authUser = await authComponent.safeGetAuthUser(ctx)
     if (!authUser?.userId) return null
-    const student = await ctx.db.get(authUser.userId as Id<'students'>)
+    const student = await ctx.db.get("students", authUser.userId as Id<'students'>)
     if (!student?.isAdmin) return null
     return {
       _id: student._id,
@@ -145,7 +145,7 @@ export async function requireAdminStudentId(
   ctx: GenericCtx<DataModel> & Pick<QueryCtx, 'db'>,
 ): Promise<Id<'students'>> {
   const studentId = await requireAuthenticatedStudentId(ctx)
-  const student = await ctx.db.get(studentId)
+  const student = await ctx.db.get("students", studentId)
   if (!student?.isAdmin) {
     throw new ConvexError('Necesitas permisos de administrador.')
   }

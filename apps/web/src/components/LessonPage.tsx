@@ -61,17 +61,20 @@ export function LessonPage({ subtopicId, studentId }: { subtopicId: string; stud
     },
   })
 
-  // Kick off generation once when the subtopic has no cached lesson yet.
+  // Kick off generation once when the subtopic has no cached lesson yet, or when
+  // the cached one is stale (older prompt, or a generation that died). A stale
+  // lesson keeps its text on screen while the rewrite runs.
   const requestedRef = useRef<string | null>(null)
   const lesson = lessonQuery.data
+  const needsRequest = lesson === null || lesson?.isStale === true
   useEffect(() => {
     if (subjectId == null) return
     if (lessonQuery.isPending) return
-    if (lesson === null && requestedRef.current !== subtopicId) {
+    if (needsRequest && requestedRef.current !== subtopicId) {
       requestedRef.current = subtopicId
       requestMutation.mutate()
     }
-  }, [lesson, lessonQuery.isPending, requestMutation, subjectId, subtopicId])
+  }, [needsRequest, lessonQuery.isPending, requestMutation, subjectId, subtopicId])
 
   if (subjectId == null) {
     return (
@@ -84,10 +87,16 @@ export function LessonPage({ subtopicId, studentId }: { subtopicId: string; stud
     )
   }
 
-  const isFailed = lesson?.status === 'failed'
   // Text lands in phase 1; the demo (phase 2) may still be generating. Render the
   // text as soon as it exists so the lesson is readable while the demo builds.
   const hasText = lesson?.ideaBody != null
+  // A failed generation, or a request that never reached the server, leaves
+  // nothing to wait for. Without text, offer a retry instead of a skeleton that
+  // spins forever. With text (a stale lesson whose rewrite failed keeps the old
+  // one) the student keeps reading it, and a quiet note offers the retry, since
+  // a failed lesson is never rewritten on its own.
+  const isFailed = !hasText && (lesson?.status === 'failed' || requestMutation.error != null)
+  const rewriteFailed = hasText && lesson?.status === 'failed'
   const isBuildingDemo = lesson?.status === 'generating' && hasText && lesson?.stage === 'demo'
 
   return (
@@ -107,7 +116,9 @@ export function LessonPage({ subtopicId, studentId }: { subtopicId: string; stud
 
       {isFailed ? (
         <div className="card p-6 text-center">
-          <div className="stage-alert mb-4">No pudimos preparar esta lección.</div>
+          <div role="alert" className="stage-alert mb-4">
+            {readConvexError(requestMutation.error, 'No pudimos preparar esta lección.')}
+          </div>
           <button
             type="button"
             disabled={requestMutation.isPending}
@@ -121,6 +132,20 @@ export function LessonPage({ subtopicId, studentId }: { subtopicId: string; stud
         <WritingSkeleton />
       ) : (
         <>
+          {rewriteFailed ? (
+            <div role="status" className="flex flex-wrap items-center justify-between gap-3 text-sm text-[var(--text-secondary)]">
+              <span>No pudimos actualizar esta lección; te mostramos la versión anterior.</span>
+              <button
+                type="button"
+                disabled={requestMutation.isPending}
+                onClick={() => requestMutation.mutate()}
+                className="btn-secondary"
+              >
+                {requestMutation.isPending ? 'Reintentando…' : 'Reintentar'}
+              </button>
+            </div>
+          ) : null}
+
           <section className="card p-6">
             <div className="mb-3 flex items-center gap-2">
               <Lightbulb size={16} className="text-[var(--accent)]" />

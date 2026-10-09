@@ -1,5 +1,6 @@
 import { v } from 'convex/values'
-import type { SessionKind } from './sessionKinds'
+import type { FeedbackMode, SessionKind } from './sessionKinds'
+import type { MasteryLevel } from './mastery'
 
 export const pdfUploadStatusValidator = v.union(
   v.literal('uploaded'),
@@ -111,6 +112,14 @@ export const questionDocumentValidator = v.object({
   eligibility: v.optional(questionEligibilityValidator),
   eligibilityReasons: v.optional(v.array(v.string())),
   eligibilityEvaluatedAt: v.optional(v.number()),
+  /**
+   * Who wrote `answerSolutionMarkdown` / `answerDistractorRationales`: the
+   * ICFES itself (an "explicadas" booklet), a model, or a person. Absent on
+   * questions enriched before it was recorded.
+   */
+  explanationSource: v.optional(
+    v.union(v.literal('icfes'), v.literal('ai_generated'), v.literal('human')),
+  ),
 })
 
 /**
@@ -141,6 +150,8 @@ export const sessionKindValidator = v.union(
   v.literal('topic'),
   v.literal('simulacro'),
   v.literal('repaso'),
+  v.literal('personalizada'),
+  v.literal('reto'),
 )
 
 // Compile-time guard: keep the validator literals in sync with SESSION_KINDS.
@@ -151,6 +162,45 @@ const _assertSessionKind: ValidatedSessionKind extends SessionKind
     : never
   : never = true
 void _assertSessionKind
+
+export const feedbackModeValidator = v.union(v.literal('inmediata'), v.literal('al_final'))
+
+// Compile-time guard: keep the validator literals in sync with FEEDBACK_MODES.
+const _assertFeedbackMode: typeof feedbackModeValidator.type extends FeedbackMode
+  ? FeedbackMode extends typeof feedbackModeValidator.type
+    ? true
+    : never
+  : never = true
+void _assertFeedbackMode
+
+export const masteryLevelValidator = v.union(
+  v.literal('sin_empezar'),
+  v.literal('intentado'),
+  v.literal('familiar'),
+  v.literal('competente'),
+  v.literal('dominado'),
+)
+
+// Compile-time guard: keep the validator literals in sync with MASTERY_LEVELS.
+const _assertMasteryLevel: typeof masteryLevelValidator.type extends MasteryLevel
+  ? MasteryLevel extends typeof masteryLevelValidator.type
+    ? true
+    : never
+  : never = true
+void _assertMasteryLevel
+
+export const practiceDifficultyValidator = v.union(
+  v.literal('basico'),
+  v.literal('medio'),
+  v.literal('avanzado'),
+)
+
+export const practiceSourceValidator = v.union(
+  v.literal('todas'),
+  v.literal('no_vistas'),
+  v.literal('falladas'),
+  v.literal('marcadas'),
+)
 
 export const sessionStatusValidator = v.union(
   v.literal('created'),
@@ -196,11 +246,12 @@ export const sessionDocumentValidator = v.object({
   kind: sessionKindValidator,
   status: sessionStatusValidator,
   recommendationSource: recommendationSourceValidator,
-  // Only set for `topic` sessions — the subject the student chose.
+  // The area of a subject-scoped session: topic practice, nivelación, or a
+  // per-area simulacro.
   subjectId: v.optional(v.string()),
   // Only set for `topic` sessions launched from the syllabus — the chosen subtopic.
   subtopicId: v.optional(v.string()),
-  // Only set for simulated exam sessions.
+  // Only set for the full simulacro (Sesión 1 or 2); a per-area one has none.
   simulacroSessionNumber: v.optional(v.number()),
   startedAt: v.number(),
   completedAt: v.optional(v.number()),
@@ -211,6 +262,12 @@ export const sessionDocumentValidator = v.object({
   questionCount: v.number(),
   currentPosition: v.number(),
   summary: v.optional(studentSummaryValidator),
+  /** Absent means `al_final`; `inmediata` only on kinds that allow it (`sessionKinds.ts`). */
+  feedbackMode: v.optional(feedbackModeValidator),
+  /** A `repaso` of one session's misses ("Reintentar las incorrectas"): that session. */
+  sourceSessionId: v.optional(v.id('sessions')),
+  /** A `personalizada`'s builder source: `falladas` and `marcadas` move no mastery (`mastery.ts`). */
+  practiceSource: v.optional(practiceSourceValidator),
 })
 
 export const questionAttemptValidator = v.object({
@@ -230,6 +287,42 @@ export const questionAttemptValidator = v.object({
   wasSkipped: v.boolean(),
   /** Declared by the student alongside the answer; absent when they skipped it. */
   confidence: v.optional(confidenceLevelValidator),
+  // Exam tools (Bluebook): they can be set before answering, so a row may exist
+  // with no `selectedOption`. Answered means `selectedOption` is set; every count
+  // of answers already requires `isCorrect`.
+  /** "Marcar para revisar". */
+  flagged: v.optional(v.boolean()),
+  /** Option labels the student crossed out. */
+  eliminatedOptions: v.optional(v.array(v.string())),
+  /** Time on the question summed over every visit (`recordQuestionTime`). */
+  timeSpentMs: v.optional(v.number()),
+  /**
+   * When the student checked this answer in an immediate-feedback practice
+   * (`checkAnswer`). The key is then shown, so the answer is locked.
+   */
+  checkedAt: v.optional(v.number()),
+})
+
+/** Why a student says a question is broken ("Reportar un problema"). */
+export const questionReportReasonValidator = v.union(
+  v.literal('respuesta_incorrecta'),
+  v.literal('enunciado_confuso'),
+  v.literal('imagen_ilegible'),
+  v.literal('otro'),
+)
+
+export const questionReportStatusValidator = v.union(v.literal('open'), v.literal('resolved'))
+
+export const questionReportDocumentValidator = v.object({
+  questionId: v.id('questions'),
+  studentId: v.id('students'),
+  /** Where the student met the question, when it was in a session. */
+  sessionId: v.optional(v.id('sessions')),
+  reason: questionReportReasonValidator,
+  note: v.optional(v.string()),
+  status: questionReportStatusValidator,
+  createdAt: v.number(),
+  resolvedAt: v.optional(v.number()),
 })
 
 export const conceptLessonStatusValidator = v.union(
@@ -312,4 +405,10 @@ export const learnerAggregateValidator = v.object({
   masteryScore: v.number(),
   evidenceLevel: v.string(),
   updatedAt: v.number(),
+  // Subtopic aggregates only (see `mastery.ts`). Moved once per completed
+  // session and carried across the rebuild in `progress.ts`; absent on
+  // aggregates built before levels existed (`masteryLevelOf` falls back).
+  masteryLevel: v.optional(masteryLevelValidator),
+  /** When the level was last evaluated — the reto re-tests the oldest first. */
+  masteryUpdatedAt: v.optional(v.number()),
 })

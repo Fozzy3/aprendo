@@ -1,13 +1,28 @@
+import { useConvexMutation } from '@convex-dev/react-query'
+import { useMutation, useQuery } from '@tanstack/react-query'
 import { Outlet, createFileRoute, useNavigate, useRouterState } from '@tanstack/react-router'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
+import { api } from '@aprendo/convex/api'
+import {
+  SESSION_KIND_CONFIG,
+  getSimulacroSessionQuestionCount,
+} from '@aprendo/convex/sessionKinds'
 import { SessionSolve } from '../components/SessionSolve.tsx'
 import { StudentAppShell } from '../components/StudentAppShell.tsx'
+import { ExamBreak } from '../components/ExamBreak.tsx'
 import { useCurrentStudent } from '../lib/student-session.ts'
+import { sessionQuery } from '../lib/student-queries.ts'
+import { isFullSittingOne } from '../lib/exam-day.ts'
+import { readConvexError } from '../lib/convex-error.ts'
 import { FullScreenLoader } from '../components/FullScreenLoader.tsx'
 
 export const Route = createFileRoute('/practice/$sessionId')({
   component: PracticeSolvePage,
 })
+
+const SITTING_TWO = SESSION_KIND_CONFIG.simulacro.simulacroSessions?.find(
+  (sitting) => sitting.sessionNumber === 2,
+)
 
 function PracticeSolvePage() {
   const navigate = useNavigate()
@@ -15,6 +30,28 @@ function PracticeSolvePage() {
   const pathname = useRouterState({ select: (state) => state.location.pathname })
   const isReviewRoute = pathname.endsWith('/review')
   const { session, isReady } = useCurrentStudent()
+  // The full simulacro's Sesión 1 ends on a break, not on its review.
+  const [breakAfter, setBreakAfter] = useState<string | null>(null)
+
+  // Same query key as SessionSolve, so this reads its cache rather than fetching.
+  const sessionDoc = useQuery({
+    ...sessionQuery(sessionId),
+    enabled: !isReviewRoute && isReady && session != null,
+  })
+
+  const createSession = useConvexMutation(api.sessions.createSession)
+  const startSecondSitting = useMutation({
+    mutationFn: async () => {
+      if (session == null) throw new Error('No has iniciado sesión.')
+      return createSession({
+        studentId: session.studentId,
+        kind: 'simulacro',
+        simulacroSessionNumber: 2,
+      })
+    },
+    onSuccess: (nextId) =>
+      navigate({ to: '/practice/$sessionId', params: { sessionId: nextId } }),
+  })
 
   useEffect(() => {
     if (isReviewRoute) return
@@ -34,14 +71,41 @@ function PracticeSolvePage() {
     )
   }
 
+  if (breakAfter === sessionId && SITTING_TWO != null) {
+    return (
+      <StudentAppShell session={session} activeSection="practice" immersive>
+        <ExamBreak
+          questionCount={getSimulacroSessionQuestionCount(SITTING_TWO)}
+          timeLimitMs={SITTING_TWO.timeLimitMs}
+          isStarting={startSecondSitting.isPending}
+          error={
+            startSecondSitting.error
+              ? readConvexError(startSecondSitting.error, 'No se pudo empezar la Sesión 2.')
+              : null
+          }
+          onStart={() => startSecondSitting.mutate()}
+          onLater={() => navigate({ to: '/practice' })}
+        />
+      </StudentAppShell>
+    )
+  }
+
   return (
-    <StudentAppShell session={session} activeSection="practice" mainClassName="student-shell-main-immersive">
+    <StudentAppShell session={session} activeSection="practice" immersive>
       <SessionSolve
+        // A new session (Sesión 2 after the break) is a fresh screen, not
+        // question 37 of the previous one.
+        key={sessionId}
         sessionId={sessionId}
         onExit={() => navigate({ to: '/practice' })}
-        onCompleted={(completedId) =>
-          navigate({ to: '/practice/$sessionId/review', params: { sessionId: completedId } })
-        }
+        onCompleted={(completedId) => {
+          const completed = sessionDoc.data?.session
+          if (completed != null && completed._id === completedId && isFullSittingOne(completed)) {
+            setBreakAfter(completedId)
+            return
+          }
+          void navigate({ to: '/practice/$sessionId/review', params: { sessionId: completedId } })
+        }}
       />
     </StudentAppShell>
   )

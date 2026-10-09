@@ -13,6 +13,7 @@
  * Deliberately free of any `convex/*` import so the web app can consume it
  * through the `@aprendo/convex/globalScore` package export.
  */
+import { MIN_ATTEMPTS_FOR_LEVEL, estimatedScoreFromAccuracy } from './levels'
 
 /**
  * Official weights: the four core areas count 3, English counts 1.
@@ -97,11 +98,10 @@ export function estimateGlobalScore(
   let varianceTotal = 0
   let attemptCount = 0
 
-  for (const subjectId of REQUIRED_SUBJECT_IDS) {
+  for (const [subjectId, weight] of Object.entries(SUBJECT_WEIGHTS)) {
     const entry = byId.get(subjectId)
     if (entry == null) return null
 
-    const weight = SUBJECT_WEIGHTS[subjectId]!
     const score = clampScore(entry.score)
     weightedTotal += weight * score
     // Independent areas, so variances add under the squared weights.
@@ -154,4 +154,69 @@ export function highestLeverageSubject(
   return candidates.reduce((best, entry) =>
     entry.availablePoints > best.availablePoints ? entry : best,
   )
+}
+
+/**
+ * The global estimate as it stood at the end of each active week, oldest first.
+ *
+ * Cumulative raw accuracy per area, so a point exists only from the week every
+ * area has `MIN_ATTEMPTS_FOR_LEVEL` graded attempts — the same evidence rule the
+ * current estimate follows. Weeks without activity add no point: a flat line
+ * drawn through weeks the student was away would claim a stagnation nobody saw.
+ *
+ * Callers pass settled attempts only (see `settledAttempts`).
+ */
+export function weeklyGlobalEstimates(
+  attempts: { subjectId: string; isCorrect: boolean; weekIndex: number }[],
+): { weekIndex: number; score: number }[] {
+  const sorted = [...attempts].sort((a, b) => a.weekIndex - b.weekIndex)
+  const totals = new Map<string, { attempts: number; correct: number }>()
+  const points: { weekIndex: number; score: number }[] = []
+
+  for (const [index, attempt] of sorted.entries()) {
+    const total = totals.get(attempt.subjectId) ?? { attempts: 0, correct: 0 }
+    total.attempts += 1
+    if (attempt.isCorrect) total.correct += 1
+    totals.set(attempt.subjectId, total)
+
+    const weekEnds = sorted[index + 1]?.weekIndex !== attempt.weekIndex
+    if (!weekEnds) continue
+
+    const areas = REQUIRED_SUBJECT_IDS.map((subjectId) => {
+      const area = totals.get(subjectId)
+      return area == null || area.attempts < MIN_ATTEMPTS_FOR_LEVEL
+        ? null
+        : {
+            subjectId,
+            score: estimatedScoreFromAccuracy(area.correct / area.attempts),
+            attemptCount: area.attempts,
+          }
+    })
+    const estimate = areas.every((area) => area != null)
+      ? estimateGlobalScore(areas.filter((area) => area != null))
+      : null
+    if (estimate != null) points.push({ weekIndex: attempt.weekIndex, score: estimate.score })
+  }
+
+  return points
+}
+
+/** Weekly points a trend needs before it is a trend rather than noise. */
+export const MIN_WEEKLY_POINTS_FOR_TREND = 3
+
+/**
+ * Global points gained per week: the least-squares slope through the weekly
+ * estimates. Null below three points — two points are a line through anything.
+ */
+export function globalPointsPerWeek(points: { weekIndex: number; score: number }[]): number | null {
+  if (points.length < MIN_WEEKLY_POINTS_FOR_TREND) return null
+  const meanX = points.reduce((sum, point) => sum + point.weekIndex, 0) / points.length
+  const meanY = points.reduce((sum, point) => sum + point.score, 0) / points.length
+  let covariance = 0
+  let variance = 0
+  for (const point of points) {
+    covariance += (point.weekIndex - meanX) * (point.score - meanY)
+    variance += (point.weekIndex - meanX) ** 2
+  }
+  return variance === 0 ? null : covariance / variance
 }

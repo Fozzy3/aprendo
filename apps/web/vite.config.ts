@@ -15,7 +15,8 @@ const config = defineConfig({
     tailwindcss(),
     tanstackStart(),
     viteReact(),
-    nitro()
+    // vitest never exits while nitro's dev server is up.
+    ...(process.env.VITEST ? [] : [nitro()]),
   ],
   ssr: {
     noExternal: ['@convex-dev/better-auth'],

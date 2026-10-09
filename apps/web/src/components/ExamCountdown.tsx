@@ -1,9 +1,12 @@
 import { useConvexMutation } from '@convex-dev/react-query'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { CalendarDays, Pencil } from 'lucide-react'
-import { useState } from 'react'
+import { Link } from '@tanstack/react-router'
+import { CalendarDays, Pencil, Target } from 'lucide-react'
+import { useState, type CSSProperties } from 'react'
 import { api } from '@aprendo/convex/api'
 import type { ExamPhase } from '@aprendo/convex/examPlan'
+import { getSubjectTheme } from '../lib/subject-theme.ts'
+import { targetGapLines } from '../lib/today-display.ts'
 
 type ExamPlan = {
   daysRemaining: number
@@ -171,5 +174,96 @@ export function ExamCountdown({
         </button>
       )}
     </div>
+  )
+}
+
+type TodayGlobalScore = Parameters<typeof targetGapLines>[0] & {
+  estimate: { score: number; low: number; high: number } | null
+  areaGaps: Array<{
+    subjectId: string
+    levelLabel: string | null
+    nextLevelLabel: string | null
+    pointsToNextLevel: number | null
+  }> | null
+}
+
+/**
+ * The gap to the target global score, under the countdown (G03). The verdict
+ * "vas a tiempo" shows only when the backend has the student's own weekly
+ * trend; without a global estimate the gap is the next ICFES level per area.
+ * `daysRemaining` is the exam plan's, null without a date.
+ */
+export function TargetGap({ data, daysRemaining }: { data: TodayGlobalScore; daysRemaining: number | null }) {
+  const lines = targetGapLines(data, daysRemaining)
+
+  if (data.estimate == null || lines == null) {
+    if (data.areaGaps == null) return null
+    return (
+      <section className="card px-5 py-4" aria-labelledby="target-gap-title">
+        <h2 id="target-gap-title" className="text-sm font-semibold text-[var(--text-primary)]">
+          Aún no hay puntaje global
+        </h2>
+        <p className="mt-0.5 text-xs text-[var(--text-secondary)]">
+          Se calcula con las cinco áreas. Mientras tanto, esto te falta en cada una:
+        </p>
+        <ul className="m-0 mt-3 flex list-none flex-col gap-2 p-0">
+          {data.areaGaps.map((area) => {
+            const theme = getSubjectTheme(area.subjectId)
+            return (
+              <li key={area.subjectId} className="flex items-center justify-between gap-3 text-sm">
+                <span className="flex min-w-0 items-center gap-2 text-[var(--text-primary)]">
+                  <span
+                    aria-hidden
+                    className="subject-dot"
+                    style={{ '--subject-color': theme.color } as CSSProperties}
+                  />
+                  <span className="truncate">{theme.label}</span>
+                </span>
+                <span className="shrink-0 text-right text-xs tabular-nums text-[var(--text-secondary)]">
+                  {area.levelLabel == null
+                    ? 'Sin nivel aún'
+                    : area.nextLevelLabel != null && area.pointsToNextLevel != null
+                      ? `${area.levelLabel} · ${area.pointsToNextLevel} pts para ${area.nextLevelLabel}`
+                      : `${area.levelLabel} · nivel más alto`}
+                </span>
+              </li>
+            )
+          })}
+        </ul>
+      </section>
+    )
+  }
+
+  return (
+    <section className="card flex items-start gap-3.5 px-5 py-4" aria-labelledby="target-gap-title">
+      <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[var(--gold-soft)] text-[var(--text-primary)]" aria-hidden>
+        <Target size={18} />
+      </span>
+      <div className="min-w-0 flex-1">
+        <h2 id="target-gap-title" className="text-sm font-semibold text-[var(--text-primary)]">
+          {lines.headline}
+        </h2>
+        <p className="mt-0.5 text-xs text-[var(--text-secondary)]">
+          Tu global estimado: <strong className="tabular-nums">{data.estimate.score}</strong> (entre{' '}
+          {data.estimate.low} y {data.estimate.high}). {lines.detail}
+        </p>
+        {lines.verdict != null ? (
+          <p
+            className={`mt-2 inline-block rounded-[var(--radius-md)] px-2.5 py-1 text-xs font-semibold ${
+              lines.verdict.onTrack
+                ? 'bg-[var(--success-soft)] text-[var(--success-text)]'
+                : 'bg-[var(--gold-soft)] text-[var(--text-primary)]'
+            }`}
+          >
+            {lines.verdict.text}
+          </p>
+        ) : null}
+        {data.target == null ? (
+          <Link to="/progress" className="mt-2 inline-block text-xs font-semibold no-underline">
+            Ponerme una meta
+          </Link>
+        ) : null}
+      </div>
+    </section>
   )
 }

@@ -3,6 +3,7 @@ import { v } from 'convex/values'
 import { query } from './_generated/server'
 import { assertOwnsStudent } from './auth'
 import { colombiaDayNumber, colombiaDayStartMs } from './colombiaTime'
+import { settledAttempts } from './sessionIntegrity'
 import { sessionKindValidator } from './validators'
 
 /**
@@ -46,59 +47,86 @@ export const getActivitySummary = query({
       .query('questionAttempts')
       .withIndex('by_studentId', (q) => q.eq('studentId', args.studentId))
       .collect()
+    const sessions = await ctx.db
+      .query('sessions')
+      .withIndex('by_studentId', (q) => q.eq('studentId', args.studentId))
+      .collect()
 
-    const byDay = new Map<number, DayBucket>()
-    let totalAnswered = 0
-    let totalCorrect = 0
-    let totalResponseTimeMs = 0
-
-    for (const attempt of attempts) {
-      if (attempt.answeredAt == null || attempt.isCorrect == null) continue
-
-      totalAnswered += 1
-      if (attempt.isCorrect) totalCorrect += 1
-      totalResponseTimeMs += attempt.responseTimeMs ?? 0
-
-      const day = colombiaDayNumber(attempt.answeredAt)
-      const bucket = byDay.get(day) ?? { attemptCount: 0, correctCount: 0 }
-      bucket.attemptCount += 1
-      if (attempt.isCorrect) bucket.correctCount += 1
-      byDay.set(day, bucket)
-    }
-
-    const today = colombiaDayNumber(Date.now())
-    const weeks = args.weeks ?? DEFAULT_CALENDAR_WEEKS
-    // Start the grid on a week boundary so the heatmap renders as full columns.
-    const firstDay = today - (weeks * 7 - 1)
-
-    const days = []
-    for (let day = firstDay; day <= today; day += 1) {
-      const bucket = byDay.get(day)
-      days.push({
-        dayNumber: day,
-        startMs: colombiaDayStartMs(day),
-        attemptCount: bucket?.attemptCount ?? 0,
-        correctCount: bucket?.correctCount ?? 0,
-      })
-    }
-
-    return {
-      days,
-      todayDayNumber: today,
-      stats: {
-        totalAnswered,
-        totalCorrect,
-        accuracy: totalAnswered === 0 ? null : totalCorrect / totalAnswered,
-        activeDayCount: byDay.size,
-        currentStreakDays: currentStreak(byDay, today),
-        longestStreakDays: longestStreak(byDay),
-        totalStudyTimeMs: totalResponseTimeMs,
-        firstActivityMs:
-          byDay.size === 0 ? null : colombiaDayStartMs(Math.min(...byDay.keys())),
-      },
-    }
+    return summarizeActivity(
+      attempts,
+      sessions,
+      colombiaDayNumber(Date.now()),
+      args.weeks ?? DEFAULT_CALENDAR_WEEKS,
+    )
   },
 })
+
+/**
+ * Every answer counts as activity (days, streaks, study time); only answers of
+ * finished sittings count as right or wrong. An open simulacro grades each
+ * answer as it is saved, so a correct count built from it would let a student
+ * change an answer and watch the number move (see `settledAttempts`).
+ */
+export function summarizeActivity(
+  attempts: { sessionId: string; answeredAt?: number; isCorrect?: boolean; responseTimeMs?: number }[],
+  sessions: { _id: string; status: string }[],
+  today: number,
+  weeks: number,
+) {
+  const settled = new Set(settledAttempts(attempts, sessions))
+  const byDay = new Map<number, DayBucket>()
+  let totalAnswered = 0
+  let totalGraded = 0
+  let totalCorrect = 0
+  let totalResponseTimeMs = 0
+
+  for (const attempt of attempts) {
+    if (attempt.answeredAt == null || attempt.isCorrect == null) continue
+    const isGraded = settled.has(attempt)
+    const isCorrect = isGraded && attempt.isCorrect
+
+    totalAnswered += 1
+    if (isGraded) totalGraded += 1
+    if (isCorrect) totalCorrect += 1
+    totalResponseTimeMs += attempt.responseTimeMs ?? 0
+
+    const day = colombiaDayNumber(attempt.answeredAt)
+    const bucket = byDay.get(day) ?? { attemptCount: 0, correctCount: 0 }
+    bucket.attemptCount += 1
+    if (isCorrect) bucket.correctCount += 1
+    byDay.set(day, bucket)
+  }
+
+  // Start the grid on a week boundary so the heatmap renders as full columns.
+  const firstDay = today - (weeks * 7 - 1)
+
+  const days = []
+  for (let day = firstDay; day <= today; day += 1) {
+    const bucket = byDay.get(day)
+    days.push({
+      dayNumber: day,
+      startMs: colombiaDayStartMs(day),
+      attemptCount: bucket?.attemptCount ?? 0,
+      correctCount: bucket?.correctCount ?? 0,
+    })
+  }
+
+  return {
+    days,
+    todayDayNumber: today,
+    stats: {
+      totalAnswered,
+      totalCorrect,
+      accuracy: totalGraded === 0 ? null : totalCorrect / totalGraded,
+      activeDayCount: byDay.size,
+      currentStreakDays: currentStreak(byDay, today),
+      longestStreakDays: longestStreak(byDay),
+      totalStudyTimeMs: totalResponseTimeMs,
+      firstActivityMs:
+        byDay.size === 0 ? null : colombiaDayStartMs(Math.min(...byDay.keys())),
+    },
+  }
+}
 
 /**
  * Current run of consecutive active days. Anchored on today *or* yesterday so a

@@ -69,7 +69,7 @@ export const retryPdfUpload = mutation({
   },
   handler: async (ctx, args) => {
     await requireAdminStudentId(ctx)
-    const upload = await ctx.db.get(args.pdfUploadId)
+    const upload = await ctx.db.get("pdfUploads", args.pdfUploadId)
     if (upload == null) {
       throw new ConvexError('PDF upload not found.')
     }
@@ -78,7 +78,7 @@ export const retryPdfUpload = mutation({
       throw new ConvexError('PDF is already processing.')
     }
 
-    await ctx.db.patch(args.pdfUploadId, {
+    await ctx.db.patch("pdfUploads", args.pdfUploadId, {
       status: 'uploaded',
       errorMessage: undefined,
       updatedAt: Date.now(),
@@ -112,7 +112,7 @@ export const getPdfUploadDetail = query({
   },
   handler: async (ctx, args) => {
     await requireAdminStudentId(ctx)
-    const upload = await ctx.db.get(args.pdfUploadId)
+    const upload = await ctx.db.get("pdfUploads", args.pdfUploadId)
     if (upload == null) {
       return null
     }
@@ -138,7 +138,7 @@ export const getQuestionBrowser = query({
   },
   handler: async (ctx, args) => {
     await requireAdminStudentId(ctx)
-    const upload = await ctx.db.get(args.pdfUploadId)
+    const upload = await ctx.db.get("pdfUploads", args.pdfUploadId)
     if (upload == null) {
       return null
     }
@@ -187,7 +187,7 @@ export const getPdfUploadForProcessing = internalQuery({
     pdfUploadId: v.id('pdfUploads'),
   },
   handler: async (ctx, args) => {
-    return ctx.db.get(args.pdfUploadId)
+    return ctx.db.get("pdfUploads", args.pdfUploadId)
   },
 })
 
@@ -197,7 +197,7 @@ export const markPdfProcessing = internalMutation({
   },
   handler: async (ctx, args) => {
     const now = Date.now()
-    await ctx.db.patch(args.pdfUploadId, {
+    await ctx.db.patch("pdfUploads", args.pdfUploadId, {
       status: 'processing',
       errorMessage: undefined,
       processingStartedAt: now,
@@ -217,7 +217,7 @@ export const clearPdfQuestions = internalMutation({
       .collect()
 
     for (const question of existing) {
-      await ctx.db.delete(question._id)
+      await ctx.db.delete("questions", question._id)
     }
 
     // Groups belong to the upload too — leaving them behind on a reprocess
@@ -228,7 +228,7 @@ export const clearPdfQuestions = internalMutation({
       .collect()
 
     for (const group of existingGroups) {
-      await ctx.db.delete(group._id)
+      await ctx.db.delete("questionGroups", group._id)
     }
   },
 })
@@ -287,7 +287,7 @@ export const markPdfCompleted = internalMutation({
   },
   handler: async (ctx, args) => {
     const now = Date.now()
-    await ctx.db.patch(args.pdfUploadId, {
+    await ctx.db.patch("pdfUploads", args.pdfUploadId, {
       status: 'enriching',
       pageCount: args.pageCount,
       assetCount: args.assetCount,
@@ -307,7 +307,7 @@ export const markPdfEnriching = internalMutation({
   },
   handler: async (ctx, args) => {
     const now = Date.now()
-    await ctx.db.patch(args.pdfUploadId, {
+    await ctx.db.patch("pdfUploads", args.pdfUploadId, {
       status: 'enriching',
       enrichmentStartedAt: now,
       updatedAt: now,
@@ -335,7 +335,7 @@ export const getQuestionsForEnrichment = internalQuery({
   },
   handler: async (ctx, args) => {
     const questions = await Promise.all(
-      args.questionIds.map((questionId) => ctx.db.get(questionId)),
+      args.questionIds.map((questionId) => ctx.db.get("questions", questionId)),
     )
 
     // Attach each grouped question's shared stimulus so enrichment sees the full
@@ -344,7 +344,7 @@ export const getQuestionsForEnrichment = internalQuery({
       questions
         .filter((question): question is Doc<'questions'> => question != null)
         .map(async (question) => {
-          const group = question.groupId == null ? null : await ctx.db.get(question.groupId)
+          const group = question.groupId == null ? null : await ctx.db.get("questionGroups", question.groupId)
           return {
             ...question,
             ...(group == null ? {} : { contextMarkdown: group.contextMarkdown }),
@@ -359,7 +359,7 @@ export const setQuestionAnswerProcessing = internalMutation({
     questionId: v.id('questions'),
   },
   handler: async (ctx, args) => {
-    await ctx.db.patch(args.questionId, {
+    await ctx.db.patch("questions", args.questionId, {
       answerStatus: 'processing',
       answerErrorMessage: undefined,
     })
@@ -379,7 +379,7 @@ export const setQuestionAnswerResult = internalMutation({
     errorMessage: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
-    await ctx.db.patch(args.questionId, {
+    await ctx.db.patch("questions", args.questionId, {
       answerStatus: args.status,
       answerCorrectOption: args.correctOption,
       answerSolutionMarkdown: args.solutionMarkdown,
@@ -398,7 +398,7 @@ export const setQuestionTaxonomyProcessing = internalMutation({
     questionId: v.id('questions'),
   },
   handler: async (ctx, args) => {
-    await ctx.db.patch(args.questionId, {
+    await ctx.db.patch("questions", args.questionId, {
       taxonomyStatus: 'processing',
       taxonomyErrorMessage: undefined,
     })
@@ -425,7 +425,7 @@ export const setQuestionTaxonomyResult = internalMutation({
     errorMessage: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
-    await ctx.db.patch(args.questionId, {
+    await ctx.db.patch("questions", args.questionId, {
       taxonomyStatus: args.status,
       taxonomyVersion: args.taxonomyVersion,
       taxonomyRelease: args.taxonomyRelease,
@@ -455,7 +455,7 @@ export const setQuestionEligibility = internalMutation({
     reasons: v.array(v.string()),
   },
   handler: async (ctx, args) => {
-    await ctx.db.patch(args.questionId, {
+    await ctx.db.patch("questions", args.questionId, {
       eligibility: args.eligibility,
       eligibilityReasons: args.reasons,
       eligibilityEvaluatedAt: Date.now(),
@@ -485,7 +485,7 @@ export const refreshPdfEnrichmentStats = internalMutation({
       && question.eligibility !== 'pending',
     )
 
-    await ctx.db.patch(args.pdfUploadId, {
+    await ctx.db.patch("pdfUploads", args.pdfUploadId, {
       status: allQuestionsResolved ? 'completed' : 'enriching',
       answerCompletedCount,
       taxonomyCompletedCount,
@@ -522,7 +522,7 @@ export const getQuestionsByIds = internalQuery({
   },
   handler: async (ctx, args) => {
     const questions = await Promise.all(
-      args.questionIds.map((questionId) => ctx.db.get(questionId)),
+      args.questionIds.map((questionId) => ctx.db.get("questions", questionId)),
     )
     return questions.filter((question): question is Doc<'questions'> => question != null)
   },
@@ -534,7 +534,7 @@ export const markPdfFailed = internalMutation({
     message: v.string(),
   },
   handler: async (ctx, args) => {
-    await ctx.db.patch(args.pdfUploadId, {
+    await ctx.db.patch("pdfUploads", args.pdfUploadId, {
       status: 'failed',
       errorMessage: args.message,
       updatedAt: Date.now(),

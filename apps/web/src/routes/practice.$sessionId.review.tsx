@@ -1,78 +1,57 @@
-import { useConvexMutation } from '@convex-dev/react-query'
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { convexQuery, useConvexMutation } from '@convex-dev/react-query'
+import { useMutation, useQuery } from '@tanstack/react-query'
 import { Link, createFileRoute, useNavigate } from '@tanstack/react-router'
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { Suspense, lazy, useCallback, useEffect, useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
 import {
   ArrowLeft,
   BookOpen,
   Bot,
   ChevronLeft,
   ChevronRight,
-  PanelRightClose,
+  Clock3,
+  Flag,
+  RotateCcw,
   Sparkles,
-  SquarePlay,
-  Trash2,
 } from 'lucide-react'
-import { extractText } from '@convex-dev/agent'
-import { useThreadMessages } from '@convex-dev/agent/react'
 import { api } from '@aprendo/convex/api'
-import type { Id } from '@aprendo/convex/dataModel'
-import { useAction } from 'convex/react'
-import { ArtifactPane } from '../components/ArtifactPane.tsx'
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from '../components/ui/dialog.tsx'
+import { MIN_STATS_SAMPLE } from '@aprendo/convex/answerStats'
 import MarkdownBlock from '../components/MarkdownBlock.tsx'
+import { NivelacionResult } from '../components/NivelacionResult.tsx'
+import { QuestionReportForm } from '../components/QuestionReportForm.tsx'
 import { SharedStimulus } from '../components/SharedStimulus.tsx'
+import { SimulacroReport } from '../components/SimulacroReport.tsx'
 import { classifyAttempt } from '@aprendo/convex/confidence'
 import { LEARNING_STATE_DISPLAY, type ConfidenceLevel } from '../lib/confidence-display.ts'
-import { Conversation, ConversationContent, ConversationEmptyState, ConversationScrollButton } from '../components/ai-elements/conversation.tsx'
-import { Message, MessageContent } from '../components/ai-elements/message.tsx'
-import { PromptInput, PromptInputBody, PromptInputFooter, PromptInputSubmit, PromptInputTextarea } from '../components/ai-elements/prompt-input.tsx'
-import { Shimmer } from '../components/ai-elements/shimmer.tsx'
 import { StudentAppShell } from '../components/StudentAppShell.tsx'
 import {
   ResizableHandle,
   ResizablePanel,
   ResizablePanelGroup,
 } from '../components/ui/resizable.tsx'
-import { sessionQuery, practiceTutorThreadQuery } from '../lib/student-queries.ts'
+import { sessionQuery } from '../lib/student-queries.ts'
 import { getKindLabel } from '../lib/session-display.ts'
+import { formatClock, hasResultScreen } from '../lib/result-display.ts'
 import { useCurrentStudent } from '../lib/student-session.ts'
 import { getSubjectLabel, getSubtopicLabel } from '../lib/taxonomy.ts'
-import { FullScreenLoader } from '../components/FullScreenLoader.tsx'
+import { indexOfPosition } from '../lib/review-position.ts'
+import { missedCount, optionExplanations, timeVersusMedian } from '../lib/review-explanations.ts'
 import { readConvexError } from '../lib/convex-error.ts'
+import { FullScreenLoader, PageLoader } from '../components/FullScreenLoader.tsx'
 
-type ChatRole = 'assistant' | 'user'
+// The whole chat stack lives behind this import; see ReviewTutor.
+const ReviewTutor = lazy(() => import('../components/ReviewTutor.tsx'))
 
-type ArtifactRef = {
-  artifactId: Id<'practiceTutorArtifacts'>
-  title: string
-  description?: string
-}
-
-type ChatMessage = {
-  id: string
-  role: ChatRole
-  content: string
-  streaming?: boolean
-  artifactRef?: ArtifactRef
-  artifactPending?: boolean
-}
+const TIME_VERSUS_MEDIAN_COPY = {
+  faster: 'más rápido que la mayoría',
+  slower: 'más lento que la mayoría',
+  similar: 'como la mayoría',
+} as const
 
 const TUTOR_COLLAPSED_STORAGE_KEY = 'aprendo:review:tutor-collapsed'
 const LAYOUT_STORAGE_KEY = 'aprendo:review:workspace-layout-v3'
 const STAGE_PANEL_ID = 'aprendo-review-stage'
 const TUTOR_PANEL_ID = 'aprendo-review-tutor'
-const QUICK_PROMPTS = [
-  'Explícame la respuesta',
-  'Dame un problema similar',
-  '¿Qué debo repasar?',
-] as const
 
 function readStoredLayout(): { [id: string]: number } | undefined {
   if (typeof window === 'undefined') return undefined
@@ -87,35 +66,24 @@ function readStoredLayout(): { [id: string]: number } | undefined {
   return undefined
 }
 
+/**
+ * `pregunta` (the 1-based session position) opens the per-question review at that question. Without
+ * it, a nivelación or simulacro opens on its result screen first: that is where
+ * completing one lands, with no change to the solve screen's navigation.
+ */
 export const Route = createFileRoute('/practice/$sessionId/review')({
+  validateSearch: (search: Record<string, unknown>): { pregunta?: number } => {
+    const pregunta = Number(search.pregunta)
+    return Number.isInteger(pregunta) && pregunta >= 1 ? { pregunta } : {}
+  },
   component: ReviewPage,
 })
 
 function ReviewPage() {
   const navigate = useNavigate()
-  const queryClient = useQueryClient()
   const { sessionId } = Route.useParams()
+  const { pregunta } = Route.useSearch()
   const { session, isReady } = useCurrentStudent()
-  const studentId = session?.studentId ?? null
-
-  const createTutorThread = useConvexMutation(api.tutor.createOrGetPracticeTutorThread)
-  const clearTutorChat = useConvexMutation(api.tutor.clearPracticeTutorChat)
-  const abortTutorStream = useConvexMutation(api.tutor.abortPracticeTutorStream)
-  const sendTutorMessage = useAction(api.tutor.sendPracticeTutorMessage)
-
-  const [currentIndex, setCurrentIndex] = useState(0)
-  const [hasEnsuredTutorThread, setHasEnsuredTutorThread] = useState(false)
-  const [tutorThreadError, setTutorThreadError] = useState<string | null>(null)
-  const [draft, setDraft] = useState('')
-  const [isAborting, setIsAborting] = useState(false)
-  const [isCompactViewport, setIsCompactViewport] = useState(false)
-  const [isTutorSheetOpen, setIsTutorSheetOpen] = useState(false)
-  const [isTutorCollapsed, setIsTutorCollapsed] = useState(false)
-  const [openArtifactId, setOpenArtifactId] = useState<Id<'practiceTutorArtifacts'> | null>(null)
-  const storedLayoutRef = useRef<{ [id: string]: number } | undefined>(undefined)
-  if (storedLayoutRef.current === undefined && typeof window !== 'undefined') {
-    storedLayoutRef.current = readStoredLayout()
-  }
 
   const reviewQuery = useQuery({
     ...sessionQuery(sessionId),
@@ -125,28 +93,88 @@ function ReviewPage() {
   const sessionDoc = data?.session ?? null
   const questions = data?.questions ?? []
 
-  const tutorThreadQuery = useQuery({
-    ...practiceTutorThreadQuery(sessionId, studentId),
-    enabled: sessionId != null && hasEnsuredTutorThread,
-  })
-  const tutorThreadId = tutorThreadQuery.data?.threadId ?? null
-  const tutorMessagesResult = useThreadMessages(
-    api.tutor.listPracticeTutorMessages,
-    tutorThreadId == null || studentId == null
-      ? 'skip'
-      : {
-        practiceSessionId: sessionId as never,
+  // "Repetir las que fallé" (G05): a repaso built from this session's misses.
+  const createSession = useConvexMutation(api.sessions.createSession)
+  const retryMutation = useMutation({
+    mutationFn: async (studentId: string) =>
+      createSession({
         studentId: studentId as never,
-        threadId: tutorThreadId,
-      },
-    { initialNumItems: 50, stream: true },
+        kind: 'repaso',
+        retryFromSessionId: sessionId as never,
+      }),
+    onSuccess: async (newSessionId) => {
+      await navigate({ to: '/practice/$sessionId', params: { sessionId: newSessionId } })
+    },
+  })
+
+  // Already right on the first frame when the session is cached; the effect
+  // below covers the first load and later links.
+  const [currentIndex, setCurrentIndex] = useState(() => indexOfPosition(questions, pregunta))
+
+  // "% eligió cada opción" (G08): only once the session is completed, so it
+  // can never hint at the key while the student is still answering. Only the
+  // question on screen: every id is a live read of all its attempts.
+  const statsQuestionId = questions[currentIndex]?.question._id
+  const statsQuery = useQuery(
+    convexQuery(
+      api.sessions.getQuestionAnswerStats,
+      sessionDoc?.status === 'completed' && statsQuestionId != null ? { questionIds: [statsQuestionId] } : 'skip',
+    ),
   )
+  const [draft, setDraft] = useState('')
+  // Read up front, not only in the effect below: starting at `false` rendered
+  // the desktop split for one frame on a phone, which mounted the tutor and
+  // fetched its chunk before the sheet layout took over.
+  const [isCompactViewport, setIsCompactViewport] = useState(
+    () => typeof window !== 'undefined' && window.matchMedia('(max-width: 1024px)').matches,
+  )
+  const [isTutorSheetOpen, setIsTutorSheetOpen] = useState(false)
+  // The sheet's tutor mounts on first open and then stays (hidden) so the
+  // conversation, and any demo it opened, survive closing the sheet.
+  const [hasOpenedTutorSheet, setHasOpenedTutorSheet] = useState(false)
+  if (isTutorSheetOpen && !hasOpenedTutorSheet) setHasOpenedTutorSheet(true)
+  // Read up front too: the desktop tutor mounts the first time it is shown,
+  // so a stored "collapsed" has to hold from the first frame.
+  const [isTutorCollapsed, setIsTutorCollapsed] = useState(() => {
+    if (typeof window === 'undefined') return false
+    try {
+      return window.localStorage.getItem(TUTOR_COLLAPSED_STORAGE_KEY) === '1'
+    } catch {
+      return false
+    }
+  })
+  // The desktop tutor renders into this node, which the tutor panel adopts
+  // while it is open. Collapsing remounts the panel group (see below) but not
+  // the tutor, so a reply still streaming keeps its Stop button and locked
+  // composer, and the thread and any open demo survive — like the phone sheet.
+  const [desktopTutorHost] = useState(() => {
+    if (typeof document === 'undefined') return null
+    const host = document.createElement('div')
+    host.className = 'h-full min-h-0'
+    return host
+  })
+  const [hasShownDesktopTutor, setHasShownDesktopTutor] = useState(false)
+  if (!isCompactViewport && !isTutorCollapsed && !hasShownDesktopTutor) setHasShownDesktopTutor(true)
+  const adoptDesktopTutorHost = useCallback((slot: HTMLDivElement | null) => {
+    if (slot != null && desktopTutorHost != null) slot.appendChild(desktopTutorHost)
+  }, [desktopTutorHost])
+  const storedLayoutRef = useRef<{ [id: string]: number } | undefined>(undefined)
+  if (storedLayoutRef.current === undefined && typeof window !== 'undefined') {
+    storedLayoutRef.current = readStoredLayout()
+  }
 
   useEffect(() => {
     if (isReady && session == null) {
       void navigate({ to: '/login' })
     }
   }, [isReady, navigate, session])
+
+  // A link into a specific question ("Donde se te fue el tiempo") lands on it,
+  // also when this screen is already mounted on the result.
+  useEffect(() => {
+    if (pregunta == null || questions.length === 0) return
+    setCurrentIndex(indexOfPosition(questions, pregunta))
+  }, [pregunta, questions.length])
 
   // The review surface requires a completed session. If it isn't complete yet,
   // send the student back to the solve screen.
@@ -155,25 +183,6 @@ function ReviewPage() {
       void navigate({ to: '/practice/$sessionId', params: { sessionId } })
     }
   }, [navigate, sessionDoc, sessionId])
-
-  useEffect(() => {
-    if (sessionDoc == null || studentId == null || hasEnsuredTutorThread) return
-    createTutorThread({ practiceSessionId: sessionDoc._id, studentId: studentId as never })
-      .then(() => {
-        setHasEnsuredTutorThread(true)
-        setTutorThreadError(null)
-      })
-      .catch((error: unknown) => {
-        setHasEnsuredTutorThread(true)
-        setTutorThreadError(readConvexError(error, 'No se pudo iniciar el tutor.'))
-      })
-  }, [createTutorThread, hasEnsuredTutorThread, sessionDoc, studentId])
-
-  // Hydrate persisted tutor-collapsed state.
-  useEffect(() => {
-    if (typeof window === 'undefined') return
-    if (window.localStorage.getItem(TUTOR_COLLAPSED_STORAGE_KEY) === '1') setIsTutorCollapsed(true)
-  }, [])
 
   // Single breakpoint: below it the tutor becomes a bottom sheet; above it a
   // horizontal resizable split. No mid-band vertical mode (that was the source
@@ -186,35 +195,6 @@ function ReviewPage() {
     compactMedia.addEventListener('change', sync)
     return () => compactMedia.removeEventListener('change', sync)
   }, [])
-
-  const clearTutorMutation = useMutation({
-    mutationFn: async () => {
-      if (sessionDoc == null || studentId == null) throw new Error('Sesión no cargada.')
-      return clearTutorChat({ practiceSessionId: sessionDoc._id, studentId: studentId as never })
-    },
-    onSuccess: async () => {
-      await queryClient.invalidateQueries({
-        queryKey: practiceTutorThreadQuery(sessionId, studentId).queryKey,
-      })
-    },
-  })
-
-  const tutorMutation = useMutation({
-    mutationFn: async (input: { prompt: string; questionId?: string }) => {
-      if (sessionDoc == null || studentId == null) throw new Error('Sesión no cargada.')
-      return sendTutorMessage({
-        practiceSessionId: sessionDoc._id,
-        studentId: studentId as never,
-        prompt: input.prompt,
-        questionId: input.questionId as never | undefined,
-      })
-    },
-    onSuccess: async () => {
-      await queryClient.invalidateQueries({
-        queryKey: practiceTutorThreadQuery(sessionId, studentId).queryKey,
-      })
-    },
-  })
 
   const persistTutorCollapsed = useCallback((collapsed: boolean) => {
     if (typeof window === 'undefined') return
@@ -277,98 +257,29 @@ function ReviewPage() {
     return () => window.removeEventListener('keydown', handler)
   }, [focusTutorInput, questions.length, toggleTutor])
 
-  const tutorMessages: ChatMessage[] = useMemo(() => {
-    const artifactByToolCallId = new Map<string, ArtifactRef>()
-    for (const message of tutorMessagesResult.results) {
-      const inner = message.message
-      if (inner == null || inner.role !== 'tool') continue
-      const content = inner.content
-      if (!Array.isArray(content)) continue
-      for (const part of content) {
-        if (
-          part != null
-          && typeof part === 'object'
-          && 'type' in part
-          && part.type === 'tool-result'
-          && 'toolName' in part
-          && part.toolName === 'create_artifact'
-        ) {
-          const output = (part as { output?: { type?: string; value?: unknown } }).output
-          if (output != null && output.type === 'json' && output.value != null && typeof output.value === 'object') {
-            const value = output.value as { artifactId?: string; title?: string; description?: string }
-            if (typeof value.artifactId === 'string' && typeof value.title === 'string') {
-              artifactByToolCallId.set((part as { toolCallId: string }).toolCallId, {
-                artifactId: value.artifactId as Id<'practiceTutorArtifacts'>,
-                title: value.title,
-                description: value.description,
-              })
-            }
-          }
-        }
-      }
-    }
-
-    return tutorMessagesResult.results.flatMap((message) => {
-      const inner = message.message
-      if (inner == null) return []
-      if (inner.role !== 'user' && inner.role !== 'assistant') return []
-
-      let artifactRef: ArtifactRef | undefined
-      let artifactPending = false
-      if (inner.role === 'assistant' && Array.isArray(inner.content)) {
-        for (const part of inner.content) {
-          if (
-            part != null
-            && typeof part === 'object'
-            && 'type' in part
-            && part.type === 'tool-call'
-            && 'toolName' in part
-            && part.toolName === 'create_artifact'
-          ) {
-            const toolCallId = (part as { toolCallId: string }).toolCallId
-            const ref = artifactByToolCallId.get(toolCallId)
-            if (ref != null) artifactRef = ref
-            else artifactPending = true
-            break
-          }
-        }
-      }
-
-      const content = extractText(inner)?.trim() ?? ''
-      if (content.length === 0 && artifactRef == null && !artifactPending) return []
-
-      return [{
-        id: message.key,
-        role: inner.role as ChatRole,
-        content,
-        streaming: message.streaming === true,
-        artifactRef,
-        artifactPending,
-      }]
-    })
-  }, [tutorMessagesResult.results])
-
-  // The order of the message currently being streamed, used to abort precisely.
-  const streamingOrder = useMemo(() => {
-    let order: number | null = null
-    for (const message of tutorMessagesResult.results) {
-      if (message.streaming === true && typeof message.order === 'number') {
-        order = message.order
-      }
-    }
-    return order
-  }, [tutorMessagesResult.results])
-
   if (!isReady || session == null || reviewQuery.isPending || sessionDoc == null) {
     return (
       <FullScreenLoader message="Preparando tu revisión…" />
     )
   }
 
+  const opensOnResult = hasResultScreen(sessionDoc.kind)
+  if (opensOnResult && pregunta == null && sessionDoc.status === 'completed') {
+    return (
+      <StudentAppShell session={session} activeSection="practice">
+        {sessionDoc.kind === 'nivelacion' ? (
+          <NivelacionResult session={sessionDoc} studentId={session.studentId} />
+        ) : (
+          <SimulacroReport sessionId={sessionDoc._id} studentId={session.studentId} />
+        )}
+      </StudentAppShell>
+    )
+  }
+
   const currentQuestion = questions[currentIndex]
   if (currentQuestion == null) {
     return (
-      <StudentAppShell session={session} activeSection="practice" mainClassName="student-shell-main-immersive">
+      <StudentAppShell session={session} activeSection="practice" immersive>
         <div className="fade-in mx-auto max-w-xl p-8 text-center">
           <h2 className="mb-2 text-xl font-semibold text-[var(--text-primary)]">No hay preguntas para revisar</h2>
           <button type="button" className="btn-primary mt-2" onClick={() => navigate({ to: '/practice' })}>
@@ -384,64 +295,31 @@ function ReviewPage() {
   const selectedOption = currentQuestion.attempt?.selectedOption ?? null
   const hasAnswered = selectedOption != null
 
-  // The rationale for the option this student actually picked. Explaining their
-  // specific wrong turn is the part that teaches; the general solution below is
-  // the part they already half-read before checking the answer.
-  const pickedRationale =
-    selectedOption == null || selectedOption === currentQuestion.question.answerCorrectOption
-      ? null
-      : currentQuestion.question.answerDistractorRationales?.find(
-          (rationale) => rationale.label === selectedOption,
-        ) ?? null
+  // Every option explained (G06): the student's wrong pick first — their
+  // specific wrong turn is the part that teaches — then the other distractors,
+  // then the solution.
+  const explanations = optionExplanations({
+    options: currentQuestion.question.options,
+    selectedOption,
+    correctOption: currentQuestion.question.answerCorrectOption,
+    rationales: currentQuestion.question.answerDistractorRationales,
+  })
+  const solutionMarkdown = currentQuestion.question.answerSolutionMarkdown
+  const isAiExplanation =
+    currentQuestion.question.explanationSource === 'ai_generated'
+    && (explanations.length > 0 || Boolean(solutionMarkdown))
+  const stats = statsQuery.data?.find((item) => item.questionId === currentQuestion.question._id) ?? null
+  const versusMedian = timeVersusMedian(currentQuestion.timeSpentMs, stats?.medianTimeMs)
+  const missed = missedCount(questions)
 
+  const eliminatedOptions = new Set(currentQuestion.eliminatedOptions)
+  const officialMs = data?.officialMsPerQuestion ?? 0
   const learningState = classifyAttempt({
     confidence: currentQuestion.attempt?.confidence as ConfidenceLevel | undefined,
     isCorrect: currentQuestion.attempt?.isCorrect ?? false,
   })
   const isFirst = currentIndex === 0
   const isLast = currentIndex === questions.length - 1
-
-  const lastMessage = tutorMessages.at(-1)
-  const isGenerating = tutorMutation.isPending
-  // Show the "thinking" placeholder only until the assistant's streamed reply
-  // starts arriving; once deltas land, the streaming bubble takes over.
-  const isTutorThinking = isGenerating
-    && (lastMessage?.role !== 'assistant' || lastMessage?.streaming !== true)
-  const canSendTutorMessage = tutorThreadError == null && tutorThreadId != null && !isGenerating
-  const sendTutorPrompt = (text: string) => {
-    const trimmed = text.trim()
-    if (!trimmed || !canSendTutorMessage) return
-    tutorMutation.mutate({ prompt: trimmed, questionId: currentQuestion.question._id })
-    setDraft('')
-    if (isCompactViewport) setIsTutorSheetOpen(true)
-  }
-  const handleStopTutor = () => {
-    if (!isGenerating || isAborting || tutorThreadId == null) return
-    setIsAborting(true)
-    abortTutorStream({
-      practiceSessionId: sessionDoc._id,
-      studentId: studentId as never,
-      threadId: tutorThreadId,
-      order: streamingOrder ?? undefined,
-    })
-      .catch(() => {
-        // The action resolves on its own when the stream stops; swallow races.
-      })
-      .finally(() => setIsAborting(false))
-  }
-  const canClearTutorChat = tutorThreadError == null
-    && tutorThreadId != null
-    && tutorMessages.length > 0
-    && !tutorMutation.isPending
-    && !clearTutorMutation.isPending
-  const handleClearTutorChat = () => {
-    if (!canClearTutorChat) return
-    if (typeof window !== 'undefined'
-      && !window.confirm('¿Borrar la conversación con el tutor? Esta acción no se puede deshacer.')) {
-      return
-    }
-    clearTutorMutation.mutate()
-  }
 
   const goPrev = () => setCurrentIndex((v) => Math.max(0, v - 1))
   const goNext = () => setCurrentIndex((v) => Math.min(questions.length - 1, v + 1))
@@ -453,15 +331,18 @@ function ReviewPage() {
           <button
             type="button"
             className="stage-back"
-            onClick={() => navigate({ to: '/practice' })}
-            aria-label="Volver a práctica"
-            title="Volver a práctica"
+            onClick={() =>
+              opensOnResult
+                ? navigate({ to: '/practice/$sessionId/review', params: { sessionId } })
+                : navigate({ to: '/practice' })}
+            aria-label={opensOnResult ? 'Volver al resultado' : 'Volver a práctica'}
+            title={opensOnResult ? 'Volver al resultado' : 'Volver a práctica'}
           >
             <ArrowLeft size={16} />
           </button>
           <span className="stage-kicker">
             <span className="stage-kicker-label">{getKindLabel(sessionDoc.kind)}</span>
-            <span className="stage-kicker-sep">·</span> {currentIndex + 1}/{questions.length}
+            <span className="stage-kicker-sep">·</span> {currentQuestion.position}/{sessionDoc.questionCount}
           </span>
           <div className="stage-tags">
             <span className="chip chip-accent">{getSubjectLabel(currentQuestion.question.subjectId ?? 'sin_asignar')}</span>
@@ -499,10 +380,16 @@ function ReviewPage() {
               type="button"
               className={['palette-dot', `is-${status}`, index === currentIndex ? 'is-current' : ''].filter(Boolean).join(' ')}
               onClick={() => setCurrentIndex(index)}
-              aria-label={`Ir a la pregunta ${index + 1}`}
+              aria-label={`Ir a la pregunta ${question.position}${question.flagged ? ' (marcada)' : ''}`}
               aria-current={index === currentIndex ? 'true' : undefined}
             >
-              <span className="palette-dot-index">{index + 1}</span>
+              <span className="palette-dot-index">{question.position}</span>
+              {question.flagged ? (
+                <span
+                  aria-hidden
+                  className="absolute -right-0.5 -top-0.5 z-[2] size-2 rounded-full border border-[var(--bg-card)] bg-[var(--gold)]"
+                />
+              ) : null}
             </button>
           )
         })}
@@ -537,11 +424,32 @@ function ReviewPage() {
               )}
             </div>
 
+            {currentQuestion.flagged || currentQuestion.timeSpentMs != null || !hasAnswered ? (
+              <div className="mb-3 flex flex-wrap gap-1.5" aria-label="Cómo la respondiste">
+                {!hasAnswered ? <span className="chip">La dejaste en blanco</span> : null}
+                {currentQuestion.flagged ? (
+                  <span className="chip">
+                    <Flag size={11} aria-hidden /> La marcaste para revisar
+                  </span>
+                ) : null}
+                {currentQuestion.timeSpentMs != null ? (
+                  <span
+                    className={`chip tabular-nums${currentQuestion.timeSpentMs > officialMs ? ' border-transparent bg-[var(--danger-soft)] text-[var(--danger-text)]' : ''}`}
+                  >
+                    <Clock3 size={11} aria-hidden /> {formatClock(currentQuestion.timeSpentMs)}
+                    <span className="font-medium">· ritmo oficial {formatClock(officialMs)}</span>
+                  </span>
+                ) : null}
+              </div>
+            ) : null}
+
             <div className="review-options">
               {currentQuestion.question.options.map((option) => {
                 const isSelected = selectedOption === option.label
                 const isCorrect = option.label === currentQuestion.question.answerCorrectOption
                 const isWrongPick = hasAnswered && isSelected && !isCorrect
+                const wasEliminated = eliminatedOptions.has(option.label)
+                const percent = stats?.options.find((item) => item.label === option.label)?.percent ?? null
                 return (
                   <div
                     key={option.label}
@@ -554,26 +462,85 @@ function ReviewPage() {
                   >
                     <span className="option-label">{option.label}</span>
                     <span className="min-w-0 flex-1 text-left">
-                      <MarkdownBlock markdown={option.bodyMarkdown} />
+                      <span className={wasEliminated ? 'block line-through decoration-2 opacity-60' : undefined}>
+                        <MarkdownBlock markdown={option.bodyMarkdown} />
+                      </span>
                       {isCorrect ? <span className="review-option-meta is-correct">Respuesta correcta</span> : null}
                       {isWrongPick ? <span className="review-option-meta is-incorrect">Tu respuesta</span> : null}
+                      {wasEliminated ? (
+                        <span className={`review-option-meta ${isCorrect ? 'is-incorrect' : 'text-[var(--text-tertiary)]'}`}>
+                          {isCorrect ? '\u00a0· y la tachaste' : 'La tachaste'}
+                        </span>
+                      ) : null}
+                      {percent != null ? (
+                        <span className="mt-1.5 flex items-center gap-2">
+                          <span className="h-1.5 w-full max-w-[8rem] overflow-hidden rounded-full bg-[var(--bg-inset)]" aria-hidden>
+                            <span
+                              className="block h-full rounded-full"
+                              style={{
+                                width: `${percent}%`,
+                                background: isCorrect ? 'var(--success)' : 'var(--text-tertiary)',
+                              }}
+                            />
+                          </span>
+                          <span className="text-[0.6875rem] font-semibold tabular-nums text-[var(--text-tertiary)]">
+                            {percent}% la eligió
+                          </span>
+                        </span>
+                      ) : null}
                     </span>
                   </div>
                 )
               })}
             </div>
 
-            {pickedRationale != null ? (
-              <div className="review-explanation is-distractor">
-                <p className="kicker mb-2">Por qué la {pickedRationale.label} te pareció correcta</p>
-                <MarkdownBlock markdown={pickedRationale.rationaleMarkdown} />
-              </div>
+            {stats != null ? (
+              <p className="mt-2 text-xs text-[var(--text-tertiary)]">
+                {stats.hasEnoughData
+                  ? `La respondieron ${stats.sampleSize} estudiantes.`
+                  : `Aún pocos datos para mostrar qué eligieron los demás (${stats.sampleSize} de ${MIN_STATS_SAMPLE} respuestas).`}
+                {stats.medianTimeMs != null ? (
+                  <>
+                    {' '}Tiempo mediano <span className="tabular-nums">{formatClock(stats.medianTimeMs)}</span>
+                    {currentQuestion.timeSpentMs != null && versusMedian != null ? (
+                      <>
+                        ; el tuyo <span className="tabular-nums">{formatClock(currentQuestion.timeSpentMs)}</span>,{' '}
+                        {TIME_VERSUS_MEDIAN_COPY[versusMedian]}.
+                      </>
+                    ) : '.'}
+                  </>
+                ) : null}
+              </p>
             ) : null}
 
-            {currentQuestion.question.answerSolutionMarkdown ? (
+            {isAiExplanation ? (
+              <p className="chip mt-3">
+                <Sparkles size={11} aria-hidden /> Explicación generada con IA: si ves un error, repórtalo.
+              </p>
+            ) : null}
+
+            {explanations.map((item) =>
+              item.isPicked ? (
+                <div key={item.label} className="review-explanation is-distractor">
+                  <p className="kicker mb-2">Por qué la {item.label} te pareció correcta</p>
+                  <MarkdownBlock markdown={item.rationaleMarkdown} />
+                </div>
+              ) : (
+                <details key={item.label} className="review-explanation">
+                  <summary className="cursor-pointer text-sm font-semibold text-[var(--text-primary)]">
+                    Por qué la {item.label} no es
+                  </summary>
+                  <div className="mt-2">
+                    <MarkdownBlock markdown={item.rationaleMarkdown} />
+                  </div>
+                </details>
+              ),
+            )}
+
+            {solutionMarkdown ? (
               <div className="review-explanation">
                 <p className="kicker mb-2">Explicación</p>
-                <MarkdownBlock markdown={currentQuestion.question.answerSolutionMarkdown} />
+                <MarkdownBlock markdown={solutionMarkdown} />
               </div>
             ) : null}
 
@@ -584,17 +551,41 @@ function ReviewPage() {
               </div>
             ) : null}
 
-            {currentQuestion.question.primarySubtopicId ? (
-              <div className="mt-4 flex justify-center">
-                <Link
-                  to="/lesson/$subtopicId"
-                  params={{ subtopicId: currentQuestion.question.primarySubtopicId }}
-                  className="btn-ghost inline-flex items-center gap-1.5 text-sm no-underline"
-                >
-                  <BookOpen size={14} /> Repasar este concepto
-                </Link>
+            {currentQuestion.question.primarySubtopicId != null || missed > 0 ? (
+              <div className="mt-4 flex flex-wrap justify-center gap-2">
+                {currentQuestion.question.primarySubtopicId ? (
+                  <Link
+                    to="/lesson/$subtopicId"
+                    params={{ subtopicId: currentQuestion.question.primarySubtopicId }}
+                    className="btn-ghost inline-flex items-center gap-1.5 text-sm no-underline"
+                  >
+                    <BookOpen size={14} /> Repasar este concepto
+                  </Link>
+                ) : null}
+                {missed > 0 ? (
+                  <button
+                    type="button"
+                    className="btn-ghost inline-flex items-center gap-1.5 text-sm"
+                    disabled={retryMutation.isPending}
+                    onClick={() => retryMutation.mutate(session.studentId)}
+                  >
+                    <RotateCcw size={14} aria-hidden />
+                    {retryMutation.isPending ? 'Preparando…' : 'Repetir las que fallé'}
+                  </button>
+                ) : null}
               </div>
             ) : null}
+            {retryMutation.error ? (
+              <p role="alert" className="mt-2 text-center text-sm text-[var(--danger-text)]">
+                {readConvexError(retryMutation.error, 'No se pudo armar el repaso de esta sesión.')}
+              </p>
+            ) : null}
+
+            <QuestionReportForm
+              key={currentQuestion.question._id}
+              questionId={currentQuestion.question._id}
+              sessionId={sessionDoc._id}
+            />
 
             <p className="stage-shortcuts" aria-hidden>
               <kbd>←</kbd><kbd>→</kbd><span>navegar</span>
@@ -611,122 +602,20 @@ function ReviewPage() {
     </section>
   )
 
-  const tutor = (
-    <aside className="tutor" aria-label="Tutor de revisión">
-      <header className="tutor-header">
-        <div className="inline-flex items-center gap-[0.6rem]">
-          <span className="tutor-avatar" aria-hidden><Bot size={15} /></span>
-          <div className="flex flex-col leading-none">
-            <span className="tutor-title">Tutor</span>
-            <span className="tutor-subtitle"><Sparkles size={10} /> revisión</span>
-          </div>
-        </div>
-        <div className="inline-flex items-center gap-1">
-          <button type="button" onClick={handleClearTutorChat} disabled={!canClearTutorChat} title="Borrar conversación" aria-label="Borrar conversación" className="tutor-icon-btn">
-            <Trash2 size={14} />
-          </button>
-          {!isCompactViewport ? (
-            <button type="button" onClick={collapseTutor} title="Ocultar tutor (⌘\\)" aria-label="Ocultar tutor" className="tutor-icon-btn">
-              <PanelRightClose size={14} />
-            </button>
-          ) : (
-            <button type="button" onClick={() => setIsTutorSheetOpen(false)} aria-label="Cerrar" className="tutor-icon-btn">
-              <PanelRightClose size={14} />
-            </button>
-          )}
-        </div>
-      </header>
-
-      <Conversation className="min-h-0 flex-1">
-        <ConversationContent className="gap-[0.85rem] px-[0.95rem] pt-4 pb-2">
-          {tutorMessages.length === 0 ? (
-            <ConversationEmptyState className="items-stretch gap-[0.7rem] px-[1.1rem] pt-[1.6rem] pb-4 text-left" icon={null}>
-              <div className="tutor-empty-mark" aria-hidden><Bot size={20} /></div>
-              <h3 className="tutor-empty-title">Pregunta lo que necesites.</h3>
-              <p className="tutor-empty-copy">
-                Ya puedes ver las respuestas. Pídeme que explique una pregunta, te dé otra parecida o te diga qué repasar.
-              </p>
-              <div className="mt-[0.65rem] flex flex-col gap-[0.4rem]" role="group" aria-label="Sugerencias">
-                {QUICK_PROMPTS.map((prompt) => (
-                  <button key={prompt} type="button" disabled={!canSendTutorMessage} onClick={() => sendTutorPrompt(prompt)} className="tutor-quick-prompt">
-                    {prompt}
-                  </button>
-                ))}
-              </div>
-            </ConversationEmptyState>
-          ) : (
-            tutorMessages.map((message) => (
-              <Message
-                key={message.id}
-                from={message.role}
-                className={message.role === 'assistant' ? 'flex flex-row items-start gap-[0.55rem]' : 'flex flex-row-reverse items-start gap-[0.55rem]'}
-              >
-                {message.role === 'assistant' ? (
-                  <span className="tutor-msg-avatar" aria-hidden><Bot size={12} /></span>
-                ) : null}
-                <MessageContent className={message.role === 'user' ? 'tutor-bubble tutor-bubble-user' : 'tutor-bubble tutor-bubble-assistant'}>
-                  {message.content.length > 0 ? <MarkdownBlock markdown={message.content} /> : null}
-                  {message.role === 'assistant' && message.artifactRef != null ? (
-                    <button
-                      type="button"
-                      onClick={() => {
-                        const ref = message.artifactRef
-                        if (ref == null) return
-                        setOpenArtifactId(ref.artifactId)
-                        if (isCompactViewport) setIsTutorSheetOpen(false)
-                      }}
-                      className="tutor-artifact-cta"
-                    >
-                      <SquarePlay size={14} aria-hidden />
-                      <span>Ver demostración interactiva</span>
-                    </button>
-                  ) : null}
-                  {message.role === 'assistant' && message.artifactPending && message.artifactRef == null ? (
-                    <Shimmer className="tutor-artifact-pending text-xs">Preparando demostración…</Shimmer>
-                  ) : null}
-                </MessageContent>
-              </Message>
-            ))
-          )}
-          {isTutorThinking ? (
-            <Message from="assistant" className="flex flex-row items-start gap-[0.55rem]">
-              <span className="tutor-msg-avatar" aria-hidden><Bot size={12} /></span>
-              <MessageContent className="tutor-bubble tutor-bubble-assistant">
-                <Shimmer className="text-sm">Pensando…</Shimmer>
-              </MessageContent>
-            </Message>
-          ) : null}
-        </ConversationContent>
-        <ConversationScrollButton />
-      </Conversation>
-
-      <PromptInput className="tutor-composer" onSubmit={(message) => sendTutorPrompt(message.text)}>
-        <PromptInputBody>
-          <PromptInputTextarea
-            data-tutor-input
-            value={draft}
-            onChange={(event) => setDraft(event.target.value)}
-            placeholder="Escribe un mensaje para el tutor…  (⌘K)"
-          />
-        </PromptInputBody>
-        <PromptInputFooter>
-          <span className="tutor-composer-hint"><kbd>Enter</kbd> para enviar</span>
-          <PromptInputSubmit
-            status={isGenerating ? 'streaming' : 'ready'}
-            onStop={handleStopTutor}
-            disabled={isGenerating ? isAborting : (!canSendTutorMessage || draft.trim().length === 0)}
-            aria-label={isGenerating ? 'Detener generación' : 'Enviar mensaje'}
-          />
-        </PromptInputFooter>
-      </PromptInput>
-      {tutorThreadError ? <div className="tutor-alert">{tutorThreadError}</div> : null}
-      {tutorMutation.error ? (
-        <div className="tutor-alert">{readConvexError(tutorMutation.error, 'No se pudo enviar el mensaje al tutor.')}</div>
-      ) : null}
-      {clearTutorMutation.error ? (
-        <div className="tutor-alert">{readConvexError(clearTutorMutation.error, 'No se pudo borrar la conversación.')}</div>
-      ) : null}
-    </aside>
+  // Suspense covers the first fetch of the tutor's chunk.
+  const renderTutor = (onClose: () => void) => (
+    <Suspense fallback={<PageLoader message="Abriendo el tutor…" />}>
+      <ReviewTutor
+        sessionId={sessionId}
+        practiceSessionId={sessionDoc._id}
+        studentId={session.studentId}
+        questionId={currentQuestion.question._id}
+        isCompact={isCompactViewport}
+        onClose={onClose}
+        draft={draft}
+        onDraftChange={setDraft}
+      />
+    </Suspense>
   )
 
   const tutorRail = (
@@ -738,7 +627,7 @@ function ReviewPage() {
   )
 
   return (
-    <StudentAppShell session={session} activeSection="practice" mainClassName="student-shell-main-immersive">
+    <StudentAppShell session={session} activeSection="practice" immersive>
       <div className="practice-canvas fade-in">
         {isCompactViewport ? (
           <>
@@ -754,7 +643,9 @@ function ReviewPage() {
             </button>
             <div className={`tutor-sheet ${isTutorSheetOpen ? 'is-open' : ''}`}>
               <button type="button" className="tutor-sheet-backdrop" onClick={() => setIsTutorSheetOpen(false)} aria-label="Cerrar tutor" />
-              <div className="tutor-sheet-panel">{tutor}</div>
+              <div className="tutor-sheet-panel">
+                {hasOpenedTutorSheet ? renderTutor(() => setIsTutorSheetOpen(false)) : null}
+              </div>
             </div>
           </>
         ) : (
@@ -792,33 +683,17 @@ function ReviewPage() {
                 <>
                   <ResizableHandle />
                   <ResizablePanel id={TUTOR_PANEL_ID} defaultSize={40} minSize={26} className="relative h-full min-h-0">
-                    {tutor}
+                    <div ref={adoptDesktopTutorHost} className="h-full min-h-0" />
                   </ResizablePanel>
                 </>
               ) : null}
             </ResizablePanelGroup>
             {isTutorCollapsed ? tutorRail : null}
+            {hasShownDesktopTutor && desktopTutorHost != null
+              ? createPortal(renderTutor(collapseTutor), desktopTutorHost)
+              : null}
           </>
         )}
-
-        {openArtifactId != null && studentId != null ? (
-          <Dialog open onOpenChange={(open) => { if (!open) setOpenArtifactId(null) }}>
-            <DialogContent
-              className="flex h-[85vh] max-h-[85vh] w-[min(960px,calc(100vw-2rem))] max-w-[min(960px,calc(100vw-2rem))] flex-col gap-0 overflow-hidden p-0 sm:max-w-[min(960px,calc(100vw-2rem))]"
-              showCloseButton={false}
-            >
-              <DialogHeader className="sr-only">
-                <DialogTitle>Demostración interactiva</DialogTitle>
-                <DialogDescription>Demostración interactiva creada por el tutor.</DialogDescription>
-              </DialogHeader>
-              <ArtifactPane
-                artifactId={openArtifactId}
-                studentId={studentId as Id<'students'>}
-                onClose={() => setOpenArtifactId(null)}
-              />
-            </DialogContent>
-          </Dialog>
-        ) : null}
       </div>
     </StudentAppShell>
   )

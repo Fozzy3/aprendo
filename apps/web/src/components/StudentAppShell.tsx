@@ -1,4 +1,5 @@
 import { Link, useNavigate } from '@tanstack/react-router'
+import { PencilLine, Route as RouteIcon, Sun, TrendingUp } from 'lucide-react'
 import { useState } from 'react'
 import BrandMark from './BrandMark.tsx'
 import ThemeToggle from './ThemeToggle.tsx'
@@ -19,13 +20,14 @@ type StudentSection =
  * under Progreso, so both stay one tap away without growing the top bar.
  */
 const NAV_ITEMS = [
-  { to: '/today', label: 'Hoy', sections: ['today'] },
-  { to: '/path', label: 'Ruta', sections: ['path', 'syllabus'] },
-  { to: '/practice', label: 'Práctica', sections: ['practice'] },
-  { to: '/progress', label: 'Progreso', sections: ['progress', 'history'] },
+  { to: '/today', label: 'Hoy', icon: Sun, sections: ['today'] },
+  { to: '/path', label: 'Ruta', icon: RouteIcon, sections: ['path', 'syllabus'] },
+  { to: '/practice', label: 'Práctica', icon: PencilLine, sections: ['practice'] },
+  { to: '/progress', label: 'Progreso', icon: TrendingUp, sections: ['progress', 'history'] },
 ] as const satisfies ReadonlyArray<{
   to: string
   label: string
+  icon: unknown
   sections: ReadonlyArray<StudentSection>
 }>
 
@@ -33,13 +35,18 @@ export function StudentAppShell({
   session,
   activeSection,
   topBarSupplement,
-  mainClassName,
+  immersive = false,
   children,
 }: {
   session: ActiveStudentSession
   activeSection: StudentSection
   topBarSupplement?: React.ReactNode
-  mainClassName?: string
+  /**
+   * Solve and review: the page owns the whole viewport (flex down to 100dvh,
+   * never a hard-coded header height) and the section nav is gone. On a phone
+   * the header goes too — both screens carry their own way out.
+   */
+  immersive?: boolean
   children: React.ReactNode
 }) {
   const navigate = useNavigate()
@@ -58,8 +65,11 @@ export function StudentAppShell({
     }
   }
 
+  const isActive = (item: (typeof NAV_ITEMS)[number]) =>
+    (item.sections as ReadonlyArray<StudentSection>).includes(activeSection)
+
   return (
-    <div className="student-shell">
+    <div className={`student-shell${immersive ? ' is-immersive' : ''}`}>
       <header className="student-topbar">
         <div className="student-topbar-inner">
           <Link
@@ -75,23 +85,20 @@ export function StudentAppShell({
             </div>
           </Link>
 
-          <nav className="student-topnav" aria-label="Navegación principal">
-            {NAV_ITEMS.map((item) => {
-              const isActive = (item.sections as ReadonlyArray<StudentSection>).includes(
-                activeSection,
-              )
-              return (
+          {immersive ? null : (
+            <nav className="student-topnav" aria-label="Navegación principal">
+              {NAV_ITEMS.map((item) => (
                 <Link
                   key={item.to}
                   to={item.to}
-                  aria-current={isActive ? 'page' : undefined}
-                  className={`student-topnav-item ${isActive ? 'is-active' : ''}`}
+                  aria-current={isActive(item) ? 'page' : undefined}
+                  className={`student-topnav-item ${isActive(item) ? 'is-active' : ''}`}
                 >
                   {item.label}
                 </Link>
-              )
-            })}
-          </nav>
+              ))}
+            </nav>
+          )}
 
           <div className="student-topbar-actions">
             <div className="student-session-identity">
@@ -112,9 +119,33 @@ export function StudentAppShell({
         </div>
       </header>
 
-      <main className={['student-shell-main', mainClassName].filter(Boolean).join(' ')}>
+      <main className="student-shell-main">
         {children}
       </main>
+
+      {/* Phones only (CSS): the same four sections, moved to where the thumb
+          already is. The top nav is hidden at that width, so assistive tech
+          never meets two copies. */}
+      {immersive ? null : (
+        <nav className="student-tabbar" aria-label="Navegación principal">
+          {NAV_ITEMS.map((item) => {
+            const Icon = item.icon
+            return (
+              <Link
+                key={item.to}
+                to={item.to}
+                aria-current={isActive(item) ? 'page' : undefined}
+                className={`student-tabbar-item${isActive(item) ? ' is-active' : ''}`}
+              >
+                <span className="student-tabbar-icon" aria-hidden>
+                  <Icon size={19} strokeWidth={2.25} />
+                </span>
+                {item.label}
+              </Link>
+            )
+          })}
+        </nav>
+      )}
     </div>
   )
 }

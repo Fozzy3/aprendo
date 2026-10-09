@@ -4,14 +4,16 @@ import { Link, createFileRoute, useNavigate } from '@tanstack/react-router'
 import { Check } from 'lucide-react'
 import { useEffect, useState, type CSSProperties } from 'react'
 import { api } from '@aprendo/convex/api'
-import { SESSION_KIND_CONFIG } from '@aprendo/convex/sessionKinds'
+import { SESSION_KIND_CONFIG, getConfiguredQuestionCount } from '@aprendo/convex/sessionKinds'
 import BrandMark from '../components/BrandMark.tsx'
 import { Mascot } from '../components/Mascot.tsx'
 import { SessionSolve } from '../components/SessionSolve.tsx'
 import ThemeToggle from '../components/ThemeToggle.tsx'
-import { studentAppStateQuery } from '../lib/student-queries.ts'
+import { TimedSessionIntro } from '../components/TimedSessionIntro.tsx'
+import { findResumableSession } from '../lib/resume-session.ts'
+import { sessionHistoryQuery, studentAppStateQuery } from '../lib/student-queries.ts'
 import { useCurrentStudent } from '../lib/student-session.ts'
-import { getAllSubjectThemes } from '../lib/subject-theme.ts'
+import { getAllSubjectThemes, getSubjectTheme } from '../lib/subject-theme.ts'
 import { FullScreenLoader } from '../components/FullScreenLoader.tsx'
 import { readConvexError } from '../lib/convex-error.ts'
 
@@ -34,9 +36,18 @@ function PlacementPage() {
   const navigate = useNavigate()
   const { session, isReady } = useCurrentStudent()
   const [sessionId, setSessionId] = useState<string | null>(null)
+  // The area tapped but not started yet: the intro step sits between the two,
+  // because starting is what sets the clock running.
+  const [pendingSubjectId, setPendingSubjectId] = useState<string | null>(null)
 
   const appStateQuery = useQuery({
     ...studentAppStateQuery(session?.studentId),
+    enabled: isReady && session != null,
+  })
+  // createSession hands back an unfinished nivelación instead of a new one, so
+  // tapping that area resumes it: the intro's full clock would be wrong for it.
+  const nivelacionesQuery = useQuery({
+    ...sessionHistoryQuery(session?.studentId, { kind: 'nivelacion' }),
     enabled: isReady && session != null,
   })
 
@@ -48,7 +59,10 @@ function PlacementPage() {
         kind: 'nivelacion',
         subjectId,
       }),
-    onSuccess: (createdId) => setSessionId(createdId),
+    onSuccess: (createdId) => {
+      setSessionId(createdId)
+      setPendingSubjectId(null)
+    },
   })
 
   useEffect(() => {
@@ -57,7 +71,7 @@ function PlacementPage() {
     }
   }, [isReady, navigate, session])
 
-  if (!isReady || session == null || appStateQuery.isPending) {
+  if (!isReady || session == null || appStateQuery.isPending || nivelacionesQuery.isPending) {
     return (
       <FullScreenLoader />
     )
@@ -65,9 +79,12 @@ function PlacementPage() {
 
   const placedSubjectIds = appStateQuery.data?.placedSubjectIds ?? []
   const hasAnyPlacement = appStateQuery.data?.hasCompletedDiagnostic ?? false
+  const pendingSubject = pendingSubjectId != null ? getSubjectTheme(pendingSubjectId) : null
+  const findUnfinished = (subjectId: string) =>
+    findResumableSession(nivelacionesQuery.data ?? [], { kind: 'nivelacion', subjectId }, Date.now())
 
   return (
-    <div className="diagnostic-shell">
+    <div className={`diagnostic-shell${sessionId != null ? ' is-immersive' : ''}`}>
       <header className="diagnostic-topbar">
         <div className="diagnostic-topbar-inner">
           <Link to="/" className="student-brand no-underline">
@@ -96,6 +113,27 @@ function PlacementPage() {
               navigate({ to: '/practice/$sessionId/review', params: { sessionId: completedId } })
             }
           />
+        ) : pendingSubject != null ? (
+          <div className="diagnostic-intro">
+            <TimedSessionIntro
+              title={`${NIVELACION.labelEs} de ${pendingSubject.label}`}
+              subjectColor={pendingSubject.color}
+              questionCount={getConfiguredQuestionCount(NIVELACION)}
+              timeLimitMs={NIVELACION.timeLimitMs ?? 0}
+              isStarting={createMutation.isPending}
+              error={
+                createMutation.error != null
+                  ? readConvexError(createMutation.error, 'No pudimos iniciar la nivelación.')
+                  : null
+              }
+              cancelLabel="Elegir otra área"
+              onStart={() => createMutation.mutate(pendingSubject.id)}
+              onCancel={() => {
+                createMutation.reset()
+                setPendingSubjectId(null)
+              }}
+            />
+          </div>
         ) : (
           <div className="diagnostic-intro fade-in">
             <div className="diagnostic-intro-head">
@@ -112,21 +150,19 @@ function PlacementPage() {
               </div>
             </div>
 
-            {createMutation.error != null && (
-              <p className="mt-4 text-sm text-[var(--danger-text)]">
-                {readConvexError(createMutation.error, 'No pudimos iniciar la nivelación.')}
-              </p>
-            )}
-
             <ul className="mt-6 grid list-none grid-cols-1 gap-3 p-0 sm:grid-cols-2">
               {getAllSubjectThemes().map((subject) => {
                 const isPlaced = placedSubjectIds.includes(subject.id)
+                const isUnfinished = findUnfinished(subject.id) != null
                 return (
                   <li key={subject.id}>
                     <button
                       type="button"
-                      disabled={createMutation.isPending}
-                      onClick={() => createMutation.mutate(subject.id)}
+                      onClick={() => {
+                        const unfinished = findUnfinished(subject.id)
+                        if (unfinished != null) setSessionId(unfinished._id)
+                        else setPendingSubjectId(subject.id)
+                      }}
                       className="launch-card w-full p-4 text-left"
                     >
                       <span className="flex items-center gap-3">
@@ -147,7 +183,9 @@ function PlacementPage() {
                             {subject.label}
                           </span>
                           <span className="block text-xs text-[var(--text-tertiary)]">
-                            {NIVELACION.totalQuestions} preguntas · 30 min
+                            {isUnfinished
+                              ? 'En curso · toca para continuar'
+                              : `${NIVELACION.totalQuestions} preguntas · 30 min`}
                           </span>
                         </span>
                         {isPlaced && (

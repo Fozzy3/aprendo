@@ -25,7 +25,7 @@ export const resetSessionData = internalMutation({
     for (const table of tables) {
       const rows = await ctx.db.query(table).collect()
       for (const row of rows) {
-        await ctx.db.delete(row._id)
+        await ctx.db.delete(table, row._id)
       }
       deleted[table] = rows.length
     }

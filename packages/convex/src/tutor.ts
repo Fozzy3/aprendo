@@ -2,13 +2,17 @@ import { abortStream, Agent, createTool, extractText, listMessages, listStreams,
 import { stepCountIs } from 'ai'
 import { z } from 'zod'
 import { internal } from './_generated/api'
-import { action, internalMutation, internalQuery, mutation, query } from './_generated/server'
+import { action, internalMutation, internalQuery, mutation, query, type QueryCtx } from './_generated/server'
 import { components } from './_generated/api'
 import { ConvexError, v } from 'convex/values'
 import { paginationOptsValidator } from 'convex/server'
-import type { Doc, Id } from './_generated/dataModel'
+import type { Id } from './_generated/dataModel'
 import { getSubjectLabel, getSubtopicLabel } from './taxonomy'
 import { aprendoModel } from './aiProvider'
+import { assertOwnsStudent } from './auth'
+import { colombiaDayNumber } from './colombiaTime'
+import { MAX_TUTOR_PROMPT_CHARS, canUseTutor, hasLlmBudget, isLiveTimedExam } from './llmBudget'
+import { sealsItsQuestions } from './sessionIntegrity'
 
 const agentComponent = (components as Record<string, unknown>).agent as ConstructorParameters<typeof Agent>[0]
 
@@ -67,7 +71,7 @@ tiempo. Háblale de **tú**, en español de Colombia, directo y sin rodeos.
 ## Formato
 
 - De 3 a 6 frases por defecto. Si necesitas más, usa una lista corta.
-- Matemáticas en LaTeX: \( \) para fórmulas en línea, \[ \] para bloque.
+- Matemáticas en LaTeX: $...$ para fórmulas en línea, $$...$$ para bloque.
 - Sin encabezados de markdown en respuestas cortas. Sin emojis.
 - Si te preguntan algo que no tiene que ver con el examen, dilo en una frase y
   vuelve al tema.
@@ -222,7 +226,8 @@ type QuestionContext = {
   officialExplanation: string | null
   attempt: {
     selectedOption: string
-    isCorrect: boolean
+    /** `null` until the session is completed: no correctness signal mid-session. */
+    isCorrect: boolean | null
   } | null
 }
 
@@ -261,9 +266,11 @@ function buildTutorSystemPrompt(question: QuestionContext | null): string {
   }
 
   if (question.attempt != null) {
-    const attemptResult = question.attempt.isCorrect ? 'correcta' : 'incorrecta'
+    const attemptResult = question.attempt.isCorrect == null
+      ? ''
+      : question.attempt.isCorrect ? ' (correcta)' : ' (incorrecta)'
     lines.push('')
-    lines.push(`El estudiante ya respondió: ${question.attempt.selectedOption} (${attemptResult}).`)
+    lines.push(`El estudiante ya respondió: ${question.attempt.selectedOption}${attemptResult}.`)
     if (question.correctOption != null) {
       lines.push(`Respuesta correcta: ${question.correctOption}.`)
     }
@@ -287,21 +294,24 @@ function buildTutorSystemPrompt(question: QuestionContext | null): string {
 }
 
 async function requireOwnedPracticeSession(
-  ctx: { db: { get: (id: Id<'sessions'>) => Promise<Doc<'sessions'> | null> } },
+  ctx: Pick<QueryCtx, 'db'>,
   args: {
     practiceSessionId: Id<'sessions'>
     studentId: Id<'students'>
   },
 ) {
-  // The tutor works for any session kind (recommended, topic, simulacro,
-  // diagnostic review). Answer disclosure is gated separately by session
-  // status, not by kind.
-  const session = await ctx.db.get(args.practiceSessionId)
+  // Ownership only: public callers first tie `studentId` to the signed-in
+  // student with `assertOwnsStudent`. Every kind gets the tutor in review; while
+  // solving, only kinds that allow it and never an exam (see `canUseTutor`).
+  const session = await ctx.db.get("sessions", args.practiceSessionId)
   if (session == null) {
     throw new ConvexError('Session not found.')
   }
   if (session.studentId !== args.studentId) {
     throw new ConvexError('Session does not belong to this student.')
+  }
+  if (!canUseTutor(session.kind, session.status)) {
+    throw new ConvexError('El tutor no está disponible mientras resuelves esta sesión.')
   }
   return session
 }
@@ -313,6 +323,17 @@ export const getPracticeTutorThreadMapping = internalQuery({
   },
   handler: async (ctx, args) => {
     await requireOwnedPracticeSession(ctx, args)
+
+    // Checked here, the one gate before every model call: a completed session's
+    // review would otherwise answer a live exam question pasted into its chat.
+    const now = Date.now()
+    const openSessions = await ctx.db
+      .query('sessions')
+      .withIndex('by_studentId_status', (q) => q.eq('studentId', args.studentId).eq('status', 'in_progress'))
+      .collect()
+    if (openSessions.some((session) => isLiveTimedExam(session, now))) {
+      throw new ConvexError('El tutor vuelve cuando termines el examen que tienes en curso.')
+    }
 
     const mapping = await ctx.db
       .query('practiceTutorThreads')
@@ -334,7 +355,7 @@ export const touchPracticeTutorThread = internalMutation({
       .unique()
     if (mapping == null) return
 
-    await ctx.db.patch(mapping._id, {
+    await ctx.db.patch("practiceTutorThreads", mapping._id, {
       updatedAt: Date.now(),
     })
   },
@@ -346,6 +367,7 @@ export const createOrGetPracticeTutorThread = mutation({
     studentId: v.id('students'),
   },
   handler: async (ctx, args) => {
+    await assertOwnsStudent(ctx, args.studentId)
     await requireOwnedPracticeSession(ctx, args)
 
     const existing = await ctx.db
@@ -382,6 +404,7 @@ export const clearPracticeTutorChat = mutation({
     studentId: v.id('students'),
   },
   handler: async (ctx, args) => {
+    await assertOwnsStudent(ctx, args.studentId)
     await requireOwnedPracticeSession(ctx, args)
 
     const mapping = await ctx.db
@@ -400,7 +423,7 @@ export const clearPracticeTutorChat = mutation({
     })
 
     const now = Date.now()
-    await ctx.db.patch(mapping._id, {
+    await ctx.db.patch("practiceTutorThreads", mapping._id, {
       threadId: newThreadId,
       updatedAt: now,
     })
@@ -420,6 +443,7 @@ export const getPracticeTutorThread = query({
     studentId: v.id('students'),
   },
   handler: async (ctx, args) => {
+    await assertOwnsStudent(ctx, args.studentId)
     await requireOwnedPracticeSession(ctx, args)
 
     const mapping = await ctx.db
@@ -470,6 +494,7 @@ export const listPracticeTutorMessages = query({
     streamArgs: v.optional(vStreamArgs),
   },
   handler: async (ctx, args) => {
+    await assertOwnsStudent(ctx, args.studentId)
     await requireOwnedPracticeSession(ctx, {
       practiceSessionId: args.practiceSessionId,
       studentId: args.studentId,
@@ -527,7 +552,16 @@ export const getPracticeQuestionContext = internalQuery({
   handler: async (ctx, args): Promise<QuestionContext | null> => {
     const session = await requireOwnedPracticeSession(ctx, args)
 
-    const question = await ctx.db.get(args.questionId)
+    // `questionId` comes from the client: only a question of this session, or
+    // a completed session would put a live exam question in the prompt.
+    const sessionQuestion = await ctx.db
+      .query('sessionQuestions')
+      .withIndex('by_sessionId', (q) => q.eq('sessionId', args.practiceSessionId))
+      .filter((q) => q.eq(q.field('questionId'), args.questionId))
+      .first()
+    if (sessionQuestion == null) return null
+
+    const question = await ctx.db.get("questions", args.questionId)
     if (question == null) return null
 
     const attempt = await ctx.db
@@ -546,9 +580,20 @@ export const getPracticeQuestionContext = internalQuery({
       : 'Sin subtema'
 
     const isAnswered = attempt != null && attempt.selectedOption != null && attempt.isCorrect != null
-    const canReviewAnswers = session.status === 'completed'
+    // The bank is shared: an item an open exam or reto asks stays sealed here too.
+    const now = Date.now()
+    const sealingSessions = (await ctx.db
+      .query('sessions')
+      .withIndex('by_studentId_status', (q) => q.eq('studentId', args.studentId).eq('status', 'in_progress'))
+      .collect()).filter((open) => sealsItsQuestions(open, now))
+    const sealedElsewhere = await Promise.all(sealingSessions.map((open) => ctx.db
+      .query('sessionQuestions')
+      .withIndex('by_sessionId', (q) => q.eq('sessionId', open._id))
+      .filter((q) => q.eq(q.field('questionId'), args.questionId))
+      .first()))
+    const canReviewAnswers = session.status === 'completed' && sealedElsewhere.every((row) => row == null)
 
-    const group = question.groupId == null ? null : await ctx.db.get(question.groupId)
+    const group = question.groupId == null ? null : await ctx.db.get("questionGroups", question.groupId)
 
     return {
       questionNumber: question.questionNumber,
@@ -564,11 +609,41 @@ export const getPracticeQuestionContext = internalQuery({
       officialExplanation: canReviewAnswers ? question.answerSolutionMarkdown ?? null : null,
       attempt: isAnswered
         ? {
-            selectedOption: attempt!.selectedOption!,
-            isCorrect: attempt!.isCorrect!,
+            selectedOption: attempt.selectedOption!,
+            isCorrect: canReviewAnswers ? attempt.isCorrect! : null,
           }
         : null,
     }
+  },
+})
+
+/**
+ * Spends one unit of the student's daily allowance for `feature`, or returns
+ * false when it is used up. A mutation, so concurrent calls cannot both take the
+ * last unit.
+ */
+export const consumeLlmUnit = internalMutation({
+  args: {
+    studentId: v.id('students'),
+    feature: v.literal('tutor'),
+  },
+  handler: async (ctx, args) => {
+    const day = colombiaDayNumber(Date.now())
+    const usage = await ctx.db
+      .query('llmUsage')
+      .withIndex('by_studentId_day_feature', (q) =>
+        q.eq('studentId', args.studentId).eq('day', day).eq('feature', args.feature),
+      )
+      .unique()
+    const used = usage?.count ?? 0
+    if (!hasLlmBudget(args.feature, used)) return false
+
+    if (usage == null) {
+      await ctx.db.insert('llmUsage', { studentId: args.studentId, day, feature: args.feature, count: 1 })
+    } else {
+      await ctx.db.patch("llmUsage", usage._id, { count: used + 1 })
+    }
+    return true
   },
 })
 
@@ -580,12 +655,27 @@ export const sendPracticeTutorMessage = action({
     questionId: v.optional(v.id('questions')),
   },
   handler: async (ctx, args) => {
+    await assertOwnsStudent(ctx, args.studentId)
+    if (args.prompt.length > MAX_TUTOR_PROMPT_CHARS) {
+      throw new ConvexError(`Tu mensaje es muy largo. Escríbelo en menos de ${MAX_TUTOR_PROMPT_CHARS} caracteres.`)
+    }
+
     const mapping = await ctx.runQuery(internal.tutor.getPracticeTutorThreadMapping, {
       practiceSessionId: args.practiceSessionId,
       studentId: args.studentId,
     })
     if (mapping == null) {
       throw new ConvexError('Tutor thread not found for this practice session.')
+    }
+
+    // Charged after the checks above so a rejected request costs nothing, and
+    // before the model is called so a spent allowance never reaches it.
+    const allowed = await ctx.runMutation(internal.tutor.consumeLlmUnit, {
+      studentId: args.studentId,
+      feature: 'tutor',
+    })
+    if (!allowed) {
+      throw new ConvexError('Llegaste al límite de mensajes del tutor por hoy. Mañana puedes seguir preguntando.')
     }
 
     const questionContext = args.questionId != null
@@ -637,6 +727,7 @@ export const abortPracticeTutorStream = mutation({
     order: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
+    await assertOwnsStudent(ctx, args.studentId)
     await requireOwnedPracticeSession(ctx, {
       practiceSessionId: args.practiceSessionId,
       studentId: args.studentId,
@@ -720,11 +811,13 @@ export const getArtifact = query({
     studentId: v.id('students'),
   },
   handler: async (ctx, args) => {
-    const artifact = await ctx.db.get(args.artifactId)
+    await assertOwnsStudent(ctx, args.studentId)
+    const artifact = await ctx.db.get("practiceTutorArtifacts", args.artifactId)
     if (artifact == null) return null
-    if (artifact.studentId !== args.studentId) {
-      throw new ConvexError('Artifact does not belong to this student.')
-    }
+    await requireOwnedPracticeSession(ctx, {
+      practiceSessionId: artifact.practiceSessionId,
+      studentId: args.studentId,
+    })
     return artifact
   },
 })
@@ -736,6 +829,7 @@ export const listArtifactsForThread = query({
     threadId: v.string(),
   },
   handler: async (ctx, args) => {
+    await assertOwnsStudent(ctx, args.studentId)
     await requireOwnedPracticeSession(ctx, {
       practiceSessionId: args.practiceSessionId,
       studentId: args.studentId,
@@ -746,7 +840,8 @@ export const listArtifactsForThread = query({
       .withIndex('by_threadId', (q) => q.eq('threadId', args.threadId))
       .collect()
 
-    return rows.map((row) => ({
+    // `threadId` comes from the client: only list artifacts of the session just verified.
+    return rows.filter((row) => row.practiceSessionId === args.practiceSessionId).map((row) => ({
       _id: row._id,
       messageId: row.messageId,
       title: row.title,

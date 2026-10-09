@@ -63,6 +63,12 @@ export interface EnrichmentQuestionInput {
     label: string
     bodyMarkdown: string
   }>
+  /**
+   * Page renders of the question as printed (stem and shared stimulus). The
+   * booklet text layer drops figures, tables and typeset equations; without the
+   * picture the model solves a different question.
+   */
+  images?: Array<{ url: string; mediaType: string }>
 }
 
 export interface TaxonomyDimension {
@@ -167,6 +173,13 @@ function buildFileParts(question: EnrichmentQuestionInput) {
       }
     })
     .filter((part): part is { type: 'file'; data: URL; mediaType: string } => part != null)
+    .concat(
+      (question.images ?? []).map((image) => ({
+        type: 'file' as const,
+        data: new URL(image.url),
+        mediaType: image.mediaType,
+      })),
+    )
 }
 
 function buildAnswerPrompt(question: EnrichmentQuestionInput) {

@@ -1,6 +1,7 @@
 import { convexQuery } from '@convex-dev/react-query'
 import { api } from '@aprendo/convex/api'
 import type { SessionKind } from '@aprendo/convex/sessionKinds'
+import type { builderFilters } from './practice-builder.ts'
 
 function hasValue(value: string | null | undefined): value is string {
   return typeof value === 'string' && value.trim().length > 0
@@ -208,4 +209,19 @@ export function conceptLessonQuery(subtopicId: string | null | undefined) {
   }
 
   return convexQuery(api.lessons.getConceptLesson, { subtopicId })
+}
+
+/** "N preguntas disponibles" for the practice builder; skipped while it is closed. */
+export function practiceBuilderCountsQuery(
+  studentId: string | null | undefined,
+  filters: ReturnType<typeof builderFilters> | null,
+) {
+  if (!hasValue(studentId) || filters == null) {
+    return convexQuery(api.sessions.getPracticeBuilderCounts, 'skip')
+  }
+
+  return convexQuery(api.sessions.getPracticeBuilderCounts, {
+    studentId: studentId as never,
+    filters,
+  })
 }

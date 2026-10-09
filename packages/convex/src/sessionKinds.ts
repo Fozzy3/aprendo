@@ -26,8 +26,17 @@ export const SESSION_KINDS = [
   'topic',
   'simulacro',
   'repaso',
+  'personalizada',
+  'reto',
 ] as const
 export type SessionKind = (typeof SESSION_KINDS)[number]
+
+/**
+ * When a practice discloses its answers: question by question ("Ver respuesta
+ * al responder") or once the session is completed. Exams are always `al_final`.
+ */
+export const FEEDBACK_MODES = ['inmediata', 'al_final'] as const
+export type FeedbackMode = (typeof FEEDBACK_MODES)[number]
 
 /** How the question set for a session is assembled. */
 export type SelectionStrategy =
@@ -41,6 +50,10 @@ export type SelectionStrategy =
   | 'topic'
   /** Previously-missed questions resurfaced for spaced review. */
   | 'review_mistakes'
+  /** Student-built set: area, subtopics, difficulty, source, count (see `practiceBuilder.ts`). */
+  | 'custom'
+  /** Khan's Mastery Challenge: 3 practiced subtopics, 2 questions each (see `mastery.ts`). */
+  | 'mastery_challenge'
 
 /** Which question-bank eligibility tiers a kind may draw from. */
 export type QuestionEligibilityPool = 'diagnostic' | 'practice_only'
@@ -69,6 +82,12 @@ export interface SessionKindConfig {
   launchableFromHub: boolean
   /** Whether the kind needs a `subjectId` argument (topic practice). */
   requiresSubject: boolean
+  /**
+   * Whether the student may choose `feedbackMode: 'inmediata'`. Never for an
+   * exam or the mastery challenge: those measure, so nothing is disclosed
+   * before the end (see `sessionIntegrity.canCheckAnswers`).
+   */
+  allowsImmediateFeedback: boolean
 }
 
 export interface SubjectQuestionTarget {
@@ -98,6 +117,7 @@ export const SESSION_KIND_CONFIG: Record<SessionKind, SessionKindConfig> = {
     requiresDiagnostic: false,
     launchableFromHub: false,
     requiresSubject: false,
+    allowsImmediateFeedback: false,
   },
   nivelacion: {
     kind: 'nivelacion',
@@ -116,6 +136,7 @@ export const SESSION_KIND_CONFIG: Record<SessionKind, SessionKindConfig> = {
     requiresDiagnostic: false,
     launchableFromHub: true,
     requiresSubject: true,
+    allowsImmediateFeedback: false,
   },
   recommended: {
     kind: 'recommended',
@@ -129,6 +150,7 @@ export const SESSION_KIND_CONFIG: Record<SessionKind, SessionKindConfig> = {
     requiresDiagnostic: true,
     launchableFromHub: true,
     requiresSubject: false,
+    allowsImmediateFeedback: true,
   },
   topic: {
     kind: 'topic',
@@ -142,6 +164,7 @@ export const SESSION_KIND_CONFIG: Record<SessionKind, SessionKindConfig> = {
     requiresDiagnostic: true,
     launchableFromHub: true,
     requiresSubject: true,
+    allowsImmediateFeedback: true,
   },
   repaso: {
     kind: 'repaso',
@@ -155,6 +178,7 @@ export const SESSION_KIND_CONFIG: Record<SessionKind, SessionKindConfig> = {
     requiresDiagnostic: true,
     launchableFromHub: true,
     requiresSubject: false,
+    allowsImmediateFeedback: true,
   },
   simulacro: {
     kind: 'simulacro',
@@ -191,6 +215,40 @@ export const SESSION_KIND_CONFIG: Record<SessionKind, SessionKindConfig> = {
     requiresDiagnostic: true,
     launchableFromHub: true,
     requiresSubject: false,
+    allowsImmediateFeedback: false,
+  },
+  personalizada: {
+    kind: 'personalizada',
+    labelEs: 'Práctica a tu medida',
+    taglineEs: 'Elige área, subtemas, dificultad y cuántas preguntas.',
+    strategy: 'custom',
+    // The count is the student's choice (5-30, `practiceBuilder.ts`); this is
+    // only what the hub shows before they choose.
+    totalQuestions: 10,
+    eligibilityPools: ['diagnostic', 'practice_only'],
+    // Untimed unless the student asks for the clock; then the official pace
+    // per question (`pacing.officialMsPerQuestion`).
+    timeLimitMs: null,
+    tutorInSolve: false,
+    requiresDiagnostic: true,
+    // Needs the builder's filters, which the generic hub card cannot ask for.
+    launchableFromHub: false,
+    requiresSubject: false,
+    allowsImmediateFeedback: true,
+  },
+  reto: {
+    kind: 'reto',
+    labelEs: 'Reto de dominio',
+    taglineEs: 'Seis preguntas de tres subtemas que ya practicaste: sube o baja tu nivel.',
+    strategy: 'mastery_challenge',
+    totalQuestions: 6,
+    eligibilityPools: ['diagnostic', 'practice_only'],
+    timeLimitMs: null,
+    tutorInSolve: false,
+    requiresDiagnostic: true,
+    launchableFromHub: true,
+    requiresSubject: false,
+    allowsImmediateFeedback: false,
   },
 }
 

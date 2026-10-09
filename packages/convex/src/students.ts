@@ -3,6 +3,7 @@ import { ConvexError, v } from 'convex/values'
 import type { Id } from './_generated/dataModel'
 import { assertOwnsStudent, requireAuthenticatedStudentId } from './auth'
 import { MAX_GLOBAL_SCORE } from './globalScore'
+import { MAX_WEEKLY_GOAL_MINUTES, MIN_WEEKLY_GOAL_MINUTES, isValidWeeklyGoal } from './studyTime'
 
 export const getStudent = query({
   args: {
@@ -10,7 +11,7 @@ export const getStudent = query({
   },
   handler: async (ctx, args) => {
     await assertOwnsStudent(ctx, args.studentId)
-    return ctx.db.get(args.studentId)
+    return ctx.db.get("students", args.studentId)
   },
 })
 
@@ -34,7 +35,7 @@ export const setExamDate = mutation({
       throw new ConvexError('Fecha de examen inválida.')
     }
 
-    await ctx.db.patch(args.studentId, {
+    await ctx.db.patch("students", args.studentId, {
       examDate: args.examDate ?? undefined,
       updatedAt: Date.now(),
     })
@@ -60,12 +61,33 @@ export const setTargetGlobalScore = mutation({
       throw new ConvexError(`La meta debe estar entre 0 y ${MAX_GLOBAL_SCORE}.`)
     }
 
-    await ctx.db.patch(args.studentId, {
+    await ctx.db.patch("students", args.studentId, {
       targetGlobalScore:
         args.targetGlobalScore == null ? undefined : Math.round(args.targetGlobalScore),
       updatedAt: Date.now(),
     })
     return { targetGlobalScore: args.targetGlobalScore }
+  },
+})
+
+/** Set the study minutes the student aims for each week ("Hoy" shows progress against it). */
+export const setWeeklyGoal = mutation({
+  args: {
+    studentId: v.id('students'),
+    minutes: v.number(),
+  },
+  handler: async (ctx, args) => {
+    await assertOwnsStudent(ctx, args.studentId)
+
+    if (!isValidWeeklyGoal(args.minutes)) {
+      throw new ConvexError(
+        `La meta semanal debe estar entre ${MIN_WEEKLY_GOAL_MINUTES} y ${MAX_WEEKLY_GOAL_MINUTES} minutos.`,
+      )
+    }
+
+    const weeklyGoalMinutes = Math.round(args.minutes)
+    await ctx.db.patch('students', args.studentId, { weeklyGoalMinutes, updatedAt: Date.now() })
+    return { weeklyGoalMinutes }
   },
 })
 
@@ -102,7 +124,7 @@ export const getCurrentStudentAppState = query({
  * launchable from the hub.
  */
 async function computeStudentAppState(ctx: QueryCtx, studentId: Id<'students'>) {
-  const student = await ctx.db.get(studentId)
+  const student = await ctx.db.get("students", studentId)
   if (student == null) {
     return null
   }

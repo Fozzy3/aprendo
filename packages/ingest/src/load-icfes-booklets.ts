@@ -3,13 +3,15 @@
  *
  *   bun run packages/ingest/src/load-icfes-booklets.ts [--dry]
  *
- * Re-running is safe: each booklet's questions and groups are cleared before
- * they are re-inserted.
+ * Re-running is safe: questions are matched by booklet and number and groups by
+ * their context key, so a reload updates rows in place and keeps their ids, and
+ * with them every student's attempts and history. What a booklet no longer has
+ * is retired (kept, but out of every pool), and only after all of it loaded.
  */
 import { execFileSync } from 'node:child_process'
 import { existsSync } from 'node:fs'
 import { resolve } from 'node:path'
-import { parseBooklet, usableQuestions } from './icfes-booklet'
+import { groupSlots, parseBooklet, usableQuestions } from './icfes-booklet'
 import { CONFIDENT_AT, guessSubtopic } from './icfes-subtopic-guess'
 
 // `import.meta.dirname` is the portable spelling; `import.meta.dir` is Bun-only
@@ -95,17 +97,21 @@ for (const booklet of BOOKLETS) {
   })
   const parsed = parseBooklet(text)
   const usable = usableQuestions(parsed)
+  const slots = groupSlots(usable)
 
-  const questions = usable.map((question) => {
+  const questions = usable.map((question, index) => {
     const guess = guessSubtopic(
       booklet.subjectId,
       `${question.contextMarkdown ?? ''}\n${question.stem}`,
     )!
+    const slot = slots[index]
     return {
       number: question.number,
       stem: question.stem,
-      contextMarkdown: question.contextMarkdown,
-      contextKey: question.contextKey,
+      group:
+        slot == null || question.contextMarkdown == null
+          ? undefined
+          : { ...slot, contextMarkdown: question.contextMarkdown },
       options: question.options.map((option) => ({
         label: option.label,
         bodyMarkdown: option.text,
@@ -119,14 +125,14 @@ for (const booklet of BOOKLETS) {
   })
 
   const confident = questions.filter((question) => question.confidentTag).length
-  const groups = new Set(questions.map((q) => q.contextKey).filter(Boolean)).size
+  const contextKeys = [...new Set(questions.flatMap((q) => (q.group == null ? [] : [q.group.key])))]
   grandTotal += questions.length
   grandConfident += confident
 
   console.log(
     `${booklet.label.padEnd(22)} ${String(questions.length).padStart(3)} preguntas`
     + `  ·  ${String(confident).padStart(3)} con etiqueta confiable`
-    + `  ·  ${String(groups).padStart(2)} estímulos`
+    + `  ·  ${String(contextKeys.length).padStart(2)} estímulos`
     + `  ·  ${parsed.length - usable.length} descartadas`,
   )
 
@@ -142,17 +148,22 @@ for (const booklet of BOOKLETS) {
     continue
   }
 
-  convexRun('booklets:clearBooklet', { pdfUploadId })
   // Convex caps a single function argument payload, so a long booklet goes up
-  // in slices rather than as one 200-question blob.
+  // in slices rather than as one 200-question blob. A failed slice throws and
+  // stops the run before `finishBookletLoad`, so nothing is pruned on a partial load.
   for (let start = 0; start < questions.length; start += 20) {
-    convexRun('booklets:insertBookletQuestions', {
+    convexRun('booklets:upsertBookletQuestions', {
       pdfUploadId,
       subjectId: booklet.subjectId,
       questions: questions.slice(start, start + 20),
     })
   }
-  console.log('   ✓ cargado')
+  const finished = convexRun('booklets:finishBookletLoad', {
+    pdfUploadId,
+    questionNumbers: questions.map((question) => question.number),
+    contextKeys,
+  }) as { retiredQuestions?: number } | null
+  console.log(`   ✓ cargado  ·  ${finished?.retiredQuestions ?? 0} retiradas`)
 }
 
 console.log(

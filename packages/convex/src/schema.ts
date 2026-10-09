@@ -8,6 +8,7 @@ import {
   questionAttemptValidator,
   questionDocumentValidator,
   questionGroupDocumentValidator,
+  questionReportDocumentValidator,
   selectionReasonValidator,
   sessionDocumentValidator,
   studentSummaryValidator,
@@ -69,6 +70,8 @@ export default defineSchema(
       // rebuild in `progress.ts`, which deletes and re-inserts its own tables.
       abilityBySubject: v.optional(v.record(v.string(), v.number())),
       abilityAttemptsBySubject: v.optional(v.record(v.string(), v.number())),
+      /** Minutes a week the student means to study (G07); unset until they choose. */
+      weeklyGoalMinutes: v.optional(v.number()),
       createdAt: v.number(),
       updatedAt: v.number(),
       lastSeenAt: v.number(),
@@ -95,7 +98,16 @@ export default defineSchema(
       .index('by_sessionId', ['sessionId'])
       .index('by_studentId_sessionId', ['studentId', 'sessionId'])
       .index('by_sessionQuestionId', ['sessionQuestionId'])
-      .index('by_studentId_questionId', ['studentId', 'questionId']),
+      .index('by_studentId_questionId', ['studentId', 'questionId'])
+      // Every student's answers to one question: the `questionAnswerStats` backfill.
+      .index('by_questionId', ['questionId']),
+    // "% eligió cada opción", a running tally per question (see `answerStats.ts`).
+    questionAnswerStats: defineTable({
+      questionId: v.id('questions'),
+      answerCount: v.number(),
+      optionCounts: v.record(v.string(), v.number()),
+      timeSampleMs: v.array(v.number()),
+    }).index('by_questionId', ['questionId']),
     learnerSubjectAggregates: defineTable(learnerAggregateValidator)
       .index('by_studentId', ['studentId'])
       .index('by_studentId_subjectId', ['studentId', 'subjectId']),
@@ -140,6 +152,18 @@ export default defineSchema(
       .index('by_threadId', ['threadId'])
       .index('by_messageId', ['messageId'])
       .index('by_practiceSessionId', ['practiceSessionId']),
+    // One counter per student, Colombia day and LLM feature (see `llmBudget.ts`).
+    llmUsage: defineTable({
+      studentId: v.id('students'),
+      day: v.number(),
+      feature: v.string(),
+      count: v.number(),
+    }).index('by_studentId_day_feature', ['studentId', 'day', 'feature']),
+    // "Reportar un problema" on a question (see `questionReports.ts`).
+    questionReports: defineTable(questionReportDocumentValidator)
+      .index('by_studentId_questionId', ['studentId', 'questionId'])
+      .index('by_studentId_createdAt', ['studentId', 'createdAt'])
+      .index('by_status_createdAt', ['status', 'createdAt']),
   },
   { schemaValidation: true },
 )

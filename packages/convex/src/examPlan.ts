@@ -1,4 +1,5 @@
 import { colombiaDayNumber } from './colombiaTime'
+import { globalPointsPerWeek } from './globalScore'
 
 /**
  * The exam date, and what it implies about pace.
@@ -114,4 +115,33 @@ export function observedSessionsPerWeek(args: {
     colombiaDayNumber(args.nowMs) - colombiaDayNumber(args.firstActivityMs) + 1,
   )
   return (args.activeDayCount / spanDays) * 7
+}
+
+/**
+ * Gap to the target global score, and whether the student is closing it in
+ * time ("vas a tiempo").
+ *
+ * The verdict feeds `isPaceEnough` with the student's own slope — global points
+ * per week from their weekly estimates — never with an assumed rate. Below three
+ * weekly points there is no slope and therefore no verdict: the gap is shown on
+ * its own. A target already met is on track whatever the slope says.
+ */
+export function targetPace(args: {
+  estimate: number | null
+  target: number | null
+  weeksRemaining: number | null
+  weeklyEstimates: { weekIndex: number; score: number }[]
+}): { gap: number | null; pointsPerWeek: number | null; onTrack: boolean | null } {
+  const gap =
+    args.estimate == null || args.target == null ? null : Math.max(0, args.target - args.estimate)
+  const pointsPerWeek = globalPointsPerWeek(args.weeklyEstimates)
+  const onTrack =
+    gap == null || pointsPerWeek == null || args.weeksRemaining == null
+      ? null
+      : isPaceEnough({
+          pointsNeeded: gap,
+          projectedSessions: args.weeksRemaining,
+          pointsPerSession: pointsPerWeek,
+        })
+  return { gap, pointsPerWeek, onTrack }
 }

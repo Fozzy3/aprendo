@@ -24,13 +24,19 @@ export function useSessionTimer(options: {
   expiresAt?: number | null
   timeLimitMs?: number | null
   onExpire?: () => void
+  /** Fires `onWarn` once when this much time is left (the proctor's "quedan 5 minutos"). */
+  warnBeforeMs?: number
+  onWarn?: () => void
 }): SessionTimerState {
-  const { startedAt, expiresAt, timeLimitMs, onExpire } = options
+  const { startedAt, expiresAt, timeLimitMs, onExpire, warnBeforeMs, onWarn } = options
   const timed = expiresAt != null && timeLimitMs != null
   const [now, setNow] = useState(() => Date.now())
   const hasFiredExpire = useRef(false)
+  const hasFiredWarn = useRef(false)
   const onExpireRef = useRef(onExpire)
   onExpireRef.current = onExpire
+  const onWarnRef = useRef(onWarn)
+  onWarnRef.current = onWarn
 
   useEffect(() => {
     const tick = () => setNow(Date.now())
@@ -49,6 +55,15 @@ export function useSessionTimer(options: {
       onExpireRef.current?.()
     }
   }, [expired])
+
+  const warn = timed && warnBeforeMs != null && remainingMs != null
+    && remainingMs > 0 && remainingMs <= warnBeforeMs
+  useEffect(() => {
+    if (warn && !hasFiredWarn.current) {
+      hasFiredWarn.current = true
+      onWarnRef.current?.()
+    }
+  }, [warn])
 
   return { timed, remainingMs, elapsedMs, expired }
 }

@@ -4,10 +4,18 @@ import { Link, useNavigate } from '@tanstack/react-router'
 import { BookOpen, Check, Lock, Play } from 'lucide-react'
 import { useState } from 'react'
 import { api } from '@aprendo/convex/api'
-import { learningPathQuery, pathSubjectsQuery } from '../lib/student-queries.ts'
+import type { MasteryLevel } from '@aprendo/convex/mastery'
+import { learningPathQuery, pathSubjectsQuery, studentProgressQuery } from '../lib/student-queries.ts'
 import { getSubjectTheme } from '../lib/subject-theme.ts'
-import { getSyllabusStatus } from '../lib/syllabus-status.ts'
+import {
+  levelFor,
+  masteryLevelMap,
+  resolvePathStates,
+  scopeMastery,
+  type PathState,
+} from '../lib/mastery-display.ts'
 import { MascotMessage } from './Mascot.tsx'
+import { MasteryBadge, MasteryLegend } from './MasteryBadge.tsx'
 
 const DEFAULT_SUBJECT_ID = 'lectura_critica'
 
@@ -16,18 +24,15 @@ type PathNode = {
   label: string
   categoryLabel: string
   questionCount: number
-  attemptCount: number
-  mastery: number | null
   hasLesson: boolean
+  level: MasteryLevel
 }
-
-/** Where the student is on the path: the first node that isn't mastered yet. */
-type NodeState = 'mastered' | 'current' | 'available' | 'locked'
 
 export function LearningPathPage({ studentId }: { studentId: string }) {
   const [subjectId, setSubjectId] = useState(DEFAULT_SUBJECT_ID)
   const subjects = useQuery(pathSubjectsQuery(studentId))
   const path = useQuery(learningPathQuery(studentId, subjectId))
+  const progress = useQuery(studentProgressQuery(studentId))
 
   const theme = getSubjectTheme(subjectId)
 
@@ -65,13 +70,13 @@ export function LearningPathPage({ studentId }: { studentId: string }) {
         })}
       </div>
 
-      {path.data == null ? (
+      {path.data == null || progress.data == null ? (
         <div className="h-64 animate-pulse rounded-[var(--radius-lg)] bg-[var(--bg-inset)]" />
       ) : (
         <>
           <LevelHeader level={path.data.level} color={theme.color} />
           <PathTrack
-            nodes={path.data.nodes}
+            nodes={withLevels(path.data.nodes, progress.data.subtopicMastery)}
             studentId={studentId}
             subjectColor={theme.color}
           />
@@ -79,6 +84,14 @@ export function LearningPathPage({ studentId }: { studentId: string }) {
       )}
     </div>
   )
+}
+
+function withLevels(
+  nodes: Omit<PathNode, 'level'>[],
+  subtopicMastery: { subtopicId: string; masteryLevel: MasteryLevel }[],
+): PathNode[] {
+  const levels = masteryLevelMap(subtopicMastery)
+  return nodes.map((node) => ({ ...node, level: levelFor(levels, node.subtopicId) }))
 }
 
 type SubjectLevel = {
@@ -149,39 +162,6 @@ function LevelHeader({ level, color }: { level: SubjectLevel; color: string }) {
   )
 }
 
-/**
- * A node is locked until the one before it is mastered, so the path reads as a
- * route rather than a list. Mastery bands come from `syllabus-status.ts`, shared
- * with the Temario and Progreso.
- */
-function resolveStates(nodes: PathNode[]): NodeState[] {
-  let previousMastered = true
-  let currentAssigned = false
-
-  return nodes.map((node) => {
-    const status = getSyllabusStatus({
-      questionCount: node.questionCount,
-      attemptCount: node.attemptCount,
-      mastery: node.mastery,
-    })
-
-    if (status.status === 'mastered') {
-      previousMastered = true
-      return 'mastered'
-    }
-
-    const unlocked = previousMastered
-    previousMastered = false
-
-    if (!unlocked) return 'locked'
-    if (!currentAssigned) {
-      currentAssigned = true
-      return 'current'
-    }
-    return 'available'
-  })
-}
-
 function PathTrack({
   nodes,
   studentId,
@@ -191,7 +171,8 @@ function PathTrack({
   studentId: string
   subjectColor: string
 }) {
-  const states = resolveStates(nodes)
+  const states = resolvePathStates(nodes)
+  const mastery = scopeMastery(nodes)
 
   if (nodes.length === 0) {
     return (
@@ -205,18 +186,32 @@ function PathTrack({
   }
 
   return (
-    <ol className="fade-in stagger-3 relative m-0 flex list-none flex-col gap-3 p-0">
-      {nodes.map((node, index) => (
-        <PathNodeRow
-          key={node.subtopicId}
-          node={node}
-          state={states[index] ?? 'locked'}
-          studentId={studentId}
-          subjectColor={subjectColor}
-          isLast={index === nodes.length - 1}
-        />
-      ))}
-    </ol>
+    <>
+      <section className="fade-in stagger-3 card mb-4 p-4">
+        <div className="mb-3 flex flex-wrap items-baseline justify-between gap-2">
+          <p className="text-sm font-bold text-[var(--text-primary)]">
+            Dominio del área: <span className="tabular-nums">{mastery.percent}%</span>
+          </p>
+          <p className="text-xs tabular-nums text-[var(--text-tertiary)]">
+            {mastery.points} / {mastery.maxPoints} pts · {mastery.competenteOrAbove} de{' '}
+            {mastery.subtopicCount} temas en Competente o más
+          </p>
+        </div>
+        <MasteryLegend />
+      </section>
+      <ol className="fade-in stagger-3 relative m-0 flex list-none flex-col gap-3 p-0">
+        {nodes.map((node, index) => (
+          <PathNodeRow
+            key={node.subtopicId}
+            node={node}
+            state={states[index] ?? 'locked'}
+            studentId={studentId}
+            subjectColor={subjectColor}
+            isLast={index === nodes.length - 1}
+          />
+        ))}
+      </ol>
+    </>
   )
 }
 
@@ -228,7 +223,7 @@ function PathNodeRow({
   isLast,
 }: {
   node: PathNode
-  state: NodeState
+  state: PathState
   studentId: string
   subjectColor: string
   isLast: boolean
@@ -242,6 +237,7 @@ function PathNodeRow({
   })
 
   const isLocked = state === 'locked'
+  const isEmpty = state === 'empty'
   const hasQuestions = node.questionCount > 0
   const isCurrent = state === 'current'
 
@@ -263,7 +259,7 @@ function PathNodeRow({
           className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border-2"
           style={{
             background: state === 'mastered' ? subjectColor : 'var(--bg-card)',
-            borderColor: isLocked ? 'var(--border-strong)' : subjectColor,
+            borderColor: isLocked || isEmpty ? 'var(--border-strong)' : subjectColor,
             color: state === 'mastered' ? 'var(--text-inverted)' : subjectColor,
             boxShadow: isCurrent ? `0 3px 0 ${subjectColor}` : undefined,
           }}
@@ -272,6 +268,8 @@ function PathNodeRow({
             <Check size={18} />
           ) : isLocked ? (
             <Lock size={16} />
+          ) : isEmpty ? (
+            <BookOpen size={16} />
           ) : (
             <Play size={16} />
           )}
@@ -281,11 +279,16 @@ function PathNodeRow({
           <p className="text-[0.68rem] font-bold uppercase tracking-wide text-[var(--text-tertiary)]">
             {node.categoryLabel}
           </p>
-          <p className="text-sm font-bold text-[var(--text-primary)]">{node.label}</p>
+          <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+            <p className="text-sm font-bold text-[var(--text-primary)]">{node.label}</p>
+            <MasteryBadge level={node.level} />
+          </div>
           <p className="mt-0.5 text-xs text-[var(--text-tertiary)]">
             {isCurrent && 'Estás aquí · '}
-            {hasQuestions ? `${node.questionCount} preguntas` : 'Sin preguntas aún'}
-            {node.mastery != null && ` · ${Math.round(node.mastery * 100)}% de dominio`}
+            {hasQuestions
+              ? `${node.questionCount} preguntas`
+              : 'Sin preguntas aún: no bloquea tu ruta'}
+            {isLocked && ' · se abre cuando llegues a Familiar en el tema anterior'}
           </p>
 
           {!isLocked && (

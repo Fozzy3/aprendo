@@ -5,9 +5,11 @@ import type { FunctionReturnType } from 'convex/server'
 import { BookOpen, ChevronRight, Play } from 'lucide-react'
 import { useState } from 'react'
 import { api } from '@aprendo/convex/api'
+import type { MasteryLevel } from '@aprendo/convex/mastery'
+import { MasteryBadge, MasteryLegend } from './MasteryBadge.tsx'
 import { RingProgress } from './RingProgress.tsx'
-import { syllabusQuery } from '../lib/student-queries.ts'
-import { formatMasteryPercent, getSyllabusStatus } from '../lib/syllabus-status.ts'
+import { studentProgressQuery, syllabusQuery } from '../lib/student-queries.ts'
+import { levelFor, masteryLevelMap, scopeMastery, subjectSubtopics } from '../lib/mastery-display.ts'
 import { PageLoader } from '../components/FullScreenLoader.tsx'
 import { readConvexError } from '../lib/convex-error.ts'
 
@@ -17,20 +19,10 @@ type SyllabusData = FunctionReturnType<typeof api.syllabus.getSyllabus>
 type SubjectNode = SyllabusData['subjects'][number]
 type SubtopicNode = SubjectNode['categories'][number]['subtopics'][number]
 
-function MasteryBar({ value, color }: { value: number | null; color: string }) {
-  return (
-    <div className="h-1.5 w-full overflow-hidden rounded-full bg-[var(--bg-inset)]">
-      <div
-        className="h-full rounded-full transition-[width] duration-500"
-        style={{ width: `${Math.round((value ?? 0) * 100)}%`, background: color }}
-      />
-    </div>
-  )
-}
-
 export function SyllabusPage({ studentId }: { studentId: string }) {
   const navigate = useNavigate()
   const syllabus = useQuery({ ...syllabusQuery(studentId), enabled: true })
+  const progress = useQuery({ ...studentProgressQuery(studentId), enabled: true })
 
   const [selectedSubjectId, setSelectedSubjectId] = useState<string | null>(null)
 
@@ -43,7 +35,7 @@ export function SyllabusPage({ studentId }: { studentId: string }) {
     },
   })
 
-  if (syllabus.isPending) {
+  if (syllabus.isPending || progress.isPending) {
     return (
       <PageLoader message="Cargando el temario…" />
     )
@@ -51,7 +43,9 @@ export function SyllabusPage({ studentId }: { studentId: string }) {
 
   const data = syllabus.data
   const subjects = data?.subjects ?? []
-  const overallMastery = data?.overallMastery ?? null
+  // Khan levels per subtopic; % and points add them up over what can be practised.
+  const levels = masteryLevelMap(progress.data?.subtopicMastery ?? [])
+  const courseMastery = scopeMastery(subjects.flatMap((subject) => subjectSubtopics(subject, levels)))
   const activeSubjectId = selectedSubjectId ?? subjects[0]?.id ?? null
   const activeSubject = subjects.find((subject) => subject.id === activeSubjectId) ?? null
 
@@ -69,12 +63,18 @@ export function SyllabusPage({ studentId }: { studentId: string }) {
               Explora cada tema, mira tu dominio y practica justo donde lo necesitas.
             </p>
           </div>
-          <div className="hidden text-right sm:block">
+          <div className="shrink-0 text-right">
             <p className="text-2xl font-semibold tabular-nums tracking-tight text-[var(--text-primary)]">
-              {formatMasteryPercent(overallMastery)}
+              {courseMastery.percent}%
             </p>
             <p className="text-xs font-medium text-[var(--text-tertiary)]">tu dominio</p>
+            <p className="text-[0.6875rem] tabular-nums text-[var(--text-tertiary)]">
+              {courseMastery.points} / {courseMastery.maxPoints} pts
+            </p>
           </div>
+        </div>
+        <div className="relative mt-4 border-t border-[var(--border)] pt-3">
+          <MasteryLegend />
         </div>
       </div>
 
@@ -99,7 +99,7 @@ export function SyllabusPage({ studentId }: { studentId: string }) {
                   isActive ? 'text-[var(--text-inverted)]' : 'text-[var(--text-tertiary)]'
                 }`}
               >
-                {formatMasteryPercent(subject.mastery)}
+                {scopeMastery(subjectSubtopics(subject, levels)).percent}%
               </span>
             </button>
           )
@@ -113,6 +113,7 @@ export function SyllabusPage({ studentId }: { studentId: string }) {
       ) : (
         <SubjectPanel
           subject={activeSubject}
+          levels={levels}
           startMutation={startMutation}
         />
       )}
@@ -128,39 +129,33 @@ export function SyllabusPage({ studentId }: { studentId: string }) {
 
 function SubjectPanel({
   subject,
+  levels,
   startMutation,
 }: {
   subject: SubjectNode
+  levels: Map<string, MasteryLevel>
   startMutation: ReturnType<
     typeof useMutation<string, Error, { subjectId: string; subtopicId: string }>
   >
 }) {
-  const subjectStatus = getSyllabusStatus({
-    questionCount: subject.questionCount,
-    attemptCount: subject.attemptCount,
-    mastery: subject.mastery,
-  })
+  const mastery = scopeMastery(subjectSubtopics(subject, levels))
 
   return (
     <div className="card overflow-hidden">
       <div className="flex items-center gap-4 border-b border-[var(--border)] px-5 py-4">
         <div className="relative shrink-0">
-          <RingProgress value={subject.mastery ?? 0} size={52} strokeWidth={6} color={subjectStatus.color} />
+          <RingProgress value={mastery.percent / 100} size={52} strokeWidth={6} color="var(--accent)" />
           <span className="absolute inset-0 flex items-center justify-center text-xs font-bold tabular-nums text-[var(--text-primary)]">
-            {formatMasteryPercent(subject.mastery)}
+            {mastery.percent}%
           </span>
         </div>
         <div className="min-w-0 flex-1">
           <h3 className="font-display text-xl italic text-[var(--text-primary)]">{subject.label}</h3>
           <p className="text-xs text-[var(--text-tertiary)]">
-            {subject.questionCount} {subject.questionCount === 1 ? 'pregunta' : 'preguntas'} disponibles
+            {mastery.points} / {mastery.maxPoints} pts · {mastery.competenteOrAbove} de{' '}
+            {mastery.subtopicCount} temas en Competente o más
           </p>
         </div>
-        <span
-          className={`shrink-0 rounded-full border px-2.5 py-0.5 text-[0.6875rem] font-semibold ${subjectStatus.tone}`}
-        >
-          {subjectStatus.label}
-        </span>
       </div>
 
       <div className="divide-y divide-[var(--border)]">
@@ -173,6 +168,7 @@ function SubjectPanel({
                   key={subtopic.id}
                   subjectId={subject.id}
                   subtopic={subtopic}
+                  level={levelFor(levels, subtopic.id)}
                   startMutation={startMutation}
                 />
               ))}
@@ -187,19 +183,16 @@ function SubjectPanel({
 function SubtopicRow({
   subjectId,
   subtopic,
+  level,
   startMutation,
 }: {
   subjectId: string
   subtopic: SubtopicNode
+  level: MasteryLevel
   startMutation: ReturnType<
     typeof useMutation<string, Error, { subjectId: string; subtopicId: string }>
   >
 }) {
-  const status = getSyllabusStatus({
-    questionCount: subtopic.questionCount,
-    attemptCount: subtopic.attemptCount,
-    mastery: subtopic.mastery,
-  })
   const canPractice = subtopic.questionCount > 0
   const isStarting =
     startMutation.isPending && startMutation.variables?.subtopicId === subtopic.id
@@ -207,7 +200,7 @@ function SubtopicRow({
   return (
     <div className="flex items-center gap-3.5 rounded-[var(--radius-md)] px-2.5 py-2.5 transition-colors hover:bg-[var(--bg-inset)]">
       <div className="min-w-0 flex-1">
-        <div className="mb-1.5 flex items-center gap-2">
+        <div className="mb-1.5 flex min-w-0 items-center gap-2">
           <Link
             to="/lesson/$subtopicId"
             params={{ subtopicId: subtopic.id }}
@@ -224,20 +217,8 @@ function SubtopicRow({
               <BookOpen size={10} /> Lección
             </span>
           ) : null}
-          <span
-            className={`shrink-0 rounded-full border px-2 py-0.5 text-[0.625rem] font-semibold ${status.tone}`}
-          >
-            {status.label}
-          </span>
         </div>
-        <div className="flex items-center gap-2.5">
-          <div className="max-w-[14rem] flex-1">
-            <MasteryBar value={subtopic.mastery} color={status.color} />
-          </div>
-          <span className="shrink-0 text-[0.6875rem] font-semibold tabular-nums text-[var(--text-tertiary)]">
-            {formatMasteryPercent(subtopic.mastery)}
-          </span>
-        </div>
+        <MasteryBadge level={level} />
       </div>
 
       {canPractice ? (

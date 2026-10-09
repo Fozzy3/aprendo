@@ -1,8 +1,8 @@
 import { internal } from './_generated/api'
-import { mutation, query, type MutationCtx, type QueryCtx } from './_generated/server'
+import { internalMutation, mutation, query, type MutationCtx, type QueryCtx } from './_generated/server'
 import { ConvexError, v } from 'convex/values'
 import type { Doc, Id } from './_generated/dataModel'
-import { assertOwnsStudent } from './auth'
+import { assertOwnsStudent, requireAuthenticatedStudentId } from './auth'
 import { SUBJECT_IDS, getSubjectIdForSubtopic, getSubjectLabel } from './taxonomy'
 import {
   getSimulacroSubjectTarget,
@@ -21,9 +21,61 @@ import {
   hasUsableMetadata,
   isInEligibilityPool,
 } from './questionPool'
-import { confidenceLevelValidator, sessionKindValidator } from './validators'
+import {
+  confidenceLevelValidator,
+  feedbackModeValidator,
+  practiceDifficultyValidator,
+  practiceSourceValidator,
+  sessionKindValidator,
+} from './validators'
 import { DEFAULT_RATING, updateRatings } from './elo'
 import { classifyAttempt, reviewPriority, type ConfidenceLevel } from './confidence'
+import {
+  COMPLETION_GRACE_MS,
+  canCheckAnswers,
+  canRevealAnswers,
+  canRevealQuestion,
+  canRevealSessionQuestion,
+  canSettleSession,
+  isOutsideLiveExam,
+  isPastDeadline,
+  sealAttempt,
+  sealQuestion,
+  sealsItsQuestions,
+  settledAttempts,
+} from './sessionIntegrity'
+import { pickSimulacroForm, scoreSimulacroSubjects } from './simulacroForm'
+import { accumulateQuestionTime, officialMsPerQuestion, questionTimeMs } from './pacing'
+import {
+  buildNivelacionResult,
+  buildSimulacroReport,
+  isFirstPlacement,
+  latestSimulacroExam,
+  resolveSimulacroExam,
+  type ReportItem,
+} from './examReport'
+import { orderByDesirableDifficulty } from './adaptive'
+import {
+  RETO_QUESTIONS_PER_SUBTOPIC,
+  RETO_SUBTOPIC_COUNT,
+  interleaveBlocks,
+  masteryContext,
+  masteryLevelOf,
+  nextMasteryLevel,
+  orderRetoCandidates,
+  revealedQuestionIds,
+  type SubtopicEvidence,
+} from './mastery'
+import {
+  MAX_PRACTICE_QUESTIONS,
+  filterPracticeQuestions,
+  practiceBuilderCounts,
+  practiceCountError,
+  resolvePracticeScope,
+  type PracticeFilters,
+  type PracticeHistory,
+} from './practiceBuilder'
+import { addToTally, countsTowardStats, summarizeAnswerStats, tallyAnswers } from './answerStats'
 
 type SelectionReason =
   | 'balanced_diagnostic'
@@ -39,6 +91,9 @@ type Selection = {
   selectionReason: SelectionReason
   selectionMetadata: string
 }
+
+/** Whether a new session may take a question: false for a live exam's items (`loadLiveExamSeal`). */
+type IsFree = (question: Doc<'questions'>) => boolean
 
 function stableQuestionOrder<T extends { _creationTime: number; sequence: number }>(questions: T[]) {
   return [...questions].sort((a, b) => {
@@ -76,6 +131,7 @@ function recommendationSourceForKind(kind: SessionKind) {
     case 'nivelacion':
       return 'diagnostic_plan' as const
     case 'topic':
+    case 'personalizada':
       return 'manual' as const
     case 'repaso':
       return 'review_mistakes' as const
@@ -92,6 +148,7 @@ function recommendationSourceForKind(kind: SessionKind) {
 async function selectBalancedBySubject(
   ctx: QueryCtx,
   config: SessionKindConfig,
+  isFree: IsFree,
 ): Promise<Selection[]> {
   const perSubject = config.questionsPerSubject ?? 4
   const reason: SelectionReason =
@@ -100,7 +157,7 @@ async function selectBalancedBySubject(
 
   for (const subjectId of SUBJECT_IDS) {
     const pooled = await collectUsableQuestionsBySubject(ctx, subjectId, config.eligibilityPools)
-    const ordered = stableQuestionOrder(pooled)
+    const ordered = stableQuestionOrder(pooled.filter(isFree))
     const usable = await expandToGroups(ctx, ordered, ordered, perSubject)
     for (const question of usable) {
       selected.push({ questionId: question._id, selectionReason: reason, selectionMetadata: subjectId })
@@ -110,25 +167,69 @@ async function selectBalancedBySubject(
   return selected
 }
 
-async function selectSubjectTargets(
+/**
+ * A simulacro form for this student (see `simulacroForm.ts`): never-shown
+ * questions first, then least recently shown, seeded by student and attempt.
+ * Sesión 2 of the full exam never repeats the latest Sesión 1.
+ *
+ * ponytail: reads every past session's items to know what was shown — a few
+ * thousand rows for a heavy user. If that grows, keep a per-student "seen"
+ * table instead.
+ */
+async function selectSimulacroForm(
   ctx: QueryCtx,
   config: SessionKindConfig,
+  studentId: Id<'students'>,
   subjectTargets: SubjectQuestionTarget[],
-  reason: SelectionReason,
+  simulacroSessionNumber: number | undefined,
+  isFree: IsFree,
 ): Promise<Selection[]> {
-  const selected: Selection[] = []
+  const pastSessions = await ctx.db
+    .query('sessions')
+    .withIndex('by_studentId', (q) => q.eq('studentId', studentId))
+    .collect()
+  const latestSesion1 = simulacroSessionNumber === 2
+    ? pastSessions
+        .filter((session) =>
+          session.kind === 'simulacro'
+          && session.subjectId == null
+          && session.simulacroSessionNumber === 1)
+        .sort((a, b) => b.startedAt - a.startedAt)[0]
+    : undefined
 
+  // "Seen" means shown, not answered: the review of a completed session
+  // discloses every key, the unanswered questions' included.
+  const lastSeenAt = new Map<string, number>()
+  const exclude = new Set<string>()
+  for (const session of pastSessions) {
+    const items = await ctx.db
+      .query('sessionQuestions')
+      .withIndex('by_sessionId', (q) => q.eq('sessionId', session._id))
+      .collect()
+    for (const item of items) {
+      lastSeenAt.set(item.questionId, Math.max(lastSeenAt.get(item.questionId) ?? 0, session.startedAt))
+      if (session._id === latestSesion1?._id) exclude.add(item.questionId)
+    }
+  }
+  const attemptNumber = pastSessions.filter((session) => session.kind === 'simulacro').length + 1
+  const seed = `${studentId}:${attemptNumber}`
+
+  const selected: Selection[] = []
   for (const target of subjectTargets) {
     const pooled = await collectUsableQuestionsBySubject(ctx, target.subjectId, config.eligibilityPools)
-    const ordered = stableQuestionOrder(pooled)
-    // Whole groups only, and the target counts MEMBERS — a Lectura Crítica
-    // simulacro is mostly shared-text questions, so splitting groups here would
-    // reproduce the exact bug this fixes.
-    const usable = await expandToGroups(ctx, ordered, ordered, target.questionCount)
-    for (const question of usable) {
+    // The target counts MEMBERS and groups stay whole — a Lectura Crítica
+    // simulacro is mostly shared-text questions.
+    const form = pickSimulacroForm({
+      questions: stableQuestionOrder(pooled.filter(isFree)),
+      limit: target.questionCount,
+      seed,
+      lastSeenAt,
+      exclude,
+    })
+    for (const question of form) {
       selected.push({
         questionId: question._id,
-        selectionReason: reason,
+        selectionReason: 'balanced_coverage',
         selectionMetadata: target.subjectId,
       })
     }
@@ -177,13 +278,14 @@ async function selectTopic(
   studentId: Id<'students'>,
   subjectId: string,
   subtopicId: string | undefined,
+  isFree: IsFree,
 ): Promise<Selection[]> {
   const total = config.totalQuestions ?? 10
 
   const pooled = subtopicId != null
     ? await collectUsableQuestionsBySubtopic(ctx, subtopicId, config.eligibilityPools)
     : await collectUsableQuestionsBySubject(ctx, subjectId, config.eligibilityPools)
-  const usable = stableQuestionOrder(pooled)
+  const usable = stableQuestionOrder(pooled.filter(isFree))
 
   const attempts = await ctx.db
     .query('questionAttempts')
@@ -191,9 +293,15 @@ async function selectTopic(
     .collect()
   const seen = new Set(attempts.map((attempt) => attempt.questionId))
 
+  // Topic practice aims at ~70% expected success (`adaptive.ts`). Nivelación
+  // shares this strategy but measures: it keeps the plain bank order.
+  const student = await ctx.db.get('students', studentId)
+  const adapt = (list: Doc<'questions'>[]) =>
+    config.kind === 'topic' ? orderByDesirableDifficulty(list, student?.abilityBySubject) : list
+
   // Prefer unseen questions, then fall back to already-seen ones to fill.
-  const unseen = usable.filter((question) => !seen.has(question._id))
-  const seenOnly = usable.filter((question) => seen.has(question._id))
+  const unseen = adapt(usable.filter((question) => !seen.has(question._id)))
+  const seenOnly = adapt(usable.filter((question) => seen.has(question._id)))
   // A grouped question comes with its siblings even if some were already seen —
   // the alternative is a question whose text the student can't read.
   const ordered = await expandToGroups(ctx, [...unseen, ...seenOnly], usable, total)
@@ -210,6 +318,7 @@ async function selectRecommended(
   ctx: QueryCtx,
   config: SessionKindConfig,
   studentId: Id<'students'>,
+  isFree: IsFree,
 ): Promise<Selection[]> {
   const total = config.totalQuestions ?? 10
 
@@ -225,6 +334,7 @@ async function selectRecommended(
       (question) =>
         isInEligibilityPool(question, config.eligibilityPools)
         && hasUsableMetadata(question)
+        && isFree(question)
         && !attemptedQuestionIds.has(question._id),
     ),
   )
@@ -251,12 +361,14 @@ async function selectRecommended(
     { selectionReason: SelectionReason; selectionMetadata: string }
   >()
 
+  // Within each step, the questions closest to ~70% expected success first.
+  const student = await ctx.db.get('students', studentId)
   const fill = (
     candidates: Doc<'questions'>[],
     selectionReason: SelectionReason,
     selectionMetadata: string,
   ) => {
-    for (const question of stableQuestionOrder(candidates)) {
+    for (const question of orderByDesirableDifficulty(stableQuestionOrder(candidates), student?.abilityBySubject)) {
       if (candidateOrder.length >= total) return
       if (selectedIds.has(question._id)) continue
       candidateOrder.push(question)
@@ -334,10 +446,19 @@ async function collectDueReviewQuestions(
   studentId: Id<'students'>,
   eligibilityPools: QuestionEligibilityPool[],
 ): Promise<Doc<'questions'>[]> {
-  const attempts = await ctx.db
-    .query('questionAttempts')
+  // Only finished sittings count: a miss in an open simulacro showing up here
+  // would grade it answer by answer, and a repaso would then reveal the key.
+  const sessions = await ctx.db
+    .query('sessions')
     .withIndex('by_studentId', (q) => q.eq('studentId', studentId))
     .collect()
+  const attempts = settledAttempts(
+    await ctx.db
+      .query('questionAttempts')
+      .withIndex('by_studentId', (q) => q.eq('studentId', studentId))
+      .collect(),
+    sessions,
+  )
 
   const latestByQuestion = new Map<
     Id<'questions'>,
@@ -350,7 +471,7 @@ async function collectDueReviewQuestions(
       latestByQuestion.set(attempt.questionId, {
         isCorrect: attempt.isCorrect,
         answeredAt: attempt.answeredAt,
-        confidence: attempt.confidence as ConfidenceLevel | undefined,
+        confidence: attempt.confidence,
       })
     }
   }
@@ -379,7 +500,7 @@ async function collectDueReviewQuestions(
 
   const due: Doc<'questions'>[] = []
   for (const questionId of dueQuestionIds) {
-    const question = await ctx.db.get(questionId)
+    const question = await ctx.db.get('questions', questionId)
     if (question == null || !hasUsableMetadata(question) || !isInEligibilityPool(question, eligibilityPools)) {
       continue
     }
@@ -393,15 +514,212 @@ async function selectReviewMistakes(
   ctx: QueryCtx,
   config: SessionKindConfig,
   studentId: Id<'students'>,
+  isFree: IsFree,
 ): Promise<Selection[]> {
   const total = config.totalQuestions ?? 10
-  const due = await collectDueReviewQuestions(ctx, studentId, config.eligibilityPools)
+  const due = (await collectDueReviewQuestions(ctx, studentId, config.eligibilityPools)).filter(isFree)
   const ordered = await expandToGroups(ctx, due, due, total)
 
   return ordered.map((question) => ({
     questionId: question._id,
     selectionReason: 'recent_mistake' as const,
     selectionMetadata: question.primarySubtopicId ?? question.subjectId ?? 'review',
+  }))
+}
+
+/**
+ * "Reintentar las incorrectas": the misses and blanks of one completed session
+ * the student owns, in its order, groups kept whole among them.
+ */
+async function selectRetryMistakes(
+  ctx: QueryCtx,
+  config: SessionKindConfig,
+  studentId: Id<'students'>,
+  sourceSessionId: Id<'sessions'>,
+  isFree: IsFree,
+): Promise<Selection[]> {
+  const source = await ctx.db.get('sessions', sourceSessionId)
+  if (source == null || source.studentId !== studentId) {
+    throw new ConvexError('No encontramos esa sesión.')
+  }
+  // Its grades are sealed until it ends: "which ones did I miss" is the key.
+  if (!canRevealAnswers(source)) {
+    throw new ConvexError('Termina esa sesión antes de reintentar sus incorrectas.')
+  }
+  const [sessionQuestions, attempts] = await Promise.all([
+    ctx.db
+      .query('sessionQuestions')
+      .withIndex('by_sessionId_position', (q) => q.eq('sessionId', sourceSessionId))
+      .collect(),
+    ctx.db
+      .query('questionAttempts')
+      .withIndex('by_sessionId', (q) => q.eq('sessionId', sourceSessionId))
+      .collect(),
+  ])
+  const correctIds = new Set(
+    attempts.filter((attempt) => attempt.isCorrect === true).map((attempt) => attempt.sessionQuestionId),
+  )
+  const missed: Doc<'questions'>[] = []
+  for (const sessionQuestion of sessionQuestions) {
+    if (correctIds.has(sessionQuestion._id)) continue
+    const question = await ctx.db.get('questions', sessionQuestion.questionId)
+    if (question == null || !hasUsableMetadata(question) || !isInEligibilityPool(question, config.eligibilityPools)) {
+      continue
+    }
+    missed.push(question)
+  }
+  if (missed.length === 0) {
+    throw new ConvexError('No fallaste ninguna pregunta en esa sesión.')
+  }
+  const free = missed.filter(isFree)
+  if (free.length === 0) {
+    throw new ConvexError('Esas preguntas están en un examen o reto que tienes en curso. Termínalo primero.')
+  }
+  const ordered = await expandToGroups(ctx, free, free, MAX_PRACTICE_QUESTIONS)
+  return ordered.map((question) => ({
+    questionId: question._id,
+    selectionReason: 'recent_mistake' as const,
+    selectionMetadata: question.primarySubtopicId ?? question.subjectId ?? 'review',
+  }))
+}
+
+/** The usable questions of a builder scope: its subtopics, its area, or the whole bank. */
+async function loadPracticeBank(
+  ctx: QueryCtx,
+  scope: { subjectId: string | null; subtopicIds: string[] | null },
+  pools: QuestionEligibilityPool[],
+): Promise<Doc<'questions'>[]> {
+  if (scope.subtopicIds != null) {
+    const bySubtopic = await Promise.all(
+      scope.subtopicIds.map((subtopicId) => collectUsableQuestionsBySubtopic(ctx, subtopicId, pools)),
+    )
+    return stableQuestionOrder(bySubtopic.flat())
+  }
+  if (scope.subjectId != null) {
+    return stableQuestionOrder(await collectUsableQuestionsBySubject(ctx, scope.subjectId, pools))
+  }
+  const all = await ctx.db.query('questions').collect()
+  return stableQuestionOrder(
+    all.filter((question) => isInEligibilityPool(question, pools) && hasUsableMetadata(question)),
+  )
+}
+
+/**
+ * What the builder's source filter reads. "Vista" is any attempt row: visiting
+ * a question writes one (`recordQuestionTime`), as `selectTopic` counts it.
+ * "Fallada" is a latest settled answer that was wrong — an open sitting's
+ * grades stay sealed (`settledAttempts`).
+ */
+async function loadPracticeHistory(ctx: QueryCtx, studentId: Id<'students'>): Promise<PracticeHistory> {
+  const [attempts, sessions] = await Promise.all([
+    ctx.db
+      .query('questionAttempts')
+      .withIndex('by_studentId', (q) => q.eq('studentId', studentId))
+      .collect(),
+    ctx.db
+      .query('sessions')
+      .withIndex('by_studentId', (q) => q.eq('studentId', studentId))
+      .collect(),
+  ])
+  const latest = new Map<string, { answeredAt: number; isCorrect: boolean }>()
+  for (const attempt of settledAttempts(attempts, sessions)) {
+    if (attempt.answeredAt == null || attempt.isCorrect == null) continue
+    const previous = latest.get(attempt.questionId)
+    if (previous == null || attempt.answeredAt > previous.answeredAt) {
+      latest.set(attempt.questionId, { answeredAt: attempt.answeredAt, isCorrect: attempt.isCorrect })
+    }
+  }
+  return {
+    seen: new Set(attempts.map((attempt) => attempt.questionId)),
+    wrong: new Set([...latest].filter(([, entry]) => !entry.isCorrect).map(([questionId]) => questionId)),
+    flagged: new Set(attempts.filter((attempt) => attempt.flagged === true).map((attempt) => attempt.questionId)),
+  }
+}
+
+type PracticeRequest = PracticeFilters & { count: number; timed: boolean }
+
+/** "Práctica a tu medida" (see `practiceBuilder.ts`): unseen first, groups whole. */
+async function selectCustom(
+  ctx: QueryCtx,
+  config: SessionKindConfig,
+  studentId: Id<'students'>,
+  practice: PracticeRequest,
+  isFree: IsFree,
+): Promise<Selection[]> {
+  const scope = resolvePracticeScope(practice)
+  if ('error' in scope) throw new ConvexError(scope.error)
+  const bank = (await loadPracticeBank(ctx, scope, config.eligibilityPools)).filter(isFree)
+  const history = await loadPracticeHistory(ctx, studentId)
+  const matching = filterPracticeQuestions(bank, practice, history)
+  if (matching.length < practice.count) {
+    const available = matching.length
+    throw new ConvexError({
+      code: 'not_enough_questions',
+      available,
+      message: available === 0
+        ? 'No hay preguntas con esos filtros. Prueba con otros.'
+        : `Solo hay ${available} ${available === 1 ? 'pregunta' : 'preguntas'} con esos filtros: elige menos o cambia los filtros.`,
+    })
+  }
+  const ordered = await expandToGroups(
+    ctx,
+    [
+      ...matching.filter((question) => !history.seen.has(question._id)),
+      ...matching.filter((question) => history.seen.has(question._id)),
+    ],
+    matching,
+    practice.count,
+  )
+  if (ordered.length === 0) throw new ConvexError('No hay preguntas con esos filtros. Prueba con otros.')
+  return ordered.map((question) => ({
+    questionId: question._id,
+    selectionReason: 'topic_focus' as const,
+    selectionMetadata: question.primarySubtopicId ?? question.subjectId ?? 'personalizada',
+  }))
+}
+
+/**
+ * Khan's Mastery Challenge: two unseen questions from each of three practiced
+ * subtopics (`orderRetoCandidates`), interleaved so it is mixed. Never a seen
+ * one: its key was shown in a review, and a reto of known keys would promote.
+ */
+async function selectReto(
+  ctx: QueryCtx,
+  config: SessionKindConfig,
+  studentId: Id<'students'>,
+  isFree: IsFree,
+): Promise<Selection[]> {
+  const [aggregates, attempts] = await Promise.all([
+    ctx.db
+      .query('learnerSubtopicAggregates')
+      .withIndex('by_studentId', (q) => q.eq('studentId', studentId))
+      .collect(),
+    ctx.db
+      .query('questionAttempts')
+      .withIndex('by_studentId', (q) => q.eq('studentId', studentId))
+      .collect(),
+  ])
+  const seen = new Set<string>(attempts.map((attempt) => attempt.questionId))
+
+  const blocks: Doc<'questions'>[][] = []
+  for (const candidate of orderRetoCandidates(aggregates)) {
+    if (blocks.length === RETO_SUBTOPIC_COUNT) break
+    if (candidate.subtopicId == null) continue
+    const pool = stableQuestionOrder(
+      (await collectUsableQuestionsBySubtopic(ctx, candidate.subtopicId, config.eligibilityPools)).filter(isFree),
+    )
+    const unseen = pool.filter((question) => !seen.has(question._id))
+    const picked = await expandToGroups(ctx, unseen, unseen, RETO_QUESTIONS_PER_SUBTOPIC)
+    if (picked.length === RETO_QUESTIONS_PER_SUBTOPIC) blocks.push(picked)
+  }
+  if (blocks.length < RETO_SUBTOPIC_COUNT) {
+    throw new ConvexError('Practica al menos tres subtemas antes del reto de dominio.')
+  }
+
+  return interleaveBlocks(blocks).map((question) => ({
+    questionId: question._id,
+    selectionReason: 'reinforcement' as const,
+    selectionMetadata: question.primarySubtopicId ?? 'reto',
   }))
 }
 
@@ -412,38 +730,51 @@ async function buildSelection(
   subjectId: string | undefined,
   subtopicId: string | undefined,
   simulacroSessionNumber: number | undefined,
+  isFree: IsFree,
+  extra: { retryFromSessionId?: Id<'sessions'>; practice?: PracticeRequest } = {},
 ): Promise<Selection[]> {
   switch (config.strategy) {
     case 'balanced_by_subject':
-      return selectBalancedBySubject(ctx, config)
+      return selectBalancedBySubject(ctx, config, isFree)
     case 'simulacro_by_session': {
       // A simulacro scoped to one area: the official total for that area, in
       // one sitting, instead of the two full mixed sittings.
       if (subjectId != null) {
         const target = getSimulacroSubjectTarget(subjectId)
         if (target == null) throw new ConvexError('Selecciona un área válida para el simulacro.')
-        return selectSubjectTargets(
+        return selectSimulacroForm(
           ctx,
           config,
+          studentId,
           [{ subjectId: target.subjectId, questionCount: target.questionCount }],
-          'balanced_coverage',
+          undefined,
+          isFree,
         )
       }
       const simulacroSession = getSimulacroSessionConfig(config, simulacroSessionNumber)
-      return selectSubjectTargets(
+      return selectSimulacroForm(
         ctx,
         config,
+        studentId,
         simulacroSession.subjectTargets,
-        'balanced_coverage',
+        simulacroSession.sessionNumber,
+        isFree,
       )
     }
     case 'topic':
       if (subjectId == null) throw new ConvexError('Topic practice requires a subject.')
-      return selectTopic(ctx, config, studentId, subjectId, subtopicId)
+      return selectTopic(ctx, config, studentId, subjectId, subtopicId, isFree)
     case 'recommended':
-      return selectRecommended(ctx, config, studentId)
+      return selectRecommended(ctx, config, studentId, isFree)
     case 'review_mistakes':
-      return selectReviewMistakes(ctx, config, studentId)
+      return extra.retryFromSessionId != null
+        ? selectRetryMistakes(ctx, config, studentId, extra.retryFromSessionId, isFree)
+        : selectReviewMistakes(ctx, config, studentId, isFree)
+    case 'custom':
+      if (extra.practice == null) throw new ConvexError('Elige los filtros de tu práctica.')
+      return selectCustom(ctx, config, studentId, extra.practice, isFree)
+    case 'mastery_challenge':
+      return selectReto(ctx, config, studentId, isFree)
     default:
       return []
   }
@@ -453,6 +784,14 @@ async function buildSelection(
 // Mutations / queries
 // ─────────────────────────────────────────────────────────────────────────
 
+/** The builder's filters (see `practiceBuilder.ts`), shared by the counts query and `createSession`. */
+const practiceFilterFields = {
+  subjectId: v.optional(v.string()),
+  subtopicIds: v.optional(v.array(v.string())),
+  difficulty: v.optional(practiceDifficultyValidator),
+  source: practiceSourceValidator,
+}
+
 export const createSession = mutation({
   args: {
     studentId: v.id('students'),
@@ -461,9 +800,37 @@ export const createSession = mutation({
     // Optional for `topic` practice launched from the syllabus by subtopic.
     subtopicId: v.optional(v.string()),
     simulacroSessionNumber: v.optional(v.number()),
+    /** Practice kinds only (`allowsImmediateFeedback`); absent means `al_final`. */
+    feedbackMode: v.optional(feedbackModeValidator),
+    /** `repaso` only: retry the misses and blanks of this completed session. */
+    retryFromSessionId: v.optional(v.id('sessions')),
+    /** `personalizada` only: the builder's choice. */
+    practice: v.optional(v.object({
+      ...practiceFilterFields,
+      count: v.number(),
+      timed: v.boolean(),
+    })),
   },
   handler: async (ctx, args) => {
+    await assertOwnsStudent(ctx, args.studentId)
+
     const config = getSessionKindConfig(args.kind)
+    const feedbackMode = args.feedbackMode ?? 'al_final'
+    if (feedbackMode === 'inmediata' && !config.allowsImmediateFeedback) {
+      throw new ConvexError('Esta sesión muestra las respuestas solo al final.')
+    }
+    if (args.retryFromSessionId != null && args.kind !== 'repaso') {
+      throw new ConvexError('Solo un repaso puede reintentar las incorrectas de una sesión.')
+    }
+    if (args.practice != null && args.kind !== 'personalizada') {
+      throw new ConvexError('Los filtros son solo para la práctica a tu medida.')
+    }
+    if (args.kind === 'personalizada') {
+      if (args.practice == null) throw new ConvexError('Elige los filtros de tu práctica.')
+      const countError = practiceCountError(args.practice.count)
+      if (countError != null) throw new ConvexError(countError)
+    }
+
     const timeLimitMs = getSessionTimeLimitMs(
       config,
       args.simulacroSessionNumber,
@@ -506,36 +873,59 @@ export const createSession = mutation({
       }
     }
 
+    // The full exam is Sesión 1 or 2; a per-area simulacro is neither.
+    const simulacroSessionNumber = args.kind === 'simulacro' && subjectId == null
+      ? (args.simulacroSessionNumber ?? 1)
+      : undefined
+
     // Reuse an in-progress session of the same kind (and subject/subtopic, for
     // topic practice) instead of starting a duplicate.
+    const now = Date.now()
     const active = await ctx.db
       .query('sessions')
       .withIndex('by_studentId_kind_status', (q) =>
         q.eq('studentId', args.studentId).eq('kind', args.kind).eq('status', 'in_progress'),
       )
       .collect()
+    // A timed session whose clock ran out while the student was away is over,
+    // not resumable: reopening it auto-submits on load, and 2 answers out of 15
+    // would become their placement. It is closed as abandoned — every count of
+    // completed sessions already ignores that status — and a fresh one starts.
+    for (const session of active) {
+      if (isPastDeadline(session, now)) {
+        await ctx.db.patch('sessions', session._id, { status: 'abandoned' })
+      }
+    }
     // Keyed on whatever makes a session of this kind distinct: any
     // subject-scoped kind (topic practice, nivelación) must match on subject, or
     // levelling Matemáticas would resume an unfinished Lectura Crítica session.
-    const reusable = active.find(
+    // A builder session is a fresh choice every time: never reused.
+    const reusable = args.kind === 'personalizada' ? undefined : active.find(
       (session) =>
-        (!config.requiresSubject
+        !isPastDeadline(session, now)
+        && (session.feedbackMode ?? 'al_final') === feedbackMode
+        && session.sourceSessionId === args.retryFromSessionId
+        && (!config.requiresSubject
           || (session.subjectId === subjectId && session.subtopicId === subtopicId))
         && (args.kind !== 'simulacro'
           || (session.subjectId === subjectId
-            && session.simulacroSessionNumber === args.simulacroSessionNumber)),
+            && session.simulacroSessionNumber === simulacroSessionNumber)),
     )
     if (reusable) {
       return reusable._id
     }
 
+    // Nothing new takes an item a live exam asks: grading it elsewhere would
+    // leak its key. Exams too, so two sittings never share one.
     const selected = await buildSelection(
       ctx,
       config,
       args.studentId,
       subjectId,
       subtopicId,
-      args.simulacroSessionNumber,
+      simulacroSessionNumber,
+      await loadLiveExamSeal(ctx, args.studentId),
+      { retryFromSessionId: args.retryFromSessionId, practice: args.practice },
     )
     if (selected.length === 0) {
       // Naming the area matters: "no hay preguntas" reads as "the app is
@@ -549,22 +939,34 @@ export const createSession = mutation({
       )
     }
 
-    const now = Date.now()
+    // A timed builder session runs at the official pace for what it got.
+    const sessionTimeLimitMs = args.kind === 'personalizada' && args.practice?.timed === true
+      ? selected.length * officialMsPerQuestion({ kind: args.kind })
+      : timeLimitMs
+    const practiceScope = args.practice == null ? null : resolvePracticeScope(args.practice)
+
     const sessionId = await ctx.db.insert('sessions', {
       studentId: args.studentId,
       kind: args.kind,
       status: 'in_progress',
       recommendationSource: recommendationSourceForKind(args.kind),
-      subjectId: config.requiresSubject ? subjectId : undefined,
+      // A per-area simulacro keeps its area, or it reads as the full exam's
+      // Sesión 1 in the hub, the history filter and the whole-exam score.
+      subjectId: config.requiresSubject || args.kind === 'simulacro'
+        ? subjectId
+        : practiceScope != null && 'subjectId' in practiceScope
+          ? practiceScope.subjectId ?? undefined
+          : undefined,
       subtopicId,
-      simulacroSessionNumber: args.kind === 'simulacro'
-        ? (args.simulacroSessionNumber ?? 1)
-        : undefined,
+      simulacroSessionNumber,
       startedAt: now,
-      timeLimitMs: timeLimitMs ?? undefined,
-      expiresAt: timeLimitMs != null ? now + timeLimitMs : undefined,
+      timeLimitMs: sessionTimeLimitMs ?? undefined,
+      expiresAt: sessionTimeLimitMs != null ? now + sessionTimeLimitMs : undefined,
       questionCount: selected.length,
       currentPosition: 1,
+      feedbackMode: args.feedbackMode == null ? undefined : feedbackMode,
+      sourceSessionId: args.retryFromSessionId,
+      practiceSource: args.practice?.source,
     })
 
     let position = 1
@@ -595,8 +997,12 @@ export const getActiveSession = query({
       .query('sessions')
       .withIndex('by_studentId', (q) => q.eq('studentId', args.studentId))
       .collect()
+    // A session whose clock ran out can no longer be completed (see
+    // `completeSession`), so "Continúa donde quedaste" must not lead to it.
+    const now = Date.now()
     return sessions
       .filter((session) => session.status === 'in_progress' || session.status === 'created')
+      .filter((session) => !isPastDeadline(session, now, COMPLETION_GRACE_MS))
       .filter((session) => args.kind == null || session.kind === args.kind)
       .sort((a, b) => b.startedAt - a.startedAt)[0] ?? null
   },
@@ -674,53 +1080,20 @@ export const getLatestSimulacroScore = query({
         q.eq('studentId', args.studentId).eq('kind', 'simulacro'),
       )
       .collect()
-    const completed = sessions
-      .filter((session) => session.status === 'completed' && session.summary != null)
-      // Per-area simulacros are a different exercise from the full two-sitting
-      // exam; mixing them here would report a whole-exam score the student
-      // never actually sat.
-      .filter((session) => session.subjectId == null)
-      .sort((a, b) => (b.completedAt ?? b.startedAt) - (a.completedAt ?? a.startedAt))
-
-    const latestBySessionNumber = new Map<number, Doc<'sessions'>>()
-    for (const session of completed) {
-      const sessionNumber = session.simulacroSessionNumber ?? 1
-      if (!latestBySessionNumber.has(sessionNumber)) {
-        latestBySessionNumber.set(sessionNumber, session)
-      }
-    }
+    // Paired exactly as `getSimulacroReport` pairs it, so the hub never shows
+    // a whole-exam score built from two different exams.
+    const sittings = latestSimulacroExam(sessions)?.sittings ?? []
+    const sessionNumbers = sittings.map((session) => session.simulacroSessionNumber ?? 1)
 
     const subjectTotals = getSimulacroSubjectTargets()
-    const scoreBuckets = new Map<string, { correctCount: number; answeredCount: number }>()
-    for (const session of latestBySessionNumber.values()) {
-      for (const score of session.summary?.subjectScores ?? []) {
-        const bucket = scoreBuckets.get(score.subjectId) ?? {
-          correctCount: 0,
-          answeredCount: 0,
-        }
-        bucket.correctCount += score.correctCount
-        bucket.answeredCount += score.answeredCount
-        scoreBuckets.set(score.subjectId, bucket)
-      }
-    }
-
-    const subjectScores = subjectTotals.map((target) => {
-      const bucket = scoreBuckets.get(target.subjectId) ?? {
-        correctCount: 0,
-        answeredCount: 0,
-      }
-      return {
-        subjectId: target.subjectId,
-        correctCount: bucket.correctCount,
-        answeredCount: bucket.answeredCount,
-        questionCount: target.questionCount,
-        score: Math.round((bucket.correctCount / target.questionCount) * 100),
-      }
-    })
+    const subjectScores = scoreSimulacroSubjects(
+      subjectTotals,
+      sittings.map((session) => session.summary?.subjectScores ?? []),
+    )
 
     return {
-      isComplete: latestBySessionNumber.has(1) && latestBySessionNumber.has(2),
-      completedSessionNumbers: [...latestBySessionNumber.keys()].sort(),
+      isComplete: sessionNumbers.includes(1) && sessionNumbers.includes(2),
+      completedSessionNumbers: sessionNumbers.sort(),
       questionCount: subjectTotals.reduce((sum, target) => sum + target.questionCount, 0),
       subjectScores,
     }
@@ -732,7 +1105,7 @@ export const getSession = query({
     sessionId: v.id('sessions'),
   },
   handler: async (ctx, args) => {
-    const session = await ctx.db.get(args.sessionId)
+    const session = await ctx.db.get('sessions', args.sessionId)
     if (session == null) return null
 
     // This query returns correct answers and explanations once a session is
@@ -752,7 +1125,7 @@ export const getSession = query({
     )
 
     const questions = await Promise.all(
-      sessionQuestions.map((sessionQuestion) => ctx.db.get(sessionQuestion.questionId)),
+      sessionQuestions.map((sessionQuestion) => ctx.db.get('questions', sessionQuestion.questionId)),
     )
 
     // Shared stimuli for grouped questions, fetched once per group even when
@@ -764,7 +1137,7 @@ export const getSession = query({
           .filter((groupId): groupId is Id<'questionGroups'> => groupId != null),
       ),
     ]
-    const groupDocs = await Promise.all(groupIds.map((groupId) => ctx.db.get(groupId)))
+    const groupDocs = await Promise.all(groupIds.map((groupId) => ctx.db.get('questionGroups', groupId)))
     const groupById = new Map(
       groupDocs
         .filter((group): group is Doc<'questionGroups'> => group != null)
@@ -792,22 +1165,25 @@ export const getSession = query({
       }),
     )
 
-    // Answers and explanations are only disclosed once the session is complete.
-    const canReviewAnswers = session.status === 'completed'
+    // Answers, and anything they can be inferred from, are only disclosed once
+    // the session is complete — or, in an immediate-feedback practice, once that
+    // question is checked — and never for a question a live exam is asking
+    // (see `sessionIntegrity.ts`).
+    const liveExamQuestionIds = canRevealAnswers(session) || canCheckAnswers(session)
+      ? await loadLiveExamQuestionIds(ctx, session.studentId)
+      : new Set<string>()
 
     return {
       session,
+      /** The official clock per question, for the live "¿voy a tiempo?" (see `pacing.ts`). */
+      officialMsPerQuestion: officialMsPerQuestion(session),
       questions: sessionQuestions
         .map((sessionQuestion, index) => {
           const question = questions[index]
           if (question == null) return null
-          const displayQuestion = canReviewAnswers
-            ? question
-            : {
-                ...question,
-                answerCorrectOption: undefined,
-                answerSolutionMarkdown: undefined,
-              }
+          const attempt = attemptBySessionQuestionId.get(sessionQuestion._id) ?? null
+          const canReviewAnswers = canRevealSessionQuestion(session, attempt, question._id, liveExamQuestionIds)
+          const displayQuestion = canReviewAnswers ? question : sealQuestion(question)
 
           const group = question.groupId == null ? null : groupById.get(question.groupId) ?? null
 
@@ -838,7 +1214,18 @@ export const getSession = query({
                     memberCount: group.memberCount,
                     position: (question.groupPosition ?? 0) + 1,
                   },
-            attempt: attemptBySessionQuestionId.get(sessionQuestion._id) ?? null,
+            // Null until answered: a row holding only a flag or crossed-out
+            // options is not an answer.
+            attempt:
+              attempt?.selectedOption == null
+                ? null
+                : canReviewAnswers
+                  ? attempt
+                  : sealAttempt(attempt),
+            // Exam tools reveal nothing, so they are returned while solving too.
+            flagged: attempt?.flagged === true,
+            eliminatedOptions: attempt?.eliminatedOptions ?? [],
+            timeSpentMs: attempt?.timeSpentMs ?? null,
           }
         })
         .filter((item): item is NonNullable<typeof item> => item != null),
@@ -857,33 +1244,23 @@ export const submitAnswer = mutation({
     confidence: v.optional(confidenceLevelValidator),
   },
   handler: async (ctx, args) => {
-    const session = await ctx.db.get(args.sessionId)
-    if (session == null) {
-      throw new ConvexError('Sesión no encontrada.')
-    }
-    if (session.status === 'completed' || session.status === 'abandoned') {
-      throw new ConvexError('La sesión ya no está activa.')
-    }
+    const { session, sessionQuestion, attempt: existing } = await loadOpenSessionQuestion(
+      ctx,
+      args.sessionId,
+      args.sessionQuestionId,
+    )
+    assertNotChecked(existing)
 
-    const sessionQuestion = await ctx.db.get(args.sessionQuestionId)
-    if (sessionQuestion == null || sessionQuestion.sessionId !== args.sessionId) {
-      throw new ConvexError('Pregunta de la sesión no encontrada.')
-    }
-
-    const question = await ctx.db.get(sessionQuestion.questionId)
+    const question = await ctx.db.get('questions', sessionQuestion.questionId)
     if (question == null || question.answerCorrectOption == null) {
       throw new ConvexError('La respuesta correcta no está disponible.')
     }
 
-    const existing = await ctx.db
-      .query('questionAttempts')
-      .withIndex('by_sessionQuestionId', (q) => q.eq('sessionQuestionId', args.sessionQuestionId))
-      .unique()
     const now = Date.now()
     const isCorrect = args.selectedOption === question.answerCorrectOption
 
     if (existing) {
-      await ctx.db.patch(existing._id, {
+      await ctx.db.patch('questionAttempts', existing._id, {
         selectedOption: args.selectedOption,
         isCorrect,
         answeredAt: now,
@@ -913,7 +1290,7 @@ export const submitAnswer = mutation({
       })
     }
 
-    await ctx.db.patch(session._id, {
+    await ctx.db.patch('sessions', session._id, {
       currentPosition: Math.min(session.questionCount, sessionQuestion.position + 1),
     })
 
@@ -927,29 +1304,355 @@ export const clearAnswer = mutation({
     sessionQuestionId: v.id('sessionQuestions'),
   },
   handler: async (ctx, args) => {
-    const session = await ctx.db.get(args.sessionId)
-    if (session == null) {
-      throw new ConvexError('Sesión no encontrada.')
+    const { attempt } = await loadOpenSessionQuestion(ctx, args.sessionId, args.sessionQuestionId)
+    assertNotChecked(attempt)
+    // Cleared, not deleted: the row also holds the flag, the crossed-out
+    // options and the time spent, which outlive the answer.
+    if (attempt != null) {
+      await ctx.db.patch('questionAttempts', attempt._id, {
+        selectedOption: undefined,
+        isCorrect: undefined,
+        answeredAt: undefined,
+        responseTimeMs: undefined,
+        confidence: undefined,
+      })
     }
-    if (session.status !== 'in_progress' && session.status !== 'created') {
-      throw new ConvexError('La sesión no está activa.')
-    }
-
-    const sessionQuestion = await ctx.db.get(args.sessionQuestionId)
-    if (sessionQuestion == null || sessionQuestion.sessionId !== args.sessionId) {
-      throw new ConvexError('Pregunta de la sesión no encontrada.')
-    }
-
-    const existing = await ctx.db
-      .query('questionAttempts')
-      .withIndex('by_sessionQuestionId', (q) => q.eq('sessionQuestionId', args.sessionQuestionId))
-      .unique()
-    if (existing == null) {
-      return { cleared: true }
-    }
-
-    await ctx.db.delete(existing._id)
     return { cleared: true }
+  },
+})
+
+/** A checked answer has seen its key: changing it would turn the check into a lookup. */
+function assertNotChecked(attempt: Doc<'questionAttempts'> | null) {
+  if (attempt?.checkedAt != null) {
+    throw new ConvexError('Ya revisaste esta respuesta; no se puede cambiar.')
+  }
+}
+
+/**
+ * "Ver respuesta": in an immediate-feedback practice, grade one answered
+ * question now and lock it. Returns that question's key, solution and every
+ * option's rationale — nothing about any other question. Never available in an
+ * exam or a reto (`canCheckAnswers`), nor for an item a live exam is asking.
+ */
+export const checkAnswer = mutation({
+  args: {
+    sessionId: v.id('sessions'),
+    sessionQuestionId: v.id('sessionQuestions'),
+  },
+  handler: async (ctx, args) => {
+    const { session, sessionQuestion, attempt } = await loadOpenSessionQuestion(
+      ctx,
+      args.sessionId,
+      args.sessionQuestionId,
+    )
+    if (!canCheckAnswers(session)) {
+      throw new ConvexError('Esta sesión muestra las respuestas solo al final.')
+    }
+    if (attempt?.selectedOption == null || attempt.isCorrect == null) {
+      throw new ConvexError('Elige una respuesta antes de revisarla.')
+    }
+    const question = await ctx.db.get('questions', sessionQuestion.questionId)
+    if (question?.answerCorrectOption == null) {
+      throw new ConvexError('La respuesta correcta no está disponible.')
+    }
+    const liveExamQuestionIds = await loadLiveExamQuestionIds(ctx, session.studentId)
+    if (liveExamQuestionIds.has(question._id)) {
+      throw new ConvexError('Esta pregunta está en un examen o reto que tienes en curso. La verás al terminarlo.')
+    }
+
+    if (attempt.checkedAt == null) {
+      await ctx.db.patch('questionAttempts', attempt._id, { checkedAt: Date.now() })
+    }
+    return {
+      selectedOption: attempt.selectedOption,
+      isCorrect: attempt.isCorrect,
+      correctOption: question.answerCorrectOption,
+      solutionMarkdown: question.answerSolutionMarkdown ?? null,
+      distractorRationales: question.answerDistractorRationales ?? [],
+      explanationSource: question.explanationSource ?? null,
+    }
+  },
+})
+
+/**
+ * The session question a student acts on, checked like an answer: their own
+ * session, still open, inside its clock. Every write during solve goes through
+ * here, so a stale tab cannot edit a sitting that is already scored.
+ */
+async function loadOpenSessionQuestion(
+  ctx: MutationCtx,
+  sessionId: Id<'sessions'>,
+  sessionQuestionId: Id<'sessionQuestions'>,
+) {
+  const session = await ctx.db.get('sessions', sessionId)
+  if (session == null) {
+    throw new ConvexError('Sesión no encontrada.')
+  }
+  // The id travels in the URL; holding it must not be enough to answer.
+  await assertOwnsStudent(ctx, session.studentId)
+  if (session.status === 'completed' || session.status === 'abandoned') {
+    throw new ConvexError('La sesión ya no está activa.')
+  }
+  if (isPastDeadline(session, Date.now())) {
+    throw new ConvexError('Se acabó el tiempo de esta sesión.')
+  }
+
+  const sessionQuestion = await ctx.db.get('sessionQuestions', sessionQuestionId)
+  if (sessionQuestion == null || sessionQuestion.sessionId !== sessionId) {
+    throw new ConvexError('Pregunta de la sesión no encontrada.')
+  }
+
+  const attempt = await ctx.db
+    .query('questionAttempts')
+    .withIndex('by_sessionQuestionId', (q) => q.eq('sessionQuestionId', sessionQuestionId))
+    .unique()
+  return { session, sessionQuestion, attempt }
+}
+
+/**
+ * Writes exam-tool state on the question's attempt. Before an answer exists it
+ * creates an unanswered row — no `selectedOption`, no `isCorrect` — which every
+ * count of answers already skips.
+ */
+async function writeAttemptTools(
+  ctx: MutationCtx,
+  open: Awaited<ReturnType<typeof loadOpenSessionQuestion>>,
+  tools: Partial<Pick<Doc<'questionAttempts'>, 'flagged' | 'eliminatedOptions' | 'timeSpentMs'>>,
+) {
+  if (open.attempt != null) {
+    await ctx.db.patch('questionAttempts', open.attempt._id, tools)
+    return
+  }
+  await ctx.db.insert('questionAttempts', {
+    studentId: open.session.studentId,
+    sessionId: open.session._id,
+    questionId: open.sessionQuestion.questionId,
+    sessionQuestionId: open.sessionQuestion._id,
+    attemptType: open.session.kind,
+    usedHint: false,
+    usedTutor: false,
+    hintCount: 0,
+    tutorMessageCount: 0,
+    wasSkipped: false,
+    ...tools,
+  })
+}
+
+/** "Marcar para revisar": independent of whether the question is answered. */
+export const setQuestionFlag = mutation({
+  args: {
+    sessionId: v.id('sessions'),
+    sessionQuestionId: v.id('sessionQuestions'),
+    flagged: v.boolean(),
+  },
+  handler: async (ctx, args) => {
+    const open = await loadOpenSessionQuestion(ctx, args.sessionId, args.sessionQuestionId)
+    await writeAttemptTools(ctx, open, { flagged: args.flagged })
+    return { flagged: args.flagged }
+  },
+})
+
+/** Crossed-out options: the full set each time (an empty array restores them all). */
+export const setEliminatedOptions = mutation({
+  args: {
+    sessionId: v.id('sessions'),
+    sessionQuestionId: v.id('sessionQuestions'),
+    options: v.array(v.string()),
+  },
+  handler: async (ctx, args) => {
+    const open = await loadOpenSessionQuestion(ctx, args.sessionId, args.sessionQuestionId)
+    const question = await ctx.db.get('questions', open.sessionQuestion.questionId)
+    // In booklet order, without repeats; a label the question lacks is refused.
+    const eliminatedOptions = (question?.options ?? [])
+      .map((option) => option.label)
+      .filter((label) => args.options.includes(label))
+    if (eliminatedOptions.length !== new Set(args.options).size) {
+      throw new ConvexError('Esa opción no existe en esta pregunta.')
+    }
+    await writeAttemptTools(ctx, open, { eliminatedOptions })
+    return { eliminatedOptions }
+  },
+})
+
+/**
+ * Adds one visit's time to the question. The client calls it whenever the
+ * question stops being on screen (next, previous, jump, submit, tab hidden),
+ * whether or not the answer changed, so `timeSpentMs` is the real total.
+ */
+export const recordQuestionTime = mutation({
+  args: {
+    sessionId: v.id('sessions'),
+    sessionQuestionId: v.id('sessionQuestions'),
+    elapsedMs: v.number(),
+  },
+  handler: async (ctx, args) => {
+    const open = await loadOpenSessionQuestion(ctx, args.sessionId, args.sessionQuestionId)
+    const previous = open.attempt?.timeSpentMs ?? 0
+    const timeSpentMs = accumulateQuestionTime(previous, args.elapsedMs)
+    if (timeSpentMs !== previous) {
+      await writeAttemptTools(ctx, open, { timeSpentMs })
+    }
+    return { timeSpentMs }
+  },
+})
+
+/**
+ * The questions of the student's open sealing sessions — exams and retos, see
+ * `sealsItsQuestions` — other than `exceptSessionId`. The bank is shared, so
+ * these stay sealed in every other session until that one ends.
+ */
+async function loadLiveExamQuestionIds(
+  ctx: QueryCtx,
+  studentId: Id<'students'>,
+  exceptSessionId?: Id<'sessions'>,
+) {
+  const now = Date.now()
+  const openSessions = await ctx.db
+    .query('sessions')
+    .withIndex('by_studentId_status', (q) => q.eq('studentId', studentId).eq('status', 'in_progress'))
+    .collect()
+  const liveRows = await Promise.all(
+    openSessions
+      .filter((session) => session._id !== exceptSessionId && sealsItsQuestions(session, now))
+      .map((session) =>
+        ctx.db
+          .query('sessionQuestions')
+          .withIndex('by_sessionId', (q) => q.eq('sessionId', session._id))
+          .collect()),
+  )
+  return new Set<Id<'questions'>>(liveRows.flat().map((row) => row.questionId))
+}
+
+/** `isOutsideLiveExam` over the student's live exams, texts included. */
+async function loadLiveExamSeal(ctx: QueryCtx, studentId: Id<'students'>): Promise<IsFree> {
+  const questionIds = await loadLiveExamQuestionIds(ctx, studentId)
+  const questions = await Promise.all([...questionIds].map((questionId) => ctx.db.get('questions', questionId)))
+  const groupIds = new Set<string>(questions.flatMap((question) => question?.groupId ?? []))
+  return (question) => isOutsideLiveExam(question, { questionIds, groupIds })
+}
+
+/** Every served question of a session in report form (see `examReport.ts`). */
+async function loadReportItems(
+  ctx: QueryCtx,
+  session: Doc<'sessions'>,
+  liveExamQuestionIds: ReadonlySet<string>,
+): Promise<ReportItem[]> {
+  const [sessionQuestions, attempts] = await Promise.all([
+    ctx.db
+      .query('sessionQuestions')
+      .withIndex('by_sessionId_position', (q) => q.eq('sessionId', session._id))
+      .collect(),
+    ctx.db
+      .query('questionAttempts')
+      .withIndex('by_sessionId', (q) => q.eq('sessionId', session._id))
+      .collect(),
+  ])
+  const questions = await Promise.all(
+    sessionQuestions.map((sessionQuestion) => ctx.db.get('questions', sessionQuestion.questionId)),
+  )
+  const attemptBySessionQuestionId = new Map(
+    attempts.map((attempt) => [attempt.sessionQuestionId, attempt]),
+  )
+  const officialMs = officialMsPerQuestion(session)
+
+  return sessionQuestions.flatMap((sessionQuestion, index) => {
+    const question = questions[index]
+    if (question?.subjectId == null) return []
+    const attempt = attemptBySessionQuestionId.get(sessionQuestion._id)
+    return [{
+      sessionId: session._id,
+      sessionQuestionId: sessionQuestion._id,
+      position: sessionQuestion.position,
+      subjectId: question.subjectId,
+      subtopicId: question.primarySubtopicId ?? null,
+      isCorrect: canRevealQuestion(session, question._id, liveExamQuestionIds)
+        ? attempt?.isCorrect ?? null
+        : null,
+      confidence: attempt?.confidence,
+      flagged: attempt?.flagged === true,
+      timeMs: questionTimeMs(attempt),
+      officialMs,
+    }]
+  })
+}
+
+/**
+ * The level reveal after a nivelación (see `examReport.buildNivelacionResult`).
+ * Null unless it is the caller's completed nivelación: the result is built from
+ * correctness, which stays sealed while the sitting is open.
+ */
+export const getNivelacionResult = query({
+  args: {
+    sessionId: v.id('sessions'),
+  },
+  handler: async (ctx, args) => {
+    const session = await ctx.db.get('sessions', args.sessionId)
+    if (session == null) return null
+    await assertOwnsStudent(ctx, session.studentId)
+    if (
+      session.kind !== 'nivelacion'
+      || session.subjectId == null
+      || session.summary == null
+      || !canRevealAnswers(session)
+    ) {
+      return null
+    }
+
+    const sessions = await ctx.db
+      .query('sessions')
+      .withIndex('by_studentId', (q) => q.eq('studentId', session.studentId))
+      .collect()
+    return {
+      sessionId: session._id,
+      ...buildNivelacionResult({
+        subjectId: session.subjectId,
+        summary: session.summary,
+        items: await loadReportItems(ctx, session, await loadLiveExamQuestionIds(ctx, session.studentId)),
+        isFirstPlacement: isFirstPlacement(sessions, session._id),
+      }),
+    }
+  },
+})
+
+/**
+ * The post-simulacro report (see `examReport.buildSimulacroReport`). A full
+ * exam combines the completed Sesión 1 and 2 of the same exam; a per-area
+ * simulacro stands alone. Null unless it is the caller's completed simulacro.
+ */
+export const getSimulacroReport = query({
+  args: {
+    sessionId: v.id('sessions'),
+  },
+  handler: async (ctx, args) => {
+    const session = await ctx.db.get('sessions', args.sessionId)
+    if (session == null) return null
+    await assertOwnsStudent(ctx, session.studentId)
+    if (session.kind !== 'simulacro' || !canRevealAnswers(session)) return null
+
+    const simulacros = await ctx.db
+      .query('sessions')
+      .withIndex('by_studentId_kind', (q) =>
+        q.eq('studentId', session.studentId).eq('kind', 'simulacro'))
+      .collect()
+    const exam = resolveSimulacroExam(simulacros, session)
+    const liveExamQuestionIds = await loadLiveExamQuestionIds(ctx, session.studentId)
+    const items = (await Promise.all(
+      exam.sittings.map((sitting) => loadReportItems(ctx, sitting, liveExamQuestionIds)),
+    )).flat()
+    const subjectScores = (sittings: Doc<'sessions'>[]) =>
+      sittings.map((sitting) => sitting.summary?.subjectScores ?? [])
+
+    return {
+      /** The area of a per-area simulacro; null for the full exam. */
+      subjectId: session.subjectId ?? null,
+      sessionIds: exam.sittings.map((sitting) => sitting._id),
+      ...buildSimulacroReport({
+        sittings: subjectScores(exam.sittings),
+        previousSittings: exam.previous.length === 0 ? null : subjectScores(exam.previous),
+        items,
+        missingSessionNumbers: exam.missingSessionNumbers,
+      }),
+    }
   },
 })
 
@@ -960,24 +1663,42 @@ export const completeSession = mutation({
     expired: v.optional(v.boolean()),
   },
   handler: async (ctx, args) => {
-    const session = await ctx.db.get(args.sessionId)
+    const session = await ctx.db.get('sessions', args.sessionId)
     if (session == null) {
       throw new ConvexError('Sesión no encontrada.')
     }
+    await assertOwnsStudent(ctx, session.studentId)
     if (session.status === 'completed') {
       return summarize(session)
     }
+    // An abandoned session stays abandoned — a stale tab must not score it.
+    if (session.status === 'abandoned') {
+      throw new ConvexError('La sesión ya no está activa.')
+    }
+    // The client completes a session the moment its clock runs out, and that
+    // time-out is scored even if it arrives a few minutes late. One arriving
+    // long after is a student reopening a sitting they left: scoring it would
+    // make 2 answers out of 15 their placement. Not patched to abandoned here —
+    // a throwing mutation rolls back its writes; `createSession` closes it.
+    if (isPastDeadline(session, Date.now(), COMPLETION_GRACE_MS)) {
+      throw new ConvexError('Se acabó el tiempo de esta sesión.')
+    }
 
-    const attempts = await ctx.db
-      .query('questionAttempts')
-      .withIndex('by_sessionId', (q) => q.eq('sessionId', args.sessionId))
-      .collect()
     const sessionQuestions = await ctx.db
       .query('sessionQuestions')
       .withIndex('by_sessionId_position', (q) => q.eq('sessionId', args.sessionId))
       .collect()
+    // Scoring grades every item: one a live exam asks would hand over its key.
+    const otherLiveExamQuestionIds = await loadLiveExamQuestionIds(ctx, session.studentId, session._id)
+    if (!canSettleSession(sessionQuestions.map((item) => item.questionId), otherLiveExamQuestionIds)) {
+      throw new ConvexError('Termina el examen o reto que tienes en curso antes de cerrar esta práctica.')
+    }
+    const attempts = await ctx.db
+      .query('questionAttempts')
+      .withIndex('by_sessionId', (q) => q.eq('sessionId', args.sessionId))
+      .collect()
     const questions = await Promise.all(
-      sessionQuestions.map((sessionQuestion) => ctx.db.get(sessionQuestion.questionId)),
+      sessionQuestions.map((sessionQuestion) => ctx.db.get('questions', sessionQuestion.questionId)),
     )
     const attemptBySessionQuestionId = new Map(
       attempts.map((attempt) => [attempt.sessionQuestionId, attempt]),
@@ -1035,7 +1756,7 @@ export const completeSession = mutation({
       subjectScores,
     }
 
-    await ctx.db.patch(args.sessionId, {
+    await ctx.db.patch('sessions', args.sessionId, {
       status: 'completed',
       completedAt,
       currentPosition: session.questionCount,
@@ -1052,8 +1773,19 @@ export const completeSession = mutation({
       ),
     })
 
+    await tallyAnswerStats(ctx, { session, attempts: answeredAttempts, completedAt })
+
     await ctx.runMutation(internal.progress.rebuildStudentProgress, {
       studentId: session.studentId,
+    })
+
+    // After the rebuild, so a subtopic answered for the first time has its row.
+    await applyMastery(ctx, {
+      session,
+      sessionQuestions,
+      questions,
+      attemptBySessionQuestionId,
+      now: completedAt,
     })
 
     return { sessionId: args.sessionId, ...summary }
@@ -1082,7 +1814,7 @@ async function calibrateDifficulty(
     questionById: Map<Id<'questions'>, Doc<'questions'>>
   },
 ) {
-  const student = await ctx.db.get(args.studentId)
+  const student = await ctx.db.get('students', args.studentId)
   if (student == null) return
 
   const abilityBySubject = { ...(student.abilityBySubject ?? {}) }
@@ -1116,19 +1848,238 @@ async function calibrateDifficulty(
     abilityBySubject[subjectId] = next.abilityRating
     abilityAttemptsBySubject[subjectId] = (abilityAttemptsBySubject[subjectId] ?? 0) + 1
 
-    await ctx.db.patch(question._id, {
+    await ctx.db.patch('questions', question._id, {
       difficultyRating: next.questionRating,
       difficultyAttemptCount: questionAttemptCount + 1,
       difficultyUpdatedAt: now,
     })
   }
 
-  await ctx.db.patch(args.studentId, {
+  await ctx.db.patch('students', args.studentId, {
     abilityBySubject,
     abilityAttemptsBySubject,
     updatedAt: now,
   })
 }
+
+/**
+ * Add this session's answers to each question's "% eligió cada opción" tally
+ * (`answerStats.ts`): only a student's first settled answer, given before the
+ * key was ever shown to them. Once per session, like the Elo calibration.
+ */
+async function tallyAnswerStats(
+  ctx: MutationCtx,
+  args: { session: Doc<'sessions'>; attempts: Doc<'questionAttempts'>[]; completedAt: number },
+) {
+  const sessions = await ctx.db
+    .query('sessions')
+    .withIndex('by_studentId', (q) => q.eq('studentId', args.session.studentId))
+    .collect()
+  const completedAtById = new Map(sessions.map((session) => [
+    session._id,
+    canRevealAnswers(session) ? session.completedAt : undefined,
+  ]))
+
+  for (const attempt of args.attempts) {
+    if (attempt.selectedOption == null || attempt.answeredAt == null) continue
+    const others = await ctx.db
+      .query('questionAttempts')
+      .withIndex('by_studentId_questionId', (q) =>
+        q.eq('studentId', args.session.studentId).eq('questionId', attempt.questionId))
+      .collect()
+    const counts = countsTowardStats(
+      { answeredAt: attempt.answeredAt, completedAt: args.completedAt },
+      others
+        .filter((other) => other._id !== attempt._id)
+        .map((other) => ({ checkedAt: other.checkedAt, completedAt: completedAtById.get(other.sessionId) })),
+    )
+    if (!counts) continue
+    const row = await ctx.db
+      .query('questionAnswerStats')
+      .withIndex('by_questionId', (q) => q.eq('questionId', attempt.questionId))
+      .unique()
+    const tally = addToTally(row, { ...attempt, selectedOption: attempt.selectedOption })
+    if (row == null) await ctx.db.insert('questionAnswerStats', { questionId: attempt.questionId, ...tally })
+    else await ctx.db.patch('questionAnswerStats', row._id, tally)
+  }
+}
+
+/**
+ * One-off: build each question's tally from the answers given before it was
+ * kept (`tallyAnswers`), ten questions per run, chaining itself to the end.
+ * Replaces each tally, so it can run again; run it right after deploying:
+ * `bunx convex run sessions:backfillQuestionAnswerStats`
+ */
+export const backfillQuestionAnswerStats = internalMutation({
+  args: { cursor: v.optional(v.string()) },
+  handler: async (ctx, args) => {
+    const page = await ctx.db.query('questions').paginate({ numItems: 10, cursor: args.cursor ?? null })
+    const sessionById = new Map<Id<'sessions'>, Doc<'sessions'> | null>()
+    for (const question of page.page) {
+      const attempts = await ctx.db
+        .query('questionAttempts')
+        .withIndex('by_questionId', (q) => q.eq('questionId', question._id))
+        .collect()
+      for (const sessionId of new Set(attempts.map((attempt) => attempt.sessionId))) {
+        if (!sessionById.has(sessionId)) sessionById.set(sessionId, await ctx.db.get('sessions', sessionId))
+      }
+      const tally = tallyAnswers(attempts.map((attempt) => {
+        const session = sessionById.get(attempt.sessionId)
+        return { ...attempt, completedAt: session != null && canRevealAnswers(session) ? session.completedAt : undefined }
+      }))
+      const row = await ctx.db
+        .query('questionAnswerStats')
+        .withIndex('by_questionId', (q) => q.eq('questionId', question._id))
+        .unique()
+      if (row != null) await ctx.db.delete('questionAnswerStats', row._id)
+      if (tally != null) await ctx.db.insert('questionAnswerStats', { questionId: question._id, ...tally })
+    }
+    if (!page.isDone) {
+      await ctx.scheduler.runAfter(0, internal.sessions.backfillQuestionAnswerStats, { cursor: page.continueCursor })
+    }
+  },
+})
+
+/**
+ * Move each subtopic's mastery level on this session's evidence (`mastery.ts`).
+ * Like the Elo calibration it runs once per session: `completeSession` returns
+ * early when the session is already completed.
+ */
+async function applyMastery(
+  ctx: MutationCtx,
+  args: {
+    session: Doc<'sessions'>
+    sessionQuestions: Doc<'sessionQuestions'>[]
+    questions: (Doc<'questions'> | null)[]
+    attemptBySessionQuestionId: Map<Id<'sessionQuestions'>, Doc<'questionAttempts'>>
+    now: number
+  },
+) {
+  // Only questions whose key the student had not been shown count.
+  const [studentAttempts, studentSessions] = await Promise.all([
+    ctx.db
+      .query('questionAttempts')
+      .withIndex('by_studentId', (q) => q.eq('studentId', args.session.studentId))
+      .collect(),
+    ctx.db
+      .query('sessions')
+      .withIndex('by_studentId', (q) => q.eq('studentId', args.session.studentId))
+      .collect(),
+  ])
+  const revealed = revealedQuestionIds(studentAttempts, studentSessions, args.session._id)
+  const evidenceBySubtopic = new Map<string, SubtopicEvidence>()
+  args.sessionQuestions.forEach((sessionQuestion, index) => {
+    const subtopicId = args.questions[index]?.primarySubtopicId
+    if (subtopicId == null || revealed.has(sessionQuestion.questionId)) return
+    const evidence = evidenceBySubtopic.get(subtopicId) ?? { questionCount: 0, answeredCount: 0, correctCount: 0 }
+    const attempt = args.attemptBySessionQuestionId.get(sessionQuestion._id)
+    evidence.questionCount += 1
+    if (attempt?.isCorrect != null) evidence.answeredCount += 1
+    if (attempt?.isCorrect === true) evidence.correctCount += 1
+    evidenceBySubtopic.set(subtopicId, evidence)
+  })
+  const context = masteryContext(args.session, evidenceBySubtopic.size)
+
+  for (const [subtopicId, evidence] of evidenceBySubtopic) {
+    if (evidence.answeredCount === 0) continue
+    const aggregate = await ctx.db
+      .query('learnerSubtopicAggregates')
+      .withIndex('by_studentId_subtopicId', (q) =>
+        q.eq('studentId', args.session.studentId).eq('subtopicId', subtopicId))
+      .first()
+    if (aggregate == null) continue
+    // The rebuilt aggregate already holds this session's answers; a row from
+    // before levels existed is judged on the answers that came before them.
+    const current = aggregate.masteryLevel ?? masteryLevelOf({
+      attemptCount: Math.max(0, aggregate.attemptCount - evidence.answeredCount),
+      correctCount: Math.max(0, aggregate.correctCount - evidence.correctCount),
+    })
+    await ctx.db.patch('learnerSubtopicAggregates', aggregate._id, {
+      masteryLevel: nextMasteryLevel(current, evidence, context),
+      masteryUpdatedAt: args.now,
+    })
+  }
+}
+
+/**
+ * "N preguntas disponibles" for the practice builder, live as the student
+ * changes filters. A filter error comes back as `error` instead of throwing, so
+ * the sheet keeps rendering.
+ */
+export const getPracticeBuilderCounts = query({
+  args: {
+    studentId: v.id('students'),
+    filters: v.object(practiceFilterFields),
+  },
+  handler: async (ctx, args) => {
+    await assertOwnsStudent(ctx, args.studentId)
+    const scope = resolvePracticeScope(args.filters)
+    if ('error' in scope) {
+      return { available: 0, byDifficulty: { basico: 0, medio: 0, avanzado: 0 }, error: scope.error }
+    }
+    const pools = getSessionKindConfig('personalizada').eligibilityPools
+    const [bank, history] = await Promise.all([
+      loadPracticeBank(ctx, scope, pools),
+      loadPracticeHistory(ctx, args.studentId),
+    ])
+    return { ...practiceBuilderCounts(bank, args.filters, history), error: null }
+  },
+})
+
+/** Questions per `getQuestionAnswerStats` call: the largest session (a full sitting). */
+const MAX_STATS_QUESTIONS = 250
+
+/**
+ * "% eligió cada opción" and the median time (`answerStats.ts`), read from the
+ * running tally: one row per question, whatever the number of students. Only
+ * for questions the caller already saw in one of their completed sessions (or
+ * an admin), and never for an item a live exam of theirs is asking: the most
+ * chosen option often is the key. Questions the caller may not see are left
+ * out of the result.
+ */
+export const getQuestionAnswerStats = query({
+  args: {
+    questionIds: v.array(v.id('questions')),
+  },
+  handler: async (ctx, args) => {
+    const callerId = await requireAuthenticatedStudentId(ctx)
+    if (args.questionIds.length > MAX_STATS_QUESTIONS) {
+      throw new ConvexError('Demasiadas preguntas a la vez.')
+    }
+    const caller = await ctx.db.get('students', callerId)
+    const isAdmin = caller?.isAdmin === true
+    const callerSessions = await ctx.db
+      .query('sessions')
+      .withIndex('by_studentId', (q) => q.eq('studentId', callerId))
+      .collect()
+    const completedIds = new Set<string>(callerSessions.filter(canRevealAnswers).map((session) => session._id))
+    const liveExamQuestionIds = await loadLiveExamQuestionIds(ctx, callerId)
+
+    const results = []
+    for (const questionId of new Set(args.questionIds)) {
+      if (liveExamQuestionIds.has(questionId)) continue
+      if (!isAdmin) {
+        const own = await ctx.db
+          .query('questionAttempts')
+          .withIndex('by_studentId_questionId', (q) => q.eq('studentId', callerId).eq('questionId', questionId))
+          .collect()
+        if (!own.some((attempt) => completedIds.has(attempt.sessionId))) continue
+      }
+      const question = await ctx.db.get('questions', questionId)
+      if (question == null) continue
+
+      const tally = await ctx.db
+        .query('questionAnswerStats')
+        .withIndex('by_questionId', (q) => q.eq('questionId', questionId))
+        .unique()
+      results.push({
+        questionId,
+        ...summarizeAnswerStats(tally, question.options.map((option) => option.label)),
+      })
+    }
+    return results
+  },
+})
 
 function summarize(session: Doc<'sessions'>) {
   return {

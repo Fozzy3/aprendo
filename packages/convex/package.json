@@ -7,7 +7,7 @@
     "predev": "convex dev --until-success",
     "logs": "convex logs",
     "test": "bun test",
-    "lint": "tsc -p convex && eslint . --report-unused-disable-directives --max-warnings 0"
+    "lint": "tsc -p src && eslint src --report-unused-disable-directives --max-warnings 0"
   },
   "exports": {
     "./api": "./src/_generated/api.js",
@@ -17,7 +17,14 @@
     "./globalScore": "./src/globalScore.ts",
     "./confidence": "./src/confidence.ts",
     "./examPlan": "./src/examPlan.ts",
-    "./elo": "./src/elo.ts"
+    "./elo": "./src/elo.ts",
+    "./pacing": "./src/pacing.ts",
+    "./sessionIntegrity": "./src/sessionIntegrity.ts",
+    "./mastery": "./src/mastery.ts",
+    "./practiceBuilder": "./src/practiceBuilder.ts",
+    "./answerStats": "./src/answerStats.ts",
+    "./studyPlan": "./src/studyPlan.ts",
+    "./studyTime": "./src/studyTime.ts"
   },
   "dependencies": {
     "@ai-sdk/google": "^3.0.54",

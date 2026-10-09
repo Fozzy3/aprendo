@@ -76,27 +76,20 @@ export const createBooklet = internalMutation({
   },
 })
 
-/** Drop everything previously imported for a booklet, so a re-run is idempotent. */
-export const clearBooklet = internalMutation({
-  args: { pdfUploadId: v.id('pdfUploads') },
-  handler: async (ctx, args) => {
-    const questions = await ctx.db
-      .query('questions')
-      .withIndex('by_pdfUploadId', (q) => q.eq('pdfUploadId', args.pdfUploadId))
-      .collect()
-    for (const question of questions) await ctx.db.delete(question._id)
-
-    const groups = await ctx.db
-      .query('questionGroups')
-      .withIndex('by_pdfUploadId', (q) => q.eq('pdfUploadId', args.pdfUploadId))
-      .collect()
-    for (const group of groups) await ctx.db.delete(group._id)
-
-    return { removedQuestions: questions.length, removedGroups: groups.length }
-  },
-})
-
-export const insertBookletQuestions = internalMutation({
+/**
+ * Insert or update one slice of a booklet's questions.
+ *
+ * Re-running the loader must not touch ids: attempts, session questions, the
+ * review queue and the Elo calibration all point at a question's `_id`, and a
+ * delete-and-reinsert left every one of them dangling. So a question is matched
+ * by its number within the booklet and a group by its context key, and a reload
+ * patches the row that already exists. Fields this loader does not own (Elo,
+ * rendered crops) survive the patch.
+ *
+ * Group ranges and positions arrive computed over the whole booklet
+ * (`groupSlots`), so a passage that straddles two slices is still one row.
+ */
+export const upsertBookletQuestions = internalMutation({
   args: {
     pdfUploadId: v.id('pdfUploads'),
     subjectId: v.string(),
@@ -104,8 +97,16 @@ export const insertBookletQuestions = internalMutation({
       v.object({
         number: v.number(),
         stem: v.string(),
-        contextMarkdown: v.optional(v.string()),
-        contextKey: v.optional(v.string()),
+        group: v.optional(
+          v.object({
+            key: v.string(),
+            contextMarkdown: v.string(),
+            firstNumber: v.number(),
+            lastNumber: v.number(),
+            memberCount: v.number(),
+            position: v.number(),
+          }),
+        ),
         options: v.array(v.object({ label: v.string(), bodyMarkdown: v.string() })),
         correctOption: v.string(),
         categoryId: v.string(),
@@ -117,52 +118,58 @@ export const insertBookletQuestions = internalMutation({
   },
   handler: async (ctx, args) => {
     const now = Date.now()
+    const [existingQuestions, existingGroups] = await Promise.all([
+      ctx.db
+        .query('questions')
+        .withIndex('by_pdfUploadId', (q) => q.eq('pdfUploadId', args.pdfUploadId))
+        .collect(),
+      ctx.db
+        .query('questionGroups')
+        .withIndex('by_pdfUploadId', (q) => q.eq('pdfUploadId', args.pdfUploadId))
+        .collect(),
+    ])
+    const questionByNumber = new Map(existingQuestions.map((row) => [row.questionNumber, row]))
+    const groupIdByKey = new Map(existingGroups.map((row) => [row.contextKey, row._id]))
 
     // One group row per distinct stimulus, so members share the text instead of
     // each carrying a copy — the arrangement `expandToGroups` expects.
-    const groupIdByKey = new Map<string, Id<'questionGroups'>>()
-    for (const question of args.questions) {
-      const key = question.contextKey
-      if (key == null || question.contextMarkdown == null) continue
-      if (groupIdByKey.has(key)) continue
-
-      const members = args.questions.filter((item) => item.contextKey === key)
-      const numbers = members.map((item) => item.number)
-      const groupId = await ctx.db.insert('questionGroups', {
-        pdfUploadId: args.pdfUploadId,
-        contextKey: key,
-        contextMarkdown: question.contextMarkdown,
-        firstNumber: Math.min(...numbers),
-        lastNumber: Math.max(...numbers),
-        memberCount: members.length,
-        createdAt: now,
-      })
-      groupIdByKey.set(key, groupId)
+    const written = new Set<string>()
+    for (const { group } of args.questions) {
+      if (group == null || written.has(group.key)) continue
+      written.add(group.key)
+      const fields = {
+        contextMarkdown: group.contextMarkdown,
+        firstNumber: group.firstNumber,
+        lastNumber: group.lastNumber,
+        memberCount: group.memberCount,
+      }
+      const groupId = groupIdByKey.get(group.key)
+      if (groupId != null) {
+        await ctx.db.patch("questionGroups", groupId, fields)
+      } else {
+        groupIdByKey.set(
+          group.key,
+          await ctx.db.insert('questionGroups', {
+            pdfUploadId: args.pdfUploadId,
+            contextKey: group.key,
+            ...fields,
+            createdAt: now,
+          }),
+        )
+      }
     }
 
     let inserted = 0
     for (const question of args.questions) {
-      const groupId = question.contextKey == null ? undefined : groupIdByKey.get(question.contextKey)
-      const members =
-        question.contextKey == null
-          ? []
-          : args.questions
-              .filter((item) => item.contextKey === question.contextKey)
-              .sort((a, b) => a.number - b.number)
-
-      await ctx.db.insert('questions', {
-        pdfUploadId: args.pdfUploadId,
-        questionNumber: question.number,
+      const fields = {
         sequence: question.number,
         bodyMarkdown: question.stem,
         options: question.options,
-        createdAt: now,
-        groupId,
-        groupPosition:
-          groupId == null ? undefined : members.findIndex((item) => item.number === question.number),
+        groupId: question.group == null ? undefined : groupIdByKey.get(question.group.key),
+        groupPosition: question.group?.position,
 
         // Printed in the booklet, so it is settled — not inferred, not scored.
-        answerStatus: 'completed',
+        answerStatus: 'completed' as const,
         answerCorrectOption: question.correctOption,
         answerConfidence: 1,
         answerModelId: 'icfes-booklet-key',
@@ -171,7 +178,7 @@ export const insertBookletQuestions = internalMutation({
 
         // The one field the booklet does not carry. Flagged for review so the
         // model pipeline can improve it later without re-importing anything.
-        taxonomyStatus: question.confidentTag ? 'completed' : 'needs_review',
+        taxonomyStatus: question.confidentTag ? ('completed' as const) : ('needs_review' as const),
         taxonomyVersion: 'keyword-v1',
         taxonomyRelease: 'keyword-v1',
         subjectId: args.subjectId,
@@ -192,26 +199,106 @@ export const insertBookletQuestions = internalMutation({
         // Matemáticas with zero usable questions to measure a student with,
         // which is a worse answer to "what level am I" than a slightly
         // misfiled subtopic.
-        eligibility: 'diagnostic',
+        eligibility: 'diagnostic' as const,
         eligibilityReasons: question.confidentTag
           ? ['icfes_answer_key', 'keyword_taxonomy_confident']
           : ['icfes_answer_key', 'keyword_taxonomy_low_confidence'],
         eligibilityEvaluatedAt: now,
-      })
-      inserted += 1
+      }
+
+      const existing = questionByNumber.get(question.number)
+      if (existing != null) {
+        await ctx.db.patch("questions", existing._id, fields)
+      } else {
+        await ctx.db.insert('questions', {
+          pdfUploadId: args.pdfUploadId,
+          questionNumber: question.number,
+          createdAt: now,
+          ...fields,
+        })
+        inserted += 1
+      }
     }
 
-    await ctx.db.patch(args.pdfUploadId, {
-      questionCount: inserted,
-      answerCompletedCount: inserted,
-      taxonomyCompletedCount: inserted,
-      diagnosticEligibleCount: args.questions.filter((q) => q.confidentTag).length,
+    return { inserted, updated: args.questions.length - inserted, groups: written.size }
+  },
+})
+
+/**
+ * Split a reload into the questions it kept, the ones it no longer has, and the
+ * groups nothing points at any more.
+ *
+ * A missing question is retired, never deleted: a number also goes missing when
+ * the parser's filters drop it, and attempts and session questions point at its
+ * id (with no index to check them cheaply). A group stays while any row, retired
+ * included, still references it, so review can show a question with its text.
+ */
+export function planBookletFinish<
+  Q extends { questionNumber: number; groupId?: string },
+  G extends { _id: string; contextKey: string },
+>(questions: Q[], groups: G[], keepNumbers: ReadonlySet<number>, keepKeys: ReadonlySet<string>) {
+  const referenced = new Set(questions.map((question) => question.groupId))
+  return {
+    kept: questions.filter((question) => keepNumbers.has(question.questionNumber)),
+    retired: questions.filter((question) => !keepNumbers.has(question.questionNumber)),
+    orphanGroups: groups.filter((group) => !keepKeys.has(group.contextKey) && !referenced.has(group._id)),
+  }
+}
+
+/**
+ * Close a (re)load once every slice is in: retire what the booklet no longer
+ * has, then recount. The counts are read from the rows rather than from the
+ * last slice, which is how `/admin` came to report 8 Sociales questions out of
+ * 48. A retired question leaves every pool (they draw by eligibility), and a
+ * later reload that finds it again makes it `diagnostic` once more.
+ */
+export const finishBookletLoad = internalMutation({
+  args: {
+    pdfUploadId: v.id('pdfUploads'),
+    questionNumbers: v.array(v.number()),
+    contextKeys: v.array(v.string()),
+  },
+  handler: async (ctx, args) => {
+    const [questions, groups] = await Promise.all([
+      ctx.db
+        .query('questions')
+        .withIndex('by_pdfUploadId', (q) => q.eq('pdfUploadId', args.pdfUploadId))
+        .collect(),
+      ctx.db
+        .query('questionGroups')
+        .withIndex('by_pdfUploadId', (q) => q.eq('pdfUploadId', args.pdfUploadId))
+        .collect(),
+    ])
+    const { kept, retired, orphanGroups } = planBookletFinish(
+      questions,
+      groups,
+      new Set(args.questionNumbers),
+      new Set(args.contextKeys),
+    )
+
+    const now = Date.now()
+    for (const question of retired) {
+      await ctx.db.patch("questions", question._id, {
+        eligibility: 'excluded',
+        eligibilityReasons: ['removed_from_booklet'],
+        eligibilityEvaluatedAt: now,
+      })
+    }
+    for (const group of orphanGroups) await ctx.db.delete("questionGroups", group._id)
+
+    const confident = kept.filter((question) => question.taxonomyStatus === 'completed')
+    await ctx.db.patch("pdfUploads", args.pdfUploadId, {
+      questionCount: kept.length,
+      answerCompletedCount: kept.length,
+      taxonomyCompletedCount: kept.length,
+      diagnosticEligibleCount: confident.length,
+      excludedQuestionCount: retired.length,
       updatedAt: now,
       processedAt: now,
       enrichedAt: now,
     })
 
-    return { inserted, groups: groupIdByKey.size }
+    return { questions: kept.length, retiredQuestions: retired.length, removedGroups: orphanGroups.length }
   },
 })
 
@@ -225,7 +312,7 @@ export const grantAdmin = internalMutation({
       .withIndex('by_normalizedEmail', (q) => q.eq('normalizedEmail', normalized))
       .unique()
     if (student == null) return { granted: false, reason: 'No existe un estudiante con ese correo.' }
-    await ctx.db.patch(student._id, { isAdmin: true, updatedAt: Date.now() })
+    await ctx.db.patch("students", student._id, { isAdmin: true, updatedAt: Date.now() })
     return { granted: true, studentId: student._id }
   },
 })
@@ -276,7 +363,7 @@ export const attachCrops = internalMutation({
     for (const crop of args.questions) {
       const row = byNumber.get(crop.number)
       if (row == null) continue
-      await ctx.db.patch(row._id, { renderedStemImageId: crop.storageId })
+      await ctx.db.patch("questions", row._id, { renderedStemImageId: crop.storageId })
       attached += 1
     }
 
@@ -290,7 +377,7 @@ export const attachCrops = internalMutation({
         (g) => g.firstNumber === crop.first && g.lastNumber === crop.last,
       )
       if (row == null) continue
-      await ctx.db.patch(row._id, { renderedContextImageId: crop.storageId })
+      await ctx.db.patch("questionGroups", row._id, { renderedContextImageId: crop.storageId })
       attachedGroups += 1
     }
 

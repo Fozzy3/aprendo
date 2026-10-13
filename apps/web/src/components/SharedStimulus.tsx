@@ -1,4 +1,4 @@
-import MarkdownBlock from './MarkdownBlock.tsx'
+import { MarkdownBlock } from './MarkdownBlock.tsx'
 
 export interface QuestionGroupContext {
   id: string

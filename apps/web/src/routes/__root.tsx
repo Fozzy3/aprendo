@@ -69,6 +69,11 @@ export const Route = createRootRouteWithContext<{
       {
         title: 'Aprendo | ICFES Saber 11',
       },
+      {
+        name: 'description',
+        content:
+          'Aprendo ubica a cada estudiante de grado 11 en los niveles del Saber 11, le arma un plan diario y le muestra al docente quién necesita apoyo.',
+      },
     ],
     links: [
       {
@@ -79,6 +84,17 @@ export const Route = createRootRouteWithContext<{
   }),
   component: RootComponent,
 })
+
+// The design direction, emitted as the first thing in <body> so the built page
+// carries it (see DESIGN.md).
+const DIRECTION_CONTRACT = `<!--
+THESIS: a 5 mm squared notebook as an instrument: a ruling everything respects and a red margin where the teacher's judgment lives; refuses the blue LMS of cards and the KPI dashboard.
+OWN-WORLD: cold white paper, pale blue ruling only on work sheets, navy ink, margin red for mistakes and risk, green ink for right, pencil grey for tentative; Source Serif 4 headings, Public Sans work; 1px rules, square controls, no cards, no shadows.
+STORY: the student knows what to study today and their ICFES level per area; the teacher knows who and which competency is at risk; the school sees it as its own.
+FIRST VIEWPORT (Hoy): cover label with the school crest top left; today's plan as numbered lines on the ruling, "Empezar" on the first line; date and study days in the margin column.
+FORM: Cuaderno cuadriculado, seed 6ffabd95.
+FINISH: unreviewed and undocumented is unfinished; this build ends with the finish review, the verdict, DESIGN.md, and every shipping raster carrying its provenance.
+-->`
 
 function RootComponent() {
   const ctx = useRouteContext({ from: Route.id })
@@ -93,7 +109,8 @@ function RootComponent() {
           <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
           <HeadContent />
         </head>
-        <body className="font-sans antialiased selection:bg-[var(--accent-soft)]">
+        <body className="font-sans antialiased">
+          <div hidden dangerouslySetInnerHTML={{ __html: DIRECTION_CONTRACT }} />
           <TooltipProvider>
             <Outlet />
           </TooltipProvider>

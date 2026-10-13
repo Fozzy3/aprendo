@@ -1,12 +1,13 @@
 import { useConvexMutation } from '@convex-dev/react-query'
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { Link, useNavigate } from '@tanstack/react-router'
-import { BookOpen, Check, Lock, Play } from 'lucide-react'
-import { useState } from 'react'
+import { BookOpen, Play } from 'lucide-react'
+import { useState, type CSSProperties } from 'react'
 import { api } from '@aprendo/convex/api'
 import type { MasteryLevel } from '@aprendo/convex/mastery'
 import { learningPathQuery, pathSubjectsQuery, studentProgressQuery } from '../lib/student-queries.ts'
 import { getSubjectTheme } from '../lib/subject-theme.ts'
+import { readConvexError } from '../lib/convex-error.ts'
 import {
   levelFor,
   masteryLevelMap,
@@ -14,7 +15,8 @@ import {
   scopeMastery,
   type PathState,
 } from '../lib/mastery-display.ts'
-import { MascotMessage } from './Mascot.tsx'
+import { EmptyState } from './EmptyState.tsx'
+import { PageLoader } from './FullScreenLoader.tsx'
 import { MasteryBadge, MasteryLegend } from './MasteryBadge.tsx'
 
 const DEFAULT_SUBJECT_ID = 'lectura_critica'
@@ -35,53 +37,99 @@ export function LearningPathPage({ studentId }: { studentId: string }) {
   const progress = useQuery(studentProgressQuery(studentId))
 
   const theme = getSubjectTheme(subjectId)
+  const nodes =
+    path.data == null || progress.data == null
+      ? null
+      : withLevels(path.data.nodes, progress.data.subtopicMastery)
+  const mastery = nodes == null ? null : scopeMastery(nodes)
 
   return (
-    <div className="page-container py-8">
-      <header className="fade-in mb-6">
-        <p className="kicker">Tu ruta</p>
-        <h1 className="font-display text-3xl font-bold tracking-tight text-[var(--text-primary)]">
-          Ruta de aprendizaje
-        </h1>
-        <p className="mt-1 text-sm text-[var(--text-secondary)]">
-          Un tema a la vez, hasta tu siguiente nivel.{' '}
-          <Link to="/syllabus" className="font-semibold">
-            Ver todo el temario
-          </Link>
+    <div className="ruled-page fade-in">
+      {/* The margin: the area this page is about and how far along it is. */}
+      <aside className="ruled-page-margin" aria-label="Tu área">
+        <p className="ruled-page-date inline-flex items-center gap-2">
+          <span aria-hidden className="subject-dot" style={{ '--subject-color': theme.color } as CSSProperties} />
+          {theme.label}
         </p>
-      </header>
+        {mastery != null ? (
+          <dl className="margin-facts">
+            <div>
+              <dt>Dominio del área</dt>
+              <dd>{mastery.percent}%</dd>
+            </div>
+            <div>
+              <dt>Competente o más</dt>
+              <dd>
+                {mastery.competenteOrAbove} de {mastery.subtopicCount}
+              </dd>
+            </div>
+          </dl>
+        ) : null}
+        <Link to="/syllabus" className="margin-link">
+          Ver todo el temario
+        </Link>
+      </aside>
 
-      <div className="fade-in stagger-1 topic-picker mb-6">
-        {(subjects.data ?? []).map((subject) => {
-          const subjectTheme = getSubjectTheme(subject.subjectId)
-          const isActive = subject.subjectId === subjectId
-          return (
-            <button
-              key={subject.subjectId}
-              type="button"
-              onClick={() => setSubjectId(subject.subjectId)}
-              aria-pressed={isActive}
-              className={`topic-chip ${isActive ? 'is-active' : ''}`}
-              style={isActive ? { borderColor: subjectTheme.color } : undefined}
-            >
-              <span aria-hidden="true">{subjectTheme.emoji}</span> {subject.label}
-            </button>
-          )
-        })}
+      <div className="ruled-page-body">
+        <header className="ruled-page-head">
+          <h1 className="page-title">Ruta de aprendizaje</h1>
+          <p className="page-lede">Un tema a la vez, en orden, hasta tu siguiente nivel.</p>
+        </header>
+
+        <div className="mb-2 overflow-x-auto">
+          <nav className="tab-nav" aria-label="Área">
+            {(subjects.data ?? []).map((subject) => {
+              const isActive = subject.subjectId === subjectId
+              return (
+                <button
+                  key={subject.subjectId}
+                  type="button"
+                  onClick={() => setSubjectId(subject.subjectId)}
+                  aria-pressed={isActive}
+                  className={`tab-item shrink-0 whitespace-nowrap ${isActive ? 'is-active' : ''}`}
+                >
+                  <span
+                    aria-hidden
+                    className="subject-dot"
+                    style={{ '--subject-color': getSubjectTheme(subject.subjectId).color } as CSSProperties}
+                  />
+                  {subject.label}
+                </button>
+              )
+            })}
+          </nav>
+        </div>
+
+        {path.data == null || nodes == null || mastery == null ? (
+          <PageLoader message="Cargando la ruta…" />
+        ) : (
+          <>
+            <LevelSection level={path.data.level} />
+            <section className="ruled-section" aria-labelledby="path-topics-title">
+              <div className="section-head">
+                <h2 id="path-topics-title" className="section-title">Temas, en orden</h2>
+                {nodes.length > 0 ? (
+                  <span className="section-meta tabular-nums">
+                    {mastery.points} / {mastery.maxPoints} pts
+                  </span>
+                ) : null}
+              </div>
+              {nodes.length === 0 ? (
+                <EmptyState title="Esta área aún no tiene temas">
+                  Todavía no hay preguntas cargadas para esta materia. Prueba con otra mientras tanto.
+                </EmptyState>
+              ) : (
+                <>
+                  <PathLines nodes={nodes} studentId={studentId} />
+                  <div className="mt-5">
+                    <MasteryLegend />
+                  </div>
+                </>
+              )}
+            </section>
+          </>
+        )}
       </div>
-
-      {path.data == null || progress.data == null ? (
-        <div className="h-64 animate-pulse rounded-[var(--radius-lg)] bg-[var(--bg-inset)]" />
-      ) : (
-        <>
-          <LevelHeader level={path.data.level} color={theme.color} />
-          <PathTrack
-            nodes={withLevels(path.data.nodes, progress.data.subtopicMastery)}
-            studentId={studentId}
-            subjectColor={theme.color}
-          />
-        </>
-      )}
     </div>
   )
 }
@@ -107,126 +155,82 @@ type SubjectLevel = {
   } | null
 }
 
-function LevelHeader({ level, color }: { level: SubjectLevel; color: string }) {
-  if (!level.hasEnoughEvidence || level.placement == null) {
-    return (
-      <section className="fade-in stagger-2 card mb-6 p-5">
-        <p className="text-sm font-bold text-[var(--text-primary)]">Sin nivel aún</p>
-        <p className="mt-1 text-sm text-[var(--text-secondary)]">
-          Te faltan {level.attemptsNeeded} preguntas en esta área para calcular tu nivel ICFES
-          con confianza. Haz la nivelación o practica un poco más.
-        </p>
-      </section>
-    )
-  }
-
-  const { band, index, bandCount, nextBand, pointsToNextBand } = level.placement
-
+function LevelSection({ level }: { level: SubjectLevel }) {
+  const placement = level.hasEnoughEvidence ? level.placement : null
   return (
-    <section className="fade-in stagger-2 card mb-6 p-5">
-      <div className="mb-3 flex flex-wrap items-baseline justify-between gap-2">
-        <div>
-          <p className="kicker">Tu nivel ICFES</p>
-          <p className="font-display text-2xl font-bold text-[var(--text-primary)]">
-            {band.labelEs}
+    <section className="ruled-section" aria-labelledby="path-level-title">
+      <h2 id="path-level-title" className="section-title">Tu nivel ICFES</h2>
+      {placement == null ? (
+        <>
+          <p className="m-0 font-display text-2xl font-semibold text-[var(--text-primary)]">Sin nivel aún</p>
+          <p className="mt-1 max-w-[60ch] text-sm text-[var(--text-secondary)]">
+            Te faltan {level.attemptsNeeded} preguntas en esta área para calcular tu nivel ICFES con
+            confianza. Haz la nivelación o practica un poco más.
           </p>
-        </div>
-        {nextBand != null && pointsToNextBand != null && (
-          <p className="text-sm text-[var(--text-secondary)]">
-            Te faltan{' '}
-            <strong className="text-[var(--text-primary)]">{pointsToNextBand} puntos</strong> para{' '}
-            {nextBand.labelEs}
-          </p>
-        )}
-      </div>
-
-      <div
-        className="flex gap-1"
-        role="img"
-        aria-label={`Nivel ${index} de ${bandCount}`}
-      >
-        {Array.from({ length: bandCount }, (_, position) => (
-          <span
-            key={position}
-            className="h-2 flex-1 rounded-[var(--radius-pill)]"
-            style={{
-              background: position < index ? color : 'var(--bg-inset)',
-              border: '1px solid var(--border)',
-            }}
-          />
-        ))}
-      </div>
-
-      <p className="mt-3 text-sm text-[var(--text-secondary)]">{band.descriptorEs}</p>
+        </>
+      ) : (
+        <>
+          <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+            <p className="m-0 font-display text-2xl font-semibold text-[var(--text-primary)]">
+              {placement.band.labelEs}
+            </p>
+            {placement.nextBand != null && placement.pointsToNextBand != null ? (
+              <p className="m-0 text-sm text-[var(--text-secondary)]">
+                Te faltan <strong className="text-[var(--text-primary)]">{placement.pointsToNextBand} puntos</strong>{' '}
+                para {placement.nextBand.labelEs}
+              </p>
+            ) : (
+              <p className="m-0 text-sm text-[var(--text-secondary)]">Estás en el nivel más alto de esta área</p>
+            )}
+          </div>
+          <div
+            className="mt-3 flex gap-px"
+            role="img"
+            aria-label={`Nivel ${placement.index} de ${placement.bandCount}`}
+          >
+            {Array.from({ length: placement.bandCount }, (_, position) => (
+              <span
+                key={position}
+                className="h-1.5 flex-1"
+                style={{ background: position < placement.index ? 'var(--text-primary)' : 'var(--bg-inset)' }}
+              />
+            ))}
+          </div>
+          <p className="mt-3 max-w-[60ch] text-sm text-[var(--text-secondary)]">{placement.band.descriptorEs}</p>
+        </>
+      )}
     </section>
   )
 }
 
-function PathTrack({
-  nodes,
-  studentId,
-  subjectColor,
-}: {
-  nodes: PathNode[]
-  studentId: string
-  subjectColor: string
-}) {
+/** The path as numbered lines: the line you are on is inked, the rest wait. */
+function PathLines({ nodes, studentId }: { nodes: PathNode[]; studentId: string }) {
   const states = resolvePathStates(nodes)
-  const mastery = scopeMastery(nodes)
-
-  if (nodes.length === 0) {
-    return (
-      <div className="card">
-        <MascotMessage mood="sleeping" title="Esta área aún no tiene temas">
-          Todavía no hay preguntas cargadas para esta materia. Prueba con otra
-          mientras tanto.
-        </MascotMessage>
-      </div>
-    )
-  }
-
   return (
-    <>
-      <section className="fade-in stagger-3 card mb-4 p-4">
-        <div className="mb-3 flex flex-wrap items-baseline justify-between gap-2">
-          <p className="text-sm font-bold text-[var(--text-primary)]">
-            Dominio del área: <span className="tabular-nums">{mastery.percent}%</span>
-          </p>
-          <p className="text-xs tabular-nums text-[var(--text-tertiary)]">
-            {mastery.points} / {mastery.maxPoints} pts · {mastery.competenteOrAbove} de{' '}
-            {mastery.subtopicCount} temas en Competente o más
-          </p>
-        </div>
-        <MasteryLegend />
-      </section>
-      <ol className="fade-in stagger-3 relative m-0 flex list-none flex-col gap-3 p-0">
-        {nodes.map((node, index) => (
-          <PathNodeRow
-            key={node.subtopicId}
-            node={node}
-            state={states[index] ?? 'locked'}
-            studentId={studentId}
-            subjectColor={subjectColor}
-            isLast={index === nodes.length - 1}
-          />
-        ))}
-      </ol>
-    </>
+    <ol className="plan-lines">
+      {nodes.map((node, index) => (
+        <PathLine
+          key={node.subtopicId}
+          node={node}
+          number={index + 1}
+          state={states[index] ?? 'locked'}
+          studentId={studentId}
+        />
+      ))}
+    </ol>
   )
 }
 
-function PathNodeRow({
+function PathLine({
   node,
+  number,
   state,
   studentId,
-  subjectColor,
-  isLast,
 }: {
   node: PathNode
+  number: number
   state: PathState
   studentId: string
-  subjectColor: string
-  isLast: boolean
 }) {
   const navigate = useNavigate()
   const createSession = useMutation({
@@ -237,89 +241,64 @@ function PathNodeRow({
   })
 
   const isLocked = state === 'locked'
-  const isEmpty = state === 'empty'
-  const hasQuestions = node.questionCount > 0
   const isCurrent = state === 'current'
+  const hasQuestions = node.questionCount > 0
+  const isMuted = isLocked || state === 'empty'
 
   return (
-    <li className="relative">
-      {!isLast && (
-        <span
-          aria-hidden="true"
-          className="absolute left-[1.4rem] top-[3.2rem] bottom-[-0.75rem] w-[3px] rounded-full"
-          style={{ background: state === 'mastered' ? subjectColor : 'var(--border-strong)' }}
-        />
-      )}
-
-      <div
-        className="card flex items-start gap-3 p-4"
-        style={isCurrent ? { borderColor: subjectColor } : undefined}
-      >
-        <span
-          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border-2"
-          style={{
-            background: state === 'mastered' ? subjectColor : 'var(--bg-card)',
-            borderColor: isLocked || isEmpty ? 'var(--border-strong)' : subjectColor,
-            color: state === 'mastered' ? 'var(--text-inverted)' : subjectColor,
-            boxShadow: isCurrent ? `0 3px 0 ${subjectColor}` : undefined,
-          }}
-        >
-          {state === 'mastered' ? (
-            <Check size={18} />
-          ) : isLocked ? (
-            <Lock size={16} />
-          ) : isEmpty ? (
-            <BookOpen size={16} />
-          ) : (
-            <Play size={16} />
-          )}
+    <li className={`plan-line${isCurrent ? ' is-first' : ''}`} aria-current={isCurrent ? 'step' : undefined}>
+      <span className="plan-line-number" aria-hidden>
+        {number}
+      </span>
+      <div className="flex min-w-0 flex-col gap-1 py-3">
+        <span className="text-xs text-[var(--text-tertiary)]">{node.categoryLabel}</span>
+        <span className="flex flex-wrap items-center gap-x-2 gap-y-1">
+          <span className={`plan-line-title ${isMuted ? 'text-[var(--text-tertiary)]' : 'text-[var(--text-primary)]'}`}>
+            {node.label}
+          </span>
+          <MasteryBadge level={node.level} />
+        </span>
+        <span className="plan-line-reason">
+          {isCurrent && 'Estás aquí · '}
+          {hasQuestions ? `${node.questionCount} preguntas` : 'Sin preguntas aún: no bloquea tu ruta'}
+          {isLocked && ' · se abre cuando llegues a Familiar en el tema anterior'}
         </span>
 
-        <div className="min-w-0 flex-1">
-          <p className="text-[0.68rem] font-bold uppercase tracking-wide text-[var(--text-tertiary)]">
-            {node.categoryLabel}
-          </p>
-          <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
-            <p className="text-sm font-bold text-[var(--text-primary)]">{node.label}</p>
-            <MasteryBadge level={node.level} />
-          </div>
-          <p className="mt-0.5 text-xs text-[var(--text-tertiary)]">
-            {isCurrent && 'Estás aquí · '}
-            {hasQuestions
-              ? `${node.questionCount} preguntas`
-              : 'Sin preguntas aún: no bloquea tu ruta'}
-            {isLocked && ' · se abre cuando llegues a Familiar en el tema anterior'}
-          </p>
-
-          {!isLocked && (
-            <div className="mt-2.5 flex flex-wrap gap-2">
-              <Link
-                to="/lesson/$subtopicId"
-                params={{ subtopicId: node.subtopicId }}
-                className="btn-ghost text-xs no-underline"
+        {!isLocked ? (
+          <span className="mt-1.5 flex flex-wrap gap-2">
+            <Link
+              to="/lesson/$subtopicId"
+              params={{ subtopicId: node.subtopicId }}
+              className="btn-ghost text-xs no-underline"
+            >
+              <BookOpen size={13} aria-hidden />
+              {node.hasLesson ? 'Ver lección' : 'Aprender el tema'}
+            </Link>
+            {hasQuestions ? (
+              <button
+                type="button"
+                disabled={createSession.isPending}
+                onClick={() =>
+                  createSession.mutate({
+                    studentId: studentId as never,
+                    kind: 'topic',
+                    subtopicId: node.subtopicId,
+                  })
+                }
+                className={`${isCurrent ? 'btn-primary' : 'btn-secondary'} text-xs`}
               >
-                <BookOpen size={13} />
-                {node.hasLesson ? 'Ver lección' : 'Aprender el tema'}
-              </Link>
-              {hasQuestions && (
-                <button
-                  type="button"
-                  disabled={createSession.isPending}
-                  onClick={() =>
-                    createSession.mutate({
-                      studentId: studentId as never,
-                      kind: 'topic',
-                      subtopicId: node.subtopicId,
-                    })
-                  }
-                  className="btn-primary text-xs"
-                >
-                  {createSession.isPending ? 'Preparando…' : 'Practicar'}
-                </button>
-              )}
-            </div>
-          )}
-        </div>
+                <Play size={13} aria-hidden />
+                {createSession.isPending ? 'Preparando…' : 'Practicar'}
+              </button>
+            ) : null}
+          </span>
+        ) : null}
+
+        {createSession.error ? (
+          <p role="alert" className="notice is-danger">
+            {readConvexError(createSession.error, 'No se pudo iniciar la práctica.')}
+          </p>
+        ) : null}
       </div>
     </li>
   )

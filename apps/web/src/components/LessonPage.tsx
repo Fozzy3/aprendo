@@ -1,45 +1,24 @@
 import { useConvexMutation } from '@convex-dev/react-query'
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { Link, useNavigate } from '@tanstack/react-router'
-import { ArrowLeft, Lightbulb, Loader2, Play } from 'lucide-react'
+import { ArrowLeft, Loader2, Play } from 'lucide-react'
 import { useEffect, useRef } from 'react'
 import { api } from '@aprendo/convex/api'
-import MarkdownBlock from './MarkdownBlock.tsx'
+import { EmptyState } from './EmptyState.tsx'
+import { MarkdownBlock } from './MarkdownBlock.tsx'
 import { buildDemoDocument } from '../lib/demo-document.ts'
 import { conceptLessonQuery } from '../lib/student-queries.ts'
-import { getSubjectIdForSubtopic, getSubjectLabel, getSubtopicLabel } from '../lib/taxonomy.ts'
+import { getSubjectIdForSubtopic, getSubjectLabel, getSubtopicLabel } from '@aprendo/convex/taxonomy'
 import { useResolvedTheme } from '../lib/use-resolved-theme.ts'
 import { readConvexError } from '../lib/convex-error.ts'
 
-/** Shown while the text sections are still being drafted (no content yet). */
-function WritingSkeleton() {
+/** A line of status in place of a section that is still being written. */
+function Writing({ children }: { children: React.ReactNode }) {
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-center gap-2 text-sm font-medium text-[var(--text-secondary)]">
-        <Loader2 size={15} className="animate-spin text-[var(--accent)]" />
-        Escribiendo tu lección…
-      </div>
-      <div className="card h-32 animate-pulse bg-[var(--bg-inset)]" />
-      <div className="card h-40 animate-pulse bg-[var(--bg-inset)]" />
-    </div>
-  )
-}
-
-/** Placeholder in the demo slot while the interactive demo is being built. */
-function DemoBuildingPlaceholder() {
-  return (
-    <section className="card overflow-hidden">
-      <div className="border-b border-[var(--border)] px-6 py-3">
-        <p className="kicker">Demostración interactiva</p>
-      </div>
-      <div className="flex h-40 flex-col items-center justify-center gap-2 bg-[var(--bg-inset)]">
-        <Loader2 size={18} className="animate-spin text-[var(--accent)]" />
-        <p className="text-sm font-medium text-[var(--text-secondary)]">
-          Creando una demostración interactiva…
-        </p>
-        <p className="text-xs text-[var(--text-tertiary)]">Ya puedes leer la lección mientras tanto.</p>
-      </div>
-    </section>
+    <p role="status" className="m-0 inline-flex items-center gap-2 text-sm text-[var(--text-secondary)]">
+      <Loader2 size={15} aria-hidden className="animate-spin text-[var(--text-tertiary)]" />
+      {children}
+    </p>
   )
 }
 
@@ -78,12 +57,14 @@ export function LessonPage({ subtopicId, studentId }: { subtopicId: string; stud
 
   if (subjectId == null) {
     return (
-      <div className="fade-in mx-auto max-w-md py-12 text-center">
-        <p className="mb-4 text-sm text-[var(--text-secondary)]">Este subtema no existe.</p>
-        <Link to="/syllabus" className="btn-primary no-underline">
-          Volver al temario
-        </Link>
-      </div>
+      <EmptyState
+        title="Este tema no existe"
+        action={
+          <Link to="/syllabus" className="btn-primary no-underline">
+            Volver al temario
+          </Link>
+        }
+      />
     )
   }
 
@@ -99,41 +80,39 @@ export function LessonPage({ subtopicId, studentId }: { subtopicId: string; stud
   const rewriteFailed = hasText && lesson?.status === 'failed'
   const isBuildingDemo = lesson?.status === 'generating' && hasText && lesson?.stage === 'demo'
 
+  // A Read surface: one column at reading width, sections opened by a rule.
   return (
-    <div className="fade-in mx-auto max-w-3xl space-y-5">
-      {/* Breadcrumb + title */}
-      <div>
-        <Link
-          to="/syllabus"
-          className="inline-flex items-center gap-1.5 text-sm text-[var(--text-tertiary)] no-underline transition-colors hover:text-[var(--text-secondary)]"
-        >
-          <ArrowLeft size={14} /> {getSubjectLabel(subjectId)}
-        </Link>
-        <h1 className="mt-2 font-display text-3xl italic tracking-tight text-[var(--text-primary)] sm:text-4xl">
-          {getSubtopicLabel(subtopicId)}
-        </h1>
-      </div>
+    <article className="fade-in mx-auto w-full max-w-3xl">
+      <Link to="/syllabus" className="back-link no-underline">
+        <ArrowLeft size={14} aria-hidden /> {getSubjectLabel(subjectId)}
+      </Link>
+      <header className="ruled-page-head">
+        <h1 className="page-title">{getSubtopicLabel(subtopicId)}</h1>
+        <p className="page-lede">Lee la idea, explórala y luego ponla a prueba con preguntas reales.</p>
+      </header>
 
       {isFailed ? (
-        <div className="card p-6 text-center">
-          <div role="alert" className="stage-alert mb-4">
+        <section className="ruled-section">
+          <p role="alert" className="notice is-danger">
             {readConvexError(requestMutation.error, 'No pudimos preparar esta lección.')}
-          </div>
+          </p>
           <button
             type="button"
             disabled={requestMutation.isPending}
             onClick={() => requestMutation.mutate()}
-            className="btn-primary"
+            className="btn-primary mt-4"
           >
             {requestMutation.isPending ? 'Reintentando…' : 'Reintentar'}
           </button>
-        </div>
+        </section>
       ) : !hasText ? (
-        <WritingSkeleton />
+        <section className="ruled-section">
+          <Writing>Escribiendo tu lección…</Writing>
+        </section>
       ) : (
         <>
           {rewriteFailed ? (
-            <div role="status" className="flex flex-wrap items-center justify-between gap-3 text-sm text-[var(--text-secondary)]">
+            <div role="status" className="notice flex flex-wrap items-center justify-between gap-3">
               <span>No pudimos actualizar esta lección; te mostramos la versión anterior.</span>
               <button
                 type="button"
@@ -146,54 +125,54 @@ export function LessonPage({ subtopicId, studentId }: { subtopicId: string; stud
             </div>
           ) : null}
 
-          <section className="card p-6">
-            <div className="mb-3 flex items-center gap-2">
-              <Lightbulb size={16} className="text-[var(--accent)]" />
-              <p className="kicker">La idea</p>
+          <section className="ruled-section" aria-labelledby="lesson-idea-title">
+            <h2 id="lesson-idea-title" className="section-title">La idea</h2>
+            <div className="max-w-[68ch]">
+              {lesson?.ideaBody ? <MarkdownBlock markdown={lesson.ideaBody} /> : null}
             </div>
-            {lesson?.ideaBody ? <MarkdownBlock markdown={lesson.ideaBody} /> : null}
           </section>
 
           {lesson?.demoHtml ? (
-            <section className="card overflow-hidden">
-              <div className="border-b border-[var(--border)] px-6 py-3">
-                <p className="kicker">Explóralo</p>
-              </div>
+            <section className="ruled-section" aria-labelledby="lesson-demo-title">
+              <h2 id="lesson-demo-title" className="section-title">Explóralo</h2>
               <iframe
                 srcDoc={buildDemoDocument(lesson.demoHtml, theme)}
                 sandbox="allow-scripts"
                 title={`Demostración: ${getSubtopicLabel(subtopicId)}`}
-                className="h-[26rem] w-full border-0 bg-[var(--bg-card)]"
+                className="h-[26rem] w-full border border-[var(--border)] bg-[var(--bg-card)]"
               />
             </section>
           ) : isBuildingDemo ? (
-            <DemoBuildingPlaceholder />
+            <section className="ruled-section" aria-labelledby="lesson-demo-title">
+              <h2 id="lesson-demo-title" className="section-title">Explóralo</h2>
+              <Writing>Creando una demostración interactiva…</Writing>
+              <p className="mt-1 text-xs text-[var(--text-tertiary)]">Ya puedes leer la lección mientras tanto.</p>
+            </section>
           ) : null}
         </>
       )}
 
-      {/* Practice CTA — always available, independent of lesson state */}
-      <div className="card flex flex-col items-center gap-3 p-6 text-center sm:flex-row sm:justify-between sm:text-left">
-        <div>
-          <p className="text-base font-semibold text-[var(--text-primary)]">¿Todo listo para practicar?</p>
-          <p className="text-sm text-[var(--text-secondary)]">Pon a prueba este tema con preguntas reales.</p>
+      {/* Practice — always available, independent of lesson state */}
+      <section className="ruled-section" aria-labelledby="lesson-practice-title">
+        <h2 id="lesson-practice-title" className="section-title">Practica este tema</h2>
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <p className="m-0 text-sm text-[var(--text-secondary)]">Pon a prueba este tema con preguntas reales.</p>
+          <button
+            type="button"
+            disabled={practiceMutation.isPending}
+            onClick={() => practiceMutation.mutate()}
+            className="btn-primary shrink-0"
+          >
+            <Play size={16} aria-hidden />
+            {practiceMutation.isPending ? 'Preparando…' : 'Practicar este tema'}
+          </button>
         </div>
-        <button
-          type="button"
-          disabled={practiceMutation.isPending}
-          onClick={() => practiceMutation.mutate()}
-          className="btn-primary shrink-0"
-        >
-          <Play size={16} />
-          {practiceMutation.isPending ? 'Preparando…' : 'Practicar este tema'}
-        </button>
-      </div>
-
-      {practiceMutation.error ? (
-        <div className="stage-alert">
-          {readConvexError(practiceMutation.error, 'No se pudo iniciar la práctica.')}
-        </div>
-      ) : null}
-    </div>
+        {practiceMutation.error ? (
+          <p role="alert" className="notice is-danger">
+            {readConvexError(practiceMutation.error, 'No se pudo iniciar la práctica.')}
+          </p>
+        ) : null}
+      </section>
+    </article>
   )
 }

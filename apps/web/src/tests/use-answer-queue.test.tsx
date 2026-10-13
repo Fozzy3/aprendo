@@ -3,7 +3,7 @@ import { act } from 'react'
 import { createRoot, type Root } from 'react-dom/client'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import type { QueueItem } from '../lib/answer-queue'
-import { useAnswerQueue } from '../lib/useAnswerQueue'
+import { useAnswerQueue } from '../lib/use-answer-queue'
 
 // Mounted with react-dom directly, as in session-timer.test.tsx.
 ;(globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true

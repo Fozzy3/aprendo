@@ -10,15 +10,17 @@ import { UploadCloud, X } from 'lucide-react'
 import { useState } from 'react'
 import type { ChangeEvent, DragEvent } from 'react'
 import { api } from '@aprendo/convex/api'
-import BrandMark from '../components/BrandMark.tsx'
-import MarkdownBlock from '../components/MarkdownBlock.tsx'
+import { Wordmark } from '../components/BrandMark.tsx'
+import { ReportsQueue } from '../components/admin/ReportsQueue.tsx'
+import { SchoolsAdmin } from '../components/admin/SchoolsAdmin.tsx'
+import { MarkdownBlock } from '../components/MarkdownBlock.tsx'
 import { pdfUploadsQuery, questionBrowserQuery } from '../lib/pdf-queries.ts'
 import { uploadPdfToConvex } from '../lib/pdf-upload.ts'
-import ThemeToggle from '../components/ThemeToggle.tsx'
+import { ThemeToggle } from '../components/ThemeToggle.tsx'
 import { FullScreenLoader } from '../components/FullScreenLoader.tsx'
 import { readConvexError } from '../lib/convex-error.ts'
 
-type AdminTab = 'uploads' | 'questions'
+type AdminTab = 'uploads' | 'questions' | 'reports' | 'schools'
 
 type AdminSearch = {
   tab?: AdminTab
@@ -37,7 +39,10 @@ export const Route = createFileRoute('/admin')({
     return { admin }
   },
   validateSearch: (search: Record<string, unknown>): AdminSearch => ({
-    tab: search.tab === 'questions' ? 'questions' : undefined,
+    tab:
+      search.tab === 'questions' || search.tab === 'reports' || search.tab === 'schools'
+        ? search.tab
+        : undefined,
     pdfUploadId:
       typeof search.pdfUploadId === 'string' ? search.pdfUploadId : undefined,
     sequence:
@@ -80,17 +85,8 @@ function AdminPage() {
       <header className="border-b border-[var(--border)] bg-[var(--bg)]">
         <div className="page-container-wide flex flex-wrap items-center justify-between gap-3 py-3">
           {/* Brand */}
-          <Link
-            to="/"
-            className="flex items-center gap-2.5 text-[var(--text-primary)] no-underline"
-          >
-            <div className="flex h-9 w-9 items-center justify-center rounded-full border border-[var(--border-accent)] bg-[var(--accent-soft)]">
-              <BrandMark />
-            </div>
-            <div>
-              <span className="text-sm font-semibold">Aprendo</span>
-              <span className="ml-1.5 text-xs text-[var(--text-tertiary)]">Admin</span>
-            </div>
+          <Link to="/" className="no-underline">
+            <Wordmark subtitle="Equipo Aprendo" />
           </Link>
 
           {/* Center tabs */}
@@ -105,7 +101,7 @@ function AdminPage() {
                 <polyline points="17 8 12 3 7 8" />
                 <line x1="12" x2="12" y1="3" y2="15" />
               </svg>
-              Upload PDFs
+              PDFs
             </Link>
             <Link
               to="/admin"
@@ -116,7 +112,21 @@ function AdminPage() {
                 <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z" />
                 <polyline points="14 2 14 8 20 8" />
               </svg>
-              Questions
+              Preguntas
+            </Link>
+            <Link
+              to="/admin"
+              search={{ tab: 'reports' }}
+              className={`tab-item ${activeTab === 'reports' ? 'is-active' : ''}`}
+            >
+              Reportes
+            </Link>
+            <Link
+              to="/admin"
+              search={{ tab: 'schools' }}
+              className={`tab-item ${activeTab === 'schools' ? 'is-active' : ''}`}
+            >
+              Colegios
             </Link>
           </nav>
 
@@ -135,7 +145,15 @@ function AdminPage() {
 
       {/* Content */}
       <main className="page-container-wide px-4 py-8">
-        {activeTab === 'uploads' ? <UploadsTab /> : <QuestionsTab search={search} />}
+        {activeTab === 'uploads' ? (
+          <UploadsTab />
+        ) : activeTab === 'reports' ? (
+          <ReportsQueue />
+        ) : activeTab === 'schools' ? (
+          <SchoolsAdmin />
+        ) : (
+          <QuestionsTab search={search} />
+        )}
       </main>
     </div>
   )

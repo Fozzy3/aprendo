@@ -12,19 +12,27 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AppRouteImport } from './routes/app'
-import { Route as DashboardRouteImport } from './routes/dashboard'
+import { Route as CuentaRouteImport } from './routes/cuenta'
 import { Route as DiagnosticRouteImport } from './routes/diagnostic'
 import { Route as HistoryRouteImport } from './routes/history'
+import { Route as JoinRouteImport } from './routes/join'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as PathRouteImport } from './routes/path'
 import { Route as PracticeRouteImport } from './routes/practice'
+import { Route as PrivacidadRouteImport } from './routes/privacidad'
 import { Route as ProgressRouteImport } from './routes/progress'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
+import { Route as SchoolRouteImport } from './routes/school'
 import { Route as SyllabusRouteImport } from './routes/syllabus'
+import { Route as TerminosRouteImport } from './routes/terminos'
 import { Route as TodayRouteImport } from './routes/today'
 import { Route as LessonSubtopicIdRouteImport } from './routes/lesson.$subtopicId'
 import { Route as PracticeSessionIdRouteImport } from './routes/practice.$sessionId'
+import { Route as TeacherIndexRouteImport } from './routes/teacher.index'
+import { Route as TeacherClassGroupIdRouteImport } from './routes/teacher.$classGroupId'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 import { Route as PracticeSessionIdReviewRouteImport } from './routes/practice.$sessionId.review'
+import { Route as TeacherStudentStudentIdRouteImport } from './routes/teacher.student.$studentId'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -41,9 +49,9 @@ const AppRoute = AppRouteImport.update({
   path: '/app',
   getParentRoute: () => rootRouteImport,
 } as any)
-const DashboardRoute = DashboardRouteImport.update({
-  id: '/dashboard',
-  path: '/dashboard',
+const CuentaRoute = CuentaRouteImport.update({
+  id: '/cuenta',
+  path: '/cuenta',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DiagnosticRoute = DiagnosticRouteImport.update({
@@ -54,6 +62,11 @@ const DiagnosticRoute = DiagnosticRouteImport.update({
 const HistoryRoute = HistoryRouteImport.update({
   id: '/history',
   path: '/history',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const JoinRoute = JoinRouteImport.update({
+  id: '/join',
+  path: '/join',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LoginRoute = LoginRouteImport.update({
@@ -71,14 +84,34 @@ const PracticeRoute = PracticeRouteImport.update({
   path: '/practice',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PrivacidadRoute = PrivacidadRouteImport.update({
+  id: '/privacidad',
+  path: '/privacidad',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ProgressRoute = ProgressRouteImport.update({
   id: '/progress',
   path: '/progress',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SchoolRoute = SchoolRouteImport.update({
+  id: '/school',
+  path: '/school',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SyllabusRoute = SyllabusRouteImport.update({
   id: '/syllabus',
   path: '/syllabus',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TerminosRoute = TerminosRouteImport.update({
+  id: '/terminos',
+  path: '/terminos',
   getParentRoute: () => rootRouteImport,
 } as any)
 const TodayRoute = TodayRouteImport.update({
@@ -96,6 +129,16 @@ const PracticeSessionIdRoute = PracticeSessionIdRouteImport.update({
   path: '/$sessionId',
   getParentRoute: () => PracticeRoute,
 } as any)
+const TeacherIndexRoute = TeacherIndexRouteImport.update({
+  id: '/teacher/',
+  path: '/teacher/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TeacherClassGroupIdRoute = TeacherClassGroupIdRouteImport.update({
+  id: '/teacher/$classGroupId',
+  path: '/teacher/$classGroupId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
   id: '/api/auth/$',
   path: '/api/auth/$',
@@ -106,61 +149,90 @@ const PracticeSessionIdReviewRoute = PracticeSessionIdReviewRouteImport.update({
   path: '/review',
   getParentRoute: () => PracticeSessionIdRoute,
 } as any)
+const TeacherStudentStudentIdRoute = TeacherStudentStudentIdRouteImport.update({
+  id: '/teacher/student/$studentId',
+  path: '/teacher/student/$studentId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
   '/app': typeof AppRoute
-  '/dashboard': typeof DashboardRoute
+  '/cuenta': typeof CuentaRoute
   '/diagnostic': typeof DiagnosticRoute
   '/history': typeof HistoryRoute
+  '/join': typeof JoinRoute
   '/login': typeof LoginRoute
   '/path': typeof PathRoute
   '/practice': typeof PracticeRouteWithChildren
+  '/privacidad': typeof PrivacidadRoute
   '/progress': typeof ProgressRoute
+  '/reset-password': typeof ResetPasswordRoute
+  '/school': typeof SchoolRoute
   '/syllabus': typeof SyllabusRoute
+  '/terminos': typeof TerminosRoute
   '/today': typeof TodayRoute
   '/lesson/$subtopicId': typeof LessonSubtopicIdRoute
   '/practice/$sessionId': typeof PracticeSessionIdRouteWithChildren
+  '/teacher/$classGroupId': typeof TeacherClassGroupIdRoute
+  '/teacher/': typeof TeacherIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/practice/$sessionId/review': typeof PracticeSessionIdReviewRoute
+  '/teacher/student/$studentId': typeof TeacherStudentStudentIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
   '/app': typeof AppRoute
-  '/dashboard': typeof DashboardRoute
+  '/cuenta': typeof CuentaRoute
   '/diagnostic': typeof DiagnosticRoute
   '/history': typeof HistoryRoute
+  '/join': typeof JoinRoute
   '/login': typeof LoginRoute
   '/path': typeof PathRoute
   '/practice': typeof PracticeRouteWithChildren
+  '/privacidad': typeof PrivacidadRoute
   '/progress': typeof ProgressRoute
+  '/reset-password': typeof ResetPasswordRoute
+  '/school': typeof SchoolRoute
   '/syllabus': typeof SyllabusRoute
+  '/terminos': typeof TerminosRoute
   '/today': typeof TodayRoute
   '/lesson/$subtopicId': typeof LessonSubtopicIdRoute
   '/practice/$sessionId': typeof PracticeSessionIdRouteWithChildren
+  '/teacher/$classGroupId': typeof TeacherClassGroupIdRoute
+  '/teacher': typeof TeacherIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/practice/$sessionId/review': typeof PracticeSessionIdReviewRoute
+  '/teacher/student/$studentId': typeof TeacherStudentStudentIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
   '/app': typeof AppRoute
-  '/dashboard': typeof DashboardRoute
+  '/cuenta': typeof CuentaRoute
   '/diagnostic': typeof DiagnosticRoute
   '/history': typeof HistoryRoute
+  '/join': typeof JoinRoute
   '/login': typeof LoginRoute
   '/path': typeof PathRoute
   '/practice': typeof PracticeRouteWithChildren
+  '/privacidad': typeof PrivacidadRoute
   '/progress': typeof ProgressRoute
+  '/reset-password': typeof ResetPasswordRoute
+  '/school': typeof SchoolRoute
   '/syllabus': typeof SyllabusRoute
+  '/terminos': typeof TerminosRoute
   '/today': typeof TodayRoute
   '/lesson/$subtopicId': typeof LessonSubtopicIdRoute
   '/practice/$sessionId': typeof PracticeSessionIdRouteWithChildren
+  '/teacher/$classGroupId': typeof TeacherClassGroupIdRoute
+  '/teacher/': typeof TeacherIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/practice/$sessionId/review': typeof PracticeSessionIdReviewRoute
+  '/teacher/student/$studentId': typeof TeacherStudentStudentIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -168,72 +240,104 @@ export interface FileRouteTypes {
     | '/'
     | '/admin'
     | '/app'
-    | '/dashboard'
+    | '/cuenta'
     | '/diagnostic'
     | '/history'
+    | '/join'
     | '/login'
     | '/path'
     | '/practice'
+    | '/privacidad'
     | '/progress'
+    | '/reset-password'
+    | '/school'
     | '/syllabus'
+    | '/terminos'
     | '/today'
     | '/lesson/$subtopicId'
     | '/practice/$sessionId'
+    | '/teacher/$classGroupId'
+    | '/teacher/'
     | '/api/auth/$'
     | '/practice/$sessionId/review'
+    | '/teacher/student/$studentId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/admin'
     | '/app'
-    | '/dashboard'
+    | '/cuenta'
     | '/diagnostic'
     | '/history'
+    | '/join'
     | '/login'
     | '/path'
     | '/practice'
+    | '/privacidad'
     | '/progress'
+    | '/reset-password'
+    | '/school'
     | '/syllabus'
+    | '/terminos'
     | '/today'
     | '/lesson/$subtopicId'
     | '/practice/$sessionId'
+    | '/teacher/$classGroupId'
+    | '/teacher'
     | '/api/auth/$'
     | '/practice/$sessionId/review'
+    | '/teacher/student/$studentId'
   id:
     | '__root__'
     | '/'
     | '/admin'
     | '/app'
-    | '/dashboard'
+    | '/cuenta'
     | '/diagnostic'
     | '/history'
+    | '/join'
     | '/login'
     | '/path'
     | '/practice'
+    | '/privacidad'
     | '/progress'
+    | '/reset-password'
+    | '/school'
     | '/syllabus'
+    | '/terminos'
     | '/today'
     | '/lesson/$subtopicId'
     | '/practice/$sessionId'
+    | '/teacher/$classGroupId'
+    | '/teacher/'
     | '/api/auth/$'
     | '/practice/$sessionId/review'
+    | '/teacher/student/$studentId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminRoute: typeof AdminRoute
   AppRoute: typeof AppRoute
-  DashboardRoute: typeof DashboardRoute
+  CuentaRoute: typeof CuentaRoute
   DiagnosticRoute: typeof DiagnosticRoute
   HistoryRoute: typeof HistoryRoute
+  JoinRoute: typeof JoinRoute
   LoginRoute: typeof LoginRoute
   PathRoute: typeof PathRoute
   PracticeRoute: typeof PracticeRouteWithChildren
+  PrivacidadRoute: typeof PrivacidadRoute
   ProgressRoute: typeof ProgressRoute
+  ResetPasswordRoute: typeof ResetPasswordRoute
+  SchoolRoute: typeof SchoolRoute
   SyllabusRoute: typeof SyllabusRoute
+  TerminosRoute: typeof TerminosRoute
   TodayRoute: typeof TodayRoute
   LessonSubtopicIdRoute: typeof LessonSubtopicIdRoute
+  TeacherClassGroupIdRoute: typeof TeacherClassGroupIdRoute
+  TeacherIndexRoute: typeof TeacherIndexRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
+  TeacherStudentStudentIdRoute: typeof TeacherStudentStudentIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -259,11 +363,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/dashboard': {
-      id: '/dashboard'
-      path: '/dashboard'
-      fullPath: '/dashboard'
-      preLoaderRoute: typeof DashboardRouteImport
+    '/cuenta': {
+      id: '/cuenta'
+      path: '/cuenta'
+      fullPath: '/cuenta'
+      preLoaderRoute: typeof CuentaRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/diagnostic': {
@@ -278,6 +382,13 @@ declare module '@tanstack/react-router' {
       path: '/history'
       fullPath: '/history'
       preLoaderRoute: typeof HistoryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/join': {
+      id: '/join'
+      path: '/join'
+      fullPath: '/join'
+      preLoaderRoute: typeof JoinRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/login': {
@@ -301,6 +412,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PracticeRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/privacidad': {
+      id: '/privacidad'
+      path: '/privacidad'
+      fullPath: '/privacidad'
+      preLoaderRoute: typeof PrivacidadRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/progress': {
       id: '/progress'
       path: '/progress'
@@ -308,11 +426,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProgressRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/school': {
+      id: '/school'
+      path: '/school'
+      fullPath: '/school'
+      preLoaderRoute: typeof SchoolRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/syllabus': {
       id: '/syllabus'
       path: '/syllabus'
       fullPath: '/syllabus'
       preLoaderRoute: typeof SyllabusRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/terminos': {
+      id: '/terminos'
+      path: '/terminos'
+      fullPath: '/terminos'
+      preLoaderRoute: typeof TerminosRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/today': {
@@ -336,6 +475,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PracticeSessionIdRouteImport
       parentRoute: typeof PracticeRoute
     }
+    '/teacher/': {
+      id: '/teacher/'
+      path: '/teacher'
+      fullPath: '/teacher/'
+      preLoaderRoute: typeof TeacherIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/teacher/$classGroupId': {
+      id: '/teacher/$classGroupId'
+      path: '/teacher/$classGroupId'
+      fullPath: '/teacher/$classGroupId'
+      preLoaderRoute: typeof TeacherClassGroupIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/auth/$': {
       id: '/api/auth/$'
       path: '/api/auth/$'
@@ -349,6 +502,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/practice/$sessionId/review'
       preLoaderRoute: typeof PracticeSessionIdReviewRouteImport
       parentRoute: typeof PracticeSessionIdRoute
+    }
+    '/teacher/student/$studentId': {
+      id: '/teacher/student/$studentId'
+      path: '/teacher/student/$studentId'
+      fullPath: '/teacher/student/$studentId'
+      preLoaderRoute: typeof TeacherStudentStudentIdRouteImport
+      parentRoute: typeof rootRouteImport
     }
   }
 }
@@ -380,17 +540,25 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRoute,
   AppRoute: AppRoute,
-  DashboardRoute: DashboardRoute,
+  CuentaRoute: CuentaRoute,
   DiagnosticRoute: DiagnosticRoute,
   HistoryRoute: HistoryRoute,
+  JoinRoute: JoinRoute,
   LoginRoute: LoginRoute,
   PathRoute: PathRoute,
   PracticeRoute: PracticeRouteWithChildren,
+  PrivacidadRoute: PrivacidadRoute,
   ProgressRoute: ProgressRoute,
+  ResetPasswordRoute: ResetPasswordRoute,
+  SchoolRoute: SchoolRoute,
   SyllabusRoute: SyllabusRoute,
+  TerminosRoute: TerminosRoute,
   TodayRoute: TodayRoute,
   LessonSubtopicIdRoute: LessonSubtopicIdRoute,
+  TeacherClassGroupIdRoute: TeacherClassGroupIdRoute,
+  TeacherIndexRoute: TeacherIndexRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
+  TeacherStudentStudentIdRoute: TeacherStudentStudentIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

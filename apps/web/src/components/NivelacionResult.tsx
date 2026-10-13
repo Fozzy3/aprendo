@@ -4,13 +4,12 @@ import { Link } from '@tanstack/react-router'
 import { ArrowRight, BookOpen, ListChecks } from 'lucide-react'
 import type { CSSProperties } from 'react'
 import { api } from '@aprendo/convex/api'
-import { Mascot } from './Mascot.tsx'
 import { PageLoader } from './FullScreenLoader.tsx'
 import { PracticeSubtopicButton } from './PracticeSubtopicButton.tsx'
 import { celebrationFor, previousPlacementIndex } from '../lib/result-display.ts'
 import { sessionHistoryQuery, studentAppStateQuery } from '../lib/student-queries.ts'
 import { getAllSubjectThemes, getSubjectTheme } from '../lib/subject-theme.ts'
-import { getSubtopicLabel } from '../lib/taxonomy.ts'
+import { getSubtopicLabel } from '@aprendo/convex/taxonomy'
 
 /**
  * The level reveal after a nivelación — the first time the product tells the
@@ -49,7 +48,7 @@ export function NivelacionResult({
 
   if (result == null) {
     return (
-      <div className="fade-in mx-auto w-[min(40rem,calc(100%-2rem))] py-10 text-center">
+      <div className="fade-in mx-auto w-[min(40rem,calc(100%-2rem))] py-10">
         <p className="text-sm text-[var(--text-secondary)]">
           No pudimos calcular el nivel de esta nivelación.
         </p>
@@ -73,9 +72,9 @@ export function NivelacionResult({
   })
   const headline =
     celebration === 'first'
-      ? '¡Ya tienes tu primer nivel!'
+      ? `Tu primer nivel en ${theme.label}`
       : celebration === 'level_up'
-        ? `¡Subiste de nivel en ${theme.label}!`
+        ? `Subiste de nivel en ${theme.label}`
         : `Tu nivel en ${theme.label}`
 
   const placed = appStateQuery.data?.placedSubjectIds ?? []
@@ -85,50 +84,43 @@ export function NivelacionResult({
 
   return (
     <div className="fade-in mx-auto w-[min(40rem,calc(100%-2rem))] py-6 sm:py-10">
-      <header className="flex items-end gap-3">
-        {celebration != null ? <Mascot mood="happy" size="md" className="shrink-0" /> : null}
-        <div className="min-w-0">
-          <p className="flex items-center gap-2 text-sm font-semibold text-[var(--text-secondary)]">
-            <span
-              aria-hidden
-              className="subject-dot subject-dot-lg"
-              style={{ '--subject-color': theme.color } as CSSProperties}
-            />
-            Nivelación de {theme.label}
-          </p>
-          <h1 className="mt-1 text-balance font-display text-2xl font-bold tracking-tight text-[var(--text-primary)] sm:text-3xl">
-            {headline}
-          </h1>
-        </div>
+      <header className="ruled-page-head">
+        <p className="m-0 flex items-center gap-2 text-sm text-[var(--text-secondary)]">
+          <span
+            aria-hidden
+            className="subject-dot"
+            style={{ '--subject-color': theme.color } as CSSProperties}
+          />
+          Nivelación de {theme.label}
+        </p>
+        <h1 className="page-title mt-1 text-balance">{headline}</h1>
       </header>
 
-      <section className="card mt-5 p-5" aria-label="Tu nivel">
-        <div className="flex items-baseline justify-between gap-3">
-          <p className="font-display text-4xl font-bold tracking-tight text-[var(--text-primary)]">
-            {level?.band.labelEs ?? 'Sin nivel'}
-          </p>
-          <p className="text-sm text-[var(--text-tertiary)] tabular-nums">
-            <strong className="text-2xl font-bold text-[var(--text-primary)]">{result.score}</strong>/100
-          </p>
-        </div>
+      <section className="ruled-section" aria-label="Tu nivel">
+        <p className="m-0 flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+          <span className="figure">{level?.band.labelEs ?? 'Sin nivel'}</span>
+          <span className="text-sm text-[var(--text-secondary)] tabular-nums">
+            <strong className="text-lg text-[var(--text-primary)]">{result.score}</strong> de 100
+          </span>
+        </p>
 
         {level != null ? (
           <>
             <div
-              className="mt-3 flex gap-1"
+              className="mt-4 flex gap-0.5"
               role="img"
               aria-label={`${level.band.labelEs}: nivel ${level.index} de ${level.bandCount}`}
             >
               {Array.from({ length: level.bandCount }, (_, position) => (
                 <span
                   key={position}
-                  className="h-2 flex-1 rounded-full"
-                  style={{ background: position < level.index ? theme.color : 'var(--bg-inset)' }}
+                  className="h-2 flex-1"
+                  style={{ background: position < level.index ? 'var(--ink)' : 'var(--bg-inset)' }}
                 />
               ))}
             </div>
             <p className="mt-1.5 text-xs text-[var(--text-tertiary)] tabular-nums">
-              {level.index} de {level.bandCount} niveles ICFES
+              Nivel {level.index} de {level.bandCount} del ICFES
               {previousIndex != null && previousIndex !== level.index
                 ? ` · antes estabas en el ${previousIndex}`
                 : ''}
@@ -140,52 +132,52 @@ export function NivelacionResult({
         ) : null}
 
         {!result.hasEnoughEvidence ? (
-          <p className="review-state review-state-warn">
-            <strong>Estimación preliminar</strong>
-            <span>
-              Respondiste menos de 12 preguntas, así que este nivel puede cambiar. Nivela de nuevo
-              esta área cuando quieras para confirmarlo.
-            </span>
+          <p className="notice">
+            <strong className="text-[var(--text-primary)]">Estimación preliminar.</strong> Respondiste
+            menos de 12 preguntas, así que este nivel puede cambiar. Nivela de nuevo esta área cuando
+            quieras para confirmarlo.
           </p>
         ) : null}
       </section>
 
       {level?.nextBand != null ? (
-        <section className="card-inset mt-3 p-4">
-          <h2 className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1 text-sm font-bold text-[var(--text-primary)]">
-            Para llegar a {level.nextBand.labelEs}
+        <section className="ruled-section" aria-labelledby="nivelacion-next-title">
+          <div className="section-head">
+            <h2 id="nivelacion-next-title" className="section-title">
+              Para llegar a {level.nextBand.labelEs}
+            </h2>
             {level.pointsToNextBand != null ? (
-              <span className="text-xs font-semibold text-[var(--text-tertiary)] tabular-nums">
-                te faltan {level.pointsToNextBand} puntos
-              </span>
+              <span className="section-meta tabular-nums">te faltan {level.pointsToNextBand} puntos</span>
             ) : null}
-          </h2>
-          <p className="mt-1.5 text-sm leading-relaxed text-[var(--text-secondary)]">
+          </div>
+          <p className="m-0 text-sm leading-relaxed text-[var(--text-secondary)]">
             {level.nextBand.descriptorEs}
           </p>
         </section>
       ) : level != null ? (
-        <p className="mt-3 text-sm text-[var(--text-secondary)]">
-          Estás en el nivel más alto de esta área. Ahora toca sostenerlo.
-        </p>
+        <section className="ruled-section">
+          <p className="m-0 text-sm text-[var(--text-secondary)]">
+            Estás en el nivel más alto de esta área. Ahora toca sostenerlo.
+          </p>
+        </section>
       ) : null}
 
       {result.weakestSubtopics.length > 0 ? (
-        <section className="mt-8">
-          <h2 className="font-display text-lg font-bold text-[var(--text-primary)]">Por dónde empezar</h2>
-          <p className="mt-0.5 text-sm text-[var(--text-secondary)]">
+        <section className="ruled-section" aria-labelledby="nivelacion-start-title">
+          <h2 id="nivelacion-start-title" className="section-title">Por dónde empezar</h2>
+          <p className="mb-3 text-sm text-[var(--text-secondary)]">
             Los temas que más te costaron en esta nivelación.
           </p>
-          <ul className="mt-3 grid list-none gap-2 p-0">
+          <ul className="ruled-list">
             {result.weakestSubtopics.map((subtopic) => (
-              <li key={subtopic.subtopicId} className="card p-4">
-                <p className="text-sm font-bold text-[var(--text-primary)]">
-                  {getSubtopicLabel(subtopic.subtopicId)}
-                </p>
-                <p className="mt-0.5 text-xs text-[var(--text-tertiary)] tabular-nums">
-                  Acertaste {subtopic.correctCount} de {subtopic.questionCount}
-                </p>
-                <div className="mt-3 flex flex-wrap items-start gap-2">
+              <li key={subtopic.subtopicId} className="ruled-row flex-wrap">
+                <span className="ruled-row-main">
+                  <span className="font-semibold">{getSubtopicLabel(subtopic.subtopicId)}</span>
+                  <span className="ruled-row-note tabular-nums">
+                    Acertaste {subtopic.correctCount} de {subtopic.questionCount}
+                  </span>
+                </span>
+                <span className="flex flex-wrap items-start gap-2">
                   <Link
                     to="/lesson/$subtopicId"
                     params={{ subtopicId: subtopic.subtopicId }}
@@ -194,20 +186,18 @@ export function NivelacionResult({
                     <BookOpen size={14} aria-hidden /> Ver la lección
                   </Link>
                   <PracticeSubtopicButton studentId={studentId} subtopicId={subtopic.subtopicId} />
-                </div>
+                </span>
               </li>
             ))}
           </ul>
         </section>
       ) : null}
 
-      <section className="mt-8">
+      <section className="ruled-section">
         {pendingSubjects.length > 0 ? (
           <>
-            <h2 className="font-display text-lg font-bold text-[var(--text-primary)]">
-              Nivela la siguiente área
-            </h2>
-            <p className="mt-0.5 text-sm text-[var(--text-secondary)]">
+            <h2 className="section-title">Nivela la siguiente área</h2>
+            <p className="text-sm text-[var(--text-secondary)]">
               Con las cinco áreas medidas te damos tu puntaje global estimado.
             </p>
             <ul className="mt-3 flex list-none flex-wrap gap-2 p-0">
@@ -222,7 +212,7 @@ export function NivelacionResult({
                 </li>
               ))}
             </ul>
-            <Link to="/diagnostic" className="btn-secondary mt-3 no-underline">
+            <Link to="/diagnostic" className="btn-secondary mt-4 no-underline">
               Elegir la siguiente área <ArrowRight size={14} aria-hidden />
             </Link>
           </>
@@ -233,7 +223,7 @@ export function NivelacionResult({
         )}
       </section>
 
-      <div className="mt-8 border-t border-[var(--border)] pt-5">{reviewLink}</div>
+      <div className="border-t border-[var(--border-strong)] pt-5">{reviewLink}</div>
     </div>
   )
 }

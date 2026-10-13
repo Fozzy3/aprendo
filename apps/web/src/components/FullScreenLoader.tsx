@@ -1,4 +1,4 @@
-import { Mascot } from './Mascot.tsx'
+import { BrandMark } from './BrandMark.tsx'
 
 /**
  * The two loading states this app is allowed to have.
@@ -8,12 +8,10 @@ import { Mascot } from './Mascot.tsx'
  * three dots instead of an ellipsis — each with its own hand-rolled markup. The
  * split here is not stylistic; the two cases are genuinely different:
  *
- * - `FullScreenLoader` runs before the shell exists, once per visit. Nico is
- *   welcome: there is nothing else on screen and the wait is real.
+ * - `FullScreenLoader` runs before the shell exists, once per visit: the mark
+ *   and a line on blank paper.
  * - `PageLoader` runs inside a shell that is already painted, on every single
- *   navigation. A character there would be choreography on every tab change,
- *   which the product register rules out — delight belongs to moments, not
- *   transitions.
+ *   navigation, so it is only a quiet line.
  */
 
 export function FullScreenLoader({
@@ -22,8 +20,8 @@ export function FullScreenLoader({
   message?: string
 }) {
   return (
-    <div className="route-loader">
-      <Mascot mood="thinking" size="lg" />
+    <div className="route-loader" role="status" aria-live="polite">
+      <BrandMark size={28} />
       <p className="route-loader-text">{message}</p>
     </div>
   )

@@ -1,5 +1,5 @@
 import { Hourglass, ListChecks, Play } from 'lucide-react'
-import { MascotMessage } from './Mascot.tsx'
+import { EmptyState } from './EmptyState.tsx'
 import { formatTimeLimit } from '../lib/session-display.ts'
 
 /**
@@ -24,8 +24,7 @@ export function ExamBreak({
 }) {
   return (
     <div className="exam-break fade-in">
-      <MascotMessage
-        mood="happy"
+      <EmptyState
         title="Descanso"
         action={
           <div className="exam-break-actions">
@@ -41,7 +40,7 @@ export function ExamBreak({
       >
         Terminaste la Sesión 1. En el examen real sales y vuelves a la 1:30 p. m.: come algo,
         toma agua y vuelve cuando estés listo.
-      </MascotMessage>
+      </EmptyState>
 
       <p className="timed-intro-facts exam-break-facts">
         <span>

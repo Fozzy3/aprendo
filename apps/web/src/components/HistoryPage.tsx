@@ -1,14 +1,13 @@
 import { useQuery } from '@tanstack/react-query'
 import { Link } from '@tanstack/react-router'
 import { usePaginatedQuery } from 'convex/react'
-import { Flame, Target, TrendingUp, CalendarDays } from 'lucide-react'
-import { useState } from 'react'
+import { useState, type CSSProperties } from 'react'
 import { api } from '@aprendo/convex/api'
 import { SESSION_KINDS, type SessionKind } from '@aprendo/convex/sessionKinds'
 import { activitySummaryQuery } from '../lib/student-queries.ts'
-import { getKindIcon, getKindLabel } from '../lib/session-display.ts'
+import { getKindLabel } from '../lib/session-display.ts'
 import { getSubjectTheme } from '../lib/subject-theme.ts'
-import { MascotMessage } from './Mascot.tsx'
+import { EmptyState } from './EmptyState.tsx'
 
 const CALENDAR_WEEKS = 16
 const PAGE_SIZE = 20
@@ -31,139 +30,107 @@ export function HistoryPage({ studentId }: { studentId: string }) {
   const stats = summary.data?.stats
 
   return (
-    <div className="page-container py-8">
-      <header className="fade-in mb-7">
-        <p className="kicker">Tu historia</p>
-        <h1 className="font-display text-3xl font-bold tracking-tight text-[var(--text-primary)]">
-          Historial de estudio
-        </h1>
-        <p className="mt-1 text-sm text-[var(--text-secondary)]">
-          Cada día que estudiaste — y los que no.
-        </p>
-      </header>
+    <div className="ruled-page fade-in">
+      <aside className="ruled-page-margin" aria-label={`Últimas ${CALENDAR_WEEKS} semanas`}>
+        <p className="ruled-page-date">Últimas {CALENDAR_WEEKS} semanas</p>
+        <dl className="margin-facts">
+          <div>
+            <dt>Días seguidos</dt>
+            <dd>{stats == null ? '—' : stats.currentStreakDays}</dd>
+          </div>
+          <div>
+            <dt>Racha más larga</dt>
+            <dd>{stats == null ? '—' : `${stats.longestStreakDays} días`}</dd>
+          </div>
+          <div>
+            <dt>Días de estudio</dt>
+            <dd>{stats == null ? '—' : stats.activeDayCount}</dd>
+          </div>
+          <div>
+            <dt>Preguntas</dt>
+            <dd>
+              {stats == null ? '—' : stats.totalAnswered}
+              {stats != null ? (
+                <span className="block text-xs font-normal text-[var(--text-tertiary)]">
+                  {stats.totalCorrect} correctas
+                </span>
+              ) : null}
+            </dd>
+          </div>
+          <div>
+            <dt>Aciertos</dt>
+            <dd>{stats?.accuracy == null ? '—' : `${Math.round(stats.accuracy * 100)}%`}</dd>
+          </div>
+        </dl>
+      </aside>
 
-      <section className="fade-in stagger-1 mb-7 grid grid-cols-2 gap-3 md:grid-cols-4">
-        <StatTile
-          icon={<Flame size={16} />}
-          label="Racha actual"
-          value={stats == null ? '—' : `${stats.currentStreakDays} d`}
-          hint={stats == null ? undefined : `Tu mejor racha: ${stats.longestStreakDays} d`}
-        />
-        <StatTile
-          icon={<CalendarDays size={16} />}
-          label="Días activos"
-          value={stats == null ? '—' : `${stats.activeDayCount}`}
-        />
-        <StatTile
-          icon={<Target size={16} />}
-          label="Preguntas"
-          value={stats == null ? '—' : `${stats.totalAnswered}`}
-          hint={stats == null ? undefined : `${stats.totalCorrect} correctas`}
-        />
-        <StatTile
-          icon={<TrendingUp size={16} />}
-          label="Precisión"
-          value={stats?.accuracy == null ? '—' : `${Math.round(stats.accuracy * 100)}%`}
-        />
-      </section>
+      <div className="ruled-page-body">
+        <header className="ruled-page-head">
+          <h1 className="page-title">Historial de estudio</h1>
+          <p className="page-lede">Cada día que estudiaste, y los que no.</p>
+        </header>
 
-      <section className="fade-in stagger-2 card mb-7 p-5">
-        <h2 className="mb-1 text-sm font-bold text-[var(--text-primary)]">
-          Últimas {CALENDAR_WEEKS} semanas
-        </h2>
-        <p className="mb-4 text-xs text-[var(--text-tertiary)]">
-          Cada cuadro es un día. Los vacíos son días sin estudiar.
-        </p>
-        {summary.data == null ? (
-          <div className="h-24 animate-pulse rounded-[var(--radius-md)] bg-[var(--bg-inset)]" />
-        ) : (
-          <ActivityCalendar days={summary.data.days} />
-        )}
-      </section>
+        <section className="ruled-section" aria-labelledby="history-days-title">
+          <div className="section-head">
+            <h2 id="history-days-title" className="section-title">Días de estudio</h2>
+            <span className="section-meta">Cada cuadro es un día</span>
+          </div>
+          {summary.data == null ? (
+            <div className="h-24 bg-[var(--bg-inset)]" aria-hidden />
+          ) : (
+            <ActivityCalendar days={summary.data.days} />
+          )}
+        </section>
 
-      <section className="fade-in stagger-3">
-        <div className="hub-filters mb-4">
-          <FilterChip
-            label="Todas"
-            isActive={kindFilter === 'all'}
-            onSelect={() => setKindFilter('all')}
-          />
-          {SESSION_KINDS.map((kind) => (
-            <FilterChip
-              key={kind}
-              label={getKindLabel(kind)}
-              isActive={kindFilter === kind}
-              onSelect={() => setKindFilter(kind)}
-            />
-          ))}
-        </div>
+        <section className="ruled-section" aria-labelledby="history-sessions-title">
+          <h2 id="history-sessions-title" className="section-title">Sesiones</h2>
+          <nav className="tab-nav mb-4 flex-wrap" aria-label="Tipo de sesión">
+            <FilterTab label="Todas" isActive={kindFilter === 'all'} onSelect={() => setKindFilter('all')} />
+            {SESSION_KINDS.map((kind) => (
+              <FilterTab
+                key={kind}
+                label={getKindLabel(kind)}
+                isActive={kindFilter === kind}
+                onSelect={() => setKindFilter(kind)}
+              />
+            ))}
+          </nav>
 
-        {history.status === 'LoadingFirstPage' ? (
-          <div className="h-40 animate-pulse rounded-[var(--radius-lg)] bg-[var(--bg-inset)]" />
-        ) : history.results.length === 0 ? (
-          <div className="card">
-            <MascotMessage
-              mood="sleeping"
-              title={
-                kindFilter === 'all'
-                  ? 'Tu historial está vacío'
-                  : 'Nada de este tipo todavía'
-              }
+          {history.status === 'LoadingFirstPage' ? (
+            <p className="text-sm text-[var(--text-tertiary)]">Cargando…</p>
+          ) : history.results.length === 0 ? (
+            <EmptyState
+              title={kindFilter === 'all' ? 'Tu historial está vacío' : 'Nada de este tipo todavía'}
             >
               {kindFilter === 'all'
                 ? 'Cuando termines tu primera sesión, va a aparecer acá con lo que respondiste.'
                 : 'Prueba con otro filtro, o haz una sesión de este tipo.'}
-            </MascotMessage>
-          </div>
-        ) : (
-          <>
-            <ul className="flex list-none flex-col gap-2 p-0">
-              {history.results.map((session) => (
-                <li key={session._id}>
-                  <HistoryRow session={session} />
-                </li>
-              ))}
-            </ul>
-            {history.status === 'CanLoadMore' && (
-              <div className="mt-4 flex justify-center">
+            </EmptyState>
+          ) : (
+            <>
+              <ul className="ruled-list">
+                {history.results.map((session) => (
+                  <li key={session._id}>
+                    <HistoryRow session={session} />
+                  </li>
+                ))}
+              </ul>
+              {history.status === 'CanLoadMore' && (
                 <button
                   type="button"
-                  className="btn-secondary"
+                  className="btn-secondary mt-4"
                   onClick={() => history.loadMore(PAGE_SIZE)}
                 >
                   Ver más
                 </button>
-              </div>
-            )}
-            {history.status === 'LoadingMore' && (
-              <p className="mt-4 text-center text-xs text-[var(--text-tertiary)]">Cargando…</p>
-            )}
-          </>
-        )}
-      </section>
-    </div>
-  )
-}
-
-function StatTile({
-  icon,
-  label,
-  value,
-  hint,
-}: {
-  icon: React.ReactNode
-  label: string
-  value: string
-  hint?: string
-}) {
-  return (
-    <div className="card p-4">
-      <div className="mb-1 flex items-center gap-1.5 text-[var(--text-tertiary)]">
-        {icon}
-        <span className="text-[0.68rem] font-bold uppercase tracking-wide">{label}</span>
+              )}
+              {history.status === 'LoadingMore' && (
+                <p className="mt-4 text-xs text-[var(--text-tertiary)]">Cargando…</p>
+              )}
+            </>
+          )}
+        </section>
       </div>
-      <p className="font-display text-2xl font-bold text-[var(--text-primary)]">{value}</p>
-      {hint != null && <p className="mt-0.5 text-xs text-[var(--text-tertiary)]">{hint}</p>}
     </div>
   )
 }
@@ -187,9 +154,9 @@ function ActivityCalendar({ days }: { days: ActivityDay[] }) {
 
   return (
     <div className="overflow-x-auto">
-      <div className="flex gap-1">
+      <div className="flex gap-0.5">
         {weeks.map((week) => (
-          <div key={week[0]?.dayNumber} className="flex flex-col gap-1">
+          <div key={week[0]?.dayNumber} className="flex flex-col gap-0.5">
             {week.map((day) => (
               <CalendarCell key={day.dayNumber} day={day} />
             ))}
@@ -224,19 +191,18 @@ function CalendarCell({ day }: { day: ActivityDay }) {
           ? `${label}: sin estudiar`
           : `${label}: ${day.attemptCount} preguntas, ${day.correctCount} correctas`
       }
-      className="h-3 w-3 rounded-[4px]"
+      className="h-3 w-3"
       style={{
         background:
           intensity === 0
             ? 'var(--bg-inset)'
-            : `color-mix(in srgb, var(--brand) ${INTENSITY_ALPHA[intensity]}, var(--bg-inset))`,
-        border: '1px solid var(--border)',
+            : `color-mix(in srgb, var(--ink) ${INTENSITY_ALPHA[intensity]}, var(--bg-inset))`,
       }}
     />
   )
 }
 
-function FilterChip({
+function FilterTab({
   label,
   isActive,
   onSelect,
@@ -250,7 +216,7 @@ function FilterChip({
       type="button"
       onClick={onSelect}
       aria-pressed={isActive}
-      className={`hub-filter ${isActive ? 'is-active' : ''}`}
+      className={`tab-item${isActive ? ' is-active' : ''}`}
     >
       {label}
     </button>
@@ -274,48 +240,9 @@ type HistorySession = {
 }
 
 function HistoryRow({ session }: { session: HistorySession }) {
-  const Icon = getKindIcon(session.kind)
   const subject = session.subjectId == null ? null : getSubjectTheme(session.subjectId)
   const summary = session.summary
   const isCompleted = session.status === 'completed'
-
-  const body = (
-    <>
-      <span
-        className="history-row-icon"
-        style={subject == null ? undefined : { color: subject.color }}
-      >
-        <Icon size={16} />
-      </span>
-      <span className="min-w-0 flex-1">
-        <span className="block text-sm font-bold text-[var(--text-primary)]">
-          {getKindLabel(session.kind)}
-          {subject != null && (
-            <span className="ml-1.5 font-medium text-[var(--text-secondary)]">
-              · {subject.label}
-            </span>
-          )}
-        </span>
-        <span className="block text-xs text-[var(--text-tertiary)]">
-          {formatDateTime(session.startedAt)}
-          {isCompleted && summary != null && ` · ${formatDuration(summary.durationMs)}`}
-        </span>
-      </span>
-      {isCompleted && summary != null ? (
-        <span className="history-row-score">
-          <span className="history-row-fraction">
-            {summary.correctCount}
-            <span className="history-row-of">/{summary.questionCount}</span>
-          </span>
-          <span className="history-row-badge" data-band={accuracyBand(summary.accuracy)}>
-            {Math.round(summary.accuracy * 100)}%
-          </span>
-        </span>
-      ) : (
-        <span className="chip">Sin terminar</span>
-      )}
-    </>
-  )
 
   // Only completed sessions have a review to open; an unfinished one links back
   // into solving it.
@@ -323,18 +250,43 @@ function HistoryRow({ session }: { session: HistorySession }) {
     <Link
       to={isCompleted ? '/practice/$sessionId/review' : '/practice/$sessionId'}
       params={{ sessionId: session._id }}
-      className="history-row no-underline"
+      className="ruled-row no-underline"
     >
-      {body}
+      <span className="ruled-row-main">
+        <span className="flex items-center gap-2 font-semibold">
+          {subject != null ? (
+            <span
+              aria-hidden
+              className="subject-dot"
+              style={{ '--subject-color': subject.color } as CSSProperties}
+            />
+          ) : null}
+          {getKindLabel(session.kind)}
+          {subject != null && <span className="font-normal text-[var(--text-secondary)]">· {subject.label}</span>}
+        </span>
+        <span className="ruled-row-note">
+          {formatDateTime(session.startedAt)}
+          {isCompleted && summary != null && ` · ${formatDuration(summary.durationMs)}`}
+        </span>
+      </span>
+      {isCompleted && summary != null ? (
+        <span
+          className={`shrink-0 text-right text-sm tabular-nums ${summary.accuracy < LOW_ACCURACY ? 'text-[var(--danger-text)]' : 'text-[var(--text-primary)]'}`}
+        >
+          <span className="font-semibold">
+            {summary.correctCount} de {summary.questionCount}
+          </span>
+          <span className="block text-xs text-[var(--text-tertiary)]">{Math.round(summary.accuracy * 100)}%</span>
+        </span>
+      ) : (
+        <span className="chip">Sin terminar</span>
+      )}
     </Link>
   )
 }
 
-function accuracyBand(accuracy: number): 'high' | 'mid' | 'low' {
-  if (accuracy >= 0.7) return 'high'
-  if (accuracy >= 0.4) return 'mid'
-  return 'low'
-}
+/** Below this a result is written in red ink, as a teacher would mark it. */
+const LOW_ACCURACY = 0.4
 
 function formatDateTime(timestamp: number): string {
   return new Date(timestamp).toLocaleDateString('es-CO', {

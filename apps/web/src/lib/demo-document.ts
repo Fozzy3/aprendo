@@ -8,51 +8,51 @@ import type { ResolvedTheme } from './use-resolved-theme.ts'
  */
 const TOKENS: Record<ResolvedTheme, Record<string, string>> = {
   light: {
-    '--bg': '#ffffff',
+    '--bg': '#fbfcfe',
     '--bg-card': '#ffffff',
-    '--bg-inset': '#f5f2ff',
-    '--text-primary': '#1b1235',
-    '--text-secondary': '#5b5473',
-    '--text-tertiary': '#8e88a3',
+    '--bg-inset': '#eef3f9',
+    '--text-primary': '#16233f',
+    '--text-secondary': '#3f4b63',
+    '--text-tertiary': '#5a667d',
     '--text-inverted': '#ffffff',
-    '--brand': '#6c4cf1',
-    '--accent': '#6c4cf1',
-    '--accent-soft': 'rgba(108, 76, 241, 0.1)',
-    '--accent-hover': '#5a3ad9',
-    '--gold': '#ffc93c',
-    '--success': '#21c08b',
-    '--danger': '#ff5d5d',
-    '--border': 'rgba(27, 18, 53, 0.1)',
-    '--border-hard': '#1b1235',
+    '--brand': '#16233f',
+    '--accent': '#1d4f91',
+    '--accent-soft': 'rgba(29, 79, 145, 0.08)',
+    '--accent-hover': '#163f75',
+    '--warn': '#4a5263',
+    '--success': '#2e6b45',
+    '--danger': '#c3352b',
+    '--border': 'rgba(22, 35, 63, 0.13)',
+    '--rule': '#c9d8ea',
   },
   dark: {
-    '--bg': '#0e1020',
-    '--bg-card': '#171a2e',
-    '--bg-inset': '#121427',
-    '--text-primary': '#f2f0ff',
-    '--text-secondary': '#a49fc4',
-    '--text-tertiary': '#736e91',
-    '--text-inverted': '#0e1020',
-    '--brand': '#9b83ff',
-    '--accent': '#9b83ff',
-    '--accent-soft': 'rgba(155, 131, 255, 0.16)',
-    '--accent-hover': '#b09aff',
-    '--gold': '#ffd469',
-    '--success': '#3fd8a4',
-    '--danger': '#ff7d7d',
-    '--border': 'rgba(255, 255, 255, 0.1)',
-    '--border-hard': '#05060f',
+    '--bg': '#0f1626',
+    '--bg-card': '#131c2f',
+    '--bg-inset': '#0b111e',
+    '--text-primary': '#e4eaf4',
+    '--text-secondary': '#b4bdcd',
+    '--text-tertiary': '#929cb0',
+    '--text-inverted': '#0f1626',
+    '--brand': '#e4eaf4',
+    '--accent': '#8db6ee',
+    '--accent-soft': 'rgba(141, 182, 238, 0.12)',
+    '--accent-hover': '#a9c8f3',
+    '--warn': '#aab3c4',
+    '--success': '#6cbf8b',
+    '--danger': '#e8695e',
+    '--border': 'rgba(228, 234, 244, 0.12)',
+    '--rule': '#24324b',
   },
 }
 
 const RADII = {
-  '--radius-sm': '14px',
-  '--radius-md': '20px',
+  '--radius-sm': '2px',
+  '--radius-md': '3px',
 }
 
 const FONTS = {
-  '--font-sans': '"Hanken Grotesk", ui-sans-serif, system-ui, sans-serif',
-  '--font-display': '"Bricolage Grotesque", "Hanken Grotesk", sans-serif',
+  '--font-sans': '"Public Sans", ui-sans-serif, system-ui, sans-serif',
+  '--font-display': '"Source Serif 4", Georgia, serif',
 }
 
 function rootBlock(theme: ResolvedTheme): string {
@@ -76,7 +76,7 @@ export function buildDemoDocument(fragment: string, theme: ResolvedTheme): strin
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=Hanken+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,600&display=swap" rel="stylesheet" />
 <style>
   :root {
 ${rootBlock(theme)}
@@ -92,22 +92,20 @@ ${rootBlock(theme)}
     background: var(--bg-card);
     -webkit-font-smoothing: antialiased;
   }
-  h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 700; margin: 0 0 0.5rem; }
+  h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 600; margin: 0 0 0.5rem; }
   p { color: var(--text-secondary); }
   button {
     font-family: inherit;
-    font-weight: 700;
+    font-weight: 600;
     cursor: pointer;
     color: var(--text-inverted);
     background: var(--brand);
-    border: 2px solid var(--border-hard);
-    border-radius: var(--radius-sm);
+    border: 1px solid var(--brand);
+    border-radius: var(--radius-md);
     padding: 0.5rem 0.9rem;
-    box-shadow: 0 3px 0 var(--border-hard);
-    transition: background 0.15s ease, transform 0.12s ease, box-shadow 0.12s ease;
+    transition: background 0.15s ease;
   }
-  button:hover { background: var(--accent-hover); }
-  button:active { transform: translateY(2px); box-shadow: 0 1px 0 var(--border-hard); }
+  button:hover { opacity: 0.9; }
   button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
   input[type="range"] { accent-color: var(--accent); width: 100%; }
   label { color: var(--text-secondary); font-size: 13px; font-weight: 600; }

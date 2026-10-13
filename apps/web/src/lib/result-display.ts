@@ -1,6 +1,6 @@
 import { estimatedScoreFromAccuracy, getLevelForScore } from '@aprendo/convex/levels'
 import type { SessionKind } from '@aprendo/convex/sessionKinds'
-import { getSubjectLabel } from './taxonomy'
+import { getSubjectLabel } from '@aprendo/convex/taxonomy'
 
 /**
  * The kinds that open on a result screen before the per-question review: the

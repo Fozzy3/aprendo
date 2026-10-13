@@ -11,25 +11,21 @@ import type { ConfidenceLevel } from '@aprendo/convex/confidence'
 export const CONFIDENCE_OPTIONS: Array<{
   value: ConfidenceLevel
   label: string
-  emoji: string
   help: string
 }> = [
   {
     value: 'sure',
     label: 'Seguro',
-    emoji: '💪',
     help: 'Sé por qué esta es la respuesta.',
   },
   {
     value: 'unsure',
     label: 'Dudé',
-    emoji: '🤔',
     help: 'Descarté algunas, pero no estoy seguro.',
   },
   {
     value: 'guess',
     label: 'Adiviné',
-    emoji: '🎲',
     help: 'No sabía. Marcar esto no baja tu puntaje.',
   },
 ]

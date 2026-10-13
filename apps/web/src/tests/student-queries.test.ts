@@ -6,11 +6,7 @@ import {
   studentProgressQuery,
 } from '../lib/student-queries'
 
-describe('web scaffold', () => {
-  it('keeps the initial workspace test suite green', () => {
-    expect(true).toBe(true)
-  })
-
+describe('student queries', () => {
   it('skips student-scoped queries when the student id is missing', () => {
     expect(latestDiagnosticQuery('')).toMatchObject({
       enabled: false,

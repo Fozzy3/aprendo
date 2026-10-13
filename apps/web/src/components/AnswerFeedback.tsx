@@ -1,6 +1,6 @@
 import { ChevronRight, CircleCheck, CircleX } from 'lucide-react'
 import { useEffect, useRef } from 'react'
-import MarkdownBlock from './MarkdownBlock.tsx'
+import { MarkdownBlock } from './MarkdownBlock.tsx'
 import type { answerFeedback } from '../lib/answer-feedback.ts'
 
 type AnswerFeedbackProps = {

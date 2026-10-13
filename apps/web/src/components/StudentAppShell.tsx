@@ -1,9 +1,11 @@
+import { useQuery } from '@tanstack/react-query'
 import { Link, useNavigate } from '@tanstack/react-router'
 import { PencilLine, Route as RouteIcon, Sun, TrendingUp } from 'lucide-react'
 import { useState } from 'react'
-import BrandMark from './BrandMark.tsx'
-import ThemeToggle from './ThemeToggle.tsx'
+import { SchoolLabel } from './SchoolLabel.tsx'
+import { ThemeToggle } from './ThemeToggle.tsx'
 import { authClient } from '../lib/auth-client.ts'
+import { mySchoolsQuery } from '../lib/student-queries.ts'
 import type { ActiveStudentSession } from '../lib/student-session.ts'
 
 type StudentSection =
@@ -50,6 +52,8 @@ export function StudentAppShell({
   children: React.ReactNode
 }) {
   const navigate = useNavigate()
+  const schoolsQuery = useQuery(mySchoolsQuery)
+  const teaches = (schoolsQuery.data ?? []).some((school) => school.role !== 'student')
   const [isSigningOut, setIsSigningOut] = useState(false)
   const handleSignOut = async () => {
     if (isSigningOut) return
@@ -72,18 +76,7 @@ export function StudentAppShell({
     <div className={`student-shell${immersive ? ' is-immersive' : ''}`}>
       <header className="student-topbar">
         <div className="student-topbar-inner">
-          <Link
-            to="/"
-            className="student-brand no-underline"
-          >
-            <div className="student-brand-mark">
-              <BrandMark />
-            </div>
-            <div className="student-brand-copy">
-              <span className="student-brand-title">Aprendo</span>
-              <span className="student-brand-subtitle">Preparación Saber 11</span>
-            </div>
-          </Link>
+          <SchoolLabel studentName={session.name} subtitle="Saber 11" />
 
           {immersive ? null : (
             <nav className="student-topnav" aria-label="Navegación principal">
@@ -101,12 +94,16 @@ export function StudentAppShell({
           )}
 
           <div className="student-topbar-actions">
-            <div className="student-session-identity">
-              <span className="student-session-label">Sesion</span>
-              <strong>{session.email}</strong>
-            </div>
+            {teaches && !immersive ? (
+              <Link to="/teacher" className="btn-ghost text-xs no-underline">
+                Panel docente
+              </Link>
+            ) : null}
             {topBarSupplement}
             <ThemeToggle />
+            <Link to="/cuenta" className="btn-ghost text-xs no-underline">
+              Cuenta
+            </Link>
             <button
               type="button"
               disabled={isSigningOut}

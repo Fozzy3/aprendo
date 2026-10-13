@@ -1,174 +1,196 @@
 import { Link, createFileRoute } from '@tanstack/react-router'
 import { ArrowRight } from 'lucide-react'
+import { Wordmark } from '../components/BrandMark.tsx'
+import { ThemeToggle } from '../components/ThemeToggle.tsx'
+import { CONTACT_EMAIL } from '../lib/contact.ts'
 import { useCurrentStudent } from '../lib/student-session.ts'
-import BrandMark from '../components/BrandMark.tsx'
-import ThemeToggle from '../components/ThemeToggle.tsx'
-import { Mascot } from '../components/Mascot.tsx'
 
 export const Route = createFileRoute('/')({
   component: LandingPage,
 })
 
+/** A made-up class, labelled as such: the page shows the instrument, not a claim. */
+const SAMPLE_ROWS = [
+  { name: 'Valentina R.', levels: ['Nivel 3', 'Nivel 2', 'Nivel 3', 'Nivel 2', 'A2'], note: null },
+  { name: 'Santiago M.', levels: ['Nivel 2', 'Nivel 1', '—', 'Nivel 2', 'A1'], note: 'Nivel 1 en Matemáticas' },
+  { name: 'Mariana G.', levels: ['Nivel 4', 'Nivel 3', 'Nivel 3', 'Nivel 3', 'B1'], note: null },
+  { name: 'Juan D. P.', levels: ['—', '—', '—', '—', '—'], note: 'Sin nivelación' },
+]
+const AREAS = ['Lectura', 'Matemáticas', 'Ciencias', 'Sociales', 'Inglés']
+
 /**
- * The landing page.
- *
- * Brand register: this is the one surface where design *is* the product, so it
- * commits where the app is restrained — a violet field behind the hero, display
- * type at poster scale, and Nico as the protagonist rather than an ornament.
- *
- * The copy deliberately refuses the category script. "Diagnóstico · Seguimiento
- * · 5 áreas" describes every ICFES app ever built and is therefore worth
- * nothing; what this one actually does differently is name the level, put an
- * honest band around the score, and separate knowing from guessing. Those are
- * the three things on the page.
+ * The landing, written for the person who decides whether a school buys:
+ * what Aprendo measures, what a teacher sees, where the questions come from,
+ * how minors' data is handled, and how to get in touch. No prices: there is no
+ * price list to show.
  */
 function LandingPage() {
   const { session, isReady } = useCurrentStudent()
   const isSignedIn = isReady && session != null
+  const contactHref = CONTACT_EMAIL == null ? null : `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent('Aprendo para mi colegio')}`
 
   return (
     <div className="landing">
       <header className="landing-bar">
-        <span className="landing-brand">
-          <BrandMark size={22} strokeWidth={2.4} />
-          Aprendo
-        </span>
+        <Wordmark subtitle="Saber 11" />
         <div className="landing-bar-actions">
           <ThemeToggle />
-          {isSignedIn ? null : (
-            <Link to="/login" className="landing-bar-link no-underline">
-              Entrar
-            </Link>
-          )}
+          <Link to={isSignedIn ? '/app' : '/login'} className="btn-ghost no-underline">
+            {isSignedIn ? 'Ir a mi cuenta' : 'Entrar'}
+          </Link>
         </div>
       </header>
 
       <main>
-        {/* Hero — asymmetric on purpose: the claim leads, Nico answers it. */}
         <section className="landing-hero">
-          <div className="landing-hero-copy">
-            <h1 className="landing-title">
-              Estudiar más no sube tu puntaje.
-              <em> Estudiar lo que te falta, sí.</em>
-            </h1>
+          <div>
+            <h1 className="landing-title">El nivel ICFES de cada estudiante, área por área, antes del examen.</h1>
             <p className="landing-lede">
-              Aprendo mide en qué nivel del ICFES estás, área por área, y te dice qué practicar
-              hoy para subir al siguiente. Con preguntas reales del Saber 11.
+              Aprendo ubica a sus estudiantes de grado 11 en los niveles del Saber 11, les arma un plan de
+              estudio diario y le muestra a cada docente quién necesita apoyo y en qué competencia.
             </p>
-
             <div className="landing-cta">
-              {isSignedIn ? (
-                <>
-                  <Link to="/app" className="btn-primary landing-cta-main no-underline">
-                    Continuar donde ibas
-                    <ArrowRight size={18} />
-                  </Link>
-                  <span className="landing-cta-note">Sesión activa: {session.email}</span>
-                </>
-              ) : (
-                <>
-                  <Link to="/login" className="btn-primary landing-cta-main no-underline">
-                    Empezar mi nivelación
-                    <ArrowRight size={18} />
-                  </Link>
-                  <span className="landing-cta-note">
-                    15 preguntas de un área. Sin tarjeta, sin trucos.
-                  </span>
-                </>
-              )}
+              {contactHref != null ? (
+                <a href={contactHref} className="btn-primary no-underline">
+                  Hablar con nosotros
+                  <ArrowRight size={18} aria-hidden />
+                </a>
+              ) : null}
+              <Link to={isSignedIn ? '/app' : '/login'} className="btn-secondary no-underline">
+                {isSignedIn ? 'Continuar donde iba' : 'Soy estudiante: entrar'}
+              </Link>
             </div>
           </div>
 
-          <div className="landing-hero-mascot">
-            <Mascot mood="idle" size="xl" />
-            <p className="landing-hero-speech">
-              Yo soy Nico.<br />
-              Te acompaño.
+          <figure className="landing-artifact sheet">
+            <div className="landing-artifact-head">
+              <p className="landing-artifact-title">11A · Nivel por área</p>
+              <span className="text-xs text-[var(--text-tertiary)]">Panel docente</span>
+            </div>
+            <table className="data-table">
+              <thead>
+                <tr>
+                  <th scope="col">Estudiante</th>
+                  {AREAS.map((area) => (
+                    <th key={area} scope="col">{area}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {SAMPLE_ROWS.map((row) => (
+                  <tr key={row.name}>
+                    <th scope="row">
+                      {row.name}
+                      {row.note != null ? <span className="cell-note margin-note">{row.note}</span> : null}
+                    </th>
+                    {row.levels.map((level, index) => (
+                      <td key={AREAS[index]} className={level === 'Nivel 1' ? 'is-low' : undefined}>
+                        {level}
+                      </td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            <figcaption>Ejemplo con estudiantes ficticios. «—» quiere decir que aún no hay respuestas suficientes para dar un nivel.</figcaption>
+          </figure>
+        </section>
+
+        <section className="landing-section" aria-labelledby="measures-title">
+          <h2 id="measures-title" className="landing-h2">Qué mide, y con cuánta evidencia</h2>
+          <dl className="landing-terms">
+            <div>
+              <dt>Nivelación por área</dt>
+              <dd>
+                Quince preguntas sin ayuda ubican al estudiante en los mismos cuatro niveles de desempeño
+                que reporta el ICFES (Pre A1 a B1 en inglés). Sin un mínimo de respuestas no se afirma
+                ningún nivel.
+              </dd>
+            </div>
+            <div>
+              <dt>Puntaje global estimado</dt>
+              <dd>
+                De 0 a 500, siempre con su rango probable, y solo cuando las cinco áreas tienen evidencia.
+                Mientras falte un área, se dice cuál falta.
+              </dd>
+            </div>
+            <div>
+              <dt>Plan de cada día</dt>
+              <dd>
+                Lecciones, práctica y repasos según lo que el estudiante más necesita, hasta la fecha de su
+                examen. Simulacros cronometrados como la prueba real.
+              </dd>
+            </div>
+            <div>
+              <dt>Saber o adivinar</dt>
+              <dd>
+                Después de cada respuesta el estudiante dice si estaba seguro. Un acierto con suerte no
+                cuenta como dominio, y un error con seguridad se marca como concepto por corregir.
+              </dd>
+            </div>
+          </dl>
+        </section>
+
+        <section className="landing-section landing-split" aria-labelledby="teacher-title">
+          <div>
+            <h2 id="teacher-title" className="landing-h2">Lo que ve el docente</h2>
+            <p className="landing-copy">
+              Cada curso tiene su código. Los estudiantes se unen con él y el docente ve, sin hacer nada más,
+              el nivel de cada uno por área, quién no se ha nivelado, quién lleva dos semanas sin practicar y
+              qué temas le cuestan al grupo entero.
+            </p>
+          </div>
+          <div>
+            <h2 className="landing-h2">Y lo que no puede hacer</h2>
+            <p className="landing-copy">
+              Responder por un estudiante. El docente lee; solo el estudiante practica y presenta sus
+              simulacros. Así el nivel que aparece en el panel es del estudiante.
             </p>
           </div>
         </section>
 
-        {/* What it actually tells you — real product artifacts, not icon cards.
-            Each block is a different shape because each answers a different
-            question; three identical boxes would say they were interchangeable. */}
-        <section className="landing-proof">
-          <h2 className="landing-h2">Lo que vas a saber de ti</h2>
-
-          <div className="landing-proof-grid">
-            <article className="landing-proof-level">
-              <p className="landing-proof-label">Tu nivel oficial, por área</p>
-              <p className="landing-proof-value">Nivel 3</p>
-              <div className="landing-levelbar" role="img" aria-label="Nivel 3 de 4">
-                <span className="is-on" />
-                <span className="is-on" />
-                <span className="is-on" />
-                <span />
-              </div>
-              <p className="landing-proof-note">
-                Te faltan <strong>7 puntos</strong> para Nivel 4 en Matemáticas.
-              </p>
-              <p className="landing-proof-copy">
-                Los mismos cuatro niveles que usa el ICFES y que tu colegio nombra. No un
-                porcentaje inventado.
-              </p>
-            </article>
-
-            <article className="landing-proof-score">
-              <p className="landing-proof-label">Tu puntaje global estimado</p>
-              <p className="landing-proof-value">
-                312 <span>/ 500</span>
-              </p>
-              <div className="landing-scoretrack" role="img" aria-label="Entre 297 y 327 de 500">
-                <span className="landing-scoretrack-range" />
-                <span className="landing-scoretrack-mark" />
-              </div>
-              <p className="landing-proof-note">Rango probable: 297–327</p>
-              <p className="landing-proof-copy">
-                Siempre con su margen. Un estimado hecho con 30 preguntas y uno hecho con 600 no
-                son la misma afirmación, y no te los vamos a mostrar igual.
-              </p>
-            </article>
-
-            <article className="landing-proof-confidence">
-              <p className="landing-proof-label">Qué sabes y qué adivinaste</p>
-              <ul className="landing-quadrant">
-                <li className="is-danger">
-                  <strong>Error de concepto</strong>
-                  <span>Estabas seguro y fallaste. Lo más urgente.</span>
-                </li>
-                <li className="is-warn">
-                  <strong>Frágil</strong>
-                  <span>Acertaste, pero dudando. En el examen puede no repetirse.</span>
-                </li>
-              </ul>
-              <p className="landing-proof-copy">
-                Después de responder te preguntamos si estabas seguro. Así una respuesta con
-                suerte deja de contar como dominio.
-              </p>
-            </article>
+        <section className="landing-section landing-split" aria-labelledby="source-title">
+          <div>
+            <h2 id="source-title" className="landing-h2">De dónde salen las preguntas</h2>
+            <p className="landing-copy">
+              De los cuadernillos que el ICFES ha publicado, sin modificarlas y con su fuente. Cada pregunta
+              pasa un control de su clave, su área y su tema antes de usarse, y los estudiantes pueden
+              reportar la que esté mal. Estamos
+              construyendo un banco propio de Aprendo con el mismo proceso de verificación.
+            </p>
+          </div>
+          <div>
+            <h2 className="landing-h2">Datos de menores de edad</h2>
+            <p className="landing-copy">
+              Cada estudiante es dueño de su cuenta. El colegio ve su nivel mientras esté en un curso, y si
+              la cuenta se elimina se borra todo lo que el estudiante produjo, como pide la Ley 1581 de 2012.
+              Detalles en la <Link to="/privacidad">política de tratamiento de datos</Link>.
+            </p>
           </div>
         </section>
 
-        <section className="landing-close">
-          <Mascot mood="cheering" size="lg" />
-          <h2 className="landing-h2">Empieza por un área. Quince preguntas.</h2>
-          <p className="landing-close-copy">
-            No necesitas saber por dónde arrancar — para eso es la nivelación. Al terminar ya
-            tienes tu nivel y tu ruta.
-          </p>
-          <Link
-            to={isSignedIn ? '/app' : '/login'}
-            className="btn-primary landing-cta-main no-underline"
-          >
-            {isSignedIn ? 'Continuar' : 'Empezar ahora'}
-            <ArrowRight size={18} />
-          </Link>
-        </section>
+        {contactHref != null ? (
+          <section className="landing-section" aria-labelledby="contact-title">
+            <h2 id="contact-title" className="landing-h2">Llevar Aprendo a su colegio</h2>
+            <p className="landing-copy">
+              Escríbanos con el nombre del colegio y cuántos estudiantes de grado 11 tienen. Le respondemos con
+              una propuesta para su colegio.
+            </p>
+            <div className="landing-cta">
+              <a href={contactHref} className="btn-primary no-underline">
+                {CONTACT_EMAIL}
+              </a>
+            </div>
+          </section>
+        ) : null}
       </main>
 
       <footer className="landing-footer">
-        <span>Aprendo · preparación ICFES Saber 11</span>
-        <span>Preguntas oficiales del ICFES</span>
+        <span>Aprendo · preparación para el Saber 11. No estamos afiliados al ICFES.</span>
+        <nav aria-label="Legal">
+          <Link to="/terminos">Términos</Link>
+          <Link to="/privacidad">Tratamiento de datos</Link>
+        </nav>
       </footer>
     </div>
   )

@@ -6,6 +6,7 @@ import { createPortal } from 'react-dom'
 import {
   ArrowLeft,
   BookOpen,
+  Check,
   Bot,
   ChevronLeft,
   ChevronRight,
@@ -13,10 +14,11 @@ import {
   Flag,
   RotateCcw,
   Sparkles,
+  X,
 } from 'lucide-react'
 import { api } from '@aprendo/convex/api'
 import { MIN_STATS_SAMPLE } from '@aprendo/convex/answerStats'
-import MarkdownBlock from '../components/MarkdownBlock.tsx'
+import { MarkdownBlock } from '../components/MarkdownBlock.tsx'
 import { NivelacionResult } from '../components/NivelacionResult.tsx'
 import { QuestionReportForm } from '../components/QuestionReportForm.tsx'
 import { SharedStimulus } from '../components/SharedStimulus.tsx'
@@ -33,7 +35,7 @@ import { sessionQuery } from '../lib/student-queries.ts'
 import { getKindLabel } from '../lib/session-display.ts'
 import { formatClock, hasResultScreen } from '../lib/result-display.ts'
 import { useCurrentStudent } from '../lib/student-session.ts'
-import { getSubjectLabel, getSubtopicLabel } from '../lib/taxonomy.ts'
+import { getSubjectLabel, getSubtopicLabel } from '@aprendo/convex/taxonomy'
 import { indexOfPosition } from '../lib/review-position.ts'
 import { missedCount, optionExplanations, timeVersusMedian } from '../lib/review-explanations.ts'
 import { readConvexError } from '../lib/convex-error.ts'
@@ -387,7 +389,7 @@ function ReviewPage() {
               {question.flagged ? (
                 <span
                   aria-hidden
-                  className="absolute -right-0.5 -top-0.5 z-[2] size-2 rounded-full border border-[var(--bg-card)] bg-[var(--gold)]"
+                  className="absolute -right-0.5 -top-0.5 z-[2] size-2 rounded-full border border-[var(--bg-card)] bg-[var(--text-primary)]"
                 />
               ) : null}
             </button>
@@ -407,7 +409,7 @@ function ReviewPage() {
             <SharedStimulus group={currentQuestion.group} />
           ) : null}
 
-          <article className="stage-question">
+          <article className="stage-question sheet">
             <div className="stage-question-body">
               {currentQuestion.stemImageUrl != null ? (
                 <>
@@ -422,6 +424,7 @@ function ReviewPage() {
               ) : (
                 <MarkdownBlock markdown={currentQuestion.question.bodyMarkdown} />
               )}
+              <p className="question-source">{currentQuestion.source.label}</p>
             </div>
 
             {currentQuestion.flagged || currentQuestion.timeSpentMs != null || !hasAnswered ? (
@@ -465,8 +468,16 @@ function ReviewPage() {
                       <span className={wasEliminated ? 'block line-through decoration-2 opacity-60' : undefined}>
                         <MarkdownBlock markdown={option.bodyMarkdown} />
                       </span>
-                      {isCorrect ? <span className="review-option-meta is-correct">Respuesta correcta</span> : null}
-                      {isWrongPick ? <span className="review-option-meta is-incorrect">Tu respuesta</span> : null}
+                      {isCorrect ? (
+                        <span className="review-option-meta is-correct">
+                          <Check size={14} strokeWidth={3} aria-hidden /> Respuesta correcta
+                        </span>
+                      ) : null}
+                      {isWrongPick ? (
+                        <span className="review-option-meta is-incorrect">
+                          <X size={14} strokeWidth={3} aria-hidden /> Tu respuesta
+                        </span>
+                      ) : null}
                       {wasEliminated ? (
                         <span className={`review-option-meta ${isCorrect ? 'is-incorrect' : 'text-[var(--text-tertiary)]'}`}>
                           {isCorrect ? '\u00a0· y la tachaste' : 'La tachaste'}
@@ -522,7 +533,7 @@ function ReviewPage() {
             {explanations.map((item) =>
               item.isPicked ? (
                 <div key={item.label} className="review-explanation is-distractor">
-                  <p className="kicker mb-2">Por qué la {item.label} te pareció correcta</p>
+                  <p className="review-explanation-title">Por qué la {item.label} te pareció correcta</p>
                   <MarkdownBlock markdown={item.rationaleMarkdown} />
                 </div>
               ) : (
@@ -539,7 +550,7 @@ function ReviewPage() {
 
             {solutionMarkdown ? (
               <div className="review-explanation">
-                <p className="kicker mb-2">Explicación</p>
+                <p className="review-explanation-title">Explicación</p>
                 <MarkdownBlock markdown={solutionMarkdown} />
               </div>
             ) : null}

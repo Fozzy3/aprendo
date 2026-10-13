@@ -2,7 +2,7 @@
 import { act } from 'react'
 import { createRoot, type Root } from 'react-dom/client'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { useSessionTimer } from '../lib/useSessionTimer'
+import { useSessionTimer } from '../lib/use-session-timer'
 
 // @testing-library/react loads its own React under this config (see
 // timed-session-intro.test.tsx), so the hook is mounted with react-dom directly.

@@ -21,7 +21,7 @@ function Paragraph({ node, children, ...props }: ComponentProps<'p'> & ExtraProp
 
 const components = { p: Paragraph }
 
-export default function MarkdownBlock({ markdown }: { markdown: string }) {
+export function MarkdownBlock({ markdown }: { markdown: string }) {
   return (
     <Streamdown className="markdown-body" plugins={{ math }} components={components}>
       {markdown}

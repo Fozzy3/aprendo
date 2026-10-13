@@ -1,14 +1,13 @@
 import { useConvexMutation } from '@convex-dev/react-query'
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { Link, createFileRoute, useNavigate } from '@tanstack/react-router'
-import { Check } from 'lucide-react'
+import { Check, ChevronRight } from 'lucide-react'
 import { useEffect, useState, type CSSProperties } from 'react'
 import { api } from '@aprendo/convex/api'
 import { SESSION_KIND_CONFIG, getConfiguredQuestionCount } from '@aprendo/convex/sessionKinds'
-import BrandMark from '../components/BrandMark.tsx'
-import { Mascot } from '../components/Mascot.tsx'
+import { SchoolLabel } from '../components/SchoolLabel.tsx'
 import { SessionSolve } from '../components/SessionSolve.tsx'
-import ThemeToggle from '../components/ThemeToggle.tsx'
+import { ThemeToggle } from '../components/ThemeToggle.tsx'
 import { TimedSessionIntro } from '../components/TimedSessionIntro.tsx'
 import { findResumableSession } from '../lib/resume-session.ts'
 import { sessionHistoryQuery, studentAppStateQuery } from '../lib/student-queries.ts'
@@ -78,7 +77,7 @@ function PlacementPage() {
   }
 
   const placedSubjectIds = appStateQuery.data?.placedSubjectIds ?? []
-  const hasAnyPlacement = appStateQuery.data?.hasCompletedDiagnostic ?? false
+  const hasAnyPlacement = appStateQuery.data?.hasPlacement ?? false
   const pendingSubject = pendingSubjectId != null ? getSubjectTheme(pendingSubjectId) : null
   const findUnfinished = (subjectId: string) =>
     findResumableSession(nivelacionesQuery.data ?? [], { kind: 'nivelacion', subjectId }, Date.now())
@@ -87,15 +86,7 @@ function PlacementPage() {
     <div className={`diagnostic-shell${sessionId != null ? ' is-immersive' : ''}`}>
       <header className="diagnostic-topbar">
         <div className="diagnostic-topbar-inner">
-          <Link to="/" className="student-brand no-underline">
-            <div className="student-brand-mark">
-              <BrandMark />
-            </div>
-            <div className="student-brand-copy">
-              <span className="student-brand-title">Aprendo</span>
-              <span className="student-brand-subtitle">Nivelación</span>
-            </div>
-          </Link>
+          <SchoolLabel studentName={session.name} subtitle="Nivelación" />
 
           <div className="diagnostic-topbar-actions">
             <div className="student-pill">Sin tutor · medimos tu nivel</div>
@@ -136,21 +127,18 @@ function PlacementPage() {
           </div>
         ) : (
           <div className="diagnostic-intro fade-in">
-            <div className="diagnostic-intro-head">
-              <Mascot mood={hasAnyPlacement ? 'happy' : 'idle'} size="lg" />
-              <div>
-                <h1 className="diagnostic-intro-title">
-                  {hasAnyPlacement ? 'Nivela otra área' : '¿En qué nivel estás?'}
-                </h1>
-                <p className="diagnostic-intro-copy">
-              {hasAnyPlacement
-                ? 'Ya conoces tu nivel en al menos un área. Nivela las demás cuando quieras.'
-                : `Elige un área y responde ${NIVELACION.totalQuestions} preguntas sin ayuda. Con eso ubicamos tu nivel ICFES y armamos tu ruta. Puedes nivelar las demás áreas después.`}
-                </p>
-              </div>
-            </div>
+            <header className="ruled-page-head">
+              <h1 className="page-title">
+                {hasAnyPlacement ? 'Nivela otra área' : '¿En qué nivel estás?'}
+              </h1>
+              <p className="page-lede">
+                {hasAnyPlacement
+                  ? 'Ya conoces tu nivel en al menos un área. Nivela las demás cuando quieras.'
+                  : `Elige un área y responde ${NIVELACION.totalQuestions} preguntas sin ayuda. Con eso ubicamos tu nivel ICFES y armamos tu ruta. Puedes nivelar las demás áreas después.`}
+              </p>
+            </header>
 
-            <ul className="mt-6 grid list-none grid-cols-1 gap-3 p-0 sm:grid-cols-2">
+            <ul className="ruled-list">
               {getAllSubjectThemes().map((subject) => {
                 const isPlaced = placedSubjectIds.includes(subject.id)
                 const isUnfinished = findUnfinished(subject.id) != null
@@ -163,40 +151,28 @@ function PlacementPage() {
                         if (unfinished != null) setSessionId(unfinished._id)
                         else setPendingSubjectId(subject.id)
                       }}
-                      className="launch-card w-full p-4 text-left"
+                      className="ruled-row w-full cursor-pointer border-x-0 border-t-0 bg-transparent text-left hover:bg-[var(--bg-inset)]"
                     >
-                      <span className="flex items-center gap-3">
-                        {/* The area's colour lives here and nowhere else on the
-                            card. Painting the whole border with it put five
-                            saturated outlines on one screen, two of which were
-                            the same colours as "correct" and "wrong". */}
-                        <span
-                          aria-hidden="true"
-                          className="subject-dot subject-dot-lg"
-                          style={{ '--subject-color': subject.color } as CSSProperties}
-                        />
-                        <span aria-hidden="true" className="text-2xl">
-                          {subject.emoji}
+                      {/* The area's colour lives in its dot and nowhere else. */}
+                      <span
+                        aria-hidden="true"
+                        className="subject-dot"
+                        style={{ '--subject-color': subject.color } as CSSProperties}
+                      />
+                      <span className="ruled-row-main">
+                        <span className="font-semibold">{subject.label}</span>
+                        <span className="ruled-row-note">
+                          {isUnfinished
+                            ? 'En curso · toca para continuar'
+                            : `${NIVELACION.totalQuestions} preguntas · 30 min`}
                         </span>
-                        <span className="min-w-0 flex-1">
-                          <span className="block text-sm font-bold text-[var(--text-primary)]">
-                            {subject.label}
-                          </span>
-                          <span className="block text-xs text-[var(--text-tertiary)]">
-                            {isUnfinished
-                              ? 'En curso · toca para continuar'
-                              : `${NIVELACION.totalQuestions} preguntas · 30 min`}
-                          </span>
-                        </span>
-                        {isPlaced && (
-                          <span
-                            className="chip-success chip"
-                            title="Ya nivelaste esta área"
-                          >
-                            <Check size={12} /> Nivelada
-                          </span>
-                        )}
                       </span>
+                      {isPlaced && (
+                        <span className="chip-success chip" title="Ya nivelaste esta área">
+                          <Check size={12} aria-hidden /> Nivelada
+                        </span>
+                      )}
+                      <ChevronRight size={16} aria-hidden className="shrink-0 text-[var(--text-tertiary)]" />
                     </button>
                   </li>
                 )
@@ -204,7 +180,7 @@ function PlacementPage() {
             </ul>
 
             {hasAnyPlacement && (
-              <div className="mt-6 flex justify-center">
+              <div className="mt-6">
                 <Link to="/today" className="btn-secondary no-underline">
                   Ir a mi plan de hoy
                 </Link>

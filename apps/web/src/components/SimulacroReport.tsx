@@ -15,19 +15,21 @@ import {
   simulacroGapMessage,
 } from '../lib/result-display.ts'
 import { getSubjectTheme } from '../lib/subject-theme.ts'
-import { getSubjectLabel, getSubtopicLabel } from '../lib/taxonomy.ts'
+import { getSubjectLabel, getSubtopicLabel } from '@aprendo/convex/taxonomy'
 
 const PACE_DISPLAY = {
   adelantado: { label: 'Adelantado', className: 'chip-accent' },
   a_tiempo: { label: 'A tiempo', className: 'chip-success' },
-  atrasado: { label: 'Atrasado', className: 'border-transparent bg-[var(--danger-soft)] text-[var(--danger-text)]' },
+  atrasado: { label: 'Atrasado', className: 'border-[var(--margin)] text-[var(--danger-text)]' },
 } as const
 
-function DeltaChip({ delta, label }: { delta: number | null; label: string }) {
+/** A change in points, written in green or red ink; no change is pencil. */
+function DeltaText({ delta, label }: { delta: number | null; label: string }) {
   if (delta == null) return null
-  const tone = delta > 0 ? 'chip-success' : delta < 0 ? 'border-transparent bg-[var(--danger-soft)] text-[var(--danger-text)]' : ''
+  const tone =
+    delta > 0 ? 'text-[var(--success-text)]' : delta < 0 ? 'text-[var(--danger-text)]' : 'text-[var(--text-tertiary)]'
   return (
-    <span className={`chip tabular-nums ${tone}`} title={label}>
+    <span className={`text-sm font-semibold tabular-nums ${tone}`} title={label}>
       {formatSignedPoints(delta)}
       <span className="sr-only"> {label}</span>
     </span>
@@ -56,7 +58,7 @@ export function SimulacroReport({
   const report = reportQuery.data
   if (report == null) {
     return (
-      <div className="fade-in mx-auto w-[min(44rem,calc(100%-2rem))] py-10 text-center">
+      <div className="fade-in mx-auto w-[min(44rem,calc(100%-2rem))] py-10">
         <p className="text-sm text-[var(--text-secondary)]">No pudimos armar el reporte de este simulacro.</p>
         <Link
           to="/practice/$sessionId/review"
@@ -85,29 +87,35 @@ export function SimulacroReport({
     }),
     { mastered: 0, fragile: 0, misconception: 0, gap: 0, declaredCount: 0, undeclaredCount: 0 },
   )
+  // Every pace bar shares one scale, so a bar's length is its seconds per
+  // question and two areas can be compared by eye.
+  const paceScaleMs = Math.max(
+    1,
+    ...report.areas.flatMap((area) => (area.pace == null ? [] : [area.pace.averageMs, area.pace.officialMs])),
+  ) * 1.1
   const sittingLabel = (id: string) =>
     report.sessionIds.length > 1 ? `Sesión ${report.sessionIds.findIndex((sittingId) => sittingId === id) + 1} · ` : ''
 
   return (
     <div className="fade-in mx-auto w-[min(44rem,calc(100%-2rem))] py-6 sm:py-10">
-      <header>
-        <p className="text-sm font-semibold text-[var(--text-secondary)]">
+      <header className="ruled-page-head">
+        <p className="m-0 text-sm text-[var(--text-secondary)]">
           Simulacro · {isFullExam ? 'Examen completo' : getSubjectLabel(report.subjectId ?? '')}
         </p>
-        <h1 className="mt-1 text-balance font-display text-2xl font-bold tracking-tight text-[var(--text-primary)] sm:text-3xl">
+        <h1 className="page-title mt-1 text-balance">
           {isFullExam ? 'Tu reporte del simulacro' : `Tu resultado en ${getSubjectLabel(report.subjectId ?? '')}`}
         </h1>
       </header>
 
       {isFullExam && report.global != null ? (
-        <section className="card global-score mt-5" aria-label="Puntaje global estimado">
-          <div className="global-score-head">
-            <h2 className="text-sm font-bold text-[var(--text-primary)]">Puntaje global estimado</h2>
-            <DeltaChip delta={report.globalDeltaVsPrevious} label="frente a tu simulacro anterior" />
+        <section className="ruled-section" aria-labelledby="report-global">
+          <div className="section-head">
+            <h2 id="report-global" className="section-title">Puntaje global estimado</h2>
+            <DeltaText delta={report.globalDeltaVsPrevious} label="frente a tu simulacro anterior" />
           </div>
-          <p className="global-score-value tabular-nums">
-            <strong>{report.global.score}</strong>
-            <span>/ {MAX_GLOBAL_SCORE}</span>
+          <p className="m-0 tabular-nums">
+            <span className="figure">{report.global.score}</span>
+            <span className="text-sm text-[var(--text-tertiary)]"> de {MAX_GLOBAL_SCORE}</span>
           </p>
           <p className="global-score-band tabular-nums">
             Rango probable: <strong>{report.global.low}–{report.global.high}</strong> (± {report.global.margin})
@@ -131,8 +139,8 @@ export function SimulacroReport({
           </p>
         </section>
       ) : gapMessage != null ? (
-        <section className="card-inset mt-5 p-4">
-          <p className="text-sm font-semibold text-[var(--text-primary)]">{gapMessage}</p>
+        <section className="ruled-section">
+          <p className="notice mt-0">{gapMessage}</p>
           {missingSessionNumber != null ? (
             <Link to="/practice" className="btn-secondary mt-3 no-underline">
               Presentar la Sesión {missingSessionNumber} <ArrowRight size={14} aria-hidden />
@@ -141,23 +149,23 @@ export function SimulacroReport({
         </section>
       ) : null}
 
-      <section className="mt-8" aria-labelledby="report-areas">
-        <h2 id="report-areas" className="font-display text-lg font-bold text-[var(--text-primary)]">
+      <section className="ruled-section" aria-labelledby="report-areas">
+        <h2 id="report-areas" className="section-title">
           {isFullExam ? 'Por área' : 'Tu desempeño'}
         </h2>
-        <ul className="mt-3 grid list-none gap-2 p-0">
+        <ul className="ruled-list border-t border-[var(--border)]">
           {report.areas.map((area) => {
             const theme = getSubjectTheme(area.subjectId)
             const blanks = area.questionCount - area.answeredCount
             const weakest = area.subtopics.find((entry) => entry.correctCount < entry.questionCount) ?? null
             return (
-              <li key={area.subjectId} className="card p-4">
+              <li key={area.subjectId} className="border-b border-[var(--border)] py-4">
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0">
-                    <p className="flex items-center gap-2 text-sm font-bold text-[var(--text-primary)]">
+                    <p className="flex items-center gap-2 font-semibold text-[var(--text-primary)]">
                       <span
                         aria-hidden
-                        className="subject-dot subject-dot-lg"
+                        className="subject-dot"
                         style={{ '--subject-color': theme.color } as CSSProperties}
                       />
                       {theme.label}
@@ -169,9 +177,14 @@ export function SimulacroReport({
                     </p>
                   </div>
                   <div className="flex shrink-0 items-center gap-2">
-                    <DeltaChip delta={area.deltaVsPrevious} label="frente al simulacro anterior" />
-                    <p className="text-xs text-[var(--text-tertiary)] tabular-nums">
-                      <strong className="text-xl font-bold text-[var(--text-primary)]">{area.score}</strong>/100
+                    <DeltaText delta={area.deltaVsPrevious} label="frente al simulacro anterior" />
+                    <p className={`text-xs tabular-nums ${area.level?.index === 1 ? 'text-[var(--danger-text)]' : 'text-[var(--text-tertiary)]'}`}>
+                      <strong
+                        className={`font-display text-xl font-semibold ${area.level?.index === 1 ? 'text-[var(--danger-text)]' : 'text-[var(--text-primary)]'}`}
+                      >
+                        {area.score}
+                      </strong>{' '}
+                      de 100
                     </p>
                   </div>
                 </div>
@@ -185,6 +198,16 @@ export function SimulacroReport({
                       </dd>
                       <dd className={`chip m-0 ${PACE_DISPLAY[area.pace.status].className}`}>
                         {PACE_DISPLAY[area.pace.status].label}
+                      </dd>
+                      <dd className="pace-bar m-0 w-full" aria-hidden>
+                        <span
+                          className={`pace-bar-fill${area.pace.averageMs > area.pace.officialMs ? ' is-over' : ''}`}
+                          style={{ width: `${(area.pace.averageMs / paceScaleMs) * 100}%` }}
+                        />
+                        <span
+                          className="pace-bar-official"
+                          style={{ left: `${(area.pace.officialMs / paceScaleMs) * 100}%` }}
+                        />
                       </dd>
                     </div>
                   ) : null}
@@ -215,9 +238,9 @@ export function SimulacroReport({
       </section>
 
       {practiceTarget != null ? (
-        <section className="card-inset mt-4 p-4">
-          <h2 className="text-sm font-bold text-[var(--text-primary)]">Practicar lo que fallaste</h2>
-          <p className="mt-0.5 text-sm text-[var(--text-secondary)]">
+        <section className="ruled-section" aria-labelledby="report-practice">
+          <h2 id="report-practice" className="section-title">Practicar lo que fallaste</h2>
+          <p className="text-sm text-[var(--text-secondary)]">
             Empieza por {getSubtopicLabel(practiceTarget.subtopicId)}, el tema donde más fallaste.
           </p>
           <div className="mt-3">
@@ -232,22 +255,22 @@ export function SimulacroReport({
       ) : null}
 
       {report.slowestQuestions.length > 0 ? (
-        <section className="mt-8">
-          <h2 className="font-display text-lg font-bold text-[var(--text-primary)]">Donde se te fue el tiempo</h2>
-          <p className="mt-0.5 text-sm text-[var(--text-secondary)]">
+        <section className="ruled-section" aria-labelledby="report-slowest">
+          <h2 id="report-slowest" className="section-title">Donde se te fue el tiempo</h2>
+          <p className="mb-3 text-sm text-[var(--text-secondary)]">
             Las preguntas en las que más pasaste del ritmo oficial.
           </p>
-          <ul className="mt-3 grid list-none gap-2 p-0">
+          <ul className="ruled-list">
             {report.slowestQuestions.map((item) => (
               <li key={item.sessionQuestionId}>
                 <Link
                   to="/practice/$sessionId/review"
                   params={{ sessionId: item.sessionId }}
                   search={{ pregunta: item.position }}
-                  className="card flex items-center gap-3 p-3 no-underline"
+                  className="ruled-row no-underline"
                 >
-                  <span className="min-w-0 flex-1">
-                    <span className="block text-sm font-bold text-[var(--text-primary)] tabular-nums">
+                  <span className="ruled-row-main">
+                    <span className="block text-sm font-semibold text-[var(--text-primary)] tabular-nums">
                       {sittingLabel(item.sessionId)}Pregunta {item.position}
                     </span>
                     <span className="block truncate text-xs text-[var(--text-tertiary)]">
@@ -269,11 +292,9 @@ export function SimulacroReport({
         </section>
       ) : null}
 
-      <section className="mt-8">
-        <ConfidenceBreakdownCard breakdown={confidence} />
-      </section>
+      <ConfidenceBreakdownCard breakdown={confidence} />
 
-      <div className="mt-8 flex flex-col gap-2 border-t border-[var(--border)] pt-5 sm:flex-row sm:flex-wrap">
+      <div className="flex flex-col gap-2 border-t border-[var(--border-strong)] pt-5 sm:flex-row sm:flex-wrap">
         {report.sessionIds.map((id, index) => (
           <Link
             key={id}

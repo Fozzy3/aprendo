@@ -6,6 +6,7 @@ import type { Id } from '@aprendo/convex/dataModel'
 export interface ActiveStudentSession {
   studentId: Id<'students'>
   email: string
+  name: string | null
 }
 
 export function useCurrentStudent() {
@@ -14,7 +15,7 @@ export function useCurrentStudent() {
   const session: ActiveStudentSession | null =
     result.data == null
       ? null
-      : { studentId: result.data._id, email: result.data.email }
+      : { studentId: result.data._id, email: result.data.email, name: result.data.name }
 
   return {
     session,

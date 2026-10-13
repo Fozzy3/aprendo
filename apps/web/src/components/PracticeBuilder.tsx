@@ -23,10 +23,10 @@ import {
   toggleSubtopic,
   type BuilderState,
 } from '../lib/practice-builder.ts'
-import { formatTimeLimit, getKindIcon } from '../lib/session-display.ts'
+import { formatTimeLimit } from '../lib/session-display.ts'
 import { practiceBuilderCountsQuery } from '../lib/student-queries.ts'
 import { getSubjectTheme } from '../lib/subject-theme.ts'
-import { subjectIds } from '../lib/taxonomy.ts'
+import { SUBJECT_IDS } from '@aprendo/convex/taxonomy'
 
 type PracticeBuilderProps = {
   studentId: string
@@ -40,7 +40,6 @@ type PracticeBuilderProps = {
 }
 
 const MS_PER_QUESTION = officialMsPerQuestion({ kind: 'personalizada' })
-const Icon = getKindIcon('personalizada')
 
 function Choice({
   pressed,
@@ -52,7 +51,7 @@ function Choice({
   children: ReactNode
 }) {
   return (
-    <button type="button" className="topic-chip" aria-pressed={pressed} onClick={onClick}>
+    <button type="button" className={pressed ? 'btn-primary' : 'btn-secondary'} aria-pressed={pressed} onClick={onClick}>
       {children}
     </button>
   )
@@ -69,9 +68,9 @@ function Field({ legend, children, help }: { legend: string; children: ReactNode
 }
 
 /**
- * "Arma tu práctica" (kind `personalizada`): a hub card that opens into the
+ * "Arma tu práctica" (kind `personalizada`): a hub line that opens into the
  * builder. Collapsed it is one line on the hub, so the phone screen stays
- * scannable; open, every choice is a chip and the count of matching questions
+ * scannable; open, every choice is a button and the count of matching questions
  * updates as the student narrows.
  */
 export function PracticeBuilder({
@@ -99,39 +98,38 @@ export function PracticeBuilder({
   const config = SESSION_KIND_CONFIG.personalizada
 
   return (
-    <div className={`launch-card is-builder${expanded ? ' is-expanded' : ''}`}>
+    <div>
       <button
         type="button"
-        className="launch-card-main"
+        className="ruled-row w-full cursor-pointer border-x-0 border-t-0 bg-transparent text-left hover:bg-[var(--bg-inset)] disabled:cursor-default disabled:opacity-60"
         disabled={disabled}
         aria-expanded={expanded}
         aria-controls="practice-builder"
         onClick={onToggle}
       >
-        <span className="launch-card-icon" aria-hidden>
-          <Icon size={20} />
-        </span>
-        <span className="launch-card-body">
-          <span className="launch-card-title">Arma tu práctica</span>
-          <span className="launch-card-copy">{config.taglineEs}</span>
-          <span className="launch-card-meta">
+        <span className="ruled-row-main">
+          <span className="font-semibold">Arma tu práctica</span>
+          <span className="ruled-row-note">{config.taglineEs}</span>
+          <span className="inline-flex flex-wrap gap-x-3 text-xs text-[var(--text-tertiary)]">
             <span>{MIN_PRACTICE_QUESTIONS} a {MAX_PRACTICE_QUESTIONS} preguntas</span>
             <span>Con o sin reloj</span>
           </span>
         </span>
-        <span className="launch-card-cta" aria-hidden>
-          <ChevronRight size={18} />
-        </span>
+        <ChevronRight
+          size={18}
+          aria-hidden
+          className={`shrink-0 text-[var(--text-tertiary)]${expanded ? ' rotate-90' : ''}`}
+        />
       </button>
 
       {expanded ? (
-        <div id="practice-builder" className="builder">
+        <div id="practice-builder" className="builder border-b border-[var(--border)] pt-3">
           <div className="builder-fields">
             <Field legend="Área">
               <Choice pressed={state.subjectId == null} onClick={() => setState((prev) => selectSubject(prev, null))}>
                 Todas
               </Choice>
-              {subjectIds.map((subjectId) => {
+              {SUBJECT_IDS.map((subjectId) => {
                 const theme = getSubjectTheme(subjectId)
                 return (
                   <Choice
@@ -179,7 +177,7 @@ export function PracticeBuilder({
                 >
                   {DIFFICULTY_LABELS[difficulty]}
                   {counts != null ? (
-                    <span className="builder-count">{counts.byDifficulty[difficulty]}</span>
+                    <span className="tabular-nums opacity-70">{counts.byDifficulty[difficulty]}</span>
                   ) : null}
                 </Choice>
               ))}
@@ -240,9 +238,9 @@ export function PracticeBuilder({
             </p>
             {status.message != null ? <p className="builder-note">{status.message}</p> : null}
             {error != null ? (
-              <div className="stage-alert" role="alert">
+              <p className="notice is-danger" role="alert">
                 {error}
-              </div>
+              </p>
             ) : null}
             <button
               type="button"

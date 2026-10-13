@@ -7,6 +7,9 @@ function hasValue(value: string | null | undefined): value is string {
   return typeof value === 'string' && value.trim().length > 0
 }
 
+/** The caller's schools (co-branding label, teacher and school menus). */
+export const mySchoolsQuery = convexQuery(api.schools.getMySchools, {})
+
 export function studentQuery(studentId: string | null | undefined) {
   if (!hasValue(studentId)) {
     return convexQuery(api.students.getStudent, 'skip')

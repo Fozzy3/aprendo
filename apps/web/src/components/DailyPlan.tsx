@@ -5,7 +5,6 @@ import {
   BookOpen,
   ChevronRight,
   Gauge,
-  Moon,
   Play,
   RotateCcw,
   Target,
@@ -66,18 +65,12 @@ export function DailyPlan({ studentId, tasks }: { studentId: string; tasks: Stud
 
   if (first == null) {
     return (
-      <div className="card flex items-start gap-3.5 p-6">
-        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[var(--accent-soft)] text-[var(--accent-text)]">
-          <Moon size={18} />
-        </span>
-        <div>
-          <p className="text-base font-semibold text-[var(--text-primary)]">Hoy toca descansar</p>
-          <p className="text-sm text-[var(--text-secondary)]">
-            Tu examen está muy cerca. Hoy nada pesado: duerme bien y llega con la cabeza
-            fresca.
-          </p>
-        </div>
-      </div>
+      <section className="ruled-section">
+        <h2 className="section-title">Hoy toca descansar</h2>
+        <p className="text-sm text-[var(--text-secondary)]">
+          Tu examen está muy cerca. Hoy nada pesado: duerme bien y llega con la cabeza fresca.
+        </p>
+      </section>
     )
   }
 
@@ -103,72 +96,58 @@ export function DailyPlan({ studentId, tasks }: { studentId: string; tasks: Stud
   }
 
   return (
-    <section className="card relative overflow-hidden p-5 sm:p-6" aria-labelledby="daily-plan-title">
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,var(--accent-soft),transparent_60%)]" />
-      <div className="relative">
-        <div className="mb-3 flex items-baseline justify-between gap-3">
-          <h2 id="daily-plan-title" className="font-display text-xl font-bold text-[var(--text-primary)]">
-            Tu plan de hoy
-          </h2>
-          <span className="shrink-0 text-xs font-medium tabular-nums text-[var(--text-tertiary)]">
-            ~{formatTimeLimit(totalMinutes * 60_000)}
-          </span>
-        </div>
+    <section className="ruled-section" aria-labelledby="daily-plan-title">
+      <div className="section-head">
+        <h2 id="daily-plan-title" className="section-title">Tu plan de hoy</h2>
+        <span className="section-meta">~{formatTimeLimit(totalMinutes * 60_000)}</span>
+      </div>
 
-        <ol className="m-0 flex list-none flex-col gap-1 p-0">
-          {tasks.map((task, index) => {
-            const Icon = TASK_ICON[task.kind]
-            const isFirst = index === 0
-            return (
-              <li key={task.id}>
+      {/* Numbered lines on the ruling. The first one carries "Empezar". */}
+      <ol className="plan-lines">
+        {tasks.map((task, index) => {
+          const Icon = TASK_ICON[task.kind]
+          const isFirst = index === 0
+          return (
+            <li key={task.id} className={`plan-line${isFirst ? ' is-first' : ''}`}>
+              <span className="plan-line-number" aria-hidden>
+                {index + 1}
+              </span>
+              <button
+                type="button"
+                disabled={launch.isPending}
+                onClick={() => open(task)}
+                className="plan-line-task"
+              >
+                <span className="plan-line-title">
+                  <Icon size={15} aria-hidden className="shrink-0 text-[var(--text-tertiary)]" />
+                  {pendingId === task.id ? 'Preparando…' : task.title}
+                </span>
+                <span className="plan-line-reason">{task.reason}</span>
+              </button>
+              <span className="plan-line-minutes">{formatTimeLimit(task.minutes * 60_000)}</span>
+              {isFirst ? (
                 <button
                   type="button"
                   disabled={launch.isPending}
-                  onClick={() => open(task)}
-                  className="flex w-full items-start gap-3 rounded-[var(--radius-md)] px-2 py-2.5 text-left transition-colors hover:bg-[var(--bg-inset)] disabled:opacity-60"
+                  onClick={() => open(first)}
+                  className="btn-primary plan-line-start"
                 >
-                  <span
-                    className={`mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full ${
-                      isFirst
-                        ? 'bg-[var(--accent)] text-[var(--text-inverted)]'
-                        : 'bg-[var(--bg-inset)] text-[var(--text-secondary)]'
-                    }`}
-                    aria-hidden
-                  >
-                    <Icon size={16} />
-                  </span>
-                  <span className="min-w-0 flex-1">
-                    <span className="block text-sm font-semibold text-[var(--text-primary)]">
-                      {pendingId === task.id ? 'Preparando…' : task.title}
-                    </span>
-                    <span className="block text-xs text-[var(--text-secondary)]">{task.reason}</span>
-                  </span>
-                  <span className="mt-0.5 flex shrink-0 items-center gap-0.5 text-xs font-medium tabular-nums text-[var(--text-tertiary)]">
-                    {formatTimeLimit(task.minutes * 60_000)}
-                    <ChevronRight size={14} aria-hidden />
-                  </span>
+                  <Play size={15} aria-hidden />
+                  {pendingId === first.id ? 'Preparando…' : 'Empezar'}
                 </button>
-              </li>
-            )
-          })}
-        </ol>
+              ) : (
+                <ChevronRight size={16} aria-hidden className="plan-line-chevron" />
+              )}
+            </li>
+          )
+        })}
+      </ol>
 
-        <button
-          type="button"
-          disabled={launch.isPending}
-          onClick={() => open(first)}
-          className="btn-primary mt-4 w-full justify-center sm:w-auto"
-        >
-          <Play size={16} />
-          {pendingId === first.id ? 'Preparando…' : 'Empezar'}
-        </button>
-
-        {launch.error ? (
-          <p role="alert" className="mt-3 text-sm text-[var(--danger-text)]">
-            {readConvexError(launch.error, 'No se pudo abrir esta tarea. Intenta de nuevo.')}
-          </p>
-        ) : null}
-      </div>
+      {launch.error ? (
+        <p role="alert" className="mt-3 text-sm text-[var(--danger-text)]">
+          {readConvexError(launch.error, 'No se pudo abrir esta tarea. Intenta de nuevo.')}
+        </p>
+      ) : null}
     </section>
   )
 }

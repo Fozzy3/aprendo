@@ -38,7 +38,7 @@ export function useStudentGuard(): StudentGuard {
 
   useEffect(() => {
     if (!isReady || session == null || appStateQuery.data == null) return
-    if (!appStateQuery.data.hasCompletedDiagnostic) {
+    if (!appStateQuery.data.hasPlacement) {
       void navigate({ to: '/diagnostic' })
     }
   }, [appStateQuery.data, isReady, navigate, session])
@@ -52,7 +52,7 @@ export function useStudentGuard(): StudentGuard {
     }
   }
   if (appStateQuery.isPending) return { status: 'loading', session: null }
-  if (appStateQuery.data != null && !appStateQuery.data.hasCompletedDiagnostic) {
+  if (appStateQuery.data != null && !appStateQuery.data.hasPlacement) {
     // A redirect that happens with no explanation reads as the app ignoring the
     // tap. Saying why costs one sentence and turns a dead end into a step.
     return {

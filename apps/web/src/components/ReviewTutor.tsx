@@ -15,7 +15,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from './ui/dialog.tsx'
-import MarkdownBlock from './MarkdownBlock.tsx'
+import { MarkdownBlock } from './MarkdownBlock.tsx'
 import { Conversation, ConversationContent, ConversationEmptyState, ConversationScrollButton } from './ai-elements/conversation.tsx'
 import { Message, MessageContent } from './ai-elements/message.tsx'
 import { PromptInput, PromptInputBody, PromptInputFooter, PromptInputSubmit, PromptInputTextarea } from './ai-elements/prompt-input.tsx'

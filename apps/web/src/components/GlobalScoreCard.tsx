@@ -1,7 +1,6 @@
 import { useConvexMutation } from '@convex-dev/react-query'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { Target } from 'lucide-react'
-import { useState } from 'react'
+import { useId, useState, type CSSProperties } from 'react'
 import { api } from '@aprendo/convex/api'
 import { MAX_GLOBAL_SCORE } from '@aprendo/convex/globalScore'
 import { getSubjectTheme } from '../lib/subject-theme.ts'
@@ -20,6 +19,8 @@ type GlobalScoreData = {
   leverage: { subjectId: string; pointsPerAreaPoint: number; availablePoints: number } | null
 }
 
+const percentOf = (value: number) => `${(value / MAX_GLOBAL_SCORE) * 100}%`
+
 /**
  * The 0-500 global score — the number the student's family and university
  * actually speak in.
@@ -35,6 +36,7 @@ export function GlobalScoreCard({
   studentId: string
   data: GlobalScoreData
 }) {
+  const titleId = useId()
   const queryClient = useQueryClient()
   const [isEditingTarget, setIsEditingTarget] = useState(false)
   const [draft, setDraft] = useState(data.target == null ? '' : String(data.target))
@@ -52,28 +54,29 @@ export function GlobalScoreCard({
   // A global score is defined over all five areas. Naming the missing ones is
   // more useful than a partial number would be, and it is the honest move.
   if (data.estimate == null) {
+    const missing = data.missingSubjectIds.length
     return (
-      <div className="card global-score is-incomplete">
-        <p className="kicker mb-1">Tu puntaje global estimado</p>
-        <p className="global-score-empty">
-          Te {data.missingSubjectIds.length === 1 ? 'falta' : 'faltan'}{' '}
-          <strong>{data.missingSubjectIds.length}</strong>{' '}
-          {data.missingSubjectIds.length === 1 ? 'área' : 'áreas'} por medir.
+      <section className="ruled-section" aria-labelledby={titleId}>
+        <h2 id={titleId} className="section-title">Tu puntaje global estimado</h2>
+        <p className="m-0 text-sm text-[var(--text-secondary)]">
+          Te {missing === 1 ? 'falta' : 'faltan'} <strong className="text-[var(--text-primary)]">{missing}</strong>{' '}
+          {missing === 1 ? 'área' : 'áreas'} por medir:
         </p>
-        <ul className="global-score-missing">
+        <ul className="m-0 mt-2 flex list-none flex-wrap gap-x-4 gap-y-1 p-0 text-sm text-[var(--text-primary)]">
           {data.missingSubjectIds.map((subjectId) => {
             const theme = getSubjectTheme(subjectId)
             return (
-              <li key={subjectId}>
-                <span aria-hidden>{theme.emoji}</span> {theme.label}
+              <li key={subjectId} className="inline-flex items-center gap-1.5">
+                <span aria-hidden="true" className="subject-dot" style={{ '--subject-color': theme.color } as CSSProperties} />
+                {theme.label}
               </li>
             )
           })}
         </ul>
-        <p className="global-score-note">
+        <p className="mt-3 mb-0 text-xs text-[var(--text-tertiary)]">
           El puntaje global va de 0 a {MAX_GLOBAL_SCORE} y solo tiene sentido con las cinco áreas.
         </p>
-      </div>
+      </section>
     )
   }
 
@@ -81,90 +84,108 @@ export function GlobalScoreCard({
   const leverageTheme = data.leverage == null ? null : getSubjectTheme(data.leverage.subjectId)
 
   return (
-    <div className="card global-score">
-      <div className="global-score-head">
-        <p className="kicker">Tu puntaje global estimado</p>
-        <span className="global-score-evidence">{attemptCount} preguntas</span>
+    <section className="ruled-section" aria-labelledby={titleId}>
+      <div className="section-head">
+        <h2 id={titleId} className="section-title">Tu puntaje global estimado</h2>
+        <span className="section-meta">{attemptCount} preguntas</span>
       </div>
 
-      <p className="global-score-value">
-        <strong>{score}</strong>
-        <span>/ {MAX_GLOBAL_SCORE}</span>
+      <p className="m-0">
+        <span className="figure">{score}</span>
+        <span className="text-sm text-[var(--text-tertiary)]"> /{MAX_GLOBAL_SCORE}</span>
       </p>
-      <p className="global-score-band">
-        Rango probable: <strong>{low}–{high}</strong> (± {margin})
+      <p className="mt-1 mb-0 text-sm text-[var(--text-secondary)]">
+        Rango probable: <strong className="text-[var(--text-primary)]">{low}–{high}</strong> (± {margin})
       </p>
 
-      {/* The band, drawn to scale against the full 0-500 range. */}
-      <div className="global-score-track" role="img" aria-label={`Entre ${low} y ${high} de ${MAX_GLOBAL_SCORE}`}>
+      {/* The band, drawn to scale against the full 0-500 range; the meta is a
+          pencil tick. */}
+      <div
+        className="relative mt-4 h-2 max-w-xl bg-[var(--bg-inset)]"
+        role="img"
+        aria-label={`Entre ${low} y ${high} de ${MAX_GLOBAL_SCORE}${data.target != null ? `; tu meta es ${data.target}` : ''}`}
+      >
         <span
-          className="global-score-range"
+          className="absolute inset-y-0"
           style={{
-            left: `${(low / MAX_GLOBAL_SCORE) * 100}%`,
-            width: `${((high - low) / MAX_GLOBAL_SCORE) * 100}%`,
+            left: percentOf(low),
+            width: percentOf(high - low),
+            background: 'color-mix(in srgb, var(--text-primary) 25%, transparent)',
           }}
         />
-        <span className="global-score-marker" style={{ left: `${(score / MAX_GLOBAL_SCORE) * 100}%` }} />
+        <span
+          className="absolute -top-1 -bottom-1 w-[2px] -translate-x-1/2 bg-[var(--text-primary)]"
+          style={{ left: percentOf(score) }}
+        />
         {data.target != null ? (
           <span
-            className="global-score-target"
-            style={{ left: `${(data.target / MAX_GLOBAL_SCORE) * 100}%` }}
+            className="absolute -top-1.5 -bottom-1.5 w-px -translate-x-1/2 bg-[var(--warn)]"
+            style={{ left: percentOf(data.target) }}
             title={`Tu meta: ${data.target}`}
           />
         ) : null}
       </div>
 
-      <div className="global-score-footer">
+      <div className="mt-4">
         {isEditingTarget ? (
           <form
-            className="global-score-target-form"
+            className="flex flex-wrap items-end gap-2"
             onSubmit={(event) => {
               event.preventDefault()
               const parsed = Number(draft)
               if (Number.isFinite(parsed)) saveMutation.mutate(parsed)
             }}
           >
-            <input
-              type="number"
-              min={0}
-              max={MAX_GLOBAL_SCORE}
-              className="global-score-target-input"
-              value={draft}
-              onChange={(event) => setDraft(event.target.value)}
-              aria-label="Tu meta de puntaje global"
-              placeholder="350"
-            />
+            <label className="field">
+              <span>Tu meta de puntaje global</span>
+              <input
+                type="number"
+                min={0}
+                max={MAX_GLOBAL_SCORE}
+                className="input w-28"
+                value={draft}
+                onChange={(event) => setDraft(event.target.value)}
+                placeholder="350"
+              />
+            </label>
             <button type="submit" className="btn-primary" disabled={saveMutation.isPending}>
               Guardar
             </button>
+            <button type="button" className="btn-ghost" onClick={() => setIsEditingTarget(false)}>
+              Cancelar
+            </button>
           </form>
         ) : data.target == null ? (
-          <button type="button" className="btn-ghost global-score-target-cta" onClick={() => setIsEditingTarget(true)}>
-            <Target size={14} /> Ponerme una meta
+          <button type="button" className="btn-secondary" onClick={() => setIsEditingTarget(true)}>
+            Ponerme una meta
           </button>
         ) : (
-          <button type="button" className="global-score-target-chip" onClick={() => setIsEditingTarget(true)}>
-            <Target size={13} />
-            Meta {data.target}
-            {data.pointsToTarget != null && data.pointsToTarget > 0
-              ? ` · te faltan ${data.pointsToTarget}`
-              : ' · ¡ya la alcanzaste!'}
-          </button>
+          <p className="m-0 flex flex-wrap items-baseline gap-x-3 text-sm text-[var(--text-secondary)]">
+            <span>
+              Tu meta: <strong className="text-[var(--text-primary)]">{data.target}</strong>
+              {data.pointsToTarget != null && data.pointsToTarget > 0
+                ? ` · te faltan ${data.pointsToTarget} puntos`
+                : ' · ya la alcanzaste'}
+            </span>
+            <button type="button" className="btn-ghost" onClick={() => setIsEditingTarget(true)}>
+              Cambiar
+            </button>
+          </p>
         )}
       </div>
 
       {data.leverage != null && leverageTheme != null ? (
-        <p className="global-score-leverage">
-          <span aria-hidden>{leverageTheme.emoji}</span> Cada punto que subas en{' '}
-          <strong>{leverageTheme.label}</strong> vale{' '}
-          <strong>{data.leverage.pointsPerAreaPoint.toFixed(2)}</strong> puntos globales — es donde
-          más rinde tu esfuerzo.
+        <p className="notice">
+          <span aria-hidden="true" className="subject-dot" style={{ '--subject-color': leverageTheme.color } as CSSProperties} />{' '}
+          Cada punto que subas en <strong className="text-[var(--text-primary)]">{leverageTheme.label}</strong> vale{' '}
+          <strong className="text-[var(--text-primary)]">{data.leverage.pointsPerAreaPoint.toFixed(2)}</strong> puntos
+          globales: es donde más rinde tu esfuerzo.
         </p>
       ) : null}
 
-      <p className="global-score-note">
+      <p className="mt-3 mb-0 text-xs text-[var(--text-tertiary)]">
         Estimado con tus respuestas en Aprendo, no es un puntaje oficial del ICFES.
       </p>
-    </div>
+    </section>
   )
 }

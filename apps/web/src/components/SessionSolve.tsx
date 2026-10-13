@@ -23,17 +23,17 @@ import {
 import { useCallback, useEffect, useRef, useState, type CSSProperties, type PointerEvent } from 'react'
 import { ConvexError } from 'convex/values'
 import { api } from '@aprendo/convex/api'
-import MarkdownBlock from './MarkdownBlock.tsx'
+import { MarkdownBlock } from './MarkdownBlock.tsx'
 import { CONFIDENCE_OPTIONS, type ConfidenceLevel } from '../lib/confidence-display.ts'
 import { SharedStimulus } from './SharedStimulus.tsx'
 import { sessionQuery } from '../lib/student-queries.ts'
 import { getKindIcon, getKindLabel } from '../lib/session-display.ts'
-import { formatClock, useSessionTimer } from '../lib/useSessionTimer.ts'
-import { getSubjectLabel } from '../lib/taxonomy.ts'
-import { MascotMessage } from './Mascot.tsx'
+import { formatClock, useSessionTimer } from '../lib/use-session-timer.ts'
+import { getSubjectLabel } from '@aprendo/convex/taxonomy'
+import { EmptyState } from './EmptyState.tsx'
 import { readConvexError } from '../lib/convex-error.ts'
 import type { QueueItem, QuestionOverlay } from '../lib/answer-queue.ts'
-import { useAnswerQueue } from '../lib/useAnswerQueue.ts'
+import { useAnswerQueue } from '../lib/use-answer-queue.ts'
 import { paceStatus } from '@aprendo/convex/pacing'
 import { canCheckAnswers } from '@aprendo/convex/sessionIntegrity'
 import { paceDescription, paceLabel } from '../lib/pacing-display.ts'
@@ -208,6 +208,14 @@ export function SessionSolve({ sessionId, onExit, onCompleted }: SessionSolvePro
 
   const current = questions[currentIndex]
   const currentQuestionId = current?.sessionQuestionId ?? null
+
+  // The next sheet is already loaded when the student turns the page: its
+  // scanned stem (the only slow part) is fetched while they work on this one.
+  const nextStemImageUrl = questions[currentIndex + 1]?.stemImageUrl ?? null
+  useEffect(() => {
+    if (nextStemImageUrl == null) return
+    new Image().src = nextStemImageUrl
+  }, [nextStemImageUrl])
 
   // Time on each question, per visit: started when it is on screen, sent when
   // it leaves (another question, the review step, leaving, a hidden tab).
@@ -525,8 +533,7 @@ export function SessionSolve({ sessionId, onExit, onCompleted }: SessionSolvePro
   if (isClosed) {
     return (
       <div className="solve-loading">
-        <MascotMessage
-          mood="idle"
+        <EmptyState
           title="Esta sesión venció"
           action={
             <button
@@ -543,7 +550,7 @@ export function SessionSolve({ sessionId, onExit, onCompleted }: SessionSolvePro
         >
           Se le acabó el tiempo mientras no estabas, así que no la calificamos: unas pocas
           respuestas no dicen cuánto sabes. Empieza una nueva cuando tengas el tiempo completo.
-        </MascotMessage>
+        </EmptyState>
       </div>
     )
   }
@@ -551,8 +558,7 @@ export function SessionSolve({ sessionId, onExit, onCompleted }: SessionSolvePro
   if (current == null || view == null) {
     return (
       <div className="solve-loading">
-        <MascotMessage
-          mood="idle"
+        <EmptyState
           title="No pudimos armar esta sesión"
           action={
             <button type="button" className="btn-primary" onClick={onExit}>
@@ -561,7 +567,7 @@ export function SessionSolve({ sessionId, onExit, onCompleted }: SessionSolvePro
           }
         >
           No hay preguntas disponibles para esta combinación todavía.
-        </MascotMessage>
+        </EmptyState>
       </div>
     )
   }
@@ -703,8 +709,14 @@ export function SessionSolve({ sessionId, onExit, onCompleted }: SessionSolvePro
               <SharedStimulus group={current.group} panelRef={stimulusRef} />
             ) : null}
 
-            <div className="solve-work" ref={workRef}>
+            <div className="solve-work sheet" ref={workRef}>
               <div className="solve-qbar">
+                <span
+                  className={`solve-number${view.flagged ? ' is-marked' : ''}`}
+                  aria-label={`Pregunta ${currentIndex + 1}${view.flagged ? ', marcada para revisar' : ''}`}
+                >
+                  {currentIndex + 1}
+                </span>
                 {pace != null ? (
                   <span
                     className={`solve-pace is-${pace.status}`}
@@ -761,6 +773,7 @@ export function SessionSolve({ sessionId, onExit, onCompleted }: SessionSolvePro
                 ) : (
                   <MarkdownBlock markdown={current.question.bodyMarkdown} />
                 )}
+                <p className="question-source">{current.source.label}</p>
               </article>
 
               <div className="solve-options" role="group" aria-label="Opciones de respuesta">
@@ -839,7 +852,6 @@ export function SessionSolve({ sessionId, onExit, onCompleted }: SessionSolvePro
                           aria-pressed={isActive}
                           title={option.help}
                         >
-                          <span aria-hidden>{option.emoji}</span>
                           {option.label}
                         </button>
                       )

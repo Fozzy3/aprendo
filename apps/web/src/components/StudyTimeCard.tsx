@@ -1,6 +1,6 @@
 import { useConvexMutation } from '@convex-dev/react-query'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { Clock3, Pencil } from 'lucide-react'
+import { Pencil } from 'lucide-react'
 import { useState } from 'react'
 import { api } from '@aprendo/convex/api'
 import { readConvexError } from '../lib/convex-error.ts'
@@ -45,16 +45,15 @@ export function StudyTimeCard({ studentId, studyTime }: { studentId: string; stu
   const parsedDraft = hoursToGoalMinutes(draft)
 
   return (
-    <section className="card p-5" aria-labelledby="study-time-title">
-      <div className="mb-3 flex items-center justify-between gap-2">
-        <h2 id="study-time-title" className="flex items-center gap-2 text-sm font-semibold text-[var(--text-primary)]">
-          <Clock3 size={15} className="text-[var(--text-tertiary)]" aria-hidden />
+    <section className="ruled-section" aria-labelledby="study-time-title">
+      <div className="section-head">
+        <h2 id="study-time-title" className="section-title">
           Tu tiempo de estudio
         </h2>
         {!isEditing ? (
           <button
             type="button"
-            className="inline-flex items-center gap-1 text-xs font-semibold text-[var(--accent-text)]"
+            className="section-meta inline-flex cursor-pointer items-center gap-1 border-0 bg-transparent p-0 text-[var(--accent-text)]"
             onClick={() => {
               setDraft(String(Math.round((goalMinutes / 60) * 10) / 10).replace('.', ','))
               setIsEditing(true)
@@ -101,14 +100,14 @@ export function StudyTimeCard({ studentId, studyTime }: { studentId: string; stu
         </form>
       ) : null}
 
-      <p className="text-2xl font-semibold tabular-nums tracking-tight text-[var(--text-primary)]">
-        {formatMinutes(minutesThisWeek)}
-        <span className="ml-1.5 text-sm font-medium text-[var(--text-tertiary)]">
+      <p className="m-0 tabular-nums">
+        <span className="figure">{formatMinutes(minutesThisWeek)}</span>
+        <span className="ml-1.5 text-sm text-[var(--text-secondary)]">
           de {formatMinutes(goalMinutes)} esta semana
         </span>
       </p>
       <div
-        className="mt-2 h-2 overflow-hidden rounded-full bg-[var(--bg-inset)]"
+        className="mt-3 h-2 overflow-hidden bg-[var(--bg-inset)]"
         role="progressbar"
         aria-label="Avance de tu meta semanal"
         aria-valuemin={0}
@@ -116,30 +115,30 @@ export function StudyTimeCard({ studentId, studyTime }: { studentId: string; stu
         aria-valuenow={Math.min(minutesThisWeek, goalMinutes)}
       >
         <div
-          className="h-full rounded-full transition-[width] duration-500"
-          style={{ width: `${share * 100}%`, background: reached ? 'var(--success)' : 'var(--accent)' }}
+          className="h-full"
+          style={{ width: `${share * 100}%`, background: reached ? 'var(--success)' : 'var(--ink)' }}
         />
       </div>
       <p className="mt-1.5 text-xs text-[var(--text-tertiary)]">
         {reached
-          ? '¡Cumpliste tu meta de la semana!'
+          ? 'Cumpliste tu meta de la semana.'
           : `Te faltan ${formatMinutes(goalMinutes - minutesThisWeek)} para tu meta.`}
       </p>
 
       {/* Six calendar weeks, this one last; the dashed line is the goal. */}
-      <div className="relative mt-4 flex h-16 items-end gap-1.5" role="img" aria-label={`Minutos por semana: ${weeks.map((week) => `${formatWeek(week.weekStartMs)}, ${week.minutes}`).join('; ')}`}>
+      <div className="relative mt-5 flex h-16 items-end gap-1.5 border-b border-[var(--border-strong)]" role="img" aria-label={`Minutos por semana: ${weeks.map((week) => `${formatWeek(week.weekStartMs)}, ${week.minutes}`).join('; ')}`}>
         <span
           aria-hidden
-          className="pointer-events-none absolute inset-x-0 border-t-2 border-dashed border-[var(--gold)]"
+          className="pointer-events-none absolute inset-x-0 border-t border-dashed border-[var(--text-primary)]"
           style={{ bottom: `${(goalMinutes / scale) * 100}%` }}
         />
         {weeks.map((week, index) => (
           <span
             key={week.weekStartMs}
-            className="flex-1 rounded-t-[3px]"
+            className="flex-1"
             style={{
               height: `${Math.max((week.minutes / scale) * 100, week.minutes > 0 ? 4 : 2)}%`,
-              background: index === weeks.length - 1 ? 'var(--accent)' : 'var(--accent-soft)',
+              background: index === weeks.length - 1 ? 'var(--ink)' : 'var(--rule)',
             }}
           />
         ))}

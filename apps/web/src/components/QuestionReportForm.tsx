@@ -7,7 +7,7 @@ import { readConvexError } from '../lib/convex-error.ts'
 
 type Reason = 'respuesta_incorrecta' | 'enunciado_confuso' | 'imagen_ilegible' | 'otro'
 
-const REASONS: Array<{ value: Reason; label: string }> = [
+export const REPORT_REASONS: Array<{ value: Reason; label: string }> = [
   { value: 'respuesta_incorrecta', label: 'La respuesta correcta está mal' },
   { value: 'enunciado_confuso', label: 'El enunciado es confuso' },
   { value: 'imagen_ilegible', label: 'No se lee la imagen' },
@@ -73,7 +73,7 @@ export function QuestionReportForm({
       <fieldset className="m-0 border-0 p-0">
         <legend className="text-sm font-bold text-[var(--text-primary)]">¿Qué tiene esta pregunta?</legend>
         <div className="mt-2 flex flex-wrap gap-2">
-          {REASONS.map((option) => (
+          {REPORT_REASONS.map((option) => (
             <button
               key={option.value}
               type="button"

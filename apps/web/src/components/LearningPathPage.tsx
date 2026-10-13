@@ -44,7 +44,7 @@ export function LearningPathPage({ studentId }: { studentId: string }) {
   const mastery = nodes == null ? null : scopeMastery(nodes)
 
   return (
-    <div className="ruled-page fade-in">
+    <div className="ruled-page fade-in" style={{ '--subject-color': theme.color } as CSSProperties}>
       {/* The margin: the area this page is about and how far along it is. */}
       <aside className="ruled-page-margin" aria-label="Tu área">
         <p className="ruled-page-date inline-flex items-center gap-2">
@@ -76,7 +76,7 @@ export function LearningPathPage({ studentId }: { studentId: string }) {
           <p className="page-lede">Un tema a la vez, en orden, hasta tu siguiente nivel.</p>
         </header>
 
-        <div className="mb-2 overflow-x-auto">
+        <div className="tab-scroll mb-2">
           <nav className="tab-nav" aria-label="Área">
             {(subjects.data ?? []).map((subject) => {
               const isActive = subject.subjectId === subjectId
@@ -192,7 +192,7 @@ function LevelSection({ level }: { level: SubjectLevel }) {
               <span
                 key={position}
                 className="h-1.5 flex-1"
-                style={{ background: position < placement.index ? 'var(--text-primary)' : 'var(--bg-inset)' }}
+                style={{ background: position < placement.index ? 'var(--subject-color, var(--text-primary))' : 'var(--bg-inset)' }}
               />
             ))}
           </div>
@@ -246,7 +246,7 @@ function PathLine({
   const isMuted = isLocked || state === 'empty'
 
   return (
-    <li className={`plan-line${isCurrent ? ' is-first' : ''}`} aria-current={isCurrent ? 'step' : undefined}>
+    <li className={`plan-line path-line${isCurrent ? ' is-first' : ''}`} aria-current={isCurrent ? 'step' : undefined}>
       <span className="plan-line-number" aria-hidden>
         {number}
       </span>
@@ -264,42 +264,42 @@ function PathLine({
           {isLocked && ' · se abre cuando llegues a Familiar en el tema anterior'}
         </span>
 
-        {!isLocked ? (
-          <span className="mt-1.5 flex flex-wrap gap-2">
-            <Link
-              to="/lesson/$subtopicId"
-              params={{ subtopicId: node.subtopicId }}
-              className="btn-ghost text-xs no-underline"
-            >
-              <BookOpen size={13} aria-hidden />
-              {node.hasLesson ? 'Ver lección' : 'Aprender el tema'}
-            </Link>
-            {hasQuestions ? (
-              <button
-                type="button"
-                disabled={createSession.isPending}
-                onClick={() =>
-                  createSession.mutate({
-                    studentId: studentId as never,
-                    kind: 'topic',
-                    subtopicId: node.subtopicId,
-                  })
-                }
-                className={`${isCurrent ? 'btn-primary' : 'btn-secondary'} text-xs`}
-              >
-                <Play size={13} aria-hidden />
-                {createSession.isPending ? 'Preparando…' : 'Practicar'}
-              </button>
-            ) : null}
-          </span>
-        ) : null}
-
         {createSession.error ? (
           <p role="alert" className="notice is-danger">
             {readConvexError(createSession.error, 'No se pudo iniciar la práctica.')}
           </p>
         ) : null}
       </div>
+
+      {!isLocked ? (
+        <span className="path-line-actions">
+          <Link
+            to="/lesson/$subtopicId"
+            params={{ subtopicId: node.subtopicId }}
+            className="btn-ghost text-xs no-underline"
+          >
+            <BookOpen size={13} aria-hidden />
+            {node.hasLesson ? 'Ver lección' : 'Aprender el tema'}
+          </Link>
+          {hasQuestions ? (
+            <button
+              type="button"
+              disabled={createSession.isPending}
+              onClick={() =>
+                createSession.mutate({
+                  studentId: studentId as never,
+                  kind: 'topic',
+                  subtopicId: node.subtopicId,
+                })
+              }
+              className={`${isCurrent ? 'btn-primary' : 'btn-secondary'} text-xs`}
+            >
+              <Play size={13} aria-hidden />
+              {createSession.isPending ? 'Preparando…' : 'Practicar'}
+            </button>
+          ) : null}
+        </span>
+      ) : null}
     </li>
   )
 }

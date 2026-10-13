@@ -35,12 +35,15 @@ identity.
 | `--margin` (`--danger`) | `#c3352b` | `#e8695e` | Mistakes, risk, the teacher's note, the margin rule |
 | `--green-ink` (`--success`) | `#2e6b45` | `#6cbf8b` | Correct, mastered |
 | `--graphite` (`--warn`) | `#4a5263` | `#aab3c4` | Pencil: what is tentative (unsure, a deadline closing in) |
-| `--accent` | `#1d4f91` | `#8db6ee` | Fountain-pen blue: links, focus, selection tint |
+| `--accent`, `--brand` | `#1d4f91` | `#8db6ee` | Fountain-pen blue: primary actions, links, focus, selection tint |
+| `--cover` | `#16233f` | `#1a2742` | The notebook's navy cover: the top bar |
+| `--desk` | `#e6edf6` | `#0a101c` | The pale blue desk the pages lie on |
 
 - The error red and the teacher's red are **one token**: the same gesture of
   correction.
 - There is no gold, no violet and no gradient anywhere.
-- `--bg-inset` (`#eef3f9`) is the desk a sheet lies on (solve, review, sign-in).
+- **Frame:** the top bar is the navy cover; inside it the colour tokens are re-mapped to white (`.student-topbar`), so nothing in it needs its own cover styles. Every page is a sheet (`.ruled-page`, `.page-sheet`: paper, 1px rule border) on the blue desk, so the screen is never a white void.
+- Inside an area's page (`--subject-color` on the page), the active tab and the level bars take that area's ink.
 - **Areas** keep a small inked dot (`.subject-dot`): identical lightness and
   chroma, hue as the only variable, away from the red, green and blue inks.
   Never text, never a fill.
@@ -85,7 +88,7 @@ margin rule is dropped so the question keeps its width.
 
 ## Controls
 
-Rectangular (radii 2–4px). Primary: filled ink. Secondary: 1px outline. Ghost:
+Rectangular (radii 2–4px). Primary: filled fountain-pen blue, the one saturated colour on a page. Secondary: 1px outline. Ghost:
 bare. No pills, no press animation, no hard offset shadows. Elevation
 (`--shadow-md/lg`) exists only for things that float over the page: menus,
 dialogs, sheets.

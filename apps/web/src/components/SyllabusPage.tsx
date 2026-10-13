@@ -84,7 +84,7 @@ export function SyllabusPage({ studentId }: { studentId: string }) {
           </p>
         </header>
 
-        <div className="mb-2 overflow-x-auto">
+        <div className="tab-scroll mb-2">
           <nav className="tab-nav" aria-label="Área">
             {subjects.map((subject) => {
               const isActive = subject.id === activeSubjectId

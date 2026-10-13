@@ -82,7 +82,7 @@ export function LessonPage({ subtopicId, studentId }: { subtopicId: string; stud
 
   // A Read surface: one column at reading width, sections opened by a rule.
   return (
-    <article className="fade-in mx-auto w-full max-w-3xl">
+    <article className="page-sheet fade-in max-w-3xl">
       <Link to="/syllabus" className="back-link no-underline">
         <ArrowLeft size={14} aria-hidden /> {getSubjectLabel(subjectId)}
       </Link>

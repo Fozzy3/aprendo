@@ -49,6 +49,12 @@
   --margin: #c3352b;
   --green-ink: #2e6b45;
 
+  /* The notebook's navy cover frames the app (top bar); the pages are sheets
+     of paper lying on a pale blue desk, so the screen is never a white void. */
+  --cover: #16233f;
+  --cover-accent: #9cc0f0;
+  --desk: #e6edf6;
+
   /* One grid cell: 5 mm at 96 dpi. Layout spacing that should sit on the
      ruling is a multiple of this. */
   --cell: 20px;
@@ -64,10 +70,10 @@
   --text-tertiary: #5a667d;
   --text-inverted: #ffffff;
 
-  /* Primary actions are filled ink. Links and focus use a fountain-pen blue so
-     they read as interactive against navy body text. */
-  --brand: var(--ink);
-  --brand-hover: #26385f;
+  /* Primary actions are filled with fountain-pen blue, the one saturated colour
+     on the page; links and focus use the same pen. Body text stays navy ink. */
+  --brand: #1d4f91;
+  --brand-hover: #163f75;
   --accent: #1d4f91;
   --accent-soft: rgba(29, 79, 145, 0.08);
   --accent-medium: rgba(29, 79, 145, 0.2);
@@ -124,13 +130,17 @@
    alone covers every case. Paper turns to ink, the ruling dims, inks lift. */
 :root.dark,
 :root[data-theme="dark"] {
-  --paper: #0f1626;
+  --paper: #111a2c;
   --rule: #24324b;
   --rule-strong: #34466a;
   --ink: #e4eaf4;
   --graphite: #aab3c4;
   --margin: #e8695e;
   --green-ink: #6cbf8b;
+
+  --cover: #1a2742;
+  --cover-accent: #8db6ee;
+  --desk: #0a101c;
 
   --bg: var(--paper);
   --bg-card: #131c2f;
@@ -143,8 +153,8 @@
   --text-tertiary: #929cb0;
   --text-inverted: #0f1626;
 
-  --brand: var(--ink);
-  --brand-hover: #ffffff;
+  --brand: #8db6ee;
+  --brand-hover: #a9c8f3;
   --accent: #8db6ee;
   --accent-soft: rgba(141, 182, 238, 0.12);
   --accent-medium: rgba(141, 182, 238, 0.24);
@@ -271,12 +281,20 @@ h3 {
 /* Every page is a notebook page: an optional margin column (date, level, the
    facts a student writes at the top) and a body of sections separated by
    rules. Hierarchy is the type scale, never a card. */
+/* Each page is a sheet of paper lying on the desk, margin column included. */
+.ruled-page,
+.page-sheet {
+  width: min(100%, 64rem);
+  margin-inline: auto;
+  padding: calc(var(--cell) * 2);
+  border: 1px solid var(--rule);
+  background: var(--paper);
+}
+
 .ruled-page {
   display: grid;
   grid-template-columns: calc(var(--cell) * 9) minmax(0, 1fr);
   gap: 0 calc(var(--cell) * 2);
-  width: min(100%, 64rem);
-  margin-inline: auto;
 }
 
 .ruled-page-margin {
@@ -501,9 +519,31 @@ a.ruled-row:hover {
   color: var(--text-tertiary);
 }
 
+/* Ruta: the topic's actions in a fixed column, so every "Practicar" lines up
+   whatever the lesson link says, and whether or not it is there. */
+.path-line {
+  grid-template-columns: calc(var(--cell) * 2) minmax(0, 1fr) auto;
+}
+
+.path-line-actions {
+  display: grid;
+  grid-template-columns: 10.5rem 8rem;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.path-line-actions > * {
+  width: 100%;
+}
+
 @media (max-width: 780px) {
   .ruled-page {
     grid-template-columns: minmax(0, 1fr);
+  }
+
+  .ruled-page,
+  .page-sheet {
+    padding: var(--cell);
   }
 
   /* On a phone the margin becomes the line of facts above the page. */
@@ -540,6 +580,17 @@ a.ruled-row:hover {
 
   .plan-line-minutes {
     display: none;
+  }
+
+  /* On a phone the actions go under the topic, still two equal columns. */
+  .path-line {
+    grid-template-columns: calc(var(--cell) * 1.5) minmax(0, 1fr);
+  }
+
+  .path-line-actions {
+    grid-column: 2;
+    grid-template-columns: 1fr 1fr;
+    padding-bottom: 0.85rem;
   }
 
   .ruled-row-label {
@@ -771,7 +822,7 @@ a.ruled-row:hover {
 /* ─── Staff and sign-in frames ─── */
 .staff-shell {
   min-height: 100vh;
-  background: var(--bg);
+  background: var(--desk);
 }
 
 .staff-main {
@@ -790,7 +841,7 @@ a.ruled-row:hover {
   align-items: flex-start;
   justify-content: center;
   padding: clamp(1rem, 6vh, 4rem) 1rem;
-  background: var(--bg-inset);
+  background: var(--desk);
 }
 
 .auth-sheet {
@@ -951,6 +1002,16 @@ pre code {
   border-bottom: 1px solid var(--border);
 }
 
+/* Area tabs scroll sideways on a phone, without a scrollbar under them. */
+.tab-scroll {
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.tab-scroll::-webkit-scrollbar {
+  display: none;
+}
+
 .tab-item {
   display: inline-flex;
   align-items: center;
@@ -972,9 +1033,10 @@ pre code {
   color: var(--text-primary);
 }
 
+/* Inside an area's page the active tab is underlined in that area's ink. */
 .tab-item.is-active {
   color: var(--text-primary);
-  border-bottom-color: var(--text-primary);
+  border-bottom-color: var(--subject-color, var(--text-primary));
   font-weight: 600;
 }
 
@@ -1121,20 +1183,37 @@ pre code {
 /* ─── Student shell ─── */
 .student-shell {
   min-height: 100vh;
-  background: var(--bg);
+  background: var(--desk);
 }
 
 .diagnostic-shell {
   min-height: 100vh;
-  background: var(--bg);
+  background: var(--desk);
+}
+
+/* The notebook's cover: the bars are navy, and everything inside them reads
+   its colours from these re-mapped tokens, so the wordmark, the tabs, the
+   school label and the buttons need no cover-specific styles of their own. */
+.student-topbar,
+.diagnostic-topbar {
+  --ink: #ffffff;
+  --rule-strong: rgba(255, 255, 255, 0.4);
+  --text-primary: #ffffff;
+  --text-secondary: rgba(255, 255, 255, 0.78);
+  --text-tertiary: rgba(255, 255, 255, 0.64);
+  --border: rgba(255, 255, 255, 0.14);
+  --border-strong: rgba(255, 255, 255, 0.3);
+  --bg-inset: rgba(255, 255, 255, 0.1);
+  --bg-card: rgba(255, 255, 255, 0.07);
+  --accent: var(--cover-accent);
+  color: var(--text-primary);
 }
 
 .diagnostic-topbar {
   position: sticky;
   top: 0;
   z-index: 20;
-  border-bottom: 1px solid var(--border);
-  background: var(--bg);
+  background: var(--cover);
 }
 
 .diagnostic-topbar-inner {
@@ -1172,8 +1251,7 @@ pre code {
   position: sticky;
   top: 0;
   z-index: 20;
-  border-bottom: 1px solid var(--border);
-  background: var(--bg);
+  background: var(--cover);
 }
 
 .student-topbar-inner {
@@ -1293,7 +1371,7 @@ pre code {
 .student-topnav-item.is-active {
   color: var(--text-primary);
   font-weight: 600;
-  border-bottom-color: var(--text-primary);
+  border-bottom-color: var(--cover-accent);
 }
 
 .student-topbar-actions {
@@ -1388,8 +1466,8 @@ pre code {
 }
 
 .student-tabbar-item.is-active {
-  color: var(--text-primary);
-  border-top-color: var(--text-primary);
+  color: var(--brand);
+  border-top-color: var(--brand);
 }
 
 .student-tabbar-item:focus-visible {

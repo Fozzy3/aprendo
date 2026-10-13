@@ -6,10 +6,12 @@ import {
 import { createRouter as createTanStackRouter } from '@tanstack/react-router'
 import { setupRouterSsrQueryIntegration } from '@tanstack/react-router-ssr-query'
 import { routeTree } from './routeTree.gen'
+import { reloadOnNewDeploy } from './lib/stale-deploy.ts'
 
 export function getRouter() {
   if (typeof document !== 'undefined') {
     notifyManager.setScheduler(window.requestAnimationFrame)
+    reloadOnNewDeploy()
   }
 
   const convexUrl = import.meta.env.VITE_CONVEX_URL

@@ -24,7 +24,8 @@
     "./practiceBuilder": "./src/practiceBuilder.ts",
     "./answerStats": "./src/answerStats.ts",
     "./studyPlan": "./src/studyPlan.ts",
-    "./studyTime": "./src/studyTime.ts"
+    "./studyTime": "./src/studyTime.ts",
+    "./taxonomy": "./src/taxonomy.ts"
   },
   "dependencies": {
     "@ai-sdk/google": "^3.0.54",
@@ -44,6 +45,7 @@
     "@types/node": "^24.12.0",
     "@typescript-eslint/eslint-plugin": "^8.57.0",
     "@typescript-eslint/parser": "^8.57.0",
+    "convex-test": "0.0.54",
     "eslint": "^9.39.4",
     "globals": "^17.4.0",
     "typescript": "^5.9.3"

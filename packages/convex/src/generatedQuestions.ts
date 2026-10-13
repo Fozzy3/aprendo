@@ -7,9 +7,9 @@ import taxonomyContract from '../../../docs/taxonomy.v1.json'
 import { getSubtopicContext } from './taxonomy'
 import { questionOptionValidator } from './validators'
 import { APRENDO_MODEL_ID, aprendoModel } from './aiProvider'
+import { AI_UPLOAD_SLUG } from './questionSource'
 
 const GENERATION_MODEL = APRENDO_MODEL_ID
-const AI_UPLOAD_SLUG = 'ai-generated'
 const TAXONOMY_VERSION = taxonomyContract.taxonomy_version
 const TAXONOMY_RELEASE = taxonomyContract.taxonomy_release
 const MAX_QUESTIONS = 10

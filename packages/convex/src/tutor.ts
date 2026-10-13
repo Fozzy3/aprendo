@@ -9,9 +9,10 @@ import { paginationOptsValidator } from 'convex/server'
 import type { Id } from './_generated/dataModel'
 import { getSubjectLabel, getSubtopicLabel } from './taxonomy'
 import { aprendoModel } from './aiProvider'
-import { assertOwnsStudent } from './auth'
+import { assertIsStudent } from './auth'
 import { colombiaDayNumber } from './colombiaTime'
-import { MAX_TUTOR_PROMPT_CHARS, canUseTutor, hasLlmBudget, isLiveTimedExam } from './llmBudget'
+import { MAX_TUTOR_PROMPT_CHARS, canUseTutor, hasLlmBudget, isLiveTimedExam, llmPlanFor } from './llmBudget'
+import { listAccountOrganizations } from './schools'
 import { sealsItsQuestions } from './sessionIntegrity'
 
 const agentComponent = (components as Record<string, unknown>).agent as ConstructorParameters<typeof Agent>[0]
@@ -301,7 +302,7 @@ async function requireOwnedPracticeSession(
   },
 ) {
   // Ownership only: public callers first tie `studentId` to the signed-in
-  // student with `assertOwnsStudent`. Every kind gets the tutor in review; while
+  // student with `assertIsStudent`. Every kind gets the tutor in review; while
   // solving, only kinds that allow it and never an exam (see `canUseTutor`).
   const session = await ctx.db.get("sessions", args.practiceSessionId)
   if (session == null) {
@@ -367,7 +368,7 @@ export const createOrGetPracticeTutorThread = mutation({
     studentId: v.id('students'),
   },
   handler: async (ctx, args) => {
-    await assertOwnsStudent(ctx, args.studentId)
+    await assertIsStudent(ctx, args.studentId)
     await requireOwnedPracticeSession(ctx, args)
 
     const existing = await ctx.db
@@ -404,7 +405,7 @@ export const clearPracticeTutorChat = mutation({
     studentId: v.id('students'),
   },
   handler: async (ctx, args) => {
-    await assertOwnsStudent(ctx, args.studentId)
+    await assertIsStudent(ctx, args.studentId)
     await requireOwnedPracticeSession(ctx, args)
 
     const mapping = await ctx.db
@@ -443,7 +444,7 @@ export const getPracticeTutorThread = query({
     studentId: v.id('students'),
   },
   handler: async (ctx, args) => {
-    await assertOwnsStudent(ctx, args.studentId)
+    await assertIsStudent(ctx, args.studentId)
     await requireOwnedPracticeSession(ctx, args)
 
     const mapping = await ctx.db
@@ -494,7 +495,7 @@ export const listPracticeTutorMessages = query({
     streamArgs: v.optional(vStreamArgs),
   },
   handler: async (ctx, args) => {
-    await assertOwnsStudent(ctx, args.studentId)
+    await assertIsStudent(ctx, args.studentId)
     await requireOwnedPracticeSession(ctx, {
       practiceSessionId: args.practiceSessionId,
       studentId: args.studentId,
@@ -636,7 +637,9 @@ export const consumeLlmUnit = internalMutation({
       )
       .unique()
     const used = usage?.count ?? 0
-    if (!hasLlmBudget(args.feature, used)) return false
+    const schools = await listAccountOrganizations(ctx, args.studentId)
+    const plan = llmPlanFor(schools.map(({ organization }) => organization), Date.now())
+    if (!hasLlmBudget(args.feature, used, plan)) return false
 
     if (usage == null) {
       await ctx.db.insert('llmUsage', { studentId: args.studentId, day, feature: args.feature, count: 1 })
@@ -655,7 +658,7 @@ export const sendPracticeTutorMessage = action({
     questionId: v.optional(v.id('questions')),
   },
   handler: async (ctx, args) => {
-    await assertOwnsStudent(ctx, args.studentId)
+    await assertIsStudent(ctx, args.studentId)
     if (args.prompt.length > MAX_TUTOR_PROMPT_CHARS) {
       throw new ConvexError(`Tu mensaje es muy largo. Escríbelo en menos de ${MAX_TUTOR_PROMPT_CHARS} caracteres.`)
     }
@@ -727,7 +730,7 @@ export const abortPracticeTutorStream = mutation({
     order: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
-    await assertOwnsStudent(ctx, args.studentId)
+    await assertIsStudent(ctx, args.studentId)
     await requireOwnedPracticeSession(ctx, {
       practiceSessionId: args.practiceSessionId,
       studentId: args.studentId,
@@ -811,7 +814,7 @@ export const getArtifact = query({
     studentId: v.id('students'),
   },
   handler: async (ctx, args) => {
-    await assertOwnsStudent(ctx, args.studentId)
+    await assertIsStudent(ctx, args.studentId)
     const artifact = await ctx.db.get("practiceTutorArtifacts", args.artifactId)
     if (artifact == null) return null
     await requireOwnedPracticeSession(ctx, {
@@ -819,34 +822,5 @@ export const getArtifact = query({
       studentId: args.studentId,
     })
     return artifact
-  },
-})
-
-export const listArtifactsForThread = query({
-  args: {
-    practiceSessionId: v.id('sessions'),
-    studentId: v.id('students'),
-    threadId: v.string(),
-  },
-  handler: async (ctx, args) => {
-    await assertOwnsStudent(ctx, args.studentId)
-    await requireOwnedPracticeSession(ctx, {
-      practiceSessionId: args.practiceSessionId,
-      studentId: args.studentId,
-    })
-
-    const rows = await ctx.db
-      .query('practiceTutorArtifacts')
-      .withIndex('by_threadId', (q) => q.eq('threadId', args.threadId))
-      .collect()
-
-    // `threadId` comes from the client: only list artifacts of the session just verified.
-    return rows.filter((row) => row.practiceSessionId === args.practiceSessionId).map((row) => ({
-      _id: row._id,
-      messageId: row.messageId,
-      title: row.title,
-      description: row.description,
-      createdAt: row.createdAt,
-    }))
   },
 })

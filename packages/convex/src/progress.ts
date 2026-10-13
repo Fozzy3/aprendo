@@ -1,7 +1,7 @@
 import { internalMutation, query } from './_generated/server'
 import { v } from 'convex/values'
 import type { Doc } from './_generated/dataModel'
-import { assertOwnsStudent } from './auth'
+import { assertCanViewStudent } from './auth'
 import { colombiaDayNumber, colombiaWeekIndex, colombiaWeekStartMs } from './colombiaTime'
 import {
   LEVELLED_SUBJECT_IDS,
@@ -318,7 +318,7 @@ export const getStudentProgress = query({
     studentId: v.id('students'),
   },
   handler: async (ctx, args) => {
-    await assertOwnsStudent(ctx, args.studentId)
+    await assertCanViewStudent(ctx, args.studentId)
 
     const snapshot = await ctx.db
       .query('learnerProfileSnapshots')
@@ -348,6 +348,8 @@ export const getStudentProgress = query({
     )
 
     return {
+      /** Who this is, for a teacher reading it (the student knows). */
+      account: { name: student?.name ?? null, email: student?.email ?? '' },
       snapshot,
       subjectAggregates: subjectAggregates.sort((a, b) => a.subjectId.localeCompare(b.subjectId)),
       subjectLevels,
@@ -465,7 +467,7 @@ export function areaScore(
  * A level is only claimed once there is enough evidence — below that the student
  * is shown "sin nivel aún" rather than a number invented from three questions.
  */
-function buildSubjectLevels(
+export function buildSubjectLevels(
   subjectAggregates: Doc<'learnerSubjectAggregates'>[],
   nivelacionSessions: Doc<'sessions'>[],
   snapshot: Doc<'learnerProfileSnapshots'> | null,
@@ -562,7 +564,7 @@ export const getProgressTrends = query({
     studentId: v.id('students'),
   },
   handler: async (ctx, args) => {
-    await assertOwnsStudent(ctx, args.studentId)
+    await assertCanViewStudent(ctx, args.studentId)
 
     const attempts = await ctx.db
       .query('questionAttempts')

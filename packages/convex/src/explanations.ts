@@ -1,10 +1,9 @@
 import { v } from 'convex/values'
 import { internal } from './_generated/api'
-import type { Id } from './_generated/dataModel'
-import { internalAction, internalMutation, internalQuery, query } from './_generated/server'
-import { requireAdminStudentId } from './auth'
+import type { Doc, Id } from './_generated/dataModel'
+import { internalAction, internalMutation, internalQuery } from './_generated/server'
 import { distractorRationaleValidator } from './validators'
-import { inferQuestionAnswer } from '../../ingest/src/question-enrichment-core'
+import { inferQuestionAnswer } from '@aprendo/ingest/question-enrichment-core'
 
 /**
  * Written explanations for the official booklet questions (G14).
@@ -36,6 +35,8 @@ export const EXPLANATION_FLAG_PREFIX = 'explicacion_ia:'
 export const MIN_EXPLANATION_CONFIDENCE = 0.6
 /** Questions per action run; the scheduler chains the next batch. */
 const BATCH_SIZE = 5
+/** Bank rows read per query: one transaction never reads the whole bank. */
+const PAGE_SIZE = 200
 
 export function needsExplanation(question: {
   answerModelId?: string
@@ -102,16 +103,25 @@ export function decideExplanation(args: {
   return { action: 'store', solutionMarkdown, distractorRationales }
 }
 
+type Candidate = {
+  questionId: Id<'questions'>
+  officialKey: string
+  bodyMarkdown: string
+  contextMarkdown: string | undefined
+  options: Doc<'questions'>['options']
+  imageIds: Id<'_storage'>[]
+}
+type CandidatePage = { questions: Candidate[]; continueCursor: string; isDone: boolean }
+
+/** The questions still to explain on one page of the bank. */
 export const listExplanationCandidates = internalQuery({
-  args: { limit: v.number(), skipIds: v.optional(v.array(v.id('questions'))) },
-  handler: async (ctx, args) => {
+  args: { cursor: v.union(v.string(), v.null()), skipIds: v.optional(v.array(v.id('questions'))) },
+  handler: async (ctx, args): Promise<CandidatePage> => {
     const skip = new Set<string>(args.skipIds ?? [])
-    // The bank is a few hundred rows; a scan is simpler than a new index.
-    const pending = (await ctx.db.query('questions').collect()).filter(
-      (question) => needsExplanation(question) && !skip.has(question._id),
-    )
+    const page = await ctx.db.query('questions').paginate({ cursor: args.cursor, numItems: PAGE_SIZE })
+    const pending = page.page.filter((question) => needsExplanation(question) && !skip.has(question._id))
     const questions = await Promise.all(
-      pending.slice(0, Math.max(0, args.limit)).map(async (question) => {
+      pending.map(async (question) => {
         const group =
           question.groupId == null ? null : await ctx.db.get('questionGroups', question.groupId)
         return {
@@ -126,7 +136,7 @@ export const listExplanationCandidates = internalQuery({
         }
       }),
     )
-    return { pendingCount: pending.length, questions }
+    return { questions, continueCursor: page.continueCursor, isDone: page.isDone }
   },
 })
 
@@ -164,7 +174,6 @@ export const flagExplanation = internalMutation({
 
 type BackfillResult = {
   dryRun: boolean
-  pendingCount: number
   questionIds: Id<'questions'>[]
   stored: number
   flagged: number
@@ -177,17 +186,30 @@ export const backfillExplanations = internalAction({
     limit: v.optional(v.number()),
     dryRun: v.optional(v.boolean()),
     skipIds: v.optional(v.array(v.id('questions'))),
+    /** Where the previous run stopped; questions before it are already settled. */
+    cursor: v.optional(v.union(v.string(), v.null())),
   },
   handler: async (ctx, args): Promise<BackfillResult> => {
     const limit = Math.max(0, Math.floor(args.limit ?? BATCH_SIZE))
     const skipIds = args.skipIds ?? []
-    const batch = await ctx.runQuery(internal.explanations.listExplanationCandidates, {
-      limit: args.dryRun ? limit : Math.min(limit, BATCH_SIZE),
-      skipIds,
-    })
+    const take = args.dryRun ? limit : Math.min(limit, BATCH_SIZE)
+    // Walk pages until there is a batch. `resumeAt` is the start of the page the
+    // batch came from: what is left on it is read again by the next run, and
+    // what this run settles no longer matches `needsExplanation`.
+    const batch = { questions: [] as Candidate[] }
+    let cursor = args.cursor ?? null
+    let resumeAt: string | null = cursor
+    let isDone = false
+    while (batch.questions.length < take && !isDone) {
+      const page: CandidatePage = await ctx.runQuery(internal.explanations.listExplanationCandidates, { cursor, skipIds })
+      const room = take - batch.questions.length
+      batch.questions.push(...page.questions.slice(0, room))
+      resumeAt = page.questions.length > room ? cursor : page.continueCursor
+      isDone = page.isDone && page.questions.length <= room
+      cursor = page.continueCursor
+    }
     const result: BackfillResult = {
       dryRun: args.dryRun ?? false,
-      pendingCount: batch.pendingCount,
       questionIds: batch.questions.map((question) => question.questionId),
       stored: 0,
       flagged: 0,
@@ -245,10 +267,11 @@ export const backfillExplanations = internalAction({
     // batch where everything failed (no key, provider down) stops the chain.
     const remaining = limit - batch.questions.length
     const progressed = result.stored + result.flagged > 0
-    if (remaining > 0 && progressed && batch.pendingCount > batch.questions.length) {
+    if (remaining > 0 && progressed && !isDone) {
       await ctx.scheduler.runAfter(0, internal.explanations.backfillExplanations, {
         limit: remaining,
         skipIds: [...skipIds, ...result.failedIds],
+        cursor: resumeAt,
       })
       result.scheduledNext = true
     }
@@ -256,13 +279,17 @@ export const backfillExplanations = internalAction({
   },
 })
 
-/** Questions the backfill refused to explain, for an admin to settle. */
-export const listExplanationFlags = query({
-  args: {},
-  handler: async (ctx) => {
-    await requireAdminStudentId(ctx)
-    const questions = await ctx.db.query('questions').collect()
-    return questions
+/**
+ * Questions the backfill refused to explain, for an admin to settle. One page
+ * per call, from the console:
+ *   bunx convex run explanations:listExplanationFlags '{"cursor": null}'
+ * and again with the `continueCursor` it returns until `isDone`.
+ */
+export const listExplanationFlags = internalQuery({
+  args: { cursor: v.union(v.string(), v.null()) },
+  handler: async (ctx, args) => {
+    const page = await ctx.db.query('questions').paginate({ cursor: args.cursor, numItems: PAGE_SIZE })
+    const flags = page.page
       .filter((question) => question.answerErrorMessage?.startsWith(EXPLANATION_FLAG_PREFIX))
       .map((question) => ({
         questionId: question._id,
@@ -272,5 +299,6 @@ export const listExplanationFlags = query({
         officialKey: question.answerCorrectOption ?? null,
         message: question.answerErrorMessage!,
       }))
+    return { flags, continueCursor: page.continueCursor, isDone: page.isDone }
   },
 })

@@ -2,11 +2,11 @@ import { internal } from './_generated/api'
 import { internalMutation, mutation, query, type MutationCtx, type QueryCtx } from './_generated/server'
 import { ConvexError, v } from 'convex/values'
 import type { Doc, Id } from './_generated/dataModel'
-import { assertOwnsStudent, requireAuthenticatedStudentId } from './auth'
+import { questionSource } from './questionSource'
+import { assertIsStudent, requireAuthenticatedStudentId } from './auth'
 import { SUBJECT_IDS, getSubjectIdForSubtopic, getSubjectLabel } from './taxonomy'
 import {
   getSimulacroSubjectTarget,
-  getSimulacroSubjectTargets,
   getSessionKindConfig,
   type QuestionEligibilityPool,
   type SessionKind,
@@ -15,6 +15,7 @@ import {
   type SubjectQuestionTarget,
 } from './sessionKinds'
 import {
+  collectUsableQuestions,
   collectUsableQuestionsBySubject,
   collectUsableQuestionsBySubtopic,
   expandToGroups,
@@ -44,13 +45,12 @@ import {
   sealsItsQuestions,
   settledAttempts,
 } from './sessionIntegrity'
-import { pickSimulacroForm, scoreSimulacroSubjects } from './simulacroForm'
+import { pickSimulacroForm } from './simulacroForm'
 import { accumulateQuestionTime, officialMsPerQuestion, questionTimeMs } from './pacing'
 import {
   buildNivelacionResult,
   buildSimulacroReport,
   isFirstPlacement,
-  latestSimulacroExam,
   resolveSimulacroExam,
   type ReportItem,
 } from './examReport'
@@ -328,15 +328,9 @@ async function selectRecommended(
     .collect()
   const attemptedQuestionIds = new Set(attempts.map((attempt) => attempt.questionId))
 
-  const allQuestions = await ctx.db.query('questions').collect()
+  const usableQuestions = await collectUsableQuestions(ctx, config.eligibilityPools)
   const eligibleQuestions = stableQuestionOrder(
-    allQuestions.filter(
-      (question) =>
-        isInEligibilityPool(question, config.eligibilityPools)
-        && hasUsableMetadata(question)
-        && isFree(question)
-        && !attemptedQuestionIds.has(question._id),
-    ),
+    usableQuestions.filter((question) => isFree(question) && !attemptedQuestionIds.has(question._id)),
   )
 
   const subtopicAggregates = await ctx.db
@@ -598,10 +592,7 @@ async function loadPracticeBank(
   if (scope.subjectId != null) {
     return stableQuestionOrder(await collectUsableQuestionsBySubject(ctx, scope.subjectId, pools))
   }
-  const all = await ctx.db.query('questions').collect()
-  return stableQuestionOrder(
-    all.filter((question) => isInEligibilityPool(question, pools) && hasUsableMetadata(question)),
-  )
+  return stableQuestionOrder(await collectUsableQuestions(ctx, pools))
 }
 
 /**
@@ -812,7 +803,7 @@ export const createSession = mutation({
     })),
   },
   handler: async (ctx, args) => {
-    await assertOwnsStudent(ctx, args.studentId)
+    await assertIsStudent(ctx, args.studentId)
 
     const config = getSessionKindConfig(args.kind)
     const feedbackMode = args.feedbackMode ?? 'al_final'
@@ -991,7 +982,7 @@ export const getActiveSession = query({
     kind: v.optional(sessionKindValidator),
   },
   handler: async (ctx, args) => {
-    await assertOwnsStudent(ctx, args.studentId)
+    await assertIsStudent(ctx, args.studentId)
 
     const sessions = await ctx.db
       .query('sessions')
@@ -1013,7 +1004,7 @@ export const getReviewQueue = query({
     studentId: v.id('students'),
   },
   handler: async (ctx, args) => {
-    await assertOwnsStudent(ctx, args.studentId)
+    await assertIsStudent(ctx, args.studentId)
 
     // Count against the same eligibility pools `repaso` draws from, so the count
     // matches what a review session can actually launch.
@@ -1030,7 +1021,7 @@ export const listSessions = query({
     limit: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
-    await assertOwnsStudent(ctx, args.studentId)
+    await assertIsStudent(ctx, args.studentId)
 
     const sessions = await ctx.db
       .query('sessions')
@@ -1052,7 +1043,7 @@ export const getLatestDiagnostic = query({
     studentId: v.id('students'),
   },
   handler: async (ctx, args) => {
-    await assertOwnsStudent(ctx, args.studentId)
+    await assertIsStudent(ctx, args.studentId)
 
     const sessions = await ctx.db
       .query('sessions')
@@ -1067,39 +1058,6 @@ export const getLatestDiagnostic = query({
   },
 })
 
-export const getLatestSimulacroScore = query({
-  args: {
-    studentId: v.id('students'),
-  },
-  handler: async (ctx, args) => {
-    await assertOwnsStudent(ctx, args.studentId)
-
-    const sessions = await ctx.db
-      .query('sessions')
-      .withIndex('by_studentId_kind', (q) =>
-        q.eq('studentId', args.studentId).eq('kind', 'simulacro'),
-      )
-      .collect()
-    // Paired exactly as `getSimulacroReport` pairs it, so the hub never shows
-    // a whole-exam score built from two different exams.
-    const sittings = latestSimulacroExam(sessions)?.sittings ?? []
-    const sessionNumbers = sittings.map((session) => session.simulacroSessionNumber ?? 1)
-
-    const subjectTotals = getSimulacroSubjectTargets()
-    const subjectScores = scoreSimulacroSubjects(
-      subjectTotals,
-      sittings.map((session) => session.summary?.subjectScores ?? []),
-    )
-
-    return {
-      isComplete: sessionNumbers.includes(1) && sessionNumbers.includes(2),
-      completedSessionNumbers: sessionNumbers.sort(),
-      questionCount: subjectTotals.reduce((sum, target) => sum + target.questionCount, 0),
-      subjectScores,
-    }
-  },
-})
-
 export const getSession = query({
   args: {
     sessionId: v.id('sessions'),
@@ -1110,7 +1068,7 @@ export const getSession = query({
 
     // This query returns correct answers and explanations once a session is
     // completed, so the owner check has to happen before anything is read.
-    await assertOwnsStudent(ctx, session.studentId)
+    await assertIsStudent(ctx, session.studentId)
 
     const sessionQuestions = await ctx.db
       .query('sessionQuestions')
@@ -1143,6 +1101,11 @@ export const getSession = query({
         .filter((group): group is Doc<'questionGroups'> => group != null)
         .map((group) => [group._id, group]),
     )
+
+    // The booklet each question came from, for its attribution line.
+    const uploadIds = [...new Set(questions.flatMap((question) => (question == null ? [] : [question.pdfUploadId])))]
+    const uploads = await Promise.all(uploadIds.map((uploadId) => ctx.db.get('pdfUploads', uploadId)))
+    const uploadById = new Map(uploads.flatMap((upload) => (upload == null ? [] : [[upload._id, upload] as const])))
 
     // Storage ids are not URLs, so they are resolved here rather than leaving
     // the client to make a round trip per question.
@@ -1193,6 +1156,7 @@ export const getSession = query({
             selectionReason: sessionQuestion.selectionReason,
             selectionMetadata: sessionQuestion.selectionMetadata ?? null,
             question: displayQuestion,
+            source: questionSource(uploadById.get(question.pdfUploadId) ?? null),
             // The stem as printed, figure included. Null for questions whose
             // text layer already carries everything.
             stemImageUrl:
@@ -1389,7 +1353,7 @@ async function loadOpenSessionQuestion(
     throw new ConvexError('Sesión no encontrada.')
   }
   // The id travels in the URL; holding it must not be enough to answer.
-  await assertOwnsStudent(ctx, session.studentId)
+  await assertIsStudent(ctx, session.studentId)
   if (session.status === 'completed' || session.status === 'abandoned') {
     throw new ConvexError('La sesión ya no está activa.')
   }
@@ -1588,7 +1552,7 @@ export const getNivelacionResult = query({
   handler: async (ctx, args) => {
     const session = await ctx.db.get('sessions', args.sessionId)
     if (session == null) return null
-    await assertOwnsStudent(ctx, session.studentId)
+    await assertIsStudent(ctx, session.studentId)
     if (
       session.kind !== 'nivelacion'
       || session.subjectId == null
@@ -1626,7 +1590,7 @@ export const getSimulacroReport = query({
   handler: async (ctx, args) => {
     const session = await ctx.db.get('sessions', args.sessionId)
     if (session == null) return null
-    await assertOwnsStudent(ctx, session.studentId)
+    await assertIsStudent(ctx, session.studentId)
     if (session.kind !== 'simulacro' || !canRevealAnswers(session)) return null
 
     const simulacros = await ctx.db
@@ -1667,9 +1631,9 @@ export const completeSession = mutation({
     if (session == null) {
       throw new ConvexError('Sesión no encontrada.')
     }
-    await assertOwnsStudent(ctx, session.studentId)
+    await assertIsStudent(ctx, session.studentId)
     if (session.status === 'completed') {
-      return summarize(session)
+      return toSessionSummary(session)
     }
     // An abandoned session stays abandoned — a stale tab must not score it.
     if (session.status === 'abandoned') {
@@ -2012,7 +1976,7 @@ export const getPracticeBuilderCounts = query({
     filters: v.object(practiceFilterFields),
   },
   handler: async (ctx, args) => {
-    await assertOwnsStudent(ctx, args.studentId)
+    await assertIsStudent(ctx, args.studentId)
     const scope = resolvePracticeScope(args.filters)
     if ('error' in scope) {
       return { available: 0, byDifficulty: { basico: 0, medio: 0, avanzado: 0 }, error: scope.error }
@@ -2081,7 +2045,7 @@ export const getQuestionAnswerStats = query({
   },
 })
 
-function summarize(session: Doc<'sessions'>) {
+function toSessionSummary(session: Doc<'sessions'>) {
   return {
     sessionId: session._id,
     correctCount: session.summary?.correctCount ?? 0,

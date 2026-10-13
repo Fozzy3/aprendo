@@ -4,16 +4,16 @@ import { internalAction } from './_generated/server'
 import { internal } from './_generated/api'
 import type { Id } from './_generated/dataModel'
 import { v } from 'convex/values'
-import { extractQuestionsFromMarkdown, joinPagesMarkdown } from '../../ingest/src/question-extraction-core'
+import { extractQuestionsFromMarkdown, joinPagesMarkdown } from '@aprendo/ingest/question-extraction-core'
 import {
   inferQuestionAnswer,
   tagQuestionTaxonomy,
   type EnrichmentQuestionInput,
   type TaxonomyContract,
-} from '../../ingest/src/question-enrichment-core'
-import { ocrPdfBlob } from '../../ingest/src/ocr-core'
-import { groupExtractedQuestions } from '../../ingest/src/question-groups'
-import type { QuestionExtraction } from '../../ingest/src/question-schema'
+} from '@aprendo/ingest/question-enrichment-core'
+import { ocrPdfBlob } from '@aprendo/ingest/ocr-core'
+import { groupExtractedQuestions } from '@aprendo/ingest/question-groups'
+import type { QuestionExtraction } from '@aprendo/ingest/question-schema'
 import taxonomyContractJson from '../../../docs/taxonomy.v1.json'
 
 const QUESTION_INSERT_CHUNK_SIZE = 20

@@ -1,7 +1,7 @@
 import { paginationOptsValidator } from 'convex/server'
 import { v } from 'convex/values'
 import { query } from './_generated/server'
-import { assertOwnsStudent } from './auth'
+import { assertCanViewStudent, assertIsStudent } from './auth'
 import { colombiaDayNumber, colombiaDayStartMs } from './colombiaTime'
 import { settledAttempts } from './sessionIntegrity'
 import { sessionKindValidator } from './validators'
@@ -41,7 +41,7 @@ export const getActivitySummary = query({
     weeks: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
-    await assertOwnsStudent(ctx, args.studentId)
+    await assertCanViewStudent(ctx, args.studentId)
 
     const attempts = await ctx.db
       .query('questionAttempts')
@@ -177,7 +177,7 @@ export const listHistory = query({
     paginationOpts: paginationOptsValidator,
   },
   handler: async (ctx, args) => {
-    await assertOwnsStudent(ctx, args.studentId)
+    await assertIsStudent(ctx, args.studentId)
 
     let sessionQuery = ctx.db
       .query('sessions')

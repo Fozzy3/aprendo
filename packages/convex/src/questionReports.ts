@@ -8,7 +8,7 @@
  */
 import { mutation, query } from './_generated/server'
 import { ConvexError, v } from 'convex/values'
-import { assertOwnsStudent, requireAdminStudentId, requireAuthenticatedStudentId } from './auth'
+import { assertIsStudent, requirePlatformAdmin, requireAuthenticatedStudentId } from './auth'
 import { colombiaDayNumber, colombiaDayStartMs } from './colombiaTime'
 import { questionReportReasonValidator, questionReportStatusValidator } from './validators'
 
@@ -51,7 +51,7 @@ export const reportQuestionProblem = mutation({
     if (args.sessionId != null) {
       const session = await ctx.db.get('sessions', args.sessionId)
       if (session == null) throw new ConvexError('Sesión no encontrada.')
-      await assertOwnsStudent(ctx, session.studentId)
+      await assertIsStudent(ctx, session.studentId)
     }
 
     const open = (
@@ -95,7 +95,7 @@ export const listQuestionReports = query({
     status: v.optional(questionReportStatusValidator),
   },
   handler: async (ctx, args) => {
-    await requireAdminStudentId(ctx)
+    await requirePlatformAdmin(ctx)
     const reports = await ctx.db
       .query('questionReports')
       .withIndex('by_status_createdAt', (q) => q.eq('status', args.status ?? 'open'))
@@ -129,7 +129,7 @@ export const resolveQuestionReport = mutation({
     reportId: v.id('questionReports'),
   },
   handler: async (ctx, args) => {
-    await requireAdminStudentId(ctx)
+    await requirePlatformAdmin(ctx)
     const report = await ctx.db.get('questionReports', args.reportId)
     if (report == null) throw new ConvexError('Reporte no encontrado.')
     if (report.status !== 'resolved') {

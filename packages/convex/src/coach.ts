@@ -10,7 +10,7 @@ import {
   type QueryCtx,
 } from './_generated/server'
 import type { Id } from './_generated/dataModel'
-import { assertOwnsStudent } from './auth'
+import { assertIsStudent } from './auth'
 import { type AiCacheStatus, type ClaimDecision, type ClaimableRow, decideClaim } from './aiCache'
 import { colombiaDayNumber, colombiaWeekIndex } from './colombiaTime'
 import { settledAttempts } from './sessionIntegrity'
@@ -103,7 +103,7 @@ export const getWeeklyCoachSummary = query({
     studentId: v.id('students'),
   },
   handler: async (ctx, args) => {
-    await assertOwnsStudent(ctx, args.studentId)
+    await assertIsStudent(ctx, args.studentId)
     const now = Date.now()
     const summary = await ctx.db
       .query('coachSummaries')
@@ -137,7 +137,7 @@ export const requestWeeklyCoachSummary = mutation({
     studentId: v.id('students'),
   },
   handler: async (ctx, args) => {
-    await assertOwnsStudent(ctx, args.studentId)
+    await assertIsStudent(ctx, args.studentId)
     const weekIndex = colombiaWeekIndex(Date.now())
     const existing = await ctx.db
       .query('coachSummaries')

@@ -4,6 +4,8 @@ import {
   coachSummaryDocumentValidator,
   conceptLessonDocumentValidator,
   learnerAggregateValidator,
+  membershipRoleValidator,
+  organizationPlanValidator,
   pdfUploadStatusValidator,
   questionAttemptValidator,
   questionDocumentValidator,
@@ -54,9 +56,15 @@ export default defineSchema(
       .index('by_pdfUploadId_eligibility', ['pdfUploadId', 'eligibility'])
       .index('by_subjectId_eligibility', ['subjectId', 'eligibility'])
       .index('by_primarySubtopicId_eligibility', ['primarySubtopicId', 'eligibility']),
+    // One row per account, whatever its role: the name predates schools, and
+    // `studentId` hangs off every learner table (see the glossary in
+    // DATA_MODEL_SPEC.md). Roles inside a school live in `memberships`.
     students: defineTable({
       email: v.string(),
       normalizedEmail: v.string(),
+      /** Display name from sign-up, so a teacher sees people and not emails. */
+      name: v.optional(v.string()),
+      /** Aprendo staff: the shared question bank and school licenses. */
       isAdmin: v.optional(v.boolean()),
       // When the student sits the exam (ms). Everything about pacing hangs off
       // this: without it "tu plan de hoy" is a suggestion, with it it is a plan
@@ -159,6 +167,45 @@ export default defineSchema(
       feature: v.string(),
       count: v.number(),
     }).index('by_studentId_day_feature', ['studentId', 'day', 'feature']),
+    // Schools (see `schools.ts`). Learner data stays keyed by `studentId` only:
+    // a school sees a student through `memberships`, never by owning their rows.
+    organizations: defineTable({
+      name: v.string(),
+      crestStorageId: v.optional(v.id('_storage')),
+      plan: organizationPlanValidator,
+      seatLimit: v.number(),
+      licenseEndsAt: v.number(),
+      createdAt: v.number(),
+    }).index('by_createdAt', ['createdAt']),
+    memberships: defineTable({
+      orgId: v.id('organizations'),
+      accountId: v.id('students'),
+      role: membershipRoleValidator,
+      createdAt: v.number(),
+    })
+      .index('by_accountId', ['accountId'])
+      .index('by_orgId_role', ['orgId', 'role'])
+      .index('by_orgId_accountId', ['orgId', 'accountId']),
+    classGroups: defineTable({
+      orgId: v.id('organizations'),
+      name: v.string(),
+      grade: v.string(),
+      inviteCode: v.string(),
+      createdAt: v.number(),
+    })
+      .index('by_orgId', ['orgId'])
+      .index('by_inviteCode', ['inviteCode']),
+    // Students and the teachers assigned to a class.
+    classGroupMembers: defineTable({
+      classGroupId: v.id('classGroups'),
+      orgId: v.id('organizations'),
+      accountId: v.id('students'),
+      role: v.union(v.literal('student'), v.literal('teacher')),
+      joinedAt: v.number(),
+    })
+      .index('by_classGroupId_role', ['classGroupId', 'role'])
+      .index('by_accountId', ['accountId'])
+      .index('by_orgId_accountId', ['orgId', 'accountId']),
     // "Reportar un problema" on a question (see `questionReports.ts`).
     questionReports: defineTable(questionReportDocumentValidator)
       .index('by_studentId_questionId', ['studentId', 'questionId'])

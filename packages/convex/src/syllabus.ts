@@ -1,7 +1,7 @@
 import { query } from './_generated/server'
 import { v } from 'convex/values'
 import taxonomyContract from '../../../docs/taxonomy.v1.json'
-import { assertOwnsStudent } from './auth'
+import { assertIsStudent } from './auth'
 import { collectUsableQuestionsBySubject } from './questionPool'
 import type { QuestionEligibilityPool } from './sessionKinds'
 
@@ -31,7 +31,7 @@ export const getSyllabus = query({
     studentId: v.id('students'),
   },
   handler: async (ctx, args) => {
-    await assertOwnsStudent(ctx, args.studentId)
+    await assertIsStudent(ctx, args.studentId)
 
     const subjectQuestionCounts = new Map<string, number>()
     const subtopicQuestionCounts = new Map<string, number>()

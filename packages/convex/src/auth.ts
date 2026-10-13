@@ -10,10 +10,18 @@ import authConfig from './auth.config'
 import { components, internal } from './_generated/api'
 import { query } from './_generated/server'
 import type { QueryCtx } from './_generated/server'
-import type { DataModel, Id } from './_generated/dataModel'
+import type { DataModel, Doc, Id } from './_generated/dataModel'
+import { sendEmail } from './email'
+import { deleteStudentData } from './students'
 
 const siteUrl = process.env.SITE_URL ?? 'http://localhost:3000'
-const trustedOrigins = Array.from(new Set([siteUrl, 'http://localhost:3002', 'http://localhost:3000']))
+// Local dev origins only when no real site is configured: in production they
+// would let any page served from the visitor's own machine call the auth API.
+const trustedOrigins = process.env.SITE_URL
+  ? [siteUrl]
+  : ['http://localhost:3000', 'http://localhost:3002']
+
+const emailEnabled = process.env.RESEND_API_KEY != null
 
 const authFunctions: AuthFunctions = internal.auth
 
@@ -50,6 +58,7 @@ export const authComponent = createClient<DataModel>(components.betterAuth, {
         const studentId = await ctx.db.insert('students', {
           email,
           normalizedEmail,
+          name: authUser.name?.trim() || undefined,
           createdAt: now,
           updatedAt: now,
           lastSeenAt: now,
@@ -57,20 +66,22 @@ export const authComponent = createClient<DataModel>(components.betterAuth, {
         await authComponent.setUserId(ctx, authUser._id, studentId)
       },
       onUpdate: async (ctx, newUser, oldUser) => {
-        if (oldUser.email === newUser.email) return
+        if (oldUser.email === newUser.email && oldUser.name === newUser.name) return
         if (!newUser.userId) return
         const email = (newUser.email ?? '').toString()
         await ctx.db.patch("students", newUser.userId as Id<'students'>, {
           email,
           normalizedEmail: normalizeEmail(email),
+          name: newUser.name?.trim() || undefined,
           updatedAt: Date.now(),
         })
       },
       onDelete: async (ctx, authUser) => {
         if (!authUser.userId) return
         const studentId = authUser.userId as Id<'students'>
-        const student = await ctx.db.get("students", studentId)
-        if (student) await ctx.db.delete("students", studentId)
+        await deleteStudentData(ctx, studentId)
+        // The tutor's threads are created with `userId: studentId` (tutor.ts).
+        await ctx.runMutation(components.agent.users.deleteAllForUserIdAsync, { userId: studentId })
       },
     },
   },
@@ -83,11 +94,37 @@ export const createAuth = (ctx: GenericCtx<DataModel>) =>
     baseURL: siteUrl,
     trustedOrigins,
     database: authComponent.adapter(ctx),
+    // Verification is required once a mail provider is configured; without one
+    // it would lock everyone out, so local development stays open.
     emailAndPassword: {
       enabled: true,
-      requireEmailVerification: false,
+      requireEmailVerification: emailEnabled,
       autoSignIn: true,
+      minPasswordLength: 8,
+      sendResetPassword: async ({ user, url }) => {
+        await sendEmail({
+          to: user.email,
+          subject: 'Restablece tu contraseña de Aprendo',
+          text: `Hola. Para elegir una contraseña nueva abre este enlace (vence en una hora):\n\n${url}\n\nSi no lo pediste, ignora este correo.`,
+        })
+      },
     },
+    emailVerification: {
+      sendOnSignUp: emailEnabled,
+      // Signing in unverified sends a fresh link, so a lost email is not a dead end.
+      sendOnSignIn: emailEnabled,
+      autoSignInAfterVerification: true,
+      sendVerificationEmail: async ({ user, url }) => {
+        await sendEmail({
+          to: user.email,
+          subject: 'Confirma tu correo en Aprendo',
+          text: `Hola. Confirma tu correo para entrar a Aprendo:\n\n${url}\n\nSi no creaste una cuenta, ignora este correo.`,
+        })
+      },
+    },
+    // Self-service deletion (Ley 1581): the `onDelete` trigger above erases
+    // everything the student produced.
+    user: { deleteUser: { enabled: true } },
     plugins: [convex({ authConfig })],
   })
 
@@ -101,6 +138,7 @@ export const getCurrentStudent = query({
     return {
       _id: student._id,
       email: student.email,
+      name: student.name ?? null,
       isAdmin: student.isAdmin === true,
     }
   },
@@ -131,7 +169,11 @@ export async function requireAuthenticatedStudentId(
   return authUser.userId as Id<'students'>
 }
 
-export async function assertOwnsStudent(
+/**
+ * Only the student themselves. Every mutation on learner data goes through
+ * this: a teacher who can read a student must never answer for them.
+ */
+export async function assertIsStudent(
   ctx: GenericCtx<DataModel>,
   studentId: Id<'students'>,
 ) {
@@ -141,7 +183,57 @@ export async function assertOwnsStudent(
   }
 }
 
-export async function requireAdminStudentId(
+const STAFF_ROLES: readonly Doc<'memberships'>['role'][] = ['teacher', 'org_admin']
+
+/**
+ * The student, or a teacher or school admin of a school the student belongs
+ * to. Read-only queries only (see `assertIsStudent`).
+ */
+export async function assertCanViewStudent(
+  ctx: GenericCtx<DataModel> & Pick<QueryCtx, 'db'>,
+  studentId: Id<'students'>,
+) {
+  const callerId = await requireAuthenticatedStudentId(ctx)
+  if (callerId === studentId) return
+  const studentOrgs = await ctx.db
+    .query('memberships')
+    .withIndex('by_accountId', (q) => q.eq('accountId', studentId))
+    .collect()
+  for (const membership of studentOrgs) {
+    if (membership.role !== 'student') continue
+    const caller = await getMembership(ctx, membership.orgId, callerId)
+    if (caller != null && STAFF_ROLES.includes(caller.role)) return
+  }
+  throw new ConvexError('No tienes acceso a este estudiante.')
+}
+
+export function getMembership(
+  ctx: Pick<QueryCtx, 'db'>,
+  orgId: Id<'organizations'>,
+  accountId: Id<'students'>,
+) {
+  return ctx.db
+    .query('memberships')
+    .withIndex('by_orgId_accountId', (q) => q.eq('orgId', orgId).eq('accountId', accountId))
+    .unique()
+}
+
+/** The caller's membership in `orgId`, if it carries one of `roles`. */
+export async function requireOrgRole(
+  ctx: GenericCtx<DataModel> & Pick<QueryCtx, 'db'>,
+  orgId: Id<'organizations'>,
+  roles: readonly Doc<'memberships'>['role'][],
+) {
+  const callerId = await requireAuthenticatedStudentId(ctx)
+  const membership = await getMembership(ctx, orgId, callerId)
+  if (membership == null || !roles.includes(membership.role)) {
+    throw new ConvexError('No tienes permisos en este colegio.')
+  }
+  return membership
+}
+
+/** Aprendo staff: the shared question bank and the schools' licenses. */
+export async function requirePlatformAdmin(
   ctx: GenericCtx<DataModel> & Pick<QueryCtx, 'db'>,
 ): Promise<Id<'students'>> {
   const studentId = await requireAuthenticatedStudentId(ctx)

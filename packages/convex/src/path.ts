@@ -1,7 +1,7 @@
 import { v } from 'convex/values'
 import taxonomyContract from '../../../docs/taxonomy.v1.json'
 import { query } from './_generated/server'
-import { assertOwnsStudent } from './auth'
+import { assertIsStudent } from './auth'
 import { LEVELLED_SUBJECT_IDS, MIN_ATTEMPTS_FOR_LEVEL, getLevelForScore } from './levels'
 import { areaScore } from './progress'
 import { collectUsableQuestionsBySubject } from './questionPool'
@@ -32,7 +32,7 @@ export const getLearningPath = query({
     subjectId: v.string(),
   },
   handler: async (ctx, args) => {
-    await assertOwnsStudent(ctx, args.studentId)
+    await assertIsStudent(ctx, args.studentId)
 
     const subject = taxonomyContract.subjects.find((item) => item.id === args.subjectId)
     if (subject == null) return null
@@ -112,7 +112,7 @@ export const listPathSubjects = query({
     studentId: v.id('students'),
   },
   handler: async (ctx, args) => {
-    await assertOwnsStudent(ctx, args.studentId)
+    await assertIsStudent(ctx, args.studentId)
 
     const aggregates = await ctx.db
       .query('learnerSubjectAggregates')

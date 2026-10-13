@@ -5,23 +5,38 @@ import {
   canUseTutor,
   hasLlmBudget,
   isLiveTimedExam,
+  llmPlanFor,
 } from '../src/llmBudget'
 import { ANSWER_GRACE_MS } from '../src/sessionIntegrity'
 import { SESSION_KINDS, SESSION_KIND_CONFIG } from '../src/sessionKinds'
 
 describe('hasLlmBudget', () => {
-  test('the tutor gets 80 messages a day', () => {
-    expect(LLM_DAILY_LIMITS.tutor).toBe(80)
+  test('an individual account gets 80 tutor messages a day; a school plan more', () => {
+    expect(LLM_DAILY_LIMITS.individual.tutor).toBe(80)
+    expect(LLM_DAILY_LIMITS.school.tutor).toBeGreaterThan(LLM_DAILY_LIMITS.individual.tutor)
   })
 
   test('allows while the student is under the daily limit', () => {
-    expect(hasLlmBudget('tutor', 0)).toBe(true)
-    expect(hasLlmBudget('tutor', LLM_DAILY_LIMITS.tutor - 1)).toBe(true)
+    expect(hasLlmBudget('tutor', 0, 'individual')).toBe(true)
+    expect(hasLlmBudget('tutor', LLM_DAILY_LIMITS.individual.tutor - 1, 'individual')).toBe(true)
   })
 
   test('denies once the daily limit is spent', () => {
-    expect(hasLlmBudget('tutor', LLM_DAILY_LIMITS.tutor)).toBe(false)
-    expect(hasLlmBudget('tutor', LLM_DAILY_LIMITS.tutor + 5)).toBe(false)
+    expect(hasLlmBudget('tutor', LLM_DAILY_LIMITS.individual.tutor, 'individual')).toBe(false)
+    expect(hasLlmBudget('tutor', LLM_DAILY_LIMITS.individual.tutor, 'school')).toBe(true)
+    expect(hasLlmBudget('tutor', LLM_DAILY_LIMITS.school.tutor, 'school')).toBe(false)
+  })
+})
+
+describe('llmPlanFor', () => {
+  const now = 1_000
+  test('no school, or only expired licenses, is the individual plan', () => {
+    expect(llmPlanFor([], now)).toBe('individual')
+    expect(llmPlanFor([{ plan: 'school', licenseEndsAt: now }], now)).toBe('individual')
+  })
+
+  test('the most generous active school plan wins', () => {
+    expect(llmPlanFor([{ plan: 'pilot', licenseEndsAt: now + 1 }, { plan: 'school', licenseEndsAt: now + 1 }], now)).toBe('school')
   })
 })
 

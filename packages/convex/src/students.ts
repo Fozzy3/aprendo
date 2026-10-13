@@ -1,7 +1,7 @@
-import { mutation, query, type QueryCtx } from './_generated/server'
+import { mutation, query, type MutationCtx, type QueryCtx } from './_generated/server'
 import { ConvexError, v } from 'convex/values'
-import type { Id } from './_generated/dataModel'
-import { assertOwnsStudent, requireAuthenticatedStudentId } from './auth'
+import type { Doc, Id, TableNames } from './_generated/dataModel'
+import { assertIsStudent } from './auth'
 import { MAX_GLOBAL_SCORE } from './globalScore'
 import { MAX_WEEKLY_GOAL_MINUTES, MIN_WEEKLY_GOAL_MINUTES, isValidWeeklyGoal } from './studyTime'
 
@@ -10,7 +10,7 @@ export const getStudent = query({
     studentId: v.id('students'),
   },
   handler: async (ctx, args) => {
-    await assertOwnsStudent(ctx, args.studentId)
+    await assertIsStudent(ctx, args.studentId)
     return ctx.db.get("students", args.studentId)
   },
 })
@@ -29,7 +29,7 @@ export const setExamDate = mutation({
     examDate: v.union(v.number(), v.null()),
   },
   handler: async (ctx, args) => {
-    await assertOwnsStudent(ctx, args.studentId)
+    await assertIsStudent(ctx, args.studentId)
 
     if (args.examDate != null && !Number.isFinite(args.examDate)) {
       throw new ConvexError('Fecha de examen inválida.')
@@ -50,7 +50,7 @@ export const setTargetGlobalScore = mutation({
     targetGlobalScore: v.union(v.number(), v.null()),
   },
   handler: async (ctx, args) => {
-    await assertOwnsStudent(ctx, args.studentId)
+    await assertIsStudent(ctx, args.studentId)
 
     if (
       args.targetGlobalScore != null
@@ -77,7 +77,7 @@ export const setWeeklyGoal = mutation({
     minutes: v.number(),
   },
   handler: async (ctx, args) => {
-    await assertOwnsStudent(ctx, args.studentId)
+    await assertIsStudent(ctx, args.studentId)
 
     if (!isValidWeeklyGoal(args.minutes)) {
       throw new ConvexError(
@@ -96,18 +96,8 @@ export const getStudentAppState = query({
     studentId: v.id('students'),
   },
   handler: async (ctx, args) => {
-    await assertOwnsStudent(ctx, args.studentId)
+    await assertIsStudent(ctx, args.studentId)
     return computeStudentAppState(ctx, args.studentId)
-  },
-})
-
-export const getCurrentStudentAppState = query({
-  args: {},
-  handler: async (ctx) => {
-    const authUser = await ctx.auth.getUserIdentity()
-    if (!authUser) return null
-    const studentId = await requireAuthenticatedStudentId(ctx)
-    return computeStudentAppState(ctx, studentId)
   },
 })
 
@@ -144,17 +134,16 @@ async function computeStudentAppState(ctx: QueryCtx, studentId: Id<'students'>) 
       .collect(),
   ])
 
-  const placementSessions = [...diagnosticSessions, ...nivelacionSessions]
+  const hasPlacement = [...diagnosticSessions, ...nivelacionSessions].some(
+    (session) => session.status === 'completed',
+  )
 
-  const activePlacement = placementSessions.find(
-    (session) => session.status === 'in_progress' || session.status === 'created',
-  ) ?? null
-
-  const completedPlacements = placementSessions
-    .filter((session) => session.status === 'completed')
-    .sort((a, b) => (b.completedAt ?? b.startedAt) - (a.completedAt ?? a.startedAt))
-
-  const latestCompletedPlacement = completedPlacements[0] ?? null
+  // Teachers and school admins land on their panel; they never sit placement.
+  const memberships = await ctx.db
+    .query('memberships')
+    .withIndex('by_accountId', (q) => q.eq('accountId', studentId))
+    .collect()
+  const isStaff = memberships.some((membership) => membership.role !== 'student')
 
   const placedSubjectIds = [
     ...new Set(
@@ -165,15 +154,58 @@ async function computeStudentAppState(ctx: QueryCtx, studentId: Id<'students'>) 
     ),
   ]
 
-  const hasPlacement = latestCompletedPlacement != null
-
   return {
     studentId: student._id,
-    hasCompletedDiagnostic: hasPlacement,
+    hasPlacement,
     /** Areas the student has actually levelled, for the placement screen. */
     placedSubjectIds,
-    activeDiagnosticSessionId: activePlacement?._id ?? null,
-    latestCompletedDiagnosticId: latestCompletedPlacement?._id ?? null,
-    defaultRoute: hasPlacement ? '/today' as const : '/diagnostic' as const,
+    isStaff,
+    defaultRoute: isStaff
+      ? '/teacher' as const
+      : hasPlacement ? '/today' as const : '/diagnostic' as const,
   }
+}
+
+/**
+ * Erase everything a student produced, and their place in any school (Ley 1581:
+ * the account holder can ask for it, and most are minors). The shared bank and its anonymous tallies
+ * (`questionAnswerStats`, question Elo) stay. The tutor's chat history lives in
+ * the agent component and is removed by the caller.
+ *
+ * ponytail: one transaction; if a student ever outgrows Convex's per-mutation
+ * write limit, batch per table through the scheduler.
+ */
+export async function deleteStudentData(ctx: MutationCtx, studentId: Id<'students'>) {
+  const sessions = await ctx.db
+    .query('sessions')
+    .withIndex('by_studentId', (q) => q.eq('studentId', studentId))
+    .collect()
+  for (const session of sessions) {
+    const [sessionQuestions, artifacts] = await Promise.all([
+      ctx.db.query('sessionQuestions').withIndex('by_sessionId', (q) => q.eq('sessionId', session._id)).collect(),
+      ctx.db
+        .query('practiceTutorArtifacts')
+        .withIndex('by_practiceSessionId', (q) => q.eq('practiceSessionId', session._id))
+        .collect(),
+    ])
+    for (const row of sessionQuestions) await ctx.db.delete('sessionQuestions', row._id)
+    for (const row of artifacts) await ctx.db.delete('practiceTutorArtifacts', row._id)
+    await ctx.db.delete('sessions', session._id)
+  }
+
+  const remove = async <T extends TableNames>(table: T, rows: Doc<T>[]) => {
+    for (const row of rows) await ctx.db.delete(table, row._id)
+  }
+  await remove('questionAttempts', await ctx.db.query('questionAttempts').withIndex('by_studentId', (q) => q.eq('studentId', studentId)).collect())
+  await remove('learnerSubjectAggregates', await ctx.db.query('learnerSubjectAggregates').withIndex('by_studentId', (q) => q.eq('studentId', studentId)).collect())
+  await remove('learnerSubtopicAggregates', await ctx.db.query('learnerSubtopicAggregates').withIndex('by_studentId', (q) => q.eq('studentId', studentId)).collect())
+  await remove('learnerProfileSnapshots', await ctx.db.query('learnerProfileSnapshots').withIndex('by_studentId', (q) => q.eq('studentId', studentId)).collect())
+  await remove('coachSummaries', await ctx.db.query('coachSummaries').withIndex('by_studentId_weekIndex', (q) => q.eq('studentId', studentId)).collect())
+  await remove('practiceTutorThreads', await ctx.db.query('practiceTutorThreads').withIndex('by_studentId', (q) => q.eq('studentId', studentId)).collect())
+  await remove('llmUsage', await ctx.db.query('llmUsage').withIndex('by_studentId_day_feature', (q) => q.eq('studentId', studentId)).collect())
+  await remove('questionReports', await ctx.db.query('questionReports').withIndex('by_studentId_createdAt', (q) => q.eq('studentId', studentId)).collect())
+  await remove('memberships', await ctx.db.query('memberships').withIndex('by_accountId', (q) => q.eq('accountId', studentId)).collect())
+  await remove('classGroupMembers', await ctx.db.query('classGroupMembers').withIndex('by_accountId', (q) => q.eq('accountId', studentId)).collect())
+
+  if ((await ctx.db.get('students', studentId)) != null) await ctx.db.delete('students', studentId)
 }

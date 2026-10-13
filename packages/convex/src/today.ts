@@ -1,7 +1,7 @@
 import { query } from './_generated/server'
 import { v } from 'convex/values'
 import type { Doc, Id } from './_generated/dataModel'
-import { assertOwnsStudent } from './auth'
+import { assertIsStudent } from './auth'
 import { colombiaDayNumber, colombiaDayStartMs, colombiaWeekIndex } from './colombiaTime'
 import { buildExamPlan, observedSessionsPerWeek, targetPace } from './examPlan'
 import { estimateGlobalScore, weeklyGlobalEstimates } from './globalScore'
@@ -28,7 +28,7 @@ export const getTodayDashboard = query({
     studentId: v.id('students'),
   },
   handler: async (ctx, args) => {
-    await assertOwnsStudent(ctx, args.studentId)
+    await assertIsStudent(ctx, args.studentId)
 
     const [student, attempts, sessions, subjectAggregates, subtopicAggregates] = await Promise.all([
       ctx.db.get('students', args.studentId),

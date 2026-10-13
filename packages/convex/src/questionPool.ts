@@ -1,6 +1,7 @@
 import type { QueryCtx } from './_generated/server'
 import type { Doc } from './_generated/dataModel'
 import type { QuestionEligibilityPool } from './sessionKinds'
+import { SUBJECT_IDS } from './taxonomy'
 
 /**
  * The launchable-question pool: the single definition of which questions a
@@ -48,6 +49,23 @@ export async function collectUsableQuestionsBySubject(
     pooled.push(...rows)
   }
   return pooled.filter(hasUsableMetadata)
+}
+
+/**
+ * Every usable question across all areas, read through the subject index so
+ * pending, excluded and untagged rows are never loaded.
+ *
+ * ponytail: still reads the whole usable bank in one transaction; when it nears
+ * Convex's per-query read limit, sample per area instead of collecting.
+ */
+export async function collectUsableQuestions(
+  ctx: QueryCtx,
+  pools: QuestionEligibilityPool[],
+): Promise<Doc<'questions'>[]> {
+  const bySubject = await Promise.all(
+    SUBJECT_IDS.map((subjectId) => collectUsableQuestionsBySubject(ctx, subjectId, pools)),
+  )
+  return bySubject.flat()
 }
 
 /**

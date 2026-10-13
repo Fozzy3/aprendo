@@ -2,9 +2,9 @@ import { mutation, query, internalMutation, internalQuery } from './_generated/s
 import { ConvexError, v } from 'convex/values'
 import { internal } from './_generated/api'
 import type { Doc, Id } from './_generated/dataModel'
-import { slugify } from '../../ingest/src/slug'
+import { slugify } from '@aprendo/ingest/slug'
 import { distractorRationaleValidator, questionDocumentValidator } from './validators'
-import { requireAdminStudentId } from './auth'
+import { requirePlatformAdmin } from './auth'
 
 async function serializeUpload(
   ctx: { storage: { getUrl: (storageId: Doc<'pdfUploads'>['pdfStorageId']) => Promise<string | null> } },
@@ -29,7 +29,7 @@ async function serializeUpload(
 export const generatePdfUploadUrl = mutation({
   args: {},
   handler: async (ctx) => {
-    await requireAdminStudentId(ctx)
+    await requirePlatformAdmin(ctx)
     return ctx.storage.generateUploadUrl()
   },
 })
@@ -42,7 +42,7 @@ export const createPdfUpload = mutation({
     sizeBytes: v.number(),
   },
   handler: async (ctx, args) => {
-    await requireAdminStudentId(ctx)
+    await requirePlatformAdmin(ctx)
     const now = Date.now()
     const pdfUploadId = await ctx.db.insert('pdfUploads', {
       fileName: args.fileName,
@@ -68,7 +68,7 @@ export const retryPdfUpload = mutation({
     pdfUploadId: v.id('pdfUploads'),
   },
   handler: async (ctx, args) => {
-    await requireAdminStudentId(ctx)
+    await requirePlatformAdmin(ctx)
     const upload = await ctx.db.get("pdfUploads", args.pdfUploadId)
     if (upload == null) {
       throw new ConvexError('PDF upload not found.')
@@ -95,7 +95,7 @@ export const listPdfUploads = query({
     limit: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
-    await requireAdminStudentId(ctx)
+    await requirePlatformAdmin(ctx)
     const uploads = await ctx.db
       .query('pdfUploads')
       .withIndex('by_createdAt')
@@ -106,38 +106,13 @@ export const listPdfUploads = query({
   },
 })
 
-export const getPdfUploadDetail = query({
-  args: {
-    pdfUploadId: v.id('pdfUploads'),
-  },
-  handler: async (ctx, args) => {
-    await requireAdminStudentId(ctx)
-    const upload = await ctx.db.get("pdfUploads", args.pdfUploadId)
-    if (upload == null) {
-      return null
-    }
-
-    const questions = await ctx.db
-      .query('questions')
-      .withIndex('by_pdfUploadId_sequence', (q) =>
-        q.eq('pdfUploadId', args.pdfUploadId),
-      )
-      .take(5)
-
-    return {
-      upload: await serializeUpload(ctx, upload),
-      previewQuestions: questions,
-    }
-  },
-})
-
 export const getQuestionBrowser = query({
   args: {
     pdfUploadId: v.id('pdfUploads'),
     sequence: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
-    await requireAdminStudentId(ctx)
+    await requirePlatformAdmin(ctx)
     const upload = await ctx.db.get("pdfUploads", args.pdfUploadId)
     if (upload == null) {
       return null
@@ -494,25 +469,6 @@ export const refreshPdfEnrichmentStats = internalMutation({
       enrichedAt: allQuestionsResolved ? Date.now() : undefined,
       updatedAt: Date.now(),
     })
-  },
-})
-
-export const getDiagnosticEligibleQuestionPool = internalQuery({
-  args: {
-    subjectId: v.optional(v.string()),
-  },
-  handler: async (ctx, args) => {
-    if (args.subjectId) {
-      return ctx.db
-        .query('questions')
-        .withIndex('by_subjectId_eligibility', (q) =>
-          q.eq('subjectId', args.subjectId).eq('eligibility', 'diagnostic'),
-        )
-        .collect()
-    }
-
-    const questions = await ctx.db.query('questions').collect()
-    return questions.filter((question) => question.eligibility === 'diagnostic')
   },
 })
 

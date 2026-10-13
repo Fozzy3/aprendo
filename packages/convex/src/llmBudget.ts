@@ -10,18 +10,39 @@ import type { Doc } from './_generated/dataModel'
 import { isPastDeadline } from './sessionIntegrity'
 import { getSessionKindConfig, type SessionKind } from './sessionKinds'
 
-/** Model calls each student may make per feature per Colombia day. */
-export const LLM_DAILY_LIMITS = {
-  tutor: 80,
-} as const
+export type LlmFeature = 'tutor'
 
-export type LlmFeature = keyof typeof LLM_DAILY_LIMITS
+/** `individual` is an account with no school, or whose school's license ran out. */
+export type LlmPlan = 'individual' | Doc<'organizations'>['plan']
+
+/**
+ * Model calls each student may make per feature per Colombia day, by plan.
+ * This is where billing hooks in: a school's plan buys its students more.
+ */
+export const LLM_DAILY_LIMITS: Record<LlmPlan, Record<LlmFeature, number>> = {
+  individual: { tutor: 80 },
+  pilot: { tutor: 80 },
+  school: { tutor: 150 },
+}
 
 /** Longest tutor message accepted; anything longer is a paste, not a question. */
 export const MAX_TUTOR_PROMPT_CHARS = 4000
 
-export function hasLlmBudget(feature: LlmFeature, usedToday: number): boolean {
-  return usedToday < LLM_DAILY_LIMITS[feature]
+export function hasLlmBudget(feature: LlmFeature, usedToday: number, plan: LlmPlan): boolean {
+  return usedToday < LLM_DAILY_LIMITS[plan][feature]
+}
+
+/** The most generous plan among the student's schools with a running license. */
+export function llmPlanFor(
+  organizations: Pick<Doc<'organizations'>, 'plan' | 'licenseEndsAt'>[],
+  now: number,
+): LlmPlan {
+  let best: LlmPlan = 'individual'
+  for (const organization of organizations) {
+    if (organization.licenseEndsAt <= now) continue
+    if (LLM_DAILY_LIMITS[organization.plan].tutor > LLM_DAILY_LIMITS[best].tutor) best = organization.plan
+  }
+  return best
 }
 
 /**

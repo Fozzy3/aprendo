@@ -137,7 +137,7 @@ export function resolveSimulacroExam<S extends SimulacroSitting>(
     return { sittings: [target], missingSessionNumbers: [], previous: previous == null ? [] : [previous] }
   }
 
-  // A full sitting stored without a number is Sesión 1, as `getLatestSimulacroScore` reads it.
+  // A full sitting stored without a number is Sesión 1, as every simulacro read treats it.
   const sittingNumber = (session: S) => session.simulacroSessionNumber ?? 1
   const exams: S[][] = []
   for (const session of byStart.filter((candidate) => candidate.subjectId == null)) {
@@ -172,19 +172,6 @@ export function resolveSimulacroExam<S extends SimulacroSitting>(
     ),
     previous,
   }
-}
-
-/**
- * The exam of the latest completed full sitting, paired exactly as its report
- * pairs it, so Progreso and the report never mix two exams. Null before any.
- * Per-area simulacros are a different exercise from the full exam.
- */
-export function latestSimulacroExam<S extends SimulacroSitting>(sessions: S[]) {
-  const latest = sessions
-    .filter((session) =>
-      session.kind === 'simulacro' && session.status === 'completed' && session.subjectId == null)
-    .sort((a, b) => (b.completedAt ?? b.startedAt) - (a.completedAt ?? a.startedAt))[0]
-  return latest == null ? null : resolveSimulacroExam(sessions, latest)
 }
 
 /** Area scores of a set of sittings, only for the areas they actually served. */

@@ -3,7 +3,6 @@ import {
   buildNivelacionResult,
   buildSimulacroReport,
   isFirstPlacement,
-  latestSimulacroExam,
   resolveSimulacroExam,
   subtopicBreakdown,
   type ReportItem,
@@ -193,7 +192,7 @@ describe('resolveSimulacroExam', () => {
     })
   })
 
-  test('a legacy sitting without a number is Sesión 1, as getLatestSimulacroScore reads it', () => {
+  test('a legacy sitting without a number is Sesión 1, as every simulacro read treats it', () => {
     const legacy = sitting('legacy', 1, 'completed')
     const legacy2 = sitting('legacy2', 2, 'completed', 2)
     expect(resolveSimulacroExam([legacy2, legacy], legacy)).toEqual({
@@ -210,41 +209,6 @@ describe('resolveSimulacroExam', () => {
       previous: [mat1],
     })
     expect(resolveSimulacroExam(sessions, lc1).previous).toEqual([])
-  })
-})
-
-describe('latestSimulacroExam', () => {
-  const sitting = (
-    _id: string,
-    startedAt: number,
-    status: string,
-    simulacroSessionNumber?: number,
-    subjectId?: string,
-  ) => ({ _id, kind: 'simulacro', status, startedAt, completedAt: startedAt + 0.5, simulacroSessionNumber, subjectId })
-
-  test('pairs the latest completed sitting with its own exam, never with an older one', () => {
-    // S1b + S2a would be a whole-exam score the student never sat.
-    const s1a = sitting('s1a', 1, 'completed', 1)
-    const s2a = sitting('s2a', 2, 'completed', 2)
-    const s1b = sitting('s1b', 3, 'completed', 1)
-    const s2b = sitting('s2b', 4, 'in_progress', 2)
-    const mat = sitting('mat', 5, 'completed', undefined, 'matematicas')
-    expect(latestSimulacroExam([mat, s2b, s1b, s2a, s1a])).toEqual({
-      sittings: [s1b],
-      missingSessionNumbers: [2],
-      previous: [s1a, s2a],
-    })
-  })
-
-  test('a finished exam is complete', () => {
-    const s1 = sitting('s1', 1, 'completed', 1)
-    const s2 = sitting('s2', 2, 'completed', 2)
-    expect(latestSimulacroExam([s2, s1])?.missingSessionNumbers).toEqual([])
-  })
-
-  test('null without a completed full sitting; per-area simulacros do not count', () => {
-    expect(latestSimulacroExam([sitting('mat', 1, 'completed', undefined, 'matematicas')])).toBeNull()
-    expect(latestSimulacroExam([sitting('s1', 1, 'in_progress', 1)])).toBeNull()
   })
 })
 

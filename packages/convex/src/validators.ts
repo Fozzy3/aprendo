@@ -412,3 +412,12 @@ export const learnerAggregateValidator = v.object({
   /** When the level was last evaluated — the reto re-tests the oldest first. */
   masteryUpdatedAt: v.optional(v.number()),
 })
+
+/** What a school bought; `llmBudget.ts` maps each plan to its allowances. */
+export const organizationPlanValidator = v.union(v.literal('pilot'), v.literal('school'))
+
+export const membershipRoleValidator = v.union(
+  v.literal('student'),
+  v.literal('teacher'),
+  v.literal('org_admin'),
+)

@@ -238,11 +238,13 @@ h3 {
    (solving, reviewing) carry it. Lines fall every `--cell`, and the red margin
    rule sits three cells in, where the question number lives. */
 .sheet {
+  /* Faint on purpose: the ruling sits under the text, never competes with it. */
+  --grid: color-mix(in srgb, var(--rule) 35%, transparent);
   background-color: var(--paper);
   background-image:
     linear-gradient(to right, var(--margin) 0 1px, transparent 1px),
-    linear-gradient(to right, color-mix(in srgb, var(--rule) 70%, transparent) 0 1px, transparent 1px),
-    linear-gradient(to bottom, color-mix(in srgb, var(--rule) 70%, transparent) 0 1px, transparent 1px);
+    linear-gradient(to right, var(--grid) 0 1px, transparent 1px),
+    linear-gradient(to bottom, var(--grid) 0 1px, transparent 1px);
   background-size: 100% 100%, var(--cell) var(--cell), var(--cell) var(--cell);
   background-position: calc(var(--cell) * 3) 0, 0 0, 0 0;
   background-repeat: no-repeat, repeat, repeat;
@@ -252,8 +254,8 @@ h3 {
 @media (max-width: 640px) {
   .sheet {
     background-image:
-      linear-gradient(to right, color-mix(in srgb, var(--rule) 70%, transparent) 0 1px, transparent 1px),
-      linear-gradient(to bottom, color-mix(in srgb, var(--rule) 70%, transparent) 0 1px, transparent 1px);
+      linear-gradient(to right, var(--grid) 0 1px, transparent 1px),
+      linear-gradient(to bottom, var(--grid) 0 1px, transparent 1px);
     background-size: var(--cell) var(--cell), var(--cell) var(--cell);
     background-position: 0 0, 0 0;
     background-repeat: repeat, repeat;

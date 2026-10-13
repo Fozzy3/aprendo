@@ -62,7 +62,9 @@ identity.
 multiples of it (the plan lines are 3 cells tall, the margin column is 3 cells
 on a sheet and 9 on a page).
 
-`.sheet` draws the ruling and the red margin rule three cells in. **The ruling
+`.sheet` draws the ruling and the red margin rule three cells in. The ruling is
+faint (`--grid`: 35% of `--rule`), like a real squared notebook: it sits under
+the text and never competes with it. **The ruling
 is a state**: only solve, review and the sign-in sheets carry it. On phones the
 margin rule is dropped so the question keeps its width.
 

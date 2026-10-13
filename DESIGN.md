@@ -1,200 +1,128 @@
 # Aprendo — DESIGN.md
 
-Visual system of record. `apps/web/src/styles.css` is the implementation; this
-file is the reasoning. When the two disagree, the CSS is what ships — fix one or
-the other, don't let them drift.
+Visual system of record: **Cuaderno cuadriculado** (direction seed `6ffabd95`,
+chosen 2026-10-10, see `plans/rediseno-institucional.md`). `apps/web/src/styles.css`
+is the implementation; this file is the reasoning. When the two disagree, the
+CSS is what ships — fix one or the other, don't let them drift.
 
-## Register
+## Thesis
 
-**Product.** Design serves the task. The student is preparing for a national
-exam under time pressure; the interface should disappear into practising, not
-perform at them. Delight is reserved for thresholds (empty states, a finished
-session, a level up), never spread across working screens.
+The 5 mm squared notebook every Colombian student carries, used as an
+instrument, not a costume: a ruling that everything respects, and a red margin
+where the teacher's judgment lives. Hierarchy comes from the type scale and 1px
+rules — never from cards, shadows or colour fills.
+
+If a screenshot with the content removed looks like a children's school
+template, it is wrong: no spirals, no handwriting, no stickers, no mascot.
 
 ## Theme
 
-Light by default, dark supported. The physical scene: a 16-year-old in Colombia,
-on a phone, in a school corridor or a lit bedroom, in short sessions between
-other obligations. That forces light-first — most sessions happen in daylight on
-a screen held at arm's length — with dark as a real alternative for night study,
-not an afterthought.
-
-The resolved theme is always written as a class on the root element by the
-blocking script in `__root.tsx`, including in `auto` mode. **There is exactly one
-dark block** (`:root.dark, :root[data-theme="dark"]`). A second copy inside
-`@media (prefers-color-scheme: dark)` existed once and the two diverged.
+Light by default (daylight, a phone at arm's length), dark as "cuaderno de
+noche": the paper turns to ink, the ruling dims, the inks lift. The resolved
+theme is always a class on the root (`__root.tsx`), so there is exactly one dark
+block (`:root.dark, :root[data-theme="dark"]`).
 
 ## Color
 
-Strategy: **Restrained.** Tinted neutrals, one brand colour, semantic colours
-with fixed meanings, and area identity demoted to a mark.
+Five inks on cold white paper. Colour means state; position and shape mean
+identity.
 
-### Semantic anchors — colour means state
+| Token | Light | Dark | Meaning |
+|---|---|---|---|
+| `--paper` (`--bg`) | `#fbfcfe` | `#0f1626` | The page. Never cream. |
+| `--rule` | `#c9d8ea` | `#24324b` | The ruling and sheet edges |
+| `--ink` (`--text-primary`, `--brand`) | `#16233f` | `#e4eaf4` | Text, primary actions |
+| `--margin` (`--danger`) | `#c3352b` | `#e8695e` | Mistakes, risk, the teacher's note, the margin rule |
+| `--green-ink` (`--success`) | `#2e6b45` | `#6cbf8b` | Correct, mastered |
+| `--graphite` (`--warn`) | `#4a5263` | `#aab3c4` | Pencil: what is tentative (unsure, a deadline closing in) |
+| `--accent` | `#1d4f91` | `#8db6ee` | Fountain-pen blue: links, focus, selection tint |
 
-| Token | Light | Meaning |
-|---|---|---|
-| `--brand` | `#6c4cf1` (H 285) | Identity, primary action, current selection |
-| `--gold` | `#ffc93c` (H 86) | Goal markers, streaks |
-| `--success` | `#21c08b` (H 164) | Correct, mastered |
-| `--danger` | `#ff5d5d` (H 24) | Incorrect, destructive, errors |
+- The error red and the teacher's red are **one token**: the same gesture of
+  correction.
+- There is no gold, no violet and no gradient anywhere.
+- `--bg-inset` (`#eef3f9`) is the desk a sheet lies on (solve, review, sign-in).
+- **Areas** keep a small inked dot (`.subject-dot`): identical lightness and
+  chroma, hue as the only variable, away from the red, green and blue inks.
+  Never text, never a fill.
 
-`--accent` is an alias of `--brand`, kept so the ~200 legacy classes never had to
-be touched. **Semantic tokens must never hang off the brand token.** Both
-failures of this rule are on record: `.option-card.is-incorrect` read as "red"
-only because the brand happened to be coral, and the login error was painted in
-brand violet, where an error simply does not read as an error.
+## Type
 
-### Area identity — shape means identity
+- **Source Serif 4** (600/700) — headings and figures: the voice of the report
+  card and the acta.
+- **Public Sans** (400–700) — everything else; `font-variant-numeric:
+  tabular-nums` is set on `body` so every table and counter lines up.
+- Scale does the hierarchy: page title `clamp(1.75rem…2.5rem)`, section title
+  1.3rem, body 0.9–1rem, labels 0.75rem in `--text-tertiary`, sentence case,
+  no tracking. **No eyebrow/kicker above a heading** — the heading speaks.
+- No italics for display, no uppercase tracked labels.
 
-Five ICFES areas, one family by construction: **identical lightness and chroma,
-hue is the only variable.**
+## The grid
 
-```
---subject-lectura_critica:      oklch(0.60 0.15 350)
---subject-matematicas:          oklch(0.60 0.15 250)
---subject-ciencias_naturales:   oklch(0.60 0.15 195)
---subject-sociales_ciudadanas:  oklch(0.60 0.15  55)
---subject-ingles:               oklch(0.60 0.15 315)
-```
+`--cell: 20px` (5 mm at 96 dpi). Layout that should sit on the ruling uses
+multiples of it (the plan lines are 3 cells tall, the margin column is 3 cells
+on a sheet and 9 on a page).
 
-Hues sit in the gaps between the semantic anchors, at least 30° from each. The
-previous ramp did not: Ciencias Naturales was `#21c08b`, **byte-identical to
-`--success`**, and Lectura Crítica sat one degree from `--danger`. A green chip
-could mean "you got it right" or "this is a science question". Lightness also
-ranged 0.62–0.785 and chroma 0.146–0.212, so the five did not read as a family
-either.
+`.sheet` draws the ruling and the red margin rule three cells in. **The ruling
+is a state**: only solve, review and the sign-in sheets carry it. On phones the
+margin rule is dropped so the question keeps its width.
 
-Two rules follow, and they are the whole system:
+## Page grammar
 
-1. **An area is marked by a dot (`.subject-dot`), never by a coloured border or
-   fill.** Five saturated outlines on one screen is confetti, and the product
-   register bans heavy colour on inactive states outright.
-2. **Never use a subject token for text.** At L 0.60 on white it lands near
-   3.5:1 — fine for a 7px mark, short of the 4.5:1 body text requires. Labels
-   stay `--text-primary` and let the dot carry the identity.
+- `.ruled-page`: a margin column (date, the facts a student writes at the top:
+  study days, seats, licence) with a red rule, and a body. On phones the margin
+  becomes one line of facts above the page.
+- `.ruled-section`: a section opened by a rule. `.card` is the same thing — it
+  no longer draws a box.
+- `.ruled-list` / `.ruled-row`: lists on hairlines, label column on the left.
+- `.plan-lines`: the day's plan as numbered lines; the first carries "Empezar".
+- `.data-table`: hairlines between rows, figures right-aligned; a low result is
+  written in red ink (`.is-low`), never highlighted.
+- `.empty-state`: a heading and a line, left-aligned. No illustration.
+- `.notice.is-danger`, `.margin-note`: red ink with a hairline, never a filled
+  alert box.
 
-## Typography
+## Controls
 
-- Display: **Bricolage Grotesque** (700) — headings only.
-- Body/UI: **Hanken Grotesk** — everything else.
-- Not Fraunces, Manrope, Inter, Roboto, or Plus Jakarta Sans. The first two were
-  the superseded v1 identity; the last was dropped as overexposed.
+Rectangular (radii 2–4px). Primary: filled ink. Secondary: 1px outline. Ghost:
+bare. No pills, no press animation, no hard offset shadows. Elevation
+(`--shadow-md/lg`) exists only for things that float over the page: menus,
+dialogs, sheets.
 
-## Shape and motion
+## Solve and review
 
-The "pressable" language: 2px `--border-hard` outline plus `--shadow-hard`, with
-`translateY(2px)` on `:active`. It is what makes the product feel like a game
-rather than a form. `.card` stays soft so dense screens (Progreso, Historial)
-don't become a wall of black outlines.
+- One question owns one sheet, centred on the desk, with its number in the red
+  margin. Marked for review = **the number is circled**, as on the answer sheet.
+- Crossed-out options get a pencil stroke (graphite line-through).
+- The chosen option's letter is circled in ink; in review the key is circled in
+  green with a check, a wrong pick in red with an ×.
+- With a shared passage, the passage is the printed booklet (plain paper) and
+  the question is the ruled sheet beside it.
+- The next question's scan is preloaded while the current one is on screen.
+- Under every question: its source (`ICFES · <booklet>` or "escrita por Aprendo
+  con IA").
+- Review: the explanation of the distractor the student chose is a note in the
+  margin (red hairline, red title).
 
-Transitions 120–250ms, ease-out. Motion conveys state, never decorates. Every
-animation has a `prefers-reduced-motion` alternative.
+## Reports
 
-## Mascot
+Time is drawn exactly: in the simulacro report a pace bar's length is the
+seconds per question on a scale shared by every area, with a tick at the
+official pace; the part over pace is red.
 
-**Nico**, a spectacled bear (`components/Mascot.tsx`). Native to the Colombian
-Andes; its facial markings read as glasses without anyone drawing glasses on an
-animal. The owl was rejected on purpose — it belongs to Duolingo and is the
-reflex answer for every education product.
+## Co-branding
 
-Moods: `idle`, `happy`, `thinking`, `cheering`, `sleeping`. Flat shapes on a
-64×64 grid, no gradients, verified legible at 40px. He blinks on an irregular
-cadence — a metronome blink is worse than none — and the head animates
-separately from the body, which is the difference between a creature and a
-sticker being waved.
+`SchoolLabel` is the notebook's cover label — a ruled box with the school's
+crest and name over "Curso · Estudiante" — beside the Aprendo wordmark (one
+ruled cell with its red margin). No per-school colour. Without a crest, the
+name stands alone.
 
-What the first pass got wrong, kept here because each was invisible until the
-SVG was actually rendered:
+## Motion
 
-- **Mid-brown fur.** The most forgettable colour a character can wear, and it
-  made him read as a generic cartoon animal. Now a deep violet-black: close
-  enough to the brand hue to belong here, dark enough to throw the cream
-  markings into hard contrast.
-- **He read as a monkey.** Large round ears perched high plus a wide cream
-  muzzle is monkey grammar. Ears are now set into the top corners and the muzzle
-  is narrower.
-- **The spectacles merged with the muzzle** into one cream mass — losing the
-  only reason this species was chosen. There is now clear fur between them.
-- **No silhouette.** He was a head floating in space; he now has shoulders and a
-  chest crescent, both real markings on the species.
-- The spectacles are **asymmetric**, which is not licence: researchers identify
-  individual spectacled bears by their face markings, no two alike.
+One quiet fade on page entry; everything else is a 140ms colour change. All of
+it is disabled under `prefers-reduced-motion`.
 
-Fur, ear, marking and nose tokens belong to no other role, so Nico can never be
-confused with a state or an area.
+## Lesson demos
 
-**Appears at thresholds only.** If Nico is on screen while the student is
-answering or reviewing a question, that is a bug. The review screen in
-particular is work, not a moment, and deliberately has no mascot.
-
-Where he does belong, and nowhere else:
-
-| Surface | Mood |
-|---|---|
-| Landing hero / close | `idle` / `cheering` |
-| Nivelación intro | `idle`, or `happy` once an area is placed |
-| Route loading (`FullScreenLoader`) | `thinking` |
-| Empty state, nothing yet | `sleeping` |
-| Empty state, something went wrong | `idle` |
-
-## Loading and empty states
-
-There are exactly **two** loading components, and the split is not stylistic:
-
-- **`FullScreenLoader`** — the guard resolving before the shell exists. Once per
-  visit, nothing else on screen, so Nico is welcome.
-- **`PageLoader`** — content arriving inside a shell that is already painted.
-  Fires on every navigation, so it gets three pulsing dots and no character. A
-  cartoon on every tab change is choreography the student did not ask for.
-
-Empty states all go through **`MascotMessage`**, so no screen invents its own
-arrangement.
-
-This replaced 20 loading states written 12 different ways (`Cargando…`,
-`Preparando…`, `Cargando admin...`, `Preparando tu ruta...`, two of them with
-three dots instead of an ellipsis), each with hand-rolled markup — and a
-`MascotMessage` component that nothing used.
-
-## Colour hygiene
-
-No hex or rgb literals outside the token blocks, and **no fallbacks inside
-`var()`**. `var(--accent, #2563eb)` appeared five times: the fallback never fires
-while the token exists, and the day someone renames the token, five rules turn
-blue in an app whose brand is violet. `.chip-success` likewise had a literal
-green border beside a tokenised background, so the border would not have followed
-a palette change the other two properties did.
-
-## Solve screen
-
-**A question with a shared passage renders as two panels, not stacked.** Stacked,
-the student scrolled away from the text to reach the options and back up again —
-for every question, on a test where looking between the two *is* the task.
-
-Both panels scroll independently and both are capped at a readable measure. The
-passage gets the wider half (`1.12fr` against `1fr`): it is the harder read, and
-a 50/50 split rendered the options wider than the text they refer to. Below
-68rem the split collapses to stacked with the passage collapsible.
-
-Prose caps at ~68ch here as everywhere. Before this the passage ran the full
-viewport — about 170 characters a line at 1900px, where the eye loses the return
-sweep. On a reading-comprehension test that is not cosmetic; it decides whether
-the text can be read at all.
-
-**Options are one column.** Two columns made the reading order zigzag (A, across
-to B, back to C, across to D) and these options routinely wrap to four lines.
-
-**The question map is a panel, not a strip.** One dot per question worked at 15
-and fell apart past that — a simulacro is 120-134 questions, where a single row
-of dots is neither scannable nor clickable. It opens on demand as a numbered
-grid; the header already carries progress, so nothing is lost by keeping it
-closed.
-
-## Containers
-
-- Student shell: `min(1320px, 100% - 2rem)`
-- Diagnostic shell: `min(1180px, 100% - 2rem)`
-- Single-decision screens (the nivelación picker): `min(54rem, 100% - 2rem)`
-
-`.diagnostic-solve-main` is deliberately full-bleed for `SessionSolve`, so
-anything else rendered inside it must bring its own container. Forgetting this is
-what once put the heading flush against x=0 with 940px-wide cards.
+The AI-generated demos inherit these tokens through `lib/demo-document.ts` and
+are told the same rules in `DEMO_FRAGMENT_RULES` (`packages/convex/src/lessons.ts`).
+Changing the tokens or fonts means changing both and bumping `PROMPT_VERSION`.

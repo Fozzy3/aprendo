@@ -19,6 +19,27 @@ This is a domain-model spec. It defines the entities and their responsibilities,
 - Student-facing eligibility is explicit: not every extracted question should be usable.
 - Derived state is allowed: learner aggregates and recommendation summaries may be denormalized for performance.
 
+## Naming Rule And Glossary
+
+Identifiers (tables, fields, functions, files) are in English. ICFES domain nouns stay in Spanish,
+because that is what students, teachers and the official documents call them; translating them would
+make the code disagree with the product. Stored enum values are never renamed: that needs a data
+migration and buys nothing.
+
+| Term in code | Meaning |
+|---|---|
+| `students` (table) | Every account, admins included. A future teacher or school admin is also a row here; the role lives elsewhere (see `plans/rediseno-institucional.md`). |
+| placement | Having at least one completed `nivelacion` (or legacy `diagnostic`) session. Unlocks the app (`hasPlacement`). |
+| `nivelacion` | Placement session for one area: 15 questions, timed, no tutor. |
+| `simulacro` | Mock exam: the full Sesión 1/Sesión 2 or one area. |
+| `repaso` | Review of questions whose latest settled answer was wrong. |
+| `personalizada` | Practice assembled by the student in the builder. |
+| `reto` | Mastery challenge: 2 questions from each of 3 subtopics. |
+| `inmediata` / `al_final` | Feedback mode: show the key after each answer, or only at the end. |
+| `sin_empezar` … `dominado` | Mastery levels (`mastery.ts`). |
+| `basico` / `medio` / `avanzado` | Builder difficulty tertiles. |
+| `practiceSessionId` (tutor tables) | Historical name: it holds any session kind, not only practice. |
+
 ## Core Domains
 
 The V1 model is organized into five domains:
@@ -237,6 +258,8 @@ Key fields:
 ## 3. Sessions And Attempts Domain
 
 ### Student
+
+> The `students` table is every **account**, whatever its role; the name predates schools and stays (renaming means migrating every `studentId`). Roles live in `memberships` (section 7). `name` comes from sign-up so teachers see people, not emails.
 
 Represents the learner.
 
@@ -502,6 +525,47 @@ Key fields:
 V1 notes:
 
 - Same atomic-claim generation lifecycle as `ConceptLesson`; generated on demand only when the student has activity that week.
+
+## 7. Schools Domain (multi-tenant)
+
+The B2B tenant. Learner data never carries a school id: a school reaches a
+student only through `memberships`, so leaving a school (or deleting the
+account) never orphans or moves learner rows. Implemented in
+`packages/convex/src/schools.ts` and `teacher.ts`.
+
+### Organization (`organizations`)
+
+- `name`, `crestStorageId?` (co-branding), `plan` (`pilot` | `school`),
+  `seatLimit`, `licenseEndsAt`, `createdAt`.
+- Created only by Aprendo staff (`requirePlatformAdmin`) together with its
+  first `org_admin`.
+- `plan` maps to the daily LLM allowance in `llmBudget.ts`
+  (`LLM_DAILY_LIMITS`); an account with no active licence is `individual`.
+
+### Membership (`memberships`)
+
+- `orgId`, `accountId` (a `students` row), `role` (`student` | `teacher` |
+  `org_admin`).
+- One per account and school. A student membership is a seat; seats and the
+  licence are checked in `joinClassGroup`, server side.
+
+### ClassGroup (`classGroups`) and ClassGroupMember (`classGroupMembers`)
+
+- A class: `orgId`, `name`, `grade`, `inviteCode` (8 characters, no 0/O/1/I,
+  unique, regenerable).
+- Members: `classGroupId`, `orgId`, `accountId`, `role` (`student` |
+  `teacher`). Students join with the code; the school admin assigns teachers.
+
+### Access rules
+
+- `assertIsStudent`: only the student. Every mutation on learner data.
+- `assertCanViewStudent`: the student, or a teacher/org_admin of a school
+  where the student has a student membership. Read-only queries
+  (`getStudentProgress`, `getProgressTrends`, `getActivitySummary`).
+- `requireOrgRole(orgId, roles)`: school management and teacher reports.
+- `requirePlatformAdmin`: the shared bank, report triage and licences.
+- Account deletion (`deleteStudentData`) removes memberships and class
+  memberships with the rest of the student's rows.
 
 ## Canonical Relationships
 

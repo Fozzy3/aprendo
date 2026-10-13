@@ -418,3 +418,27 @@ same shape as the taxonomy: declarative JSON plus pure lookups, free of any
 
 Levels are **derived** at read time from learner aggregates and placement
 sessions — no stored level, nothing to keep in sync.
+
+## Schools, roles and access
+
+Aprendo is sold to schools. The tenant model is deliberately thin (see
+`DATA_MODEL_SPEC.md` §7): `organizations`, `memberships`, `classGroups` and
+`classGroupMembers`. Learner tables stay keyed by `studentId` only.
+
+- **Guards** (`packages/convex/src/auth.ts`): `assertIsStudent` on every write
+  to learner data, `assertCanViewStudent` on the reads a teacher needs,
+  `requireOrgRole` for school management, `requirePlatformAdmin` for Aprendo
+  staff. Widening the student guard would let a teacher answer for a student,
+  which is why reads and writes are split.
+- **Teacher reports** (`teacher.ts`) reuse `buildSubjectLevels` from
+  `progress.ts`, so a teacher and a student never see two different levels.
+  Risk reasons: no placement, 14 days without a session, level 1 in an area
+  with enough evidence.
+- **Billing hook**: `LLM_DAILY_LIMITS` by plan (`llmBudget.ts`). There is no
+  payment gateway; licences are issued by staff in `/admin` → Colegios.
+- **Auth**: email + password (Better Auth). With `RESEND_API_KEY` set, email
+  verification is required and password reset works; without it (local
+  development) both are off and emails are logged. Accounts delete themselves
+  from `/cuenta`, which runs the `onDelete` cascade.
+- **Tests**: handler tests run on `convex-test` with the Better Auth component
+  registered (`test/signIn.ts`), one test per guard.

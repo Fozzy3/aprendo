@@ -358,7 +358,7 @@ G04 procedencia del contenido + nivel gratis ICFES · G28 banco original con ver
 · G30 gating por pase · G21 prueba sin registro · G22 reporte para acudiente · G24 meta por universidad
 · G23 simulacro imprimible + hoja de respuestas · recuperación de contraseña · términos y privacidad (Ley 1581).
 
-### Fase 18 — Panel de colegios (B2B)  · estado: ⏳
+### Fase 18 — Panel de colegios (B2B)  · estado: ⏳ → movida a `plans/rediseno-institucional.md` (Fases 19-24)
 G29 rol docente/coordinador, grupos con código de invitación, estudiantes en riesgo, reporte por competencia.
 
 **No construir (con razón):** Desmos/hoja de fórmulas (prohibidos en Saber 11), simulacro adaptativo

@@ -65,13 +65,19 @@ AGENTS.md             # This guide
 
 Student/admin web application.
 
-Current state:
+Current routes:
 
-- `/` is still a smoke-test style route
-- `/upload-pdfs` is the admin ingest route
-- `/questions` is the question-browser route
+- `/` landing, `/login`, `/app` (post-login router to the student's default route)
+- `/diagnostic` placement (nivelación) by area
+- `/today`, `/path`, `/syllabus`, `/lesson/$subtopicId`, `/progress`, `/history`
+- `/practice` hub, `/practice/$sessionId` solve, `/practice/$sessionId/review` review and results
+- `/join` join a class with its code, `/cuenta` account and deletion
+- `/teacher`, `/teacher/$classGroupId`, `/teacher/student/$studentId` teacher panel (read-only)
+- `/school` school admin: name and crest, classes and codes, teachers, students, seats
+- `/admin` Aprendo staff: PDF ingest, question browser, question reports, school licences
+- `/reset-password`, `/terminos`, `/privacidad`
 
-Future work will expand this app into the diagnostic, practice, results, and tutor experiences.
+Visual system: `DESIGN.md` (Cuaderno cuadriculado). The institutional redesign and the school (B2B) model are tracked in `plans/rediseno-institucional.md`; tenants and roles are specified in `specs/DATA_MODEL_SPEC.md` §7.
 
 #### `packages/convex`
 
@@ -89,6 +95,10 @@ Important current files:
 - `packages/convex/src/schema.ts`
 - `packages/convex/src/pdfs.ts`
 - `packages/convex/src/pdfPipeline.ts`
+- `packages/convex/src/auth.ts` (guards: `assertIsStudent`, `assertCanViewStudent`, `requireOrgRole`, `requirePlatformAdmin`)
+- `packages/convex/src/schools.ts`, `packages/convex/src/teacher.ts` (schools, classes, teacher reports)
+
+Deployment environment (Convex): `SITE_URL`, `OPENROUTER_API_KEY`, `RESEND_API_KEY` and `EMAIL_FROM` (email verification and password reset; without the key both stay off). Web: `VITE_CONVEX_URL`, `VITE_CONVEX_SITE_URL`, `VITE_CONTACT_EMAIL` (landing contact; hidden when unset).
 
 #### `packages/ingest`
 
@@ -121,19 +131,19 @@ The table below should be treated like a reading guide. Before implementing a fe
 
 | Spec | What It Contains | Use It When |
 |---|---|---|
-| [PRODUCT_SPEC.md](/Users/julian/Dev/aprendo/specs/PRODUCT_SPEC.md) | Product vision, target user flows, V1 scope, intended features, and product boundaries. | You need to understand what Aprendo is supposed to do from a user/product perspective. Read this first for any major feature work. |
-| [ARCHITECTURE_SPEC.md](/Users/julian/Dev/aprendo/specs/ARCHITECTURE_SPEC.md) | High-level system architecture, main layers, source-of-truth boundaries, and core data flows. | You are deciding where a capability belongs, how subsystems interact, or whether a change fits the intended architecture. |
-| [TAXONOMY_SPEC.md](/Users/julian/Dev/aprendo/specs/TAXONOMY_SPEC.md) | Canonical V1 taxonomy contract for subject/category/subtopic tagging, tagging rules, and taxonomy scope. | You are implementing or modifying question tagging, analytics rollups by subtopic, diagnostic balancing, or recommendation logic that depends on taxonomy. |
-| [DATA_MODEL_SPEC.md](/Users/julian/Dev/aprendo/specs/DATA_MODEL_SPEC.md) | Minimal V1 domain model for PDFs, questions, enrichments, sessions, attempts, learner aggregates, and tutor state. | You are designing Convex tables, indexes, relationships, or deciding what entities need to exist. |
-| [CONTENT_ENRICHMENT_SPEC.md](/Users/julian/Dev/aprendo/specs/CONTENT_ENRICHMENT_SPEC.md) | The post-extraction enrichment pipeline: answer inference, taxonomy tagging, quality gating, eligibility, retries, and reprocessing. | You are extending the ingest pipeline or building background jobs for answer/tag enrichment and question eligibility. |
-| [LEARNER_STATE_SPEC.md](/Users/julian/Dev/aprendo/specs/LEARNER_STATE_SPEC.md) | How progress should be derived from attempts into learner metrics, aggregates, mastery signals, and weak-area detection. | You are implementing progress tracking, subject/subtopic aggregates, session result summaries, or learner-profile updates. |
-| [RECOMMENDATION_ENGINE_SPEC.md](/Users/julian/Dev/aprendo/specs/RECOMMENDATION_ENGINE_SPEC.md) | V1 recommendation inputs, candidate filtering, selection goals, anti-repetition rules, and session assembly behavior. | You are building practice-session generation, question selection logic, or debugging why a question/session was recommended. |
-| [TUTOR_INTEGRATION_SPEC.md](/Users/julian/Dev/aprendo/specs/TUTOR_INTEGRATION_SPEC.md) | Tutor role, availability rules, context contract, guardrails, and how tutor usage relates to learner tracking. | You are implementing practice/review chat, hints, explanation flows, or deciding what tutor context should come from the backend. |
-| [docs/adr/0001-separate-solve-and-review-session-screens.md](/Users/julian/Dev/aprendo/docs/adr/0001-separate-solve-and-review-session-screens.md) | Decision to separate focused solve screens from reusable post-completion review screens across practice, diagnostic, and simulated exams. | You are changing session routes, active question-taking screens, review screens, answer disclosure behavior, or tutor availability by session stage. |
-| [REFERENCE_REPOS.md](/Users/julian/Dev/aprendo/specs/REFERENCE_REPOS.md) | Map of the mirrored reference repositories under `reference/` and how to search them. | You need implementation patterns or upstream examples for Effect, TanStack Start/Router, or other mirrored reference code. |
-| [TYPESCRIPT_CONVENTIONS.md](/Users/julian/Dev/aprendo/specs/TYPESCRIPT_CONVENTIONS.md) | TypeScript module/import conventions, bundler-mode assumptions, and repo rules like avoiding barrel files. | You are adding files, changing imports, or deciding module structure. Consult this before broad refactors. |
-| [EFFECT_BEST_PRACTICES.md](/Users/julian/Dev/aprendo/specs/EFFECT_BEST_PRACTICES.md) | Critical Effect rules, especially around typing, tagged errors, validation, and safe Effect usage. | You are writing or reviewing Effect-based code, especially in ingestion or any future Effect-heavy package. |
-| [EFFECT_TESTING.md](/Users/julian/Dev/aprendo/specs/EFFECT_TESTING.md) | Testing patterns for Effect code, testcontainers, and layer composition. | You are writing tests for Effect-based logic or need patterns for integration testing infrastructure-heavy code. |
+| [PRODUCT_SPEC.md](specs/PRODUCT_SPEC.md) | Product vision, target user flows, V1 scope, intended features, and product boundaries. | You need to understand what Aprendo is supposed to do from a user/product perspective. Read this first for any major feature work. |
+| [ARCHITECTURE_SPEC.md](specs/ARCHITECTURE_SPEC.md) | High-level system architecture, main layers, source-of-truth boundaries, and core data flows. | You are deciding where a capability belongs, how subsystems interact, or whether a change fits the intended architecture. |
+| [TAXONOMY_SPEC.md](specs/TAXONOMY_SPEC.md) | Canonical V1 taxonomy contract for subject/category/subtopic tagging, tagging rules, and taxonomy scope. | You are implementing or modifying question tagging, analytics rollups by subtopic, diagnostic balancing, or recommendation logic that depends on taxonomy. |
+| [DATA_MODEL_SPEC.md](specs/DATA_MODEL_SPEC.md) | Minimal V1 domain model for PDFs, questions, enrichments, sessions, attempts, learner aggregates, and tutor state. | You are designing Convex tables, indexes, relationships, or deciding what entities need to exist. |
+| [CONTENT_ENRICHMENT_SPEC.md](specs/CONTENT_ENRICHMENT_SPEC.md) | The post-extraction enrichment pipeline: answer inference, taxonomy tagging, quality gating, eligibility, retries, and reprocessing. | You are extending the ingest pipeline or building background jobs for answer/tag enrichment and question eligibility. |
+| [LEARNER_STATE_SPEC.md](specs/LEARNER_STATE_SPEC.md) | How progress should be derived from attempts into learner metrics, aggregates, mastery signals, and weak-area detection. | You are implementing progress tracking, subject/subtopic aggregates, session result summaries, or learner-profile updates. |
+| [RECOMMENDATION_ENGINE_SPEC.md](specs/RECOMMENDATION_ENGINE_SPEC.md) | V1 recommendation inputs, candidate filtering, selection goals, anti-repetition rules, and session assembly behavior. | You are building practice-session generation, question selection logic, or debugging why a question/session was recommended. |
+| [TUTOR_INTEGRATION_SPEC.md](specs/TUTOR_INTEGRATION_SPEC.md) | Tutor role, availability rules, context contract, guardrails, and how tutor usage relates to learner tracking. | You are implementing practice/review chat, hints, explanation flows, or deciding what tutor context should come from the backend. |
+| [docs/adr/0001-separate-solve-and-review-session-screens.md](docs/adr/0001-separate-solve-and-review-session-screens.md) | Decision to separate focused solve screens from reusable post-completion review screens across practice, diagnostic, and simulated exams. | You are changing session routes, active question-taking screens, review screens, answer disclosure behavior, or tutor availability by session stage. |
+| [REFERENCE_REPOS.md](specs/REFERENCE_REPOS.md) | Map of the mirrored reference repositories under `reference/` and how to search them. | You need implementation patterns or upstream examples for Effect, TanStack Start/Router, or other mirrored reference code. |
+| [TYPESCRIPT_CONVENTIONS.md](specs/TYPESCRIPT_CONVENTIONS.md) | TypeScript module/import conventions, bundler-mode assumptions, and repo rules like avoiding barrel files. | You are adding files, changing imports, or deciding module structure. Consult this before broad refactors. |
+| [EFFECT_BEST_PRACTICES.md](specs/EFFECT_BEST_PRACTICES.md) | Critical Effect rules, especially around typing, tagged errors, validation, and safe Effect usage. | You are writing or reviewing Effect-based code, especially in ingestion or any future Effect-heavy package. |
+| [EFFECT_TESTING.md](specs/EFFECT_TESTING.md) | Testing patterns for Effect code, testcontainers, and layer composition. | You are writing tests for Effect-based logic or need patterns for integration testing infrastructure-heavy code. |
 
 ## 4. Recommended Reading Order
 

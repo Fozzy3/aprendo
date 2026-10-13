@@ -1,6 +1,6 @@
 import { useConvexMutation } from '@convex-dev/react-query'
 import { useMutation, useQuery } from '@tanstack/react-query'
-import { Outlet, createFileRoute, useNavigate, useRouterState } from '@tanstack/react-router'
+import { Outlet, createFileRoute, useChildMatches, useNavigate } from '@tanstack/react-router'
 import { useEffect, useState } from 'react'
 import { api } from '@aprendo/convex/api'
 import {
@@ -27,8 +27,11 @@ const SITTING_TWO = SESSION_KIND_CONFIG.simulacro.simulacroSessions?.find(
 function PracticeSolvePage() {
   const navigate = useNavigate()
   const { sessionId } = Route.useParams()
-  const pathname = useRouterState({ select: (state) => state.location.pathname })
-  const isReviewRoute = pathname.endsWith('/review')
+  // Read the rendered child route, never the URL. The URL changes the moment a
+  // navigation starts, while this layout is still on screen: reading it here
+  // mounted the solve screen of a finished session for an instant, and its
+  // hand-off to the review navigated straight back (Hoy or Ruta "did nothing").
+  const isReviewRoute = useChildMatches().length > 0
   const { session, isReady } = useCurrentStudent()
   // The full simulacro's Sesión 1 ends on a break, not on its review.
   const [breakAfter, setBreakAfter] = useState<string | null>(null)

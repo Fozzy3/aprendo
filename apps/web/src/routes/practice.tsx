@@ -1,6 +1,6 @@
 import { useConvexMutation } from '@convex-dev/react-query'
 import { useMutation, useQuery } from '@tanstack/react-query'
-import { Link, Outlet, createFileRoute, useNavigate, useRouterState } from '@tanstack/react-router'
+import { Link, Outlet, createFileRoute, useChildMatches, useNavigate } from '@tanstack/react-router'
 import { ArrowRight, ChevronRight, Clock3, Play } from 'lucide-react'
 import { Fragment, useEffect, useState, type CSSProperties } from 'react'
 import { api } from '@aprendo/convex/api'
@@ -90,8 +90,8 @@ const FILTERS: Array<{ value: 'all' | SessionKind; label: string }> = [
 
 function PracticeHubPage() {
   const navigate = useNavigate()
-  const pathname = useRouterState({ select: (state) => state.location.pathname })
-  const isHubIndex = pathname === '/practice'
+  // The rendered child route, not the URL (see practice.$sessionId.tsx).
+  const isHubIndex = useChildMatches().length === 0
   const { session, isReady } = useCurrentStudent()
 
   const [expandedKind, setExpandedKind] = useState<SessionKind | null>(null)

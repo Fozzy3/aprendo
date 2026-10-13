@@ -2,15 +2,15 @@ import { convexQuery } from '@convex-dev/react-query'
 import { useQuery } from '@tanstack/react-query'
 import { createFileRoute, useRouter } from '@tanstack/react-router'
 import { ArrowLeft } from 'lucide-react'
-import type { CSSProperties } from 'react'
 import { api } from '@aprendo/convex/api'
 import { getSubjectLabel, getSubtopicLabel } from '@aprendo/convex/taxonomy'
+import { AreaLevelsChart } from '../components/AreaLevelsChart.tsx'
 import { EmptyState } from '../components/EmptyState.tsx'
 import { FullScreenLoader, PageLoader } from '../components/FullScreenLoader.tsx'
 import { StaffShell } from '../components/StaffShell.tsx'
 import { readConvexError } from '../lib/convex-error.ts'
+import { areaChartRow } from '../lib/progress-display.ts'
 import { studentProgressQuery } from '../lib/student-queries.ts'
-import { getSubjectTheme } from '../lib/subject-theme.ts'
 import { studentDisplayName } from '../lib/teacher-display.ts'
 import { useSignedIn } from '../lib/use-signed-in.ts'
 
@@ -100,41 +100,7 @@ function TeacherStudentPage() {
 
             <section className="ruled-section" aria-labelledby="student-levels-title">
               <h2 id="student-levels-title" className="section-title">Nivel por área</h2>
-              <div className="overflow-x-auto">
-                <table className="data-table">
-                  <thead>
-                    <tr>
-                      <th scope="col">Área</th>
-                      <th scope="col">Nivel actual</th>
-                      <th scope="col" className="is-number">Puntaje</th>
-                      <th scope="col">Al nivelarse</th>
-                      <th scope="col" className="is-number">Respuestas</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {progress.subjectLevels.map((level) => (
-                      <tr key={level.subjectId}>
-                        <th scope="row">
-                          <span className="inline-flex items-center gap-1.5">
-                            <span
-                              aria-hidden
-                              className="subject-dot"
-                              style={{ '--subject-color': getSubjectTheme(level.subjectId).color } as CSSProperties}
-                            />
-                            {getSubjectLabel(level.subjectId)}
-                          </span>
-                        </th>
-                        <td className={level.current?.index === 1 ? 'is-low' : undefined}>
-                          {level.current?.band.labelEs ?? 'Sin nivel aún'}
-                        </td>
-                        <td className="is-number">{level.hasEnoughEvidence ? level.currentScore : '—'}</td>
-                        <td>{level.baseline?.band.labelEs ?? '—'}</td>
-                        <td className="is-number">{level.attemptCount}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+              <AreaLevelsChart rows={progress.subjectLevels.map(areaChartRow)} />
             </section>
 
             <section className="ruled-section" aria-labelledby="student-weak-title">

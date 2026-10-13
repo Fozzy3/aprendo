@@ -114,6 +114,14 @@ Time is drawn exactly: in the simulacro report a pace bar's length is the
 seconds per question on a scale shared by every area, with a tick at the
 official pace; the part over pace is red.
 
+Progress is drawn, not written. Every area sits on one 0-100 bar in its
+own ink, with the ICFES cut points as paper gaps and a tick where the student
+started (`AreaLevelsChart`). A class is one 100% bar per area split by level:
+level 1 in the margin's red, 2-4 deepening the pen's blue, "not levelled yet"
+as a pencil hatch (`--level-*`); each student is a row of level chips.
+Detail that does not change what to do next stays out (topic mastery lives in
+the Temario, sessions in the Historial).
+
 ## Co-branding
 
 `SchoolLabel` is the notebook's cover label — a ruled box with the school's

@@ -1,23 +1,14 @@
-import { useQuery } from '@tanstack/react-query'
-import { Link } from '@tanstack/react-router'
-import { ArrowRight } from 'lucide-react'
-import type { CSSProperties } from 'react'
-import { MASTERY_LEVEL_LABELS, type MasteryLevel } from '@aprendo/convex/mastery'
-import { progressTrendsQuery, studentProgressQuery, syllabusQuery } from '../lib/student-queries.ts'
-import { getSubjectTheme } from '../lib/subject-theme.ts'
-import { GlobalScoreCard } from './GlobalScoreCard.tsx'
-import { MASTERY_LEVEL_COLOR, MasteryBadge } from './MasteryBadge.tsx'
-import {
-  countByLevel,
-  countedSubtopics,
-  levelFor,
-  masteryLevelMap,
-  subjectSubtopics,
-} from '../lib/mastery-display.ts'
-import { ConfidenceBreakdownCard } from './ConfidenceBreakdownCard.tsx'
+import { useConvexMutation } from '@convex-dev/react-query'
+import { useMutation, useQuery } from '@tanstack/react-query'
+import { Link, useNavigate } from '@tanstack/react-router'
+import { Play } from 'lucide-react'
+import { api } from '@aprendo/convex/api'
 import { getSubjectLabel, getSubtopicLabel } from '@aprendo/convex/taxonomy'
-import type { FunctionReturnType } from 'convex/server'
-import type { api } from '@aprendo/convex/api'
+import { progressTrendsQuery, studentProgressQuery } from '../lib/student-queries.ts'
+import { areaChartRow } from '../lib/progress-display.ts'
+import { readConvexError } from '../lib/convex-error.ts'
+import { AreaLevelsChart } from './AreaLevelsChart.tsx'
+import { GlobalScoreCard } from './GlobalScoreCard.tsx'
 import { PageLoader } from '../components/FullScreenLoader.tsx'
 import { EmptyState } from './EmptyState.tsx'
 
@@ -79,7 +70,7 @@ function TrendChart({ points }: { points: Array<{ weekStartMs: number; accuracy:
   // keeps strokes an even thickness despite the non-uniform scale (so no dots —
   // circles would distort into ellipses).
   return (
-    <svg viewBox={`0 0 ${width} ${height}`} className="h-40 w-full" preserveAspectRatio="none" role="img" aria-label="Precisión por semana">
+    <svg viewBox={`0 0 ${width} ${height}`} className="h-28 w-full" preserveAspectRatio="none" role="img" aria-label="Precisión por semana">
       <line x1={padX} y1={height - padY} x2={width - padX} y2={height - padY} stroke="var(--border-strong)" strokeWidth={1} vectorEffect="non-scaling-stroke" />
       <line x1={padX} y1={midY} x2={width - padX} y2={midY} stroke="var(--border)" strokeWidth={1} strokeDasharray="3 4" vectorEffect="non-scaling-stroke" />
       <path d={linePath} fill="none" stroke="var(--text-primary)" strokeWidth={2} strokeLinejoin="round" vectorEffect="non-scaling-stroke" />
@@ -87,32 +78,28 @@ function TrendChart({ points }: { points: Array<{ weekStartMs: number; accuracy:
   )
 }
 
+/**
+ * Progreso answers three questions and nothing else: where am I (the global
+ * score and every area on one scale), am I moving (week by week) and what do I
+ * do now (three topics). The topic-by-topic detail lives in the Temario and
+ * the session-by-session detail in the Historial.
+ */
 export function StudentProgressPage({ studentId }: { studentId: string }) {
   const progressQuery = useQuery({ ...studentProgressQuery(studentId), enabled: true })
   const trendsQuery = useQuery({ ...progressTrendsQuery(studentId), enabled: true })
-  const syllabus = useQuery({ ...syllabusQuery(studentId), enabled: true })
 
-  if (progressQuery.isPending || trendsQuery.isPending || syllabus.isPending) {
-    return (
-      <PageLoader message="Preparando tu resumen…" />
-    )
+  if (progressQuery.isPending || trendsQuery.isPending) {
+    return <PageLoader message="Preparando tu resumen…" />
   }
 
   const progress = progressQuery.data
   const trends = trendsQuery.data
-  const snapshot = progress?.snapshot
-  const overallSummary = snapshot?.overallSummary
-  const baseline = snapshot?.diagnosticBaseline ?? null
-  const subjectAggregates = progress?.subjectAggregates ?? []
-  const subjectLevels = progress?.subjectLevels ?? []
-  const weakestSubtopics = progress?.weakestSubtopics ?? []
-  const subtopicMastery = progress?.subtopicMastery ?? []
-  const levels = masteryLevelMap(subtopicMastery)
+  const overallSummary = progress?.snapshot?.overallSummary
   const weekly = trends?.weekly ?? []
 
-  if (overallSummary == null) {
+  if (progress == null || overallSummary == null) {
     return (
-      <div className="fade-in mx-auto w-[min(100%,64rem)]">
+      <div className="page-sheet fade-in">
         <header className="ruled-page-head">
           <h1 className="page-title">Tu progreso</h1>
         </header>
@@ -130,38 +117,11 @@ export function StudentProgressPage({ studentId }: { studentId: string }) {
     )
   }
 
-  const currentAccuracy = overallSummary.accuracy
-  const baselineAccuracy = baseline?.accuracy ?? null
-  const overallDelta = baselineAccuracy != null ? currentAccuracy - baselineAccuracy : null
-
-  // "Antes y ahora" per subject: diagnostic accuracy → current accuracy.
-  const baselineBySubject = new Map(
-    (baseline?.subjectScores ?? []).map((score) => [score.subjectId, score]),
-  )
-  const subjectRows = subjectAggregates
-    .map((agg) => {
-      const base = baselineBySubject.get(agg.subjectId)
-      const baselineSubjectAccuracy = base ? base.score / 100 : null
-      const delta = baselineSubjectAccuracy != null ? agg.accuracy - baselineSubjectAccuracy : null
-      return {
-        id: agg._id,
-        subjectId: agg.subjectId,
-        label: getSubjectLabel(agg.subjectId),
-        baselineAccuracy: baselineSubjectAccuracy,
-        currentAccuracy: agg.accuracy,
-        delta,
-      }
-    })
-    .sort((a, b) => (b.delta ?? -Infinity) - (a.delta ?? -Infinity))
-
-  const mostImproved = subjectRows.find((row) => row.delta != null && row.delta > 0) ?? null
+  const baselineAccuracy = progress.snapshot?.diagnosticBaseline?.accuracy ?? null
+  const overallDelta = baselineAccuracy != null ? overallSummary.accuracy - baselineAccuracy : null
   const firstWeek = weekly[0] ?? null
   const lastWeek = weekly.at(-1) ?? null
-  const trendDelta =
-    firstWeek != null && lastWeek != null && weekly.length >= 2
-      ? lastWeek.accuracy - firstWeek.accuracy
-      : null
-
+  const trendDelta = firstWeek != null && lastWeek != null && weekly.length >= 2 ? lastWeek.accuracy - firstWeek.accuracy : null
   const today = new Date().toLocaleDateString('es-CO', { weekday: 'long', day: 'numeric', month: 'long' })
 
   return (
@@ -171,7 +131,7 @@ export function StudentProgressPage({ studentId }: { studentId: string }) {
         <dl className="margin-facts">
           <div>
             <dt>Precisión general</dt>
-            <dd>{formatPercent(currentAccuracy)}</dd>
+            <dd>{formatPercent(overallSummary.accuracy)}</dd>
           </div>
           <div>
             <dt>Preguntas respondidas</dt>
@@ -181,14 +141,6 @@ export function StudentProgressPage({ studentId }: { studentId: string }) {
             <dt>Días de estudio</dt>
             <dd>{trends?.activeDays ?? 0}</dd>
           </div>
-          {mostImproved != null && mostImproved.delta != null ? (
-            <div>
-              <dt>Lo que más mejoró</dt>
-              <dd>
-                {mostImproved.label} <Delta delta={mostImproved.delta} />
-              </dd>
-            </div>
-          ) : null}
         </dl>
       </aside>
 
@@ -200,19 +152,34 @@ export function StudentProgressPage({ studentId }: { studentId: string }) {
               'Practica un poco más para comparar contra tu nivelación.'
             ) : (
               <>
-                {overallDelta >= 0 ? 'Has subido ' : 'Has bajado '}
-                <strong className="text-[var(--text-primary)]">
-                  {formatDeltaPoints(Math.abs(overallDelta)).replace('+', '')} puntos
-                </strong>{' '}
-                de precisión desde tu nivelación.
+                Desde tu nivelación: <Delta delta={overallDelta} /> de precisión.
               </>
             )}
           </p>
         </header>
 
+        <GlobalScoreCard studentId={studentId} data={progress.globalScore} />
+
+        <section className="ruled-section" aria-labelledby="progress-areas-title">
+          <div className="section-head">
+            <h2 id="progress-areas-title" className="section-title">Tus áreas</h2>
+            <Link to="/syllabus" className="section-meta">
+              Ver el temario
+            </Link>
+          </div>
+          <AreaLevelsChart
+            rows={progress.subjectLevels.map(areaChartRow)}
+            emptyAction={() => (
+              <Link to="/diagnostic" className="area-chart-action">
+                Nivelarme
+              </Link>
+            )}
+          />
+        </section>
+
         <section className="ruled-section" aria-labelledby="progress-trend-title">
           <div className="section-head">
-            <h2 id="progress-trend-title" className="section-title">Tu precisión por semana</h2>
+            <h2 id="progress-trend-title" className="section-title">Semana a semana</h2>
             {trendDelta != null ? (
               <span className="section-meta">
                 <Delta delta={trendDelta} />
@@ -224,6 +191,7 @@ export function StudentProgressPage({ studentId }: { studentId: string }) {
               <TrendChart points={weekly} />
               <div className="mt-1 flex justify-between text-xs text-[var(--text-tertiary)]">
                 <span>{firstWeek != null ? formatWeekLabel(firstWeek.weekStartMs) : ''}</span>
+                <span>Precisión por semana</span>
                 <span>{lastWeek != null ? formatWeekLabel(lastWeek.weekStartMs) : ''}</span>
               </div>
             </>
@@ -234,107 +202,25 @@ export function StudentProgressPage({ studentId }: { studentId: string }) {
           )}
         </section>
 
-        {progress?.globalScore != null ? (
-          <GlobalScoreCard studentId={studentId} data={progress.globalScore} />
-        ) : null}
-
-        <section className="ruled-section" aria-labelledby="progress-levels-title">
-          <div className="section-head">
-            <h2 id="progress-levels-title" className="section-title">Tu nivel ICFES por área</h2>
-            <Link to="/diagnostic" className="section-meta">
-              Nivelar un área
-            </Link>
-          </div>
-          <div className="overflow-x-auto">
-            <table className="data-table">
-              <thead>
-                <tr>
-                  <th scope="col">Área</th>
-                  <th scope="col">Nivel actual</th>
-                  <th scope="col">Al nivelarte</th>
-                </tr>
-              </thead>
-              <tbody>
-                {subjectLevels.map((level) => (
-                  <SubjectLevelRow key={level.subjectId} level={level} />
+        {progress.weakestSubtopics.length > 0 ? (
+          <section className="ruled-section" aria-labelledby="progress-next-title">
+            <h2 id="progress-next-title" className="section-title">Practica esto ahora</h2>
+            <ol className="plan-lines">
+              {progress.weakestSubtopics
+                .filter((aggregate) => aggregate.subtopicId != null)
+                .slice(0, 3)
+                .map((aggregate, index) => (
+                  <PracticeNowLine
+                    key={aggregate._id}
+                    number={index + 1}
+                    studentId={studentId}
+                    subjectId={aggregate.subjectId}
+                    subtopicId={aggregate.subtopicId!}
+                    correctCount={aggregate.correctCount}
+                    attemptCount={aggregate.attemptCount}
+                  />
                 ))}
-              </tbody>
-            </table>
-          </div>
-        </section>
-
-        {syllabus.data != null ? <MasteryOverview subjects={syllabus.data.subjects} levels={levels} /> : null}
-
-        {trends?.confidence != null ? (
-          <ConfidenceBreakdownCard breakdown={trends.confidence} />
-        ) : null}
-
-        <section className="ruled-section" aria-labelledby="progress-before-title">
-          <h2 id="progress-before-title" className="section-title">Antes y ahora, por área</h2>
-          <div className="overflow-x-auto">
-            <table className="data-table">
-              <thead>
-                <tr>
-                  <th scope="col">Área</th>
-                  <th scope="col" className="is-number">Al nivelarte</th>
-                  <th scope="col" className="is-number">Ahora</th>
-                  <th scope="col" className="is-number">Cambio</th>
-                </tr>
-              </thead>
-              <tbody>
-                {subjectRows.map((row) => (
-                  <tr key={row.id}>
-                    <th scope="row">
-                      <span className="inline-flex items-center gap-1.5">
-                        <span
-                          aria-hidden
-                          className="subject-dot"
-                          style={{ '--subject-color': getSubjectTheme(row.subjectId).color } as CSSProperties}
-                        />
-                        {row.label}
-                      </span>
-                    </th>
-                    <td className="is-number">
-                      {row.baselineAccuracy != null ? formatPercent(row.baselineAccuracy) : '—'}
-                    </td>
-                    <td className="is-number font-semibold">{formatPercent(row.currentAccuracy)}</td>
-                    <td className="is-number">
-                      {row.delta != null ? (
-                        <Delta delta={row.delta} />
-                      ) : (
-                        <span className="text-[var(--text-tertiary)]">sin nivelación</span>
-                      )}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </section>
-
-        {weakestSubtopics.length > 0 ? (
-          <section className="ruled-section" aria-labelledby="progress-weak-title">
-            <h2 id="progress-weak-title" className="section-title">Sigue mejorando aquí</h2>
-            <ul className="ruled-list">
-              {weakestSubtopics.slice(0, 5).map((agg) => (
-                <li key={agg._id}>
-                  <Link
-                    to="/lesson/$subtopicId"
-                    params={{ subtopicId: agg.subtopicId ?? 'sin_subtema' }}
-                    className="ruled-row no-underline"
-                  >
-                    <span className="ruled-row-main">
-                      <span className="truncate font-semibold">
-                        {getSubtopicLabel(agg.subtopicId ?? 'sin_subtema')}
-                      </span>
-                      <span className="ruled-row-note">{getSubjectLabel(agg.subjectId)}</span>
-                    </span>
-                    <MasteryBadge level={levelFor(levels, agg.subtopicId ?? '')} />
-                    <ArrowRight size={16} aria-hidden className="shrink-0 text-[var(--text-tertiary)]" />
-                  </Link>
-                </li>
-              ))}
-            </ul>
+            </ol>
           </section>
         ) : null}
       </div>
@@ -342,146 +228,59 @@ export function StudentProgressPage({ studentId }: { studentId: string }) {
   )
 }
 
-/** Best level first, so the bar fills from the left as the student advances. */
-const OVERVIEW_ORDER: MasteryLevel[] = ['dominado', 'competente', 'familiar', 'intentado', 'sin_empezar']
-
-/**
- * How many subtopics of each area sit at each Khan level, linking to the
- * Temario — counted over the same subtopics the Temario counts.
- */
-function MasteryOverview({
-  subjects,
-  levels,
+/** One weak topic: what it is, the evidence, and a way straight into practice. */
+function PracticeNowLine({
+  number,
+  studentId,
+  subjectId,
+  subtopicId,
+  correctCount,
+  attemptCount,
 }: {
-  subjects: FunctionReturnType<typeof api.syllabus.getSyllabus>['subjects']
-  levels: Map<string, MasteryLevel>
+  number: number
+  studentId: string
+  subjectId: string
+  subtopicId: string
+  correctCount: number
+  attemptCount: number
 }) {
+  const navigate = useNavigate()
+  const createSession = useMutation({
+    mutationFn: useConvexMutation(api.sessions.createSession),
+    onSuccess: (sessionId: string) => {
+      void navigate({ to: '/practice/$sessionId', params: { sessionId } })
+    },
+  })
+
   return (
-    <section className="ruled-section" aria-labelledby="progress-mastery-title">
-      <div className="section-head">
-        <h2 id="progress-mastery-title" className="section-title">Tu dominio por área</h2>
-        <Link to="/syllabus" className="section-meta">
-          Ver el temario
+    <li className={`plan-line path-line${number === 1 ? ' is-first' : ''}`}>
+      <span className="plan-line-number" aria-hidden>
+        {number}
+      </span>
+      <div className="flex min-w-0 flex-col gap-0.5 py-3">
+        <Link to="/lesson/$subtopicId" params={{ subtopicId }} className="plan-line-title text-[var(--text-primary)]">
+          {getSubtopicLabel(subtopicId)}
         </Link>
-      </div>
-      <div className="overflow-x-auto">
-        <table className="data-table">
-          <thead>
-            <tr>
-              <th scope="col">Área</th>
-              <th scope="col">Temas por nivel</th>
-              <th scope="col" className="is-number">Competente o más</th>
-            </tr>
-          </thead>
-          <tbody>
-            {subjects.map((subject) => {
-              const subjectId = subject.id
-              const theme = getSubjectTheme(subjectId)
-              const counted = countedSubtopics(subjectSubtopics(subject, levels))
-              const total = counted.length
-              const counts = countByLevel(
-                counted.map((subtopic) => subtopic.level),
-                total,
-              )
-              const competentOrAbove = counts.competente + counts.dominado
-              const spread = OVERVIEW_ORDER.filter((level) => counts[level] > 0)
-                .map((level) => `${counts[level]} ${MASTERY_LEVEL_LABELS[level]}`)
-                .join(' · ')
-              return (
-                <tr key={subjectId}>
-                  <th scope="row">
-                    <Link to="/syllabus" className="inline-flex items-center gap-1.5 text-[var(--text-primary)]">
-                      <span
-                        aria-hidden
-                        className="subject-dot"
-                        style={{ '--subject-color': theme.color } as CSSProperties}
-                      />
-                      {theme.label}
-                    </Link>
-                  </th>
-                  <td>
-                    <span className="mastery-spread" role="img" aria-label={spread}>
-                      {OVERVIEW_ORDER.filter((level) => level !== 'sin_empezar' && counts[level] > 0).map((level) => (
-                        <span
-                          key={level}
-                          style={{ flexGrow: counts[level] / Math.max(total, 1), background: MASTERY_LEVEL_COLOR[level] }}
-                        />
-                      ))}
-                    </span>
-                    <span className="cell-note">{spread}</span>
-                  </td>
-                  <td className="is-number">
-                    {competentOrAbove} de {total}
-                  </td>
-                </tr>
-              )
-            })}
-          </tbody>
-        </table>
-      </div>
-    </section>
-  )
-}
-
-type SubjectLevelRowData = FunctionReturnType<typeof api.progress.getStudentProgress>['subjectLevels'][number]
-
-/**
- * One area's ICFES performance level. Shows "sin nivel aún" rather than a number
- * when there isn't enough evidence — a level invented from three questions is
- * worse than no level, because the student will believe it.
- */
-function SubjectLevelRow({ level }: { level: SubjectLevelRowData }) {
-  const theme = getSubjectTheme(level.subjectId)
-  const placement = level.current
-  const levelledUp =
-    placement != null && level.baseline != null && placement.index > level.baseline.index
-
-  // Only rendered when the national contract actually records the figure —
-  // see `docs/national-results.v1.json`, which is deliberately incomplete.
-  const nationalLine =
-    level.national == null || placement == null
-      ? null
-      : level.national.percentileAtOrBelow != null
-        ? `Estás por encima del ${100 - level.national.percentileAtOrBelow}% del país en esta área.`
-        : level.national.shareAtThisLevel != null
-          ? `El ${level.national.shareAtThisLevel}% del país está en ${placement.band.labelEs} (ICFES ${level.national.year}).`
-          : null
-
-  return (
-    <tr>
-      <th scope="row">
-        <span className="inline-flex items-center gap-1.5">
-          <span aria-hidden="true" className="subject-dot" style={{ '--subject-color': theme.color } as CSSProperties} />
-          {theme.label}
+        <span className="plan-line-reason">
+          {getSubjectLabel(subjectId)} · acertaste {correctCount} de {attemptCount}
         </span>
-      </th>
-      {placement == null ? (
-        <td>
-          Sin nivel aún{' '}
-          <Link to="/diagnostic" className="text-sm">
-            Nivelarme
-          </Link>
-          <span className="cell-note">{level.attemptCount} preguntas respondidas</span>
-        </td>
-      ) : (
-        <td className={placement.index === 1 ? 'is-low' : undefined}>
-          <span className="font-semibold">{placement.band.labelEs}</span>
-          <span className="text-[var(--text-tertiary)]">
-            {' '}· {placement.index} de {placement.bandCount}
-          </span>
-          {levelledUp ? <span className="font-semibold text-[var(--success-text)]"> · subiste</span> : null}
-          <span className="cell-note">
-            {placement.nextBand != null && placement.pointsToNextBand != null
-              ? `Te faltan ${placement.pointsToNextBand} puntos para ${placement.nextBand.labelEs}`
-              : 'Estás en el nivel más alto de esta área'}
-            {level.isCalibrated ? (
-              <span title="Ajustado por la dificultad real de las preguntas que respondiste"> · calibrado</span>
-            ) : null}
-          </span>
-          {nationalLine != null ? <span className="cell-note">{nationalLine}</span> : null}
-        </td>
-      )}
-      <td>{level.baseline?.band.labelEs ?? '—'}</td>
-    </tr>
+        {createSession.error ? (
+          <p role="alert" className="notice is-danger">
+            {readConvexError(createSession.error, 'No se pudo iniciar la práctica.')}
+          </p>
+        ) : null}
+      </div>
+      <span className="path-line-actions is-single">
+        <button
+          type="button"
+          disabled={createSession.isPending}
+          onClick={() => createSession.mutate({ studentId: studentId as never, kind: 'topic', subtopicId })}
+          className={`${number === 1 ? 'btn-primary' : 'btn-secondary'} text-xs`}
+        >
+          <Play size={13} aria-hidden />
+          {createSession.isPending ? 'Preparando…' : 'Practicar'}
+        </button>
+      </span>
+    </li>
   )
 }

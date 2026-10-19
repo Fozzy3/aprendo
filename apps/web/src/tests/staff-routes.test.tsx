@@ -18,7 +18,7 @@ const state = vi.hoisted(() => ({
 
 vi.mock('lucide-react', () => {
   const Icon = () => null
-  return { ArrowLeft: Icon, ArrowRight: Icon, Copy: Icon, RefreshCw: Icon, Trash2: Icon }
+  return { ArrowLeft: Icon, ArrowRight: Icon, Copy: Icon, Printer: Icon, RefreshCw: Icon, Trash2: Icon }
 })
 
 vi.mock('@tanstack/react-router', () => ({
@@ -249,6 +249,17 @@ describe('/teacher/$classGroupId', () => {
     expect(rows.find((row) => row.textContent?.includes('Luis Gómez'))?.textContent).toContain('—')
     expect(rows.find((row) => row.textContent?.includes('Sara Díaz'))?.textContent).toContain('Nivel 3')
     expect(container.textContent).toContain('ABCD2345')
+  })
+
+  it('prints the class report', async () => {
+    const print = vi.spyOn(window, 'print').mockImplementation(() => {})
+    state.params = { classGroupId: 'c1' }
+    state.queries['teacher:getClassOverview'] = { isPending: false, isError: false, data: overview }
+    state.queries['teacher:getCompetencyReport'] = { isPending: false, data: [] }
+    await render('../routes/teacher.$classGroupId.tsx')
+    act(() => button('Imprimir').click())
+    expect(print).toHaveBeenCalledOnce()
+    print.mockRestore()
   })
 
   it('says it cannot open a class the teacher no longer reaches', async () => {

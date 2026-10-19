@@ -127,7 +127,9 @@
 /* Both the blocking init script in __root.tsx and ThemeToggle always put the
    RESOLVED theme on the root as a class (`.light` / `.dark`), including in
    `auto` mode — `data-theme` is only set for an explicit choice. So `.dark`
-   alone covers every case. Paper turns to ink, the ruling dims, inks lift. */
+   alone covers every case. Paper turns to ink, the ruling dims, inks lift.
+   Screen only: a printed report is always ink on white paper. */
+@media screen {
 :root.dark,
 :root[data-theme="dark"] {
   --paper: #111a2c;
@@ -185,6 +187,7 @@
 
   --shadow-md: 0 4px 14px rgba(0, 0, 0, 0.4);
   --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.5);
+}
 }
 
 /* ─── Base reset ─── */
@@ -971,6 +974,19 @@ a.ruled-row:hover {
 
 .back-link:hover {
   color: var(--text-primary);
+}
+
+/* A report's top row: the way back, and printing it. */
+.report-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.report-actions .back-link {
+  margin-bottom: 0;
 }
 
 .link-button {
@@ -4932,4 +4948,50 @@ button.solve-clock:disabled { cursor: default; }
 
 @media (prefers-reduced-motion: reduce) {
   .answer-feedback { animation: none; }
+}
+
+/* ─── Print: a teacher's report on paper ─── */
+@page {
+  margin: 14mm;
+}
+
+@media print {
+  /* The app's chrome stays on screen. */
+  .student-topbar,
+  .report-actions,
+  .invite-code-copy,
+  .tab-nav {
+    display: none !important;
+  }
+
+  body,
+  .staff-shell {
+    background: #fff;
+  }
+
+  .staff-main {
+    width: auto;
+    padding: 0;
+  }
+
+  .ruled-page {
+    border: 0;
+    padding: 0;
+  }
+
+  /* A wide table prints whole, never cut behind a scrollbar. */
+  .ruled-page .overflow-x-auto {
+    overflow: visible;
+  }
+
+  .ruled-section {
+    break-inside: avoid;
+  }
+
+  /* The charts and level chips are CSS backgrounds, which browsers skip. */
+  [class*="area-chart-"],
+  [class*="level-"] {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
 }

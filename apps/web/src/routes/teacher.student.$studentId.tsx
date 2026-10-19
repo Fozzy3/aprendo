@@ -1,7 +1,7 @@
 import { convexQuery } from '@convex-dev/react-query'
 import { useQuery } from '@tanstack/react-query'
 import { createFileRoute, useRouter } from '@tanstack/react-router'
-import { ArrowLeft } from 'lucide-react'
+import { ArrowLeft, Printer } from 'lucide-react'
 import { api } from '@aprendo/convex/api'
 import { getSubjectLabel, getSubtopicLabel } from '@aprendo/convex/taxonomy'
 import { AreaLevelsChart } from '../components/AreaLevelsChart.tsx'
@@ -40,9 +40,14 @@ function TeacherStudentPage() {
 
   return (
     <StaffShell active="classes">
-      <button type="button" className="back-link" onClick={() => router.history.back()}>
-        <ArrowLeft size={14} aria-hidden /> Volver al curso
-      </button>
+      <div className="report-actions">
+        <button type="button" className="back-link" onClick={() => router.history.back()}>
+          <ArrowLeft size={14} aria-hidden /> Volver al curso
+        </button>
+        <button type="button" className="btn-secondary" onClick={() => window.print()}>
+          <Printer size={14} aria-hidden /> Imprimir
+        </button>
+      </div>
 
       {progressQuery.isPending ? (
         <PageLoader message="Cargando al estudiante…" />

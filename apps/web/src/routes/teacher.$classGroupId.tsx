@@ -1,7 +1,7 @@
 import { convexQuery } from '@convex-dev/react-query'
 import { useQuery } from '@tanstack/react-query'
 import { Link, createFileRoute } from '@tanstack/react-router'
-import { ArrowLeft, Copy } from 'lucide-react'
+import { ArrowLeft, Copy, Printer } from 'lucide-react'
 import { useState, type CSSProperties } from 'react'
 import type { FunctionReturnType } from 'convex/server'
 import { api } from '@aprendo/convex/api'
@@ -43,9 +43,14 @@ function ClassOverviewPage() {
 
   return (
     <StaffShell active="classes">
-      <Link to="/teacher" className="back-link no-underline">
-        <ArrowLeft size={14} aria-hidden /> Tus cursos
-      </Link>
+      <div className="report-actions">
+        <Link to="/teacher" className="back-link no-underline">
+          <ArrowLeft size={14} aria-hidden /> Tus cursos
+        </Link>
+        <button type="button" className="btn-secondary" onClick={() => window.print()}>
+          <Printer size={14} aria-hidden /> Imprimir
+        </button>
+      </div>
 
       {overviewQuery.isPending ? (
         <PageLoader message="Cargando el curso…" />

@@ -21,9 +21,13 @@ function Paragraph({ node, children, ...props }: ComponentProps<'p'> & ExtraProp
 
 const components = { p: Paragraph }
 
-export function MarkdownBlock({ markdown }: { markdown: string }) {
+/**
+ * `skipHtml` drops raw HTML tags (their text stays). For chat text, where a tag
+ * is never meant; question bodies keep theirs (OCR `<img>`).
+ */
+export function MarkdownBlock({ markdown, skipHtml = false }: { markdown: string; skipHtml?: boolean }) {
   return (
-    <Streamdown className="markdown-body" plugins={{ math }} components={components}>
+    <Streamdown className="markdown-body" plugins={{ math }} components={components} skipHtml={skipHtml}>
       {markdown}
     </Streamdown>
   )

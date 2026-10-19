@@ -617,6 +617,8 @@ function ReviewPage() {
   const renderTutor = (onClose: () => void) => (
     <Suspense fallback={<PageLoader message="Abriendo el tutor…" />}>
       <ReviewTutor
+        // One chat per question: a new question is a fresh tutor on its own thread.
+        key={currentQuestion.question._id}
         sessionId={sessionId}
         practiceSessionId={sessionDoc._id}
         studentId={session.studentId}

@@ -83,14 +83,16 @@ export function latestDiagnosticQuery(studentId: string | null | undefined) {
 export function practiceTutorThreadQuery(
   practiceSessionId: string | null | undefined,
   studentId: string | null | undefined,
+  questionId: string | null | undefined,
 ) {
-  if (!hasValue(practiceSessionId) || !hasValue(studentId)) {
+  if (!hasValue(practiceSessionId) || !hasValue(studentId) || !hasValue(questionId)) {
     return convexQuery(api.tutor.getPracticeTutorThread, 'skip')
   }
 
   return convexQuery(api.tutor.getPracticeTutorThread, {
     practiceSessionId: practiceSessionId as never,
     studentId: studentId as never,
+    questionId: questionId as never,
   })
 }
 

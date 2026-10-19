@@ -23,7 +23,13 @@ describe('student queries', () => {
       queryKey: ['convexQuery', 'sessions:getSession', 'skip'],
     })
 
-    expect(practiceTutorThreadQuery('', undefined)).toMatchObject({
+    expect(practiceTutorThreadQuery('', undefined, 'q1')).toMatchObject({
+      enabled: false,
+      queryKey: ['convexQuery', 'tutor:getPracticeTutorThread', 'skip'],
+    })
+
+    // A chat belongs to one question: without it there is no thread to read.
+    expect(practiceTutorThreadQuery('s1', 'u1', null)).toMatchObject({
       enabled: false,
       queryKey: ['convexQuery', 'tutor:getPracticeTutorThread', 'skip'],
     })

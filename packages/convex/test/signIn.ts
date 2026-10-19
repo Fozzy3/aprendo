@@ -15,9 +15,19 @@ const betterAuthModules = Object.fromEntries(
   ]),
 )
 
+// The agent component (tutor threads), the same way.
+const agentDir = `${import.meta.dir}/../node_modules/@convex-dev/agent/src/component`
+const { default: agentSchema } = await import(`${agentDir}/schema.ts`)
+const agentModules = Object.fromEntries(
+  [...new Bun.Glob('**/*.ts').scanSync(agentDir)]
+    .filter((path) => !path.endsWith('.test.ts'))
+    .map((path) => [`./component/${path}`, () => import(`${agentDir}/${path}`)]),
+)
+
 export function setupTest() {
   const t = convexTest(schema, modules)
   t.registerComponent('betterAuth', betterAuthSchema, betterAuthModules)
+  t.registerComponent('agent', agentSchema, agentModules)
   return t
 }
 

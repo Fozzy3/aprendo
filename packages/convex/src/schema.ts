@@ -138,14 +138,16 @@ export default defineSchema(
     coachSummaries: defineTable(coachSummaryDocumentValidator)
       .index('by_studentId_weekIndex', ['studentId', 'weekIndex'])
       .index('by_status', ['status']),
+    // One chat per question of a session. Rows from before have no question.
     practiceTutorThreads: defineTable({
       practiceSessionId: v.id('sessions'),
+      questionId: v.optional(v.id('questions')),
       studentId: v.id('students'),
       threadId: v.string(),
       createdAt: v.number(),
       updatedAt: v.number(),
     })
-      .index('by_practiceSessionId', ['practiceSessionId'])
+      .index('by_practiceSessionId_questionId', ['practiceSessionId', 'questionId'])
       .index('by_studentId', ['studentId']),
     practiceTutorArtifacts: defineTable({
       threadId: v.string(),

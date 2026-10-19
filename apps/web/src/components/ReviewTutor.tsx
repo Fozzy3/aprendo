@@ -22,6 +22,7 @@ import { PromptInput, PromptInputBody, PromptInputFooter, PromptInputSubmit, Pro
 import { Shimmer } from './ai-elements/shimmer.tsx'
 import { practiceTutorThreadQuery } from '../lib/student-queries.ts'
 import { readConvexError } from '../lib/convex-error.ts'
+import { cleanTutorReply } from '../lib/tutor-reply.ts'
 
 type ChatRole = 'assistant' | 'user'
 
@@ -42,6 +43,7 @@ type ChatMessage = {
 
 const QUICK_PROMPTS = [
   'Explícame la respuesta',
+  'Muéstramelo en una demo interactiva',
   'Dame un problema similar',
   '¿Qué debo repasar?',
 ] as const
@@ -53,8 +55,10 @@ const QUICK_PROMPTS = [
  * client, the ai-elements chat kit (whose message renderer pulls Streamdown's
  * mermaid and shiki plugins) and the artifact dialog weigh hundreds of KB, and
  * most reviews on a phone never open the tutor — so the review renders without
- * them and fetches this chunk the first time the panel is shown. The thread is
- * created then too, not on every review.
+ * them and fetches this chunk the first time the panel is shown.
+ *
+ * Each question has its own chat (the route keys this on the question), and
+ * its thread is created by the first message, not by looking at the question.
  */
 export default function ReviewTutor({
   sessionId,
@@ -69,7 +73,7 @@ export default function ReviewTutor({
   sessionId: string
   practiceSessionId: Id<'sessions'>
   studentId: string
-  /** The question on screen, sent along with each prompt as context. */
+  /** The question on screen: its chat, and the context of each prompt. */
   questionId: string
   isCompact: boolean
   onClose: () => void
@@ -84,8 +88,6 @@ export default function ReviewTutor({
   const abortTutorStream = useConvexMutation(api.tutor.abortPracticeTutorStream)
   const sendTutorMessage = useAction(api.tutor.sendPracticeTutorMessage)
 
-  const [hasEnsuredTutorThread, setHasEnsuredTutorThread] = useState(false)
-  const [tutorThreadError, setTutorThreadError] = useState<string | null>(null)
   const [isAborting, setIsAborting] = useState(false)
   const [openArtifactId, setOpenArtifactId] = useState<Id<'practiceTutorArtifacts'> | null>(null)
   // The composer's latest text, read when a send fails after it was cleared.
@@ -94,11 +96,12 @@ export default function ReviewTutor({
     draftRef.current = draft
   }, [draft])
 
-  const tutorThreadQuery = useQuery({
-    ...practiceTutorThreadQuery(sessionId, studentId),
-    enabled: hasEnsuredTutorThread,
-  })
+  const threadQueryOptions = practiceTutorThreadQuery(sessionId, studentId, questionId)
+  const tutorThreadQuery = useQuery(threadQueryOptions)
   const tutorThreadId = tutorThreadQuery.data?.threadId ?? null
+  const tutorThreadError = tutorThreadQuery.error
+    ? readConvexError(tutorThreadQuery.error, 'No se pudo iniciar el tutor.')
+    : null
   const tutorMessagesResult = useThreadMessages(
     api.tutor.listPracticeTutorMessages,
     tutorThreadId == null
@@ -106,46 +109,28 @@ export default function ReviewTutor({
       : {
         practiceSessionId: sessionId as never,
         studentId: studentId as never,
+        questionId: questionId as never,
         threadId: tutorThreadId,
       },
     { initialNumItems: 50, stream: true },
   )
 
-  useEffect(() => {
-    if (hasEnsuredTutorThread) return
-    createTutorThread({ practiceSessionId, studentId: studentId as never })
-      .then(() => {
-        setHasEnsuredTutorThread(true)
-        setTutorThreadError(null)
-      })
-      .catch((error: unknown) => {
-        setHasEnsuredTutorThread(true)
-        setTutorThreadError(readConvexError(error, 'No se pudo iniciar el tutor.'))
-      })
-  }, [createTutorThread, hasEnsuredTutorThread, practiceSessionId, studentId])
-
   const clearTutorMutation = useMutation({
     mutationFn: async () =>
-      clearTutorChat({ practiceSessionId, studentId: studentId as never }),
+      clearTutorChat({ practiceSessionId, studentId: studentId as never, questionId: questionId as never }),
     onSuccess: async () => {
-      await queryClient.invalidateQueries({
-        queryKey: practiceTutorThreadQuery(sessionId, studentId).queryKey,
-      })
+      await queryClient.invalidateQueries({ queryKey: threadQueryOptions.queryKey })
     },
   })
 
   const tutorMutation = useMutation({
-    mutationFn: async (input: { prompt: string; questionId?: string }) =>
-      sendTutorMessage({
-        practiceSessionId,
-        studentId: studentId as never,
-        prompt: input.prompt,
-        questionId: input.questionId as never | undefined,
-      }),
+    mutationFn: async (input: { prompt: string }) => {
+      const ids = { practiceSessionId, studentId: studentId as never, questionId: questionId as never }
+      if (tutorThreadId == null) await createTutorThread(ids)
+      return sendTutorMessage({ ...ids, prompt: input.prompt })
+    },
     onSuccess: async () => {
-      await queryClient.invalidateQueries({
-        queryKey: practiceTutorThreadQuery(sessionId, studentId).queryKey,
-      })
+      await queryClient.invalidateQueries({ queryKey: threadQueryOptions.queryKey })
     },
   })
 
@@ -206,7 +191,8 @@ export default function ReviewTutor({
         }
       }
 
-      const content = extractText(inner)?.trim() ?? ''
+      const text = extractText(inner)?.trim() ?? ''
+      const content = inner.role === 'assistant' ? cleanTutorReply(text) : text
       if (content.length === 0 && artifactRef == null && !artifactPending) return []
 
       return [{
@@ -232,19 +218,21 @@ export default function ReviewTutor({
   }, [tutorMessagesResult.results])
 
   const lastMessage = tutorMessages.at(-1)
-  const isGenerating = tutorMutation.isPending
+  // A reply still streaming counts too: coming back to its question remounts
+  // this without the pending send, and the thread must not get a second one.
+  const isGenerating = tutorMutation.isPending || streamingOrder != null
   // Show the "thinking" placeholder only until the assistant's streamed reply
   // starts arriving; once deltas land, the streaming bubble takes over.
   const isTutorThinking = isGenerating
     && (lastMessage?.role !== 'assistant' || lastMessage?.streaming !== true)
-  const canSendTutorMessage = tutorThreadError == null && tutorThreadId != null && !isGenerating
+  const canSendTutorMessage = tutorThreadError == null && tutorThreadQuery.data != null && !isGenerating
   // Only a composer send owns the draft: a quick-prompt chip leaves whatever
   // the student is typing alone, and never writes its own text into it.
   const sendTutorPrompt = (text: string, fromComposer = false) => {
     const trimmed = text.trim()
     if (!trimmed || !canSendTutorMessage) return
     tutorMutation.mutate(
-      { prompt: trimmed, questionId },
+      { prompt: trimmed },
       {
         // A message the server turns away (daily limit, an exam in progress)
         // gives the student back what they wrote, unless they started another.
@@ -261,6 +249,7 @@ export default function ReviewTutor({
     abortTutorStream({
       practiceSessionId,
       studentId: studentId as never,
+      questionId: questionId as never,
       threadId: tutorThreadId,
       order: streamingOrder ?? undefined,
     })
@@ -316,7 +305,7 @@ export default function ReviewTutor({
               <div className="tutor-empty-mark" aria-hidden><Bot size={20} /></div>
               <h3 className="tutor-empty-title">Pregunta lo que necesites.</h3>
               <p className="tutor-empty-copy">
-                Ya puedes ver las respuestas. Pídeme que explique una pregunta, te dé otra parecida o te diga qué repasar.
+                Este chat es solo de esta pregunta. Pídeme que la explique, te la muestre en una demo, te dé otra parecida o te diga qué repasar.
               </p>
               <div className="mt-[0.65rem] flex flex-col gap-[0.4rem]" role="group" aria-label="Sugerencias">
                 {QUICK_PROMPTS.map((prompt) => (
@@ -337,7 +326,7 @@ export default function ReviewTutor({
                   <span className="tutor-msg-avatar" aria-hidden><Bot size={12} /></span>
                 ) : null}
                 <MessageContent className={message.role === 'user' ? 'tutor-bubble tutor-bubble-user' : 'tutor-bubble tutor-bubble-assistant'}>
-                  {message.content.length > 0 ? <MarkdownBlock markdown={message.content} /> : null}
+                  {message.content.length > 0 ? <MarkdownBlock markdown={message.content} skipHtml /> : null}
                   {message.role === 'assistant' && message.artifactRef != null ? (
                     <button
                       type="button"

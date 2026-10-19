@@ -6,8 +6,8 @@ import { createOpenRouter } from '@openrouter/ai-sdk-provider'
  * `deepseek/deepseek-v4-flash` rather than the `v4-pro` this used to call: same
  * family and generation, so the prompts written against DeepSeek carry over
  * unchanged, at roughly a twentieth of the output price ($0.165/M against
- * $3.20/M). Output is what dominates the bill — the tutor writes long
- * explanations — so the output column is the one that matters when comparing.
+ * $3.20/M). Output is what dominates the bill (lessons, and the HTML of the
+ * tutor's demos), so the output column is the one that matters when comparing.
  *
  * Both workloads need more than plain completion: the tutor calls tools, and
  * lessons go through `generateObject` with a Zod schema. A cheaper model without

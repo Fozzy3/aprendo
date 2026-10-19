@@ -77,7 +77,7 @@ Current routes:
 - `/admin` Aprendo staff: PDF ingest, question browser, question reports, school licences
 - `/reset-password`, `/terminos`, `/privacidad`
 
-Visual system: `DESIGN.md` (Cuaderno cuadriculado). The institutional redesign and the school (B2B) model are tracked in `plans/rediseno-institucional.md`; tenants and roles are specified in `specs/DATA_MODEL_SPEC.md` §7.
+Visual system: `DESIGN.md` (Cuaderno cuadriculado). The institutional redesign and the school (B2B) model are tracked in `plans/rediseno-institucional.md`; the planned ENEM (Brazil) version, not started, in `plans/enem-brasil.md`; the career-goal methodology (study weighted by the student's career family), researched and designed but not built, in `plans/meta-carrera.md`; tenants and roles are specified in `specs/DATA_MODEL_SPEC.md` §7.
 
 #### `packages/convex`
 

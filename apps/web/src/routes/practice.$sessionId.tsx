@@ -31,7 +31,9 @@ function PracticeSolvePage() {
   // navigation starts, while this layout is still on screen: reading it here
   // mounted the solve screen of a finished session for an instant, and its
   // hand-off to the review navigated straight back (Hoy or Ruta "did nothing").
-  const isReviewRoute = useChildMatches().length > 0
+  // A boolean, not the array: a new array on every router write re-rendered
+  // this layout throughout each navigation.
+  const isReviewRoute = useChildMatches({ select: (matches) => matches.length > 0 })
   const { session, isReady } = useCurrentStudent()
   // The full simulacro's Sesión 1 ends on a break, not on its review.
   const [breakAfter, setBreakAfter] = useState<string | null>(null)

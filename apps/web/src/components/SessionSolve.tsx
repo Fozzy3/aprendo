@@ -199,12 +199,19 @@ export function SessionSolve({ sessionId, onExit, onCompleted }: SessionSolvePro
     stimulusRef.current?.scrollTo({ top: 0 })
   }, [currentIndex])
 
-  // Once the session is complete, hand off to the review surface.
+  // Once the session is complete, hand off to the review surface — once. The
+  // parent passes a new callback on every render, and it re-renders on every
+  // router write while the review loads: each extra call restarted that
+  // navigation, and the tab froze after "Entregar".
+  const handedOffRef = useRef(false)
+  const handOff = useCallback(() => {
+    if (handedOffRef.current) return
+    handedOffRef.current = true
+    onCompleted(sessionId)
+  }, [onCompleted, sessionId])
   useEffect(() => {
-    if (session?.status === 'completed') {
-      onCompleted(sessionId)
-    }
-  }, [onCompleted, session?.status, sessionId])
+    if (session?.status === 'completed') handOff()
+  }, [handOff, session?.status])
 
   const current = questions[currentIndex]
   const currentQuestionId = current?.sessionQuestionId ?? null
@@ -254,7 +261,7 @@ export function SessionSolve({ sessionId, onExit, onCompleted }: SessionSolvePro
       completeSession({ sessionId: sessionId as never, expired: input.expired }),
     onSuccess: async () => {
       await queryClient.invalidateQueries()
-      onCompleted(sessionId)
+      handOff()
     },
     // A time-out the server refuses on purpose (too late, or the session was
     // closed elsewhere) will never be scored: say so instead of a dead screen.

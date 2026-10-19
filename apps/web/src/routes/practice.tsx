@@ -91,7 +91,7 @@ const FILTERS: Array<{ value: 'all' | SessionKind; label: string }> = [
 function PracticeHubPage() {
   const navigate = useNavigate()
   // The rendered child route, not the URL (see practice.$sessionId.tsx).
-  const isHubIndex = useChildMatches().length === 0
+  const isHubIndex = useChildMatches({ select: (matches) => matches.length === 0 })
   const { session, isReady } = useCurrentStudent()
 
   const [expandedKind, setExpandedKind] = useState<SessionKind | null>(null)

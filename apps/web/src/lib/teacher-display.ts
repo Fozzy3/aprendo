@@ -13,6 +13,20 @@ export function riskLabel(reason: RiskReason): string {
   return RISK_LABEL[reason]
 }
 
+// A student in level 1 or gone quiet rarely has a content problem: it is time,
+// motivation or confidence. The opener asks, it does not judge.
+const OPENER: Record<RiskReason, string> = {
+  sin_nivelacion: '¿Qué te ha frenado para hacer la primera nivelación? Son 30 minutos y con eso armamos tu ruta.',
+  inactivo: '¿Qué te sacó del ritmo? ¿Qué día de la semana puedes practicar 20 minutos?',
+  nivel_bajo: '¿Qué te cuesta más en esa área: entender lo que pregunta o resolverlo?',
+}
+
+/** How to open the one-to-one talk, from the first (most urgent) reason. */
+export function conversationOpener(reasons: RiskReason[]): string {
+  const first = reasons[0]
+  return first == null ? '' : OPENER[first]
+}
+
 /** When the student last started a session, in whole days. */
 export function lastActivityLabel(lastActiveAt: number | null, now: number): string {
   if (lastActiveAt == null) return 'Nunca'
@@ -24,4 +38,10 @@ export function lastActivityLabel(lastActiveAt: number | null, now: number): str
 
 export function studentDisplayName(student: { name: string | null; email: string }): string {
   return student.name ?? student.email
+}
+
+/** A cycle cell: how many of the students with evidence sat below Familiar. */
+export function belowShareLabel(count: { belowCount: number; evidencedCount: number }): string {
+  if (count.evidencedCount === 0) return 'sin evidencia'
+  return `${count.belowCount} de ${count.evidencedCount} (${Math.round((count.belowCount / count.evidencedCount) * 100)}%)`
 }

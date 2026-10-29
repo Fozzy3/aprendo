@@ -241,10 +241,20 @@ describe('/teacher/$classGroupId', () => {
     state.params = { classGroupId: 'c1' }
     state.queries['teacher:getClassOverview'] = { isPending: false, isError: false, data: overview }
     state.queries['teacher:getCompetencyReport'] = { isPending: false, data: [] }
+    state.queries['teacher:getClassTeachingPlan'] = {
+      isPending: false,
+      data: {
+        wholeClass: [],
+        groups: [],
+        items: [],
+        individual: [{ studentId: 's2', name: 'Luis Gómez', email: 'luis@x.co', riskReasons: ['sin_nivelacion'], lastActiveAt: null }],
+      },
+    }
     await render('../routes/teacher.$classGroupId.tsx')
-    const atRisk = container.querySelector('[aria-labelledby="at-risk-title"]')!
-    expect(atRisk.textContent).toContain('Luis Gómez')
-    expect(atRisk.textContent).not.toContain('Sara Díaz')
+    const oneToOne = container.querySelector('[aria-labelledby="week-individual-title"]')!
+    expect(oneToOne.textContent).toContain('Luis Gómez')
+    expect(oneToOne.textContent).toContain('Para abrir la charla')
+    expect(oneToOne.textContent).not.toContain('Sara Díaz')
     const rows = [...container.querySelectorAll('[aria-labelledby="levels-title"] tbody tr')]
     expect(rows.find((row) => row.textContent?.includes('Luis Gómez'))?.textContent).toContain('—')
     expect(rows.find((row) => row.textContent?.includes('Sara Díaz'))?.textContent).toContain('Nivel 3')

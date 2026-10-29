@@ -86,7 +86,8 @@ export function HistoryPage({ studentId }: { studentId: string }) {
           <h2 id="history-sessions-title" className="section-title">Sesiones</h2>
           <nav className="tab-nav mb-4 flex-wrap" aria-label="Tipo de sesión">
             <FilterTab label="Todas" isActive={kindFilter === 'all'} onSelect={() => setKindFilter('all')} />
-            {SESSION_KINDS.map((kind) => (
+            {/* The legacy diagnostic is no longer offered; old ones still list under "Todas". */}
+            {SESSION_KINDS.filter((kind) => kind !== 'diagnostic').map((kind) => (
               <FilterTab
                 key={kind}
                 label={getKindLabel(kind)}

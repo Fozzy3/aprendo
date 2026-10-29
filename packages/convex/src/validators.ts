@@ -268,6 +268,14 @@ export const sessionDocumentValidator = v.object({
   sourceSessionId: v.optional(v.id('sessions')),
   /** A `personalizada`'s builder source: `falladas` and `marcadas` move no mastery (`mastery.ts`). */
   practiceSource: v.optional(practiceSourceValidator),
+  /** A teacher's assignment this session fulfils (F40). */
+  assignmentId: v.optional(v.id('assignments')),
+  /** Each subtopic this session judged, before and after: the close of the review (F32). */
+  masteryChanges: v.optional(v.array(v.object({
+    subtopicId: v.string(),
+    from: masteryLevelValidator,
+    to: masteryLevelValidator,
+  }))),
 })
 
 export const questionAttemptValidator = v.object({
@@ -411,6 +419,9 @@ export const learnerAggregateValidator = v.object({
   masteryLevel: v.optional(masteryLevelValidator),
   /** When the level was last evaluated — the reto re-tests the oldest first. */
   masteryUpdatedAt: v.optional(v.number()),
+  /** Spaced review (`mastery.nextReviewState`): Leitner box and when it is due again. */
+  reviewBox: v.optional(v.number()),
+  reviewDueAt: v.optional(v.number()),
 })
 
 /** What a school bought; `llmBudget.ts` maps each plan to its allowances. */

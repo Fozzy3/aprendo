@@ -668,7 +668,13 @@ a.ruled-row:hover {
   font-variant-numeric: tabular-nums;
 }
 
-.data-table tbody tr:hover {
+@media (hover: hover) and (pointer: fine) {
+  .data-table tbody tr:hover {
+    background: var(--bg-inset);
+  }
+}
+
+.data-table tbody tr:active {
   background: var(--bg-inset);
 }
 
@@ -841,6 +847,16 @@ a.ruled-row:hover {
   margin: 1rem 0 0;
   font-size: 0.75rem;
   color: var(--text-tertiary);
+}
+
+.area-chart-national {
+  display: grid;
+  gap: 0.25rem;
+  margin: 0.75rem 0 0;
+  padding: 0;
+  list-style: none;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
 }
 
 .area-chart-legend-fill,
@@ -1175,7 +1191,15 @@ pre code {
   border: 1px solid var(--brand);
 }
 
-.btn-primary:hover {
+@media (hover: hover) and (pointer: fine) {
+  .btn-primary:hover {
+    background: var(--brand-hover);
+    border-color: var(--brand-hover);
+    color: var(--text-inverted);
+  }
+}
+
+.btn-primary:active {
   background: var(--brand-hover);
   border-color: var(--brand-hover);
   color: var(--text-inverted);
@@ -1187,7 +1211,14 @@ pre code {
   border: 1px solid var(--border-strong);
 }
 
-.btn-secondary:hover {
+@media (hover: hover) and (pointer: fine) {
+  .btn-secondary:hover {
+    border-color: var(--text-primary);
+    color: var(--text-primary);
+  }
+}
+
+.btn-secondary:active {
   border-color: var(--text-primary);
   color: var(--text-primary);
 }
@@ -1199,7 +1230,14 @@ pre code {
   padding-inline: 0.75rem;
 }
 
-.btn-ghost:hover {
+@media (hover: hover) and (pointer: fine) {
+  .btn-ghost:hover {
+    color: var(--text-primary);
+    background: var(--bg-inset);
+  }
+}
+
+.btn-ghost:active {
   color: var(--text-primary);
   background: var(--bg-inset);
 }
@@ -1980,13 +2018,12 @@ pre code {
   justify-content: center;
   width: 2.4rem;
   height: 2.4rem;
-  border-radius: 999px;
+  border-radius: var(--radius-md);
   border: 1px solid var(--border);
   background: color-mix(in srgb, var(--bg-card) 85%, transparent);
   color: var(--text-secondary);
   cursor: pointer;
   z-index: 3;
-  box-shadow: var(--shadow-sm);
   transition: transform 160ms ease, color 160ms ease, border-color 160ms ease, background 160ms ease, box-shadow 160ms ease, opacity 160ms ease;
 }
 
@@ -1997,7 +2034,6 @@ pre code {
   color: var(--accent-text);
   border-color: var(--border-accent);
   background: var(--bg-card);
-  box-shadow: 0 8px 22px -10px rgba(0, 0, 0, 0.22);
 }
 
 .stage-edge-nav:disabled {
@@ -2063,7 +2099,7 @@ pre code {
   justify-content: center;
   width: 1.85rem;
   height: 1.85rem;
-  border-radius: 999px;
+  border-radius: var(--radius-md);
   border: 1px solid transparent;
   background: transparent;
   color: var(--text-tertiary);
@@ -2071,7 +2107,15 @@ pre code {
   transition: color 160ms ease, border-color 160ms ease, background 160ms ease;
 }
 
-.tutor-icon-btn:hover:not(:disabled) {
+@media (hover: hover) and (pointer: fine) {
+  .tutor-icon-btn:hover:not(:disabled) {
+    color: var(--text-primary);
+    border-color: var(--border);
+    background: var(--bg-inset);
+  }
+}
+
+.tutor-icon-btn:active:not(:disabled) {
   color: var(--text-primary);
   border-color: var(--border);
   background: var(--bg-inset);
@@ -2374,7 +2418,7 @@ pre code {
   background: color-mix(in srgb, #000 35%, transparent);
   border: none;
   cursor: pointer;
-  animation: fade-in 200ms ease both;
+  animation: fade-in 200ms ease backwards;
 }
 
 .tutor-sheet-panel {
@@ -2383,11 +2427,12 @@ pre code {
   right: 0;
   bottom: 0;
   height: 78vh;
+  height: 78dvh;
   border-radius: 1.25rem 1.25rem 0 0;
   background: var(--bg-card);
   box-shadow: 0 -20px 60px -20px rgba(0, 0, 0, 0.35);
   overflow: hidden;
-  animation: tutor-sheet-up 280ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation: tutor-sheet-up 280ms cubic-bezier(0.16, 1, 0.3, 1) backwards;
 }
 
 .tutor-sheet-panel .tutor {
@@ -2396,8 +2441,11 @@ pre code {
 }
 
 @keyframes tutor-sheet-up {
-  from { transform: translateY(20%); opacity: 0; }
-  to   { transform: translateY(0);   opacity: 1; }
+  from { transform: translateY(100%); }
+}
+
+@keyframes tutor-sheet-in {
+  from { transform: translateX(100%); }
 }
 
 @media (max-width: 1200px) {
@@ -2529,19 +2577,103 @@ pre code {
 }
 
 /* ─── Animations ─── */
+/* One quiet fade, opacity only: a lasting transform would make the element the
+   containing block of any position: fixed child (the tutor sheet). */
 .fade-in {
-  animation: fade-in 500ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation: fade-in 180ms cubic-bezier(0.23, 1, 0.32, 1) backwards;
 }
 
 @keyframes fade-in {
   from {
     opacity: 0;
-    transform: translateY(8px);
   }
-  to {
-    opacity: 1;
-    transform: translateY(0);
+}
+
+/* Welcome steps crossfade through document.startViewTransition (Welcome.tsx). */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 320ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
   }
+}
+
+/* ─── First-run welcome ─── */
+.welcome {
+  display: grid;
+  gap: 1rem;
+  max-width: 34rem;
+}
+
+
+.welcome h1:focus {
+  outline: none;
+}
+
+.welcome-points {
+  display: grid;
+  gap: 1rem;
+  margin: 0.5rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.welcome-points li {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: start;
+  gap: 0.8rem;
+  font-size: 1rem;
+  line-height: 1.5;
+  color: var(--text-secondary);
+}
+
+.welcome-points svg {
+  margin-top: 0.15rem;
+  color: var(--brand);
+}
+
+.welcome-points strong {
+  display: block;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.welcome-footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border);
+}
+
+.welcome-dots {
+  display: flex;
+  gap: 0.4rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.welcome-dots span {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: var(--radius-sm);
+  background: var(--border-strong);
+  transition: background-color 140ms ease;
+}
+
+.welcome-dots span.is-current {
+  width: 1.5rem;
+  background: var(--brand);
 }
 
 /* ─── Markdown rendering ─── */
@@ -2709,9 +2841,11 @@ pre code {
 
 .solve-progress-track span {
   display: block;
+  width: 100%;
   height: 100%;
   background: var(--text-primary);
-  transition: width 280ms ease;
+  transform-origin: left;
+  transition: transform 200ms cubic-bezier(0.23, 1, 0.32, 1);
 }
 
 .solve-actions {
@@ -2763,7 +2897,7 @@ pre code {
   justify-content: center;
   width: 2rem;
   height: 2rem;
-  border-radius: 999px;
+  border-radius: var(--radius-md);
   border: 1px solid transparent;
   background: transparent;
   color: var(--text-tertiary);
@@ -2968,7 +3102,7 @@ pre code {
   font-family: var(--font-display);
   font-size: clamp(1.35rem, 1.15rem + 0.8vw, 1.9rem);
   line-height: 1.08;
-  letter-spacing: -0.03em;
+  letter-spacing: -0.015em;
   text-wrap: balance;
   color: var(--text-primary);
 }
@@ -3023,15 +3157,6 @@ pre code {
   color: var(--text-primary);
 }
 
-.timed-intro-error {
-  margin: 0;
-  padding: 0.65rem 0.85rem;
-  border-radius: var(--radius-sm);
-  background: var(--danger-soft);
-  font-size: 0.85rem;
-  font-weight: 600;
-  color: var(--danger-text);
-}
 
 .timed-intro-actions {
   display: flex;
@@ -3072,7 +3197,7 @@ pre code {
   width: 1.85rem;
   height: 1.85rem;
   flex-shrink: 0;
-  border-radius: 999px;
+  border-radius: var(--radius-md);
   border: 1px solid var(--border);
   background: var(--bg-card);
   color: var(--text-secondary);
@@ -3755,6 +3880,7 @@ pre code {
 }
 
 .page-loader {
+  animation: fade-in 150ms ease-out 300ms backwards;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -4854,6 +4980,9 @@ button.solve-clock:disabled { cursor: default; }
   display: grid;
   gap: 0.6rem;
   scroll-margin-top: 4.5rem;
+}
+
+.answer-feedback.is-arriving {
   animation: confidence-arrive 220ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
@@ -4994,4 +5123,296 @@ button.solve-clock:disabled { cursor: default; }
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
   }
+}
+
+/* ─── Class week plan: item analysis ─── */
+.item-analysis summary {
+  cursor: pointer;
+}
+
+.item-analysis[open] summary {
+  margin-bottom: 0.75rem;
+}
+
+.item-analysis-options {
+  display: grid;
+  gap: 0.35rem;
+  margin: 0.75rem 0 0;
+  padding: 0;
+  list-style: none;
+  font-size: 0.9rem;
+}
+
+.item-analysis-options li {
+  display: flex;
+  gap: 0.4rem;
+  padding: 0.25rem 0.5rem;
+  border-left: 1px solid transparent;
+}
+
+.item-analysis-options li.is-correct {
+  border-left-color: var(--success);
+}
+
+.item-analysis-options li.is-trap {
+  border-left-color: var(--margin);
+  color: var(--danger-text);
+}
+
+@media print {
+  .item-analysis summary {
+    list-style: none;
+  }
+}
+
+/* The solve screen has no positioned stage: its tutor sheet covers the viewport. */
+.tutor-sheet.is-fixed {
+  position: fixed;
+  z-index: 60;
+}
+
+@media (min-width: 64rem) {
+  .tutor-sheet.is-fixed .tutor-sheet-panel {
+    left: auto;
+    width: min(28rem, 100%);
+    height: 100%;
+    border-radius: 0;
+  }
+}
+
+/* ─── Session close (F32) ─── */
+.session-close-mark {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text-tertiary);
+}
+
+.session-close-mark.is-up {
+  border-color: var(--success);
+  color: var(--success-text);
+}
+
+.session-close-mark.is-down {
+  border-color: var(--danger);
+  color: var(--danger-text);
+}
+
+/* ─── Exam strategy in the simulacro intro (F35) ─── */
+.timed-intro-strategy {
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--border);
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: var(--text-secondary);
+}
+
+.timed-intro-strategy summary {
+  cursor: pointer;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.timed-intro-strategy ul {
+  margin: 0.4rem 0 0.6rem;
+  padding-left: 1.1rem;
+}
+
+.timed-intro-strategy-area {
+  margin: 0.4rem 0 0;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+/* ─── Career picker (meta de carrera) ─── */
+.career-picker {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.career-families {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(14rem, 1fr));
+  gap: 0 1.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.career-family {
+  display: grid;
+  gap: 0.2rem;
+  width: 100%;
+  padding: 0.65rem 0.8rem;
+  border: 0;
+  border-bottom: 1px solid var(--border);
+  border-radius: 0;
+  background: none;
+  font: inherit;
+  text-align: left;
+  color: var(--text-primary);
+  cursor: pointer;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .career-family:hover {
+    color: var(--accent-text);
+  }
+}
+
+.career-family:active {
+  color: var(--accent-text);
+}
+
+.career-quiz-item {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 1rem;
+  margin: 0;
+  padding: 0.5rem 0;
+  border: none;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.9rem;
+}
+
+.career-quiz-item legend {
+  float: left;
+  width: 100%;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.career-quiz-item label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  color: var(--text-secondary);
+}
+
+/* The mic while the browser is listening (voice, phase 0). */
+.tutor-icon-btn.is-listening {
+  color: var(--danger-text);
+}
+
+/* ─── Touch (mobile audit) ─── */
+html {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* A pull past the top of the solve or tutor scroller must not reload the session. */
+html:has(.is-immersive) {
+  overscroll-behavior: none;
+}
+
+@media (pointer: coarse) {
+  .tutor-icon-btn {
+    width: 2.75rem;
+    height: 2.75rem;
+  }
+
+  /* "Enter para enviar" means nothing on a phone keyboard. */
+  .tutor-composer-hint {
+    display: none;
+  }
+}
+
+.career-quiz-item label {
+  min-height: 2.75rem;
+  padding-inline: 0.25rem;
+}
+
+/* A chip with a long email stays inside the screen; the full name is in its button's label. */
+.chip-removable {
+  max-width: 100%;
+}
+
+.chip-remove {
+  flex-shrink: 0;
+  width: 2.75rem;
+  height: 2.75rem;
+  margin-block: -0.75rem;
+}
+
+/* With 40 students the name column stays in view while the areas scroll. */
+.level-grid tbody th,
+.level-grid thead th:first-child {
+  position: sticky;
+  left: 0;
+  background: var(--bg);
+}
+
+/* On wide screens the solve tutor is a right-side panel: it comes in from the right. */
+@media (min-width: 64rem) {
+  .tutor-sheet.is-fixed .tutor-sheet-panel {
+    animation-name: tutor-sheet-in;
+  }
+}
+
+/* The welcome dots change instantly, not inside the crossfade. */
+.welcome-dots {
+  view-transition-name: welcome-dots;
+}
+
+::view-transition-old(welcome-dots) {
+  display: none;
+}
+
+::view-transition-new(welcome-dots) {
+  animation: none;
+}
+
+/* The reward moment of a session: a topic that went up (only those move). */
+.session-close-mark.is-up {
+  animation: close-mark-up 360ms cubic-bezier(0.34, 1.36, 0.64, 1) backwards;
+  animation-delay: calc(180ms + var(--i, 0) * 60ms);
+}
+
+@keyframes close-mark-up {
+  from {
+    opacity: 0;
+    transform: translateY(6px) scale(0.9);
+  }
+}
+
+.career-picker {
+  animation: fade-in 180ms cubic-bezier(0.23, 1, 0.32, 1) backwards;
+}
+
+/* ─── Design audit ─── */
+/* Small buttons for the teacher's desktop screens. Tailwind's text-xs loses to
+   the button classes (unlayered), so the size lives here. */
+.btn-sm {
+  min-height: 2rem;
+  padding: 0.3rem 0.75rem;
+  font-size: 0.8rem;
+  gap: 0.35rem;
+}
+
+/* One icon size inside every button. */
+:is(.btn-primary, .btn-secondary, .btn-ghost) svg {
+  width: 1rem;
+  height: 1rem;
+  flex-shrink: 0;
+}
+
+.btn-sm svg {
+  width: 0.875rem;
+  height: 0.875rem;
+}
+
+/* Tabular digits for figures and tables, proportional ones in running prose. */
+.page-lede,
+.landing-lede,
+.markdown-body {
+  font-variant-numeric: proportional-nums;
+}
+
+.landing-sample td,
+.landing-sample th {
+  white-space: nowrap;
 }

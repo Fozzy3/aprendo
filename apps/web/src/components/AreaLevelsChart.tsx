@@ -70,6 +70,16 @@ export function AreaLevelsChart({
         <span className="area-chart-legend-start" aria-hidden /> al nivelarte
         <span className="area-chart-legend-cut" aria-hidden /> cortes de nivel del ICFES
       </p>
+      {rows.some((row) => row.nationalNote != null) ? (
+        <ul className="area-chart-national">
+          {rows.flatMap((row) =>
+            row.nationalNote == null ? [] : [
+              <li key={row.subjectId}>
+                <strong>{getSubjectTheme(row.subjectId).label}:</strong> {row.nationalNote}
+              </li>,
+            ])}
+        </ul>
+      ) : null}
     </div>
   )
 }

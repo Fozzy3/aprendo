@@ -49,7 +49,8 @@ export const MIXED_MIN_SUBTOPICS = 3
  * How a session's answers count: `practica` raises up to `competente` and never
  * lowers; `mixta` raises one level when all right and lowers one on any miss;
  * `reto` raises when all right, lowers when all wrong, else leaves it; `repaso`
- * leaves it: its items' keys were already shown, so a right answer is memory.
+ * (builder sources of seen items) leaves it: their keys were shown, so a right
+ * answer is memory.
  */
 export type MasteryContext = 'practica' | 'mixta' | 'reto' | 'repaso'
 
@@ -62,7 +63,9 @@ export function masteryContext(
   subtopicCount: number,
 ): MasteryContext {
   if (session.kind === 'reto') return 'reto'
-  if (session.kind === 'repaso') return 'repaso'
+  // The spaced repaso serves unseen siblings (F34); its originals are already
+  // excluded as revealed (`revealedQuestionIds`), so what remains is real evidence.
+  if (session.kind === 'repaso') return 'practica'
   if (session.practiceSource != null && SEEN_KEY_SOURCES.includes(session.practiceSource)) return 'repaso'
   // Seeing the key after each answer is learning, not an assessment.
   if (session.feedbackMode === 'inmediata') return 'practica'
@@ -97,6 +100,8 @@ export interface SubtopicEvidence {
   questionCount: number
   answeredCount: number
   correctCount: number
+  /** Answers given after asking the tutor: right counts, but not as independent mastery. */
+  tutorAssistedCount?: number
 }
 
 const rank = (level: MasteryLevel) => MASTERY_LEVELS.indexOf(level)
@@ -123,7 +128,9 @@ export function nextMasteryLevel(
   const allRight = evidence.correctCount === evidence.questionCount
 
   if (context === 'practica') {
-    const earned: MasteryLevel = allRight && evidence.questionCount >= MIN_QUESTIONS_FOR_COMPETENTE
+    // Competente means "can do it alone" (Khan): help from the tutor caps the session at familiar.
+    const independent = (evidence.tutorAssistedCount ?? 0) === 0
+    const earned: MasteryLevel = allRight && independent && evidence.questionCount >= MIN_QUESTIONS_FOR_COMPETENTE
       ? 'competente'
       : evidence.correctCount / evidence.questionCount >= FAMILIAR_ACCURACY
         ? 'familiar'
@@ -209,4 +216,31 @@ export function interleaveBlocks<T extends { groupId?: string }>(blocks: T[][]):
     for (const list of units) ordered.push(...(list[round] ?? []))
   }
   return ordered
+}
+
+/**
+ * Spaced review per subtopic: Leitner boxes over days (F34). A session that
+ * gets every question of a subtopic right moves it up a box and lets it rest
+ * longer; any miss puts it back in the first box, due tomorrow. Spacing is one
+ * of the most robust effects in learning research, and "a subtopic" rather than
+ * "a question" is what comes back, so the repaso can serve an unseen sibling
+ * instead of an item whose key the student already saw.
+ */
+export const REVIEW_INTERVAL_DAYS = [1, 3, 7, 21, 60] as const
+const DAY_MS = 86_400_000
+
+export function nextReviewState(box: number | undefined, allRight: boolean, now: number, dueAt?: number) {
+  // Cramming does not space: all right before the date keeps the box and the date.
+  if (allRight && dueAt != null && dueAt > now) return { reviewBox: box ?? 0, reviewDueAt: dueAt }
+  const reviewBox = allRight ? Math.min((box ?? 0) + 1, REVIEW_INTERVAL_DAYS.length - 1) : 0
+  return { reviewBox, reviewDueAt: now + REVIEW_INTERVAL_DAYS[reviewBox]! * DAY_MS }
+}
+
+/** Aggregates from before spacing carry no date: any miss on them makes them due now. */
+export function isReviewDue(
+  aggregate: { reviewDueAt?: number; attemptCount: number; correctCount: number },
+  now: number,
+) {
+  if (aggregate.reviewDueAt != null) return aggregate.reviewDueAt <= now
+  return aggregate.attemptCount > 0 && aggregate.correctCount < aggregate.attemptCount
 }

@@ -15,7 +15,7 @@ import {
   simulacroGapMessage,
 } from '../lib/result-display.ts'
 import { getSubjectTheme } from '../lib/subject-theme.ts'
-import { getSubjectLabel, getSubtopicLabel } from '@aprendo/convex/taxonomy'
+import { getSubjectLabel, getCompetenciaLabel, getSubtopicLabel } from '@aprendo/convex/taxonomy'
 
 const PACE_DISPLAY = {
   adelantado: { label: 'Adelantado', className: 'chip-accent' },
@@ -227,6 +227,17 @@ export function SimulacroReport({
                       <dt className="font-semibold text-[var(--text-primary)]">Lo que más te costó</dt>
                       <dd className="m-0 tabular-nums">
                         {getSubtopicLabel(weakest.subtopicId)} ({weakest.correctCount} de {weakest.questionCount})
+                      </dd>
+                    </div>
+                  ) : null}
+                  {area.competencias.length > 0 ? (
+                    // The ICFES reports by competencia (F35): the words of the official result.
+                    <div className="flex flex-wrap items-center gap-x-2">
+                      <dt className="font-semibold text-[var(--text-primary)]">Por competencia</dt>
+                      <dd className="m-0 tabular-nums">
+                        {area.competencias
+                          .map((row) => `${getCompetenciaLabel(row.competencia)} ${row.correct} de ${row.answered}`)
+                          .join(' · ')}
                       </dd>
                     </div>
                   ) : null}

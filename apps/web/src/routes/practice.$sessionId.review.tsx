@@ -23,6 +23,7 @@ import { NivelacionResult } from '../components/NivelacionResult.tsx'
 import { QuestionReportForm } from '../components/QuestionReportForm.tsx'
 import { SharedStimulus } from '../components/SharedStimulus.tsx'
 import { SimulacroReport } from '../components/SimulacroReport.tsx'
+import { SessionClose } from '../components/SessionClose.tsx'
 import { classifyAttempt } from '@aprendo/convex/confidence'
 import { LEARNING_STATE_DISPLAY, type ConfidenceLevel } from '../lib/confidence-display.ts'
 import { StudentAppShell } from '../components/StudentAppShell.tsx'
@@ -274,6 +275,20 @@ function ReviewPage() {
         ) : (
           <SimulacroReport sessionId={sessionDoc._id} studentId={session.studentId} />
         )}
+      </StudentAppShell>
+    )
+  }
+
+  const masteryChanges = sessionDoc.masteryChanges ?? []
+  if (!opensOnResult && pregunta == null && sessionDoc.status === 'completed' && masteryChanges.length > 0) {
+    return (
+      <StudentAppShell session={session} activeSection="practice">
+        <SessionClose
+          sessionId={sessionDoc._id}
+          correctCount={questions.filter((q) => q.attempt?.isCorrect).length}
+          questionCount={questions.length}
+          changes={masteryChanges}
+        />
       </StudentAppShell>
     )
   }

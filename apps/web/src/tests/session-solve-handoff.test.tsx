@@ -9,7 +9,7 @@ vi.mock('lucide-react', () => {
   const Icon = () => null
   return Object.fromEntries(
     [
-      'AArrowDown', 'AArrowUp', 'Activity', 'ArrowLeft', 'BookOpen', 'Check', 'ChevronLeft', 'ChevronRight',
+      'AArrowDown', 'AArrowUp', 'Activity', 'ArrowLeft', 'BookOpen', 'Bot', 'Check', 'ChevronLeft', 'ChevronRight',
       'CircleCheck', 'CircleX', 'ClipboardCheck', 'CloudOff', 'EyeOff', 'Flag', 'Gauge', 'Hourglass',
       'LayoutGrid', 'MessageSquareWarning', 'RotateCcw', 'Send', 'SlidersHorizontal', 'Sparkles',
       'Strikethrough', 'Timer', 'Trophy', 'Undo2', 'X',

@@ -51,8 +51,14 @@ export function llmPlanFor(
  */
 const EXAM_KINDS: readonly SessionKind[] = ['diagnostic', 'nivelacion', 'simulacro']
 
-export function canUseTutor(kind: SessionKind, status: Doc<'sessions'>['status']): boolean {
+export function canUseTutor(
+  kind: SessionKind,
+  status: Doc<'sessions'>['status'],
+  /** A practice that corrects at the end measures (the exit ticket, F40): no tutor while solving. */
+  feedbackMode?: Doc<'sessions'>['feedbackMode'],
+): boolean {
   if (status === 'completed') return true
+  if (feedbackMode === 'al_final') return false
   return getSessionKindConfig(kind).tutorInSolve && !EXAM_KINDS.includes(kind)
 }
 

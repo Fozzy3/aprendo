@@ -123,6 +123,44 @@ export function estimateGlobalScore(
 }
 
 /**
+ * How far a student's areas typically sit from each other, on the 0-100 scale.
+ * ponytail: a fixed spread; fit it from real students once there are enough
+ * with all five areas levelled.
+ */
+export const BETWEEN_AREA_SD = 15
+
+/**
+ * A global range before all five areas are levelled (F35): "hoy estarías entre
+ * 230 y 330". Each missing area is taken at the mean of the measured ones, and
+ * its uncertainty is how much a student's areas differ (`BETWEEN_AREA_SD`), so
+ * the band is wide on day one and narrows with every area. Null with nothing
+ * measured, or with everything measured (then `estimateGlobalScore` answers).
+ */
+export function provisionalGlobalRange(subjectScores: SubjectScoreInput[]) {
+  const byId = new Map(subjectScores.map((entry) => [entry.subjectId, entry]))
+  const measured = REQUIRED_SUBJECT_IDS.filter((subjectId) => byId.has(subjectId))
+  if (measured.length === 0 || measured.length === REQUIRED_SUBJECT_IDS.length) return null
+  const mean = measured.reduce((sum, subjectId) => sum + clampScore(byId.get(subjectId)!.score), 0) / measured.length
+
+  let weightedTotal = 0
+  let varianceTotal = 0
+  for (const [subjectId, weight] of Object.entries(SUBJECT_WEIGHTS)) {
+    const entry = byId.get(subjectId)
+    const score = entry == null ? mean : clampScore(entry.score)
+    weightedTotal += weight * score
+    varianceTotal += weight ** 2 * (entry == null ? BETWEEN_AREA_SD ** 2 : areaStandardError(score, entry.attemptCount) ** 2)
+  }
+  const factor = GLOBAL_SCALE / WEIGHT_TOTAL
+  const score = weightedTotal * factor
+  const margin = Z_95 * factor * Math.sqrt(varianceTotal)
+  return {
+    low: Math.max(0, Math.round(score - margin)),
+    high: Math.min(MAX_GLOBAL_SCORE, Math.round(score + margin)),
+    missingCount: REQUIRED_SUBJECT_IDS.length - measured.length,
+  }
+}
+
+/**
  * Which area would move the global score most per point gained.
  *
  * With equal weights on four of five areas this is simply the weakest weighted

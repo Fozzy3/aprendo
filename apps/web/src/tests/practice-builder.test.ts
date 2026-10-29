@@ -17,15 +17,15 @@ describe('builder filters', () => {
     expect(builderFilters(DEFAULT_BUILDER)).toEqual({ source: 'todas' })
   })
 
-  it('sends area, subtopics, difficulty and source once chosen', () => {
+  // No difficulty: choosing "fácil" buys an illusion of mastery, and Elo already adapts (F33).
+  it('sends area, subtopics and source once chosen', () => {
     const state = toggleSubtopic(
-      selectSubject({ ...DEFAULT_BUILDER, difficulty: 'avanzado', source: 'falladas' }, 'matematicas'),
+      selectSubject({ ...DEFAULT_BUILDER, source: 'falladas' }, 'matematicas'),
       'matematicas.algebra_equations.equations_inequalities',
     )
     expect(builderFilters(state)).toEqual({
       subjectId: 'matematicas',
       subtopicIds: ['matematicas.algebra_equations.equations_inequalities'],
-      difficulty: 'avanzado',
       source: 'falladas',
     })
   })

@@ -13,6 +13,7 @@ type GlobalScoreData = {
     high: number
     attemptCount: number
   } | null
+  provisional?: { low: number; high: number; missingCount: number } | null
   missingSubjectIds: string[]
   target: number | null
   pointsToTarget: number | null
@@ -58,6 +59,14 @@ export function GlobalScoreCard({
     return (
       <section className="ruled-section" aria-labelledby={titleId}>
         <h2 id={titleId} className="section-title">Tu puntaje global estimado</h2>
+        {data.provisional != null ? (
+          <p className="m-0 mb-2 text-sm text-[var(--text-secondary)]">
+            Con lo que sabemos hoy estarías entre{' '}
+            <strong className="text-[var(--text-primary)] tabular-nums">{data.provisional.low}</strong> y{' '}
+            <strong className="text-[var(--text-primary)] tabular-nums">{data.provisional.high}</strong> de {MAX_GLOBAL_SCORE}.
+            El rango se afina con cada área que nivelas.
+          </p>
+        ) : null}
         <p className="m-0 text-sm text-[var(--text-secondary)]">
           Te {missing === 1 ? 'falta' : 'faltan'} <strong className="text-[var(--text-primary)]">{missing}</strong>{' '}
           {missing === 1 ? 'área' : 'áreas'} por medir:
@@ -167,7 +176,7 @@ export function GlobalScoreCard({
                 ? ` · te faltan ${data.pointsToTarget} puntos`
                 : ' · ya la alcanzaste'}
             </span>
-            <button type="button" className="btn-ghost" onClick={() => setIsEditingTarget(true)}>
+            <button type="button" className="btn-ghost btn-sm" onClick={() => setIsEditingTarget(true)}>
               Cambiar
             </button>
           </p>

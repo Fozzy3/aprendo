@@ -9,7 +9,10 @@ import { SchoolLabel } from '../components/SchoolLabel.tsx'
 import { SessionSolve } from '../components/SessionSolve.tsx'
 import { ThemeToggle } from '../components/ThemeToggle.tsx'
 import { TimedSessionIntro } from '../components/TimedSessionIntro.tsx'
+import { Welcome } from '../components/Welcome.tsx'
 import { findResumableSession } from '../lib/resume-session.ts'
+import { readStored, writeStored } from '../lib/solve-state.ts'
+import { formatTimeLimit } from '../lib/session-display.ts'
 import { sessionHistoryQuery, studentAppStateQuery } from '../lib/student-queries.ts'
 import { useCurrentStudent } from '../lib/student-session.ts'
 import { getAllSubjectThemes, getSubjectTheme } from '../lib/subject-theme.ts'
@@ -21,6 +24,8 @@ export const Route = createFileRoute('/diagnostic')({
 })
 
 const NIVELACION = SESSION_KIND_CONFIG.nivelacion
+// ponytail: per-browser flag; a student on a new device sees the welcome again until their first nivelación.
+const WELCOME_SEEN_KEY = 'aprendo:welcome-seen'
 
 /**
  * Placement ("Nivelación"), the app's entry point.
@@ -38,6 +43,7 @@ function PlacementPage() {
   // The area tapped but not started yet: the intro step sits between the two,
   // because starting is what sets the clock running.
   const [pendingSubjectId, setPendingSubjectId] = useState<string | null>(null)
+  const [hasSeenWelcome, setHasSeenWelcome] = useState(() => readStored(WELCOME_SEEN_KEY) != null)
 
   const appStateQuery = useQuery({
     ...studentAppStateQuery(session?.studentId),
@@ -104,6 +110,15 @@ function PlacementPage() {
               navigate({ to: '/practice/$sessionId/review', params: { sessionId: completedId } })
             }
           />
+        ) : !hasAnyPlacement && !hasSeenWelcome ? (
+          <div className="diagnostic-intro">
+            <Welcome
+              onDone={() => {
+                writeStored(WELCOME_SEEN_KEY, '1')
+                setHasSeenWelcome(true)
+              }}
+            />
+          </div>
         ) : pendingSubject != null ? (
           <div className="diagnostic-intro">
             <TimedSessionIntro
@@ -164,7 +179,7 @@ function PlacementPage() {
                         <span className="ruled-row-note">
                           {isUnfinished
                             ? 'En curso · toca para continuar'
-                            : `${NIVELACION.totalQuestions} preguntas · 30 min`}
+                            : `${NIVELACION.totalQuestions} preguntas · ${formatTimeLimit(NIVELACION.timeLimitMs)}`}
                         </span>
                       </span>
                       {isPlaced && (

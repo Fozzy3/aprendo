@@ -1,4 +1,22 @@
 import { describe, expect, it } from 'vitest'
+import { closingLine } from '../lib/mastery-display'
+
+describe('closingLine', () => {
+  it('names the step up when the level moved', () => {
+    expect(closingLine({ from: 'intentado', to: 'familiar' })).toEqual({ moved: 'up', text: 'Intentado → Familiar' })
+  })
+
+  it('says what is missing when it did not', () => {
+    expect(closingLine({ from: 'familiar', to: 'familiar' }).text)
+      .toBe('Sigue en Familiar. Para Competente: una práctica perfecta de 4 o más preguntas, sin pedir ayuda al tutor.')
+    expect(closingLine({ from: 'intentado', to: 'intentado' }).text).toMatch(/7 de cada 10/)
+    expect(closingLine({ from: 'dominado', to: 'dominado' }).moved).toBe('same')
+  })
+
+  it('says a drop plainly', () => {
+    expect(closingLine({ from: 'competente', to: 'familiar' })).toEqual({ moved: 'down', text: 'Competente → Familiar' })
+  })
+})
 import {
   countByLevel,
   countedSubtopics,
@@ -93,61 +111,20 @@ describe('countByLevel', () => {
 })
 
 describe('resolvePathStates', () => {
-  it('opens the first node and locks the rest until the one before is familiar', () => {
-    expect(
-      resolvePathStates([
-        { questionCount: 5, level: 'sin_empezar' },
-        { questionCount: 5, level: 'sin_empezar' },
-      ]),
-    ).toEqual(['current', 'locked'])
+  const node = (subtopicId: string, level: 'sin_empezar' | 'intentado' | 'familiar' | 'competente' | 'dominado', questionCount = 5) =>
+    ({ subtopicId, questionCount, level })
+
+  it('never locks: Ruta is a recommended order, and the ICFES areas have no strict prerequisites', () => {
+    expect(resolvePathStates([node('a', 'sin_empezar'), node('b', 'sin_empezar')], [])).toEqual(['current', 'available'])
   })
 
-  it('unlocks the next node once the previous one reaches familiar', () => {
-    expect(
-      resolvePathStates([
-        { questionCount: 5, level: 'familiar' },
-        { questionCount: 5, level: 'sin_empezar' },
-        { questionCount: 5, level: 'sin_empezar' },
-      ]),
-    ).toEqual(['current', 'available', 'locked'])
+  it('puts "Estás aquí" on the compass pick for this area, wherever it sits', () => {
+    expect(resolvePathStates([node('a', 'familiar'), node('b', 'sin_empezar'), node('c', 'intentado')], ['c']))
+      .toEqual(['available', 'available', 'current'])
   })
 
-  it('marks competente and dominado as mastered and moves on', () => {
-    expect(
-      resolvePathStates([
-        { questionCount: 5, level: 'dominado' },
-        { questionCount: 5, level: 'competente' },
-        { questionCount: 5, level: 'intentado' },
-        { questionCount: 5, level: 'sin_empezar' },
-      ]),
-    ).toEqual(['mastered', 'mastered', 'current', 'locked'])
-  })
-
-  it('never blocks on a subtopic with no questions', () => {
-    expect(
-      resolvePathStates([
-        { questionCount: 5, level: 'familiar' },
-        { questionCount: 0, level: 'sin_empezar' },
-        { questionCount: 5, level: 'sin_empezar' },
-      ]),
-    ).toEqual(['current', 'empty', 'available'])
-  })
-
-  it('opens the path even when it starts with empty subtopics', () => {
-    expect(
-      resolvePathStates([
-        { questionCount: 0, level: 'sin_empezar' },
-        { questionCount: 5, level: 'sin_empezar' },
-      ]),
-    ).toEqual(['empty', 'current'])
-  })
-
-  it('never locks a subtopic the student already practised elsewhere', () => {
-    expect(
-      resolvePathStates([
-        { questionCount: 5, level: 'sin_empezar' },
-        { questionCount: 5, level: 'intentado' },
-      ]),
-    ).toEqual(['current', 'available'])
+  it('marks competente and dominado as mastered, and skips empty subtopics', () => {
+    expect(resolvePathStates([node('a', 'dominado'), node('b', 'sin_empezar', 0), node('c', 'competente'), node('d', 'sin_empezar')], []))
+      .toEqual(['mastered', 'empty', 'mastered', 'current'])
   })
 })

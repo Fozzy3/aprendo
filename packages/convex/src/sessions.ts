@@ -4,10 +4,12 @@ import { ConvexError, v } from 'convex/values'
 import type { Doc, Id } from './_generated/dataModel'
 import { questionSource } from './questionSource'
 import { assertIsStudent, requireAuthenticatedStudentId } from './auth'
-import { SUBJECT_IDS, getSubjectIdForSubtopic, getSubjectLabel } from './taxonomy'
+import { SUBJECT_IDS, competenciaOf, getSubjectIdForSubtopic, getSubjectLabel } from './taxonomy'
 import {
+  ASSIGNMENT_QUESTION_COUNT,
   getSimulacroSubjectTarget,
   getSessionKindConfig,
+  type FeedbackMode,
   type QuestionEligibilityPool,
   type SessionKind,
   type SessionKindConfig,
@@ -55,15 +57,19 @@ import {
   type ReportItem,
 } from './examReport'
 import { orderByDesirableDifficulty } from './adaptive'
+import { careerWeights } from './careers'
 import {
   RETO_QUESTIONS_PER_SUBTOPIC,
   RETO_SUBTOPIC_COUNT,
   interleaveBlocks,
   masteryContext,
+  isReviewDue,
   masteryLevelOf,
   nextMasteryLevel,
+  nextReviewState,
   orderRetoCandidates,
   revealedQuestionIds,
+  type MasteryLevel,
   type SubtopicEvidence,
 } from './mastery'
 import {
@@ -371,8 +377,12 @@ async function selectRecommended(
     }
   }
 
-  // 1. Weakest subtopics first.
-  for (const aggregate of [...subtopicAggregates].sort((a, b) => a.masteryScore - b.masteryScore)) {
+  // 1. Weakest subtopics first, weighted by the student's career when they chose
+  // one (plans/meta-carrera.md); without a career every area weighs the same.
+  const careerWeight = careerWeights(student?.careerFamily)
+  const need = (aggregate: Doc<'learnerSubtopicAggregates'>) =>
+    (1 - aggregate.masteryScore) * (careerWeight?.[aggregate.subjectId] ?? 1)
+  for (const aggregate of [...subtopicAggregates].sort((a, b) => need(b) - need(a))) {
     fill(
       eligibleQuestions.filter((question) => question.primarySubtopicId === aggregate.subtopicId),
       'weak_subtopic',
@@ -439,7 +449,7 @@ async function collectDueReviewQuestions(
   ctx: QueryCtx,
   studentId: Id<'students'>,
   eligibilityPools: QuestionEligibilityPool[],
-): Promise<Doc<'questions'>[]> {
+): Promise<{ due: Doc<'questions'>[]; seenQuestionIds: Set<string> }> {
   // Only finished sittings count: a miss in an open simulacro showing up here
   // would grade it answer by answer, and a repaso would then reveal the key.
   const sessions = await ctx.db
@@ -500,10 +510,55 @@ async function collectDueReviewQuestions(
     }
     due.push(question)
   }
-  return due
+  // Seen = any row in a finished session, blanks included: their key was shown in review.
+  // ponytail: a blank never touched has no row and still counts as unseen.
+  return { due, seenQuestionIds: new Set(attempts.map((attempt) => attempt.questionId as string)) }
 }
 
-/** Previously-missed questions resurfaced for spaced review (repaso). */
+/** Questions a repaso serves per due subtopic: enough to test it, few enough to cover several. */
+const REVIEW_QUESTIONS_PER_SUBTOPIC = 2
+
+/**
+ * Subtopics due for spaced review (`mastery.isReviewDue`, F34), most urgent
+ * first: one holding a recent misconception (a confident miss) leads, then the
+ * lowest Leitner box, then the most overdue.
+ */
+async function collectDueReviewSubtopics(
+  ctx: QueryCtx,
+  studentId: Id<'students'>,
+  eligibilityPools: QuestionEligibilityPool[],
+  now: number,
+) {
+  const [aggregates, { due: missed, seenQuestionIds }] = await Promise.all([
+    ctx.db.query('learnerSubtopicAggregates').withIndex('by_studentId', (q) => q.eq('studentId', studentId)).collect(),
+    collectDueReviewQuestions(ctx, studentId, eligibilityPools),
+  ])
+  const missedBySubtopic = new Map<string, Doc<'questions'>[]>()
+  for (const question of missed) {
+    const list = missedBySubtopic.get(question.primarySubtopicId!) ?? []
+    list.push(question)
+    missedBySubtopic.set(question.primarySubtopicId!, list)
+  }
+  const missRank = (subtopicId: string) => {
+    const index = missed.findIndex((question) => question.primarySubtopicId === subtopicId)
+    return index < 0 ? Number.MAX_SAFE_INTEGER : index
+  }
+  const subtopicIds = aggregates
+    .filter((aggregate) => aggregate.subtopicId != null && isReviewDue(aggregate, now))
+    .sort((a, b) =>
+      missRank(a.subtopicId!) - missRank(b.subtopicId!)
+      || (a.reviewBox ?? 0) - (b.reviewBox ?? 0)
+      || (a.reviewDueAt ?? 0) - (b.reviewDueAt ?? 0))
+    .map((aggregate) => aggregate.subtopicId!)
+  return { subtopicIds, missedBySubtopic, seenQuestionIds }
+}
+
+/**
+ * The repaso (F34): for each due subtopic, an unseen sibling first (same
+ * competencia when tagged), then the missed original, then any question of the
+ * subtopic. A right answer on the original proves memory of a key already
+ * shown; on a sibling it proves the skill, and `mastery.ts` counts it.
+ */
 async function selectReviewMistakes(
   ctx: QueryCtx,
   config: SessionKindConfig,
@@ -511,12 +566,33 @@ async function selectReviewMistakes(
   isFree: IsFree,
 ): Promise<Selection[]> {
   const total = config.totalQuestions ?? 10
-  const due = (await collectDueReviewQuestions(ctx, studentId, config.eligibilityPools)).filter(isFree)
-  const ordered = await expandToGroups(ctx, due, due, total)
+  const { subtopicIds, missedBySubtopic, seenQuestionIds } =
+    await collectDueReviewSubtopics(ctx, studentId, config.eligibilityPools, Date.now())
+  const picks: Doc<'questions'>[] = []
+  const picked = new Set<string>()
+  for (const subtopicId of subtopicIds) {
+    if (picks.length >= total) break
+    const originals = (missedBySubtopic.get(subtopicId) ?? []).filter(isFree)
+    const competencias = new Set(originals.map(competenciaOf).filter((value) => value != null))
+    const pool = (await collectUsableQuestionsBySubtopic(ctx, subtopicId, config.eligibilityPools)).filter(isFree)
+    const sameCompetencia = (question: Doc<'questions'>) => (competencias.has(competenciaOf(question) ?? '') ? 0 : 1)
+    const unseen = pool.filter((question) => !seenQuestionIds.has(question._id)).sort((x, y) => sameCompetencia(x) - sameCompetencia(y))
+    const seen = pool.filter((question) => seenQuestionIds.has(question._id))
+    // The original (or another seen item) only when the subtopic has nothing new left.
+    const candidates = unseen.length > 0 ? unseen : [...originals, ...seen]
+    const chosen = candidates
+      .filter((question, index, list) => !picked.has(question._id) && list.findIndex((other) => other._id === question._id) === index)
+      .slice(0, REVIEW_QUESTIONS_PER_SUBTOPIC)
+    for (const question of chosen) {
+      picked.add(question._id)
+      picks.push(question)
+    }
+  }
+  const ordered = await expandToGroups(ctx, picks, picks, total)
 
   return ordered.map((question) => ({
     questionId: question._id,
-    selectionReason: 'recent_mistake' as const,
+    selectionReason: seenQuestionIds.has(question._id) ? ('recent_mistake' as const) : ('reinforcement' as const),
     selectionMetadata: question.primarySubtopicId ?? question.subjectId ?? 'review',
   }))
 }
@@ -775,6 +851,35 @@ async function buildSelection(
 // Mutations / queries
 // ─────────────────────────────────────────────────────────────────────────
 
+/**
+ * A session started from a teacher's assignment (F40) takes its subtopic, its
+ * question count and its feedback mode from it; only a targeted student of
+ * that class may start it.
+ */
+async function applyAssignment<A extends { studentId: Id<'students'>; kind: SessionKind; assignmentId?: Id<'assignments'>; subtopicId?: string; feedbackMode?: FeedbackMode }>(
+  ctx: QueryCtx,
+  args: A,
+): Promise<{ args: A; questionLimit: number }> {
+  if (args.assignmentId == null) return { args, questionLimit: Number.POSITIVE_INFINITY }
+  const assignment = await ctx.db.get('assignments', args.assignmentId)
+  if (assignment == null || args.kind !== 'topic') throw new ConvexError('Esa tarea ya no existe.')
+  const isMember = (await ctx.db
+    .query('classGroupMembers')
+    .withIndex('by_accountId', (q) => q.eq('accountId', args.studentId))
+    .collect()).some((row) => row.classGroupId === assignment.classGroupId && row.role === 'student')
+  const isTargeted = assignment.studentIds == null || assignment.studentIds.includes(args.studentId)
+  if (!isMember || !isTargeted) throw new ConvexError('Esa tarea no es para ti.')
+  return {
+    args: {
+      ...args,
+      subtopicId: assignment.subtopicId,
+      // The exit ticket measures: corrected at the end. Practice teaches: at once.
+      feedbackMode: assignment.kind === 'tiquete' ? 'al_final' : 'inmediata',
+    },
+    questionLimit: ASSIGNMENT_QUESTION_COUNT[assignment.kind],
+  }
+}
+
 /** The builder's filters (see `practiceBuilder.ts`), shared by the counts query and `createSession`. */
 const practiceFilterFields = {
   subjectId: v.optional(v.string()),
@@ -801,12 +906,15 @@ export const createSession = mutation({
       count: v.number(),
       timed: v.boolean(),
     })),
+    /** `topic` only: a teacher's assignment (F40), which fixes subtopic, count and feedback. */
+    assignmentId: v.optional(v.id('assignments')),
   },
-  handler: async (ctx, args) => {
-    await assertIsStudent(ctx, args.studentId)
+  handler: async (ctx, rawArgs) => {
+    await assertIsStudent(ctx, rawArgs.studentId)
+    const { args, questionLimit } = await applyAssignment(ctx, rawArgs)
 
     const config = getSessionKindConfig(args.kind)
-    const feedbackMode = args.feedbackMode ?? 'al_final'
+    const feedbackMode = args.feedbackMode ?? config.defaultFeedbackMode
     if (feedbackMode === 'inmediata' && !config.allowsImmediateFeedback) {
       throw new ConvexError('Esta sesión muestra las respuestas solo al final.')
     }
@@ -828,7 +936,8 @@ export const createSession = mutation({
       args.kind === 'simulacro' ? args.subjectId : undefined,
     )
 
-    if (config.requiresDiagnostic && !(await hasCompletedPlacement(ctx, args.studentId))) {
+    // What the teacher assigned opens without placement: the classroom leads (F40).
+    if (config.requiresDiagnostic && args.assignmentId == null && !(await hasCompletedPlacement(ctx, args.studentId))) {
       throw new ConvexError('Nivélate en al menos un área antes de iniciar esta práctica.')
     }
 
@@ -896,6 +1005,7 @@ export const createSession = mutation({
         !isPastDeadline(session, now)
         && (session.feedbackMode ?? 'al_final') === feedbackMode
         && session.sourceSessionId === args.retryFromSessionId
+        && session.assignmentId === args.assignmentId
         && (!config.requiresSubject
           || (session.subjectId === subjectId && session.subtopicId === subtopicId))
         && (args.kind !== 'simulacro'
@@ -908,7 +1018,9 @@ export const createSession = mutation({
 
     // Nothing new takes an item a live exam asks: grading it elsewhere would
     // leak its key. Exams too, so two sittings never share one.
-    const selected = await buildSelection(
+    // ponytail: an assignment trims the topic selection to its count; a trim can
+    // split a shared-stimulus group, acceptable for 3-10 question assignments.
+    const selected = (await buildSelection(
       ctx,
       config,
       args.studentId,
@@ -917,7 +1029,7 @@ export const createSession = mutation({
       simulacroSessionNumber,
       await loadLiveExamSeal(ctx, args.studentId),
       { retryFromSessionId: args.retryFromSessionId, practice: args.practice },
-    )
+    )).slice(0, questionLimit)
     if (selected.length === 0) {
       // Naming the area matters: "no hay preguntas" reads as "the app is
       // broken", while "no hay preguntas de Matemáticas todavía" reads as
@@ -955,9 +1067,10 @@ export const createSession = mutation({
       expiresAt: sessionTimeLimitMs != null ? now + sessionTimeLimitMs : undefined,
       questionCount: selected.length,
       currentPosition: 1,
-      feedbackMode: args.feedbackMode == null ? undefined : feedbackMode,
+      feedbackMode: feedbackMode === 'al_final' ? undefined : feedbackMode,
       sourceSessionId: args.retryFromSessionId,
       practiceSource: args.practice?.source,
+      assignmentId: args.assignmentId,
     })
 
     let position = 1
@@ -1006,11 +1119,13 @@ export const getReviewQueue = query({
   handler: async (ctx, args) => {
     await assertIsStudent(ctx, args.studentId)
 
-    // Count against the same eligibility pools `repaso` draws from, so the count
-    // matches what a review session can actually launch.
-    const config = getSessionKindConfig('repaso')
-    const due = await collectDueReviewQuestions(ctx, args.studentId, config.eligibilityPools)
-    return { dueCount: due.length }
+    // Subtopics, not questions (F34), counted from the aggregates like Hoy.
+    const now = Date.now()
+    const aggregates = await ctx.db
+      .query('learnerSubtopicAggregates')
+      .withIndex('by_studentId', (q) => q.eq('studentId', args.studentId))
+      .collect()
+    return { dueCount: aggregates.filter((aggregate) => aggregate.subtopicId != null && isReviewDue(aggregate, now)).length }
   },
 })
 
@@ -1381,7 +1496,7 @@ async function loadOpenSessionQuestion(
 async function writeAttemptTools(
   ctx: MutationCtx,
   open: Awaited<ReturnType<typeof loadOpenSessionQuestion>>,
-  tools: Partial<Pick<Doc<'questionAttempts'>, 'flagged' | 'eliminatedOptions' | 'timeSpentMs'>>,
+  tools: Partial<Pick<Doc<'questionAttempts'>, 'flagged' | 'eliminatedOptions' | 'timeSpentMs' | 'usedTutor' | 'tutorMessageCount'>>,
 ) {
   if (open.attempt != null) {
     await ctx.db.patch('questionAttempts', open.attempt._id, tools)
@@ -1401,6 +1516,34 @@ async function writeAttemptTools(
     ...tools,
   })
 }
+
+/**
+ * The student asked the tutor about a question while solving it. Before the
+ * key is shown that is help, so a right answer still counts but does not prove
+ * mastery on its own (`mastery.ts`). After the check, or in review, it is not.
+ * Called from `tutor.sendPracticeTutorMessage`, which already checked ownership.
+ */
+export const recordTutorUse = internalMutation({
+  args: { sessionId: v.id('sessions'), questionId: v.id('questions') },
+  handler: async (ctx, args) => {
+    const session = await ctx.db.get('sessions', args.sessionId)
+    if (session == null || session.status === 'completed' || session.status === 'abandoned') return
+    const sessionQuestion = (await ctx.db
+      .query('sessionQuestions')
+      .withIndex('by_sessionId', (q) => q.eq('sessionId', args.sessionId))
+      .collect()).find((row) => row.questionId === args.questionId)
+    if (sessionQuestion == null) return
+    const attempt = await ctx.db
+      .query('questionAttempts')
+      .withIndex('by_sessionQuestionId', (q) => q.eq('sessionQuestionId', sessionQuestion._id))
+      .unique()
+    if (attempt?.checkedAt != null) return
+    await writeAttemptTools(ctx, { session, sessionQuestion, attempt }, {
+      usedTutor: true,
+      tutorMessageCount: (attempt?.tutorMessageCount ?? 0) + 1,
+    })
+  },
+})
 
 /** "Marcar para revisar": independent of whether the question is answered. */
 export const setQuestionFlag = mutation({
@@ -1529,6 +1672,7 @@ async function loadReportItems(
       position: sessionQuestion.position,
       subjectId: question.subjectId,
       subtopicId: question.primarySubtopicId ?? null,
+      competencia: competenciaOf(question),
       isCorrect: canRevealQuestion(session, question._id, liveExamQuestionIds)
         ? attempt?.isCorrect ?? null
         : null,
@@ -1940,9 +2084,11 @@ async function applyMastery(
     evidence.questionCount += 1
     if (attempt?.isCorrect != null) evidence.answeredCount += 1
     if (attempt?.isCorrect === true) evidence.correctCount += 1
+    if (attempt?.usedTutor === true) evidence.tutorAssistedCount = (evidence.tutorAssistedCount ?? 0) + 1
     evidenceBySubtopic.set(subtopicId, evidence)
   })
   const context = masteryContext(args.session, evidenceBySubtopic.size)
+  const changes: { subtopicId: string; from: MasteryLevel; to: MasteryLevel }[] = []
 
   for (const [subtopicId, evidence] of evidenceBySubtopic) {
     if (evidence.answeredCount === 0) continue
@@ -1958,10 +2104,41 @@ async function applyMastery(
       attemptCount: Math.max(0, aggregate.attemptCount - evidence.answeredCount),
       correctCount: Math.max(0, aggregate.correctCount - evidence.correctCount),
     })
+    const next = nextMasteryLevel(current, evidence, context)
+    changes.push({ subtopicId, from: current, to: next })
     await ctx.db.patch('learnerSubtopicAggregates', aggregate._id, {
-      masteryLevel: nextMasteryLevel(current, evidence, context),
+      masteryLevel: next,
       masteryUpdatedAt: args.now,
     })
+  }
+  if (changes.length > 0) await ctx.db.patch('sessions', args.session._id, { masteryChanges: changes })
+
+  // Spaced review (F34): every subtopic this session asked moves its Leitner
+  // box, revealed items included (retrieval is retrieval). Blanks are misses.
+  const spacing = new Map<string, { asked: number; answered: number; correct: number }>()
+  args.sessionQuestions.forEach((sessionQuestion, index) => {
+    const subtopicId = args.questions[index]?.primarySubtopicId
+    if (subtopicId == null) return
+    const entry = spacing.get(subtopicId) ?? { asked: 0, answered: 0, correct: 0 }
+    const attempt = args.attemptBySessionQuestionId.get(sessionQuestion._id)
+    entry.asked += 1
+    if (attempt?.isCorrect != null) entry.answered += 1
+    if (attempt?.isCorrect === true) entry.correct += 1
+    spacing.set(subtopicId, entry)
+  })
+  for (const [subtopicId, entry] of spacing) {
+    if (entry.answered === 0) continue
+    const aggregate = await ctx.db
+      .query('learnerSubtopicAggregates')
+      .withIndex('by_studentId_subtopicId', (q) =>
+        q.eq('studentId', args.session.studentId).eq('subtopicId', subtopicId))
+      .first()
+    if (aggregate == null) continue
+    await ctx.db.patch(
+      'learnerSubtopicAggregates',
+      aggregate._id,
+      nextReviewState(aggregate.reviewBox, entry.correct === entry.asked, args.now, aggregate.reviewDueAt),
+    )
   }
 }
 

@@ -4,6 +4,7 @@ import { useBlocker, type ShouldBlockFn } from '@tanstack/react-router'
 import {
   AArrowDown,
   AArrowUp,
+  Bot,
   Check,
   ChevronLeft,
   ChevronRight,
@@ -20,7 +21,7 @@ import {
   Undo2,
   X,
 } from 'lucide-react'
-import { useCallback, useEffect, useRef, useState, type CSSProperties, type PointerEvent } from 'react'
+import { Suspense, lazy, useCallback, useEffect, useRef, useState, type CSSProperties, type PointerEvent } from 'react'
 import { ConvexError } from 'convex/values'
 import { api } from '@aprendo/convex/api'
 import { MarkdownBlock } from './MarkdownBlock.tsx'
@@ -36,6 +37,7 @@ import type { QueueItem, QuestionOverlay } from '../lib/answer-queue.ts'
 import { useAnswerQueue } from '../lib/use-answer-queue.ts'
 import { paceStatus } from '@aprendo/convex/pacing'
 import { canCheckAnswers } from '@aprendo/convex/sessionIntegrity'
+import { SESSION_KIND_CONFIG } from '@aprendo/convex/sessionKinds'
 import { paceDescription, paceLabel } from '../lib/pacing-display.ts'
 import {
   TEXT_SCALES,
@@ -51,6 +53,11 @@ import {
 import { QuestionNavigator } from './QuestionNavigator.tsx'
 import { CheckYourWork } from './CheckYourWork.tsx'
 import { ReportProblemSheet } from './ReportProblemSheet.tsx'
+import { PageLoader } from './FullScreenLoader.tsx'
+import { stopSpeaking } from '../lib/speech.ts'
+
+// The chat stack is heavy (see ReviewTutor): fetched the first time the student opens it.
+const ReviewTutor = lazy(() => import('./ReviewTutor.tsx'))
 import { AnswerFeedback } from './AnswerFeedback.tsx'
 import { answerFeedback } from '../lib/answer-feedback.ts'
 
@@ -102,6 +109,10 @@ export function SessionSolve({ sessionId, onExit, onCompleted }: SessionSolvePro
   const [currentIndex, setCurrentIndex] = useState(0)
   const [isMapOpen, setIsMapOpen] = useState(false)
   const [isReportOpen, setIsReportOpen] = useState(false)
+  // Practice kinds open the tutor while solving (F31); it only gives hints before the key is out.
+  const [isTutorOpen, setIsTutorOpen] = useState(false)
+  const [hasOpenedTutor, setHasOpenedTutor] = useState(false)
+  const [tutorDraft, setTutorDraft] = useState('')
   const [isChecking, setIsChecking] = useState(false)
   const [isFlushing, setIsFlushing] = useState(false)
   const [showWarning, setShowWarning] = useState(false)
@@ -358,6 +369,13 @@ export function SessionSolve({ sessionId, onExit, onCompleted }: SessionSolvePro
   const locked = !isOpen || isFinishing
   // Immediate feedback only where the kind allows it: never an exam or a reto.
   const immediate = session != null && canCheckAnswers(session)
+  // Only a session that corrects at once teaches; the exit ticket measures (F40).
+  const tutorInSolve = session != null && SESSION_KIND_CONFIG[session.kind].tutorInSolve && session.feedbackMode === 'inmediata'
+  // The sheet stays mounted (display:none), so closing it must silence its voice.
+  const closeTutor = () => {
+    setIsTutorOpen(false)
+    stopSpeaking()
+  }
   const isChecked = immediate && current?.attempt?.checkedAt != null
   // A checked answer has seen its key: it can no longer change.
   const answerLocked = locked || isChecked || checkMutation.isPending
@@ -497,7 +515,8 @@ export function SessionSolve({ sessionId, onExit, onCompleted }: SessionSolvePro
     if (typeof window === 'undefined') return
     const handler = (event: KeyboardEvent) => {
       if (event.defaultPrevented || event.metaKey || event.ctrlKey || event.altKey) return
-      if (isMapOpen || isReportOpen || isChecking) return
+      // The tutor sheet owns the keyboard while open: a letter typed there is not an answer.
+      if (isMapOpen || isReportOpen || isTutorOpen || isChecking) return
       const target = event.target as HTMLElement | null
       if (
         target &&
@@ -527,7 +546,7 @@ export function SessionSolve({ sessionId, onExit, onCompleted }: SessionSolvePro
     }
     window.addEventListener('keydown', handler)
     return () => window.removeEventListener('keydown', handler)
-  }, [current, goNext, goPrev, isChecking, isMapOpen, isReportOpen, selectOption, toggleFlag])
+  }, [current, goNext, goPrev, isChecking, isMapOpen, isReportOpen, isTutorOpen, selectOption, toggleFlag])
 
   if (query.isPending || session == null) {
     return (
@@ -629,7 +648,7 @@ export function SessionSolve({ sessionId, onExit, onCompleted }: SessionSolvePro
           <strong>{currentIndex + 1}</strong>
           <span>/ {questions.length}</span>
           <div className="solve-progress-track" aria-hidden>
-            <span style={{ width: `${progress}%` }} />
+            <span style={{ transform: `scaleX(${progress / 100})` }} />
           </div>
         </div>
 
@@ -961,6 +980,21 @@ export function SessionSolve({ sessionId, onExit, onCompleted }: SessionSolvePro
                 <Flag size={16} fill={view.flagged ? 'currentColor' : 'none'} aria-hidden />
                 <span className="max-sm:hidden">{view.flagged ? 'Marcada' : 'Marcar'}</span>
               </button>
+              {tutorInSolve ? (
+                <button
+                  type="button"
+                  className="solve-flag-btn"
+                  onClick={() => {
+                    setHasOpenedTutor(true)
+                    setIsTutorOpen(true)
+                  }}
+                  aria-haspopup="dialog"
+                  title="Pedir una pista al tutor"
+                >
+                  <Bot size={16} aria-hidden />
+                  <span className="max-sm:hidden">Tutor</span>
+                </button>
+              ) : null}
             </div>
 
             {isLast ? (
@@ -995,6 +1029,39 @@ export function SessionSolve({ sessionId, onExit, onCompleted }: SessionSolvePro
         onJump={goTo}
         onReview={openCheck}
       />
+
+      {tutorInSolve && session != null ? (
+        <div
+          className={`tutor-sheet is-fixed ${isTutorOpen ? 'is-open' : ''}`}
+          role="dialog"
+          aria-modal="true"
+          aria-label="Tutor"
+          onKeyDown={(event) => {
+            if (event.key === 'Escape') closeTutor()
+          }}
+        >
+          <button type="button" className="tutor-sheet-backdrop" onClick={closeTutor} aria-label="Cerrar tutor" />
+          <div className="tutor-sheet-panel">
+            {hasOpenedTutor ? (
+              <Suspense fallback={<PageLoader message="Abriendo el tutor…" />}>
+                <ReviewTutor
+                  // One chat per question, like the review.
+                  key={current.question._id}
+                  mode="solve"
+                  sessionId={sessionId}
+                  practiceSessionId={session._id}
+                  studentId={session.studentId}
+                  questionId={current.question._id}
+                  isCompact
+                  onClose={closeTutor}
+                  draft={tutorDraft}
+                  onDraftChange={setTutorDraft}
+                />
+              </Suspense>
+            ) : null}
+          </div>
+        </div>
+      ) : null}
 
       <ReportProblemSheet
         key={current.question._id}

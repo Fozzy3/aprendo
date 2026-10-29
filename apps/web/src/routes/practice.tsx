@@ -21,8 +21,9 @@ import type { builderSessionArgs } from '../lib/practice-builder.ts'
 import { findResumableSession } from '../lib/resume-session.ts'
 import { findPendingSecondSitting } from '../lib/exam-day.ts'
 import { getSubjectTheme } from '../lib/subject-theme.ts'
-import { formatSessionDate, formatTimeLimit } from '../lib/session-display.ts'
+import { formatTimeLimit } from '../lib/session-display.ts'
 import {
+  reviewQueueQuery,
   sessionHistoryQuery,
   studentAppStateQuery,
   studentProgressQuery,
@@ -30,7 +31,6 @@ import {
 import { useCurrentStudent } from '../lib/student-session.ts'
 import { getSubjectLabel, getSubtopicLabel, SUBJECT_IDS } from '@aprendo/convex/taxonomy'
 import { FullScreenLoader } from '../components/FullScreenLoader.tsx'
-import { EmptyState } from '../components/EmptyState.tsx'
 import { readConvexError } from '../lib/convex-error.ts'
 
 export const Route = createFileRoute('/practice')({
@@ -68,6 +68,7 @@ type StartInput = {
 /** Khan's Mastery Challenge, said in what it does to the student's levels. */
 const RETO_COPY = '2 preguntas de cada uno de 3 subtemas que ya practicaste. Si aciertas ambas, ese subtema sube de nivel; si fallas ambas, baja.'
 const RETO_LOCKED_COPY = 'Se abre cuando hayas practicado al menos 3 subtemas.'
+const REPASO_EMPTY_COPY = 'Nada por repasar hoy: cada tema vuelve cuando le toca.'
 
 /** A timed session chosen but not started: what its intro step shows. */
 type PendingStart = StartInput & {
@@ -77,17 +78,6 @@ type PendingStart = StartInput & {
   timeLimitMs: number
 }
 
-const FILTERS: Array<{ value: 'all' | SessionKind; label: string }> = [
-  { value: 'all', label: 'Todas' },
-  { value: 'nivelacion', label: 'Nivelación' },
-  { value: 'recommended', label: 'Recomendada' },
-  { value: 'topic', label: 'Por tema' },
-  { value: 'repaso', label: 'Repaso' },
-  { value: 'simulacro', label: 'Simulacro' },
-  { value: 'personalizada', label: 'A tu medida' },
-  { value: 'reto', label: 'Reto' },
-]
-
 function PracticeHubPage() {
   const navigate = useNavigate()
   // The rendered child route, not the URL (see practice.$sessionId.tsx).
@@ -95,7 +85,6 @@ function PracticeHubPage() {
   const { session, isReady } = useCurrentStudent()
 
   const [expandedKind, setExpandedKind] = useState<SessionKind | null>(null)
-  const [filter, setFilter] = useState<'all' | SessionKind>('all')
   // Timed kinds stop at an intro before the clock starts; see TimedSessionIntro.
   const [pendingStart, setPendingStart] = useState<PendingStart | null>(null)
 
@@ -110,6 +99,11 @@ function PracticeHubPage() {
   // Only for `retoReady`; the reto card stays usable until it answers.
   const progressQuery = useQuery({
     ...studentProgressQuery(session?.studentId),
+    enabled: isHubIndex && isReady && session != null,
+  })
+  // The repaso card says how many are due and locks at zero instead of failing on start.
+  const reviewQueue = useQuery({
+    ...reviewQueueQuery(session?.studentId),
     enabled: isHubIndex && isReady && session != null,
   })
 
@@ -164,8 +158,6 @@ function PracticeHubPage() {
   const sessions = (historyQuery.data ?? []) as SessionRow[]
   const inProgress = sessions.filter((s) => s.status === 'in_progress' || s.status === 'created')
   const completed = sessions.filter((s) => s.status === 'completed')
-  const filtered =
-    filter === 'all' ? completed : completed.filter((s) => s.kind === filter)
   // A finished Sesión 1 whose afternoon sitting has not started yet. An
   // unfinished Sesión 2 already shows as "en curso" below.
   const pendingSecondSitting = findPendingSecondSitting(sessions)
@@ -219,20 +211,28 @@ function PracticeHubPage() {
                       type="button"
                       className={ROW_BUTTON}
                       disabled={startMutation.isPending}
-                      onClick={() => startMutation.mutate({ kind: 'simulacro', simulacroSessionNumber: 2 })}
+                      // Same intro as every timed start: it opens under the
+                      // simulacro card and focusing its title scrolls it in.
+                      onClick={() => {
+                        setExpandedKind('simulacro')
+                        openTimedStart({
+                          kind: 'simulacro',
+                          simulacroSessionNumber: 2,
+                          title: `Simulacro · ${sittingTwo.labelEs}`,
+                          questionCount: getSimulacroSessionQuestionCount(sittingTwo),
+                          timeLimitMs: sittingTwo.timeLimitMs,
+                        })
+                      }}
                     >
                       <span className="ruled-row-label">Día de examen</span>
                       <span className="ruled-row-main">
                         <span className="font-semibold">Te falta la Sesión 2</span>
                         <span className="ruled-row-note">
-                          {getSimulacroSessionQuestionCount(sittingTwo)} preguntas · {formatTimeLimit(sittingTwo.timeLimitMs)} · el reloj empieza al tocar
+                          {getSimulacroSessionQuestionCount(sittingTwo)} preguntas · {formatTimeLimit(sittingTwo.timeLimitMs)}
                         </span>
                       </span>
                       <span className="inline-flex shrink-0 items-center gap-1 text-sm font-semibold">
-                        {startMutation.isPending && startMutation.variables?.simulacroSessionNumber === 2
-                          ? 'Empezando…'
-                          : 'Empezar'}
-                        <ArrowRight size={14} aria-hidden />
+                        Empezar <ArrowRight size={14} aria-hidden />
                       </span>
                     </button>
                   </li>
@@ -270,6 +270,11 @@ function PracticeHubPage() {
                 const isStarting = startMutation.isPending && startMutation.variables?.kind === kind
                 const pending = isExpanded && pendingStart?.kind === kind ? pendingStart : null
                 const retoLocked = kind === 'reto' && progressQuery.data?.retoReady === false
+                const repasoDue = kind === 'repaso' ? reviewQueue.data?.dueCount ?? null : null
+                const repasoEmpty = repasoDue === 0
+                const questionCount = repasoDue != null
+                  ? Math.min(repasoDue * 2, getConfiguredQuestionCount(config))
+                  : getConfiguredQuestionCount(config)
 
                 return (
                   <Fragment key={kind}>
@@ -277,7 +282,7 @@ function PracticeHubPage() {
                       <button
                         type="button"
                         className={ROW_BUTTON}
-                        disabled={startMutation.isPending || retoLocked}
+                        disabled={startMutation.isPending || retoLocked || repasoEmpty}
                         aria-expanded={optionsOpen(kind) ? isExpanded : undefined}
                         onClick={() => {
                           if (optionsOpen(kind)) {
@@ -295,17 +300,20 @@ function PracticeHubPage() {
                             {kind === 'reto' ? RETO_COPY : config.taglineEs}
                           </span>
                           <span className="inline-flex flex-wrap items-center gap-x-3 text-xs text-[var(--text-tertiary)]">
-                            <span>
-                              {config.simulacroSessions != null
-                                ? `${getConfiguredQuestionCount(config)} preguntas en 2 sesiones`
-                                : `${getConfiguredQuestionCount(config)} preguntas`}
-                            </span>
+                            {repasoEmpty ? null : (
+                              <span>
+                                {config.simulacroSessions != null
+                                  ? `${questionCount} preguntas en 2 sesiones`
+                                  : `${questionCount} preguntas`}
+                              </span>
+                            )}
                             {config.timeLimitMs != null ? (
                               <span className="inline-flex items-center gap-1">
                                 <Clock3 size={12} aria-hidden /> {formatTimeLimit(config.timeLimitMs)}
                               </span>
                             ) : null}
                             {retoLocked ? <span>{RETO_LOCKED_COPY}</span> : null}
+                            {repasoEmpty ? <span>{REPASO_EMPTY_COPY}</span> : null}
                           </span>
                         </span>
                         <span className="shrink-0 text-[var(--text-tertiary)]" aria-hidden>
@@ -319,6 +327,15 @@ function PracticeHubPage() {
                         <TimedSessionIntro
                           title={pending.title}
                           subjectColor={pending.subjectColor}
+                          strategySubjectIds={
+                            pending.kind !== 'simulacro'
+                              ? undefined
+                              : pending.subjectId != null
+                                ? [pending.subjectId]
+                                : (config.simulacroSessions
+                                    ?.find((sitting) => sitting.sessionNumber === pending.simulacroSessionNumber)
+                                    ?.subjectTargets.map((target) => target.subjectId) ?? [])
+                          }
                           questionCount={pending.questionCount}
                           timeLimitMs={pending.timeLimitMs}
                           isStarting={startMutation.isPending}
@@ -340,26 +357,8 @@ function PracticeHubPage() {
                         <>
                           <div className={PICKER} role="group" aria-label="Elige una sesión del simulacro">
                             <span className={PICKER_LABEL}>Examen completo</span>
-                            {/* The real day: Sesión 1, a break, Sesión 2. It starts as
-                                Sesión 1; its end leads to the break screen. */}
-                            {config.simulacroSessions.slice(0, 1).map((sittingOne) => (
-                              <button
-                                key="exam-day"
-                                type="button"
-                                className="btn-secondary"
-                                disabled={startMutation.isPending}
-                                onClick={() =>
-                                  openTimedStart({
-                                    kind,
-                                    simulacroSessionNumber: sittingOne.sessionNumber,
-                                    title: 'Día de examen completo · Sesión 1',
-                                    questionCount: getSimulacroSessionQuestionCount(sittingOne),
-                                    timeLimitMs: sittingOne.timeLimitMs,
-                                  })}
-                              >
-                                Día de examen completo · Sesión 1, descanso y Sesión 2
-                              </button>
-                            ))}
+                            {/* A full Sesión 1 ends at the break screen and leads into
+                                Sesión 2, so it already is the whole exam day. */}
                             {config.simulacroSessions.map((simulacroSession) => (
                               <button
                                 key={simulacroSession.sessionNumber}
@@ -482,76 +481,10 @@ function PracticeHubPage() {
             ) : null}
           </section>
 
-          <section className="ruled-section" aria-labelledby="hub-history-title">
-            <div className="section-head">
-              <h2 id="hub-history-title" className="section-title">Tus sesiones</h2>
-              <Link to="/history" className="section-meta">Ver el historial</Link>
-            </div>
-            <div className="tab-nav mb-4 flex-wrap" role="tablist" aria-label="Filtrar por tipo">
-              {FILTERS.map((f) => (
-                <button
-                  key={f.value}
-                  type="button"
-                  role="tab"
-                  aria-selected={filter === f.value}
-                  className={`tab-item${filter === f.value ? ' is-active' : ''}`}
-                  onClick={() => setFilter(f.value)}
-                >
-                  {f.label}
-                </button>
-              ))}
-            </div>
-
-            {filtered.length > 0 ? (
-              <ul className="ruled-list">
-                {filtered.map((s) => {
-                  const correct = s.summary?.correctCount ?? 0
-                  const total = s.summary?.questionCount ?? s.questionCount
-                  const accuracy = s.summary?.accuracy ?? 0
-                  return (
-                    <li key={s._id}>
-                      <Link
-                        to="/practice/$sessionId/review"
-                        params={{ sessionId: s._id }}
-                        className="ruled-row no-underline"
-                      >
-                        <span className="ruled-row-main">
-                          <span className="font-semibold">
-                            {SESSION_KIND_CONFIG[s.kind].labelEs}
-                            {s.kind === 'simulacro' && s.simulacroSessionNumber != null
-                              ? ` · Sesión ${s.simulacroSessionNumber}`
-                              : ''}
-                            {getSessionFocusLabel(s) != null ? ` · ${getSessionFocusLabel(s)}` : ''}
-                          </span>
-                          <span className="ruled-row-note">{formatSessionDate(s.startedAt)}</span>
-                        </span>
-                        <span
-                          className={`shrink-0 text-right text-sm tabular-nums ${accuracy < 0.4 ? 'text-[var(--danger-text)]' : 'text-[var(--text-primary)]'}`}
-                        >
-                          <span className="font-semibold">
-                            {correct} de {total}
-                          </span>
-                          <span className="block text-xs text-[var(--text-tertiary)]">{Math.round(accuracy * 100)}%</span>
-                        </span>
-                      </Link>
-                    </li>
-                  )
-                })}
-              </ul>
-            ) : (
-              <EmptyState
-                title={
-                  filter === 'all'
-                    ? 'Todavía no has practicado'
-                    : 'Nada de este tipo todavía'
-                }
-              >
-                {filter === 'all'
-                  ? 'Elige una práctica arriba y tu primera sesión aparecerá acá.'
-                  : 'Prueba con otro filtro.'}
-              </EmptyState>
-            )}
-          </section>
+          {/* The full list lives in Historial; the hub only launches (F33). */}
+          <p className="mt-6 text-sm">
+            <Link to="/history">Ver todas tus sesiones en el historial</Link>
+          </p>
         </div>
       </div>
     </StudentAppShell>
@@ -560,6 +493,6 @@ function PracticeHubPage() {
 
 /** A launch line: a `.ruled-row` that is a button. */
 const ROW_BUTTON =
-  'ruled-row w-full cursor-pointer border-x-0 border-t-0 bg-transparent text-left font-[inherit] text-[length:inherit] hover:bg-[var(--bg-inset)] disabled:cursor-default disabled:opacity-60'
+  'ruled-row w-full cursor-pointer border-x-0 border-t-0 bg-transparent text-left font-[inherit] text-[length:inherit] hover:bg-[var(--bg-inset)] disabled:cursor-default disabled:[&_.font-semibold]:text-[var(--text-tertiary)]'
 const PICKER = 'flex flex-wrap items-center gap-2 border-b border-[var(--border)] py-3'
 const PICKER_LABEL = 'w-full text-xs text-[var(--text-tertiary)]'

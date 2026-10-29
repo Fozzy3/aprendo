@@ -25,7 +25,8 @@
     "./answerStats": "./src/answerStats.ts",
     "./studyPlan": "./src/studyPlan.ts",
     "./studyTime": "./src/studyTime.ts",
-    "./taxonomy": "./src/taxonomy.ts"
+    "./taxonomy": "./src/taxonomy.ts",
+    "./careers": "./src/careers.ts"
   },
   "dependencies": {
     "@ai-sdk/google": "^3.0.54",

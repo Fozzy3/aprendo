@@ -3,6 +3,7 @@ import { v } from 'convex/values'
 import {
   coachSummaryDocumentValidator,
   conceptLessonDocumentValidator,
+  conceptLessonStatusValidator,
   learnerAggregateValidator,
   membershipRoleValidator,
   organizationPlanValidator,
@@ -72,6 +73,8 @@ export default defineSchema(
       examDate: v.optional(v.number()),
       /** Global score (0-500) the student is aiming for, e.g. a scholarship cut. */
       targetGlobalScore: v.optional(v.number()),
+      /** The career family the student studies for (`careers.ts`): reweights the plan, never the global. */
+      careerFamily: v.optional(v.string()),
       // Elo ability per area, keyed by subjectId (see `elo.ts`). Lives on the
       // student rather than in its own table because it is only ever read and
       // written together with the student, and it must survive the aggregate
@@ -91,7 +94,40 @@ export default defineSchema(
       .index('by_studentId_kind', ['studentId', 'kind'])
       .index('by_studentId_status', ['studentId', 'status'])
       .index('by_studentId_kind_status', ['studentId', 'kind', 'status'])
-      .index('by_studentId_startedAt', ['studentId', 'startedAt']),
+      .index('by_studentId_startedAt', ['studentId', 'startedAt'])
+      .index('by_assignmentId', ['assignmentId']),
+    // Practice a teacher assigns to a class, a group or some students (F40).
+    // Only practice: a teacher never grades nor watches answers live.
+    assignments: defineTable({
+      classGroupId: v.id('classGroups'),
+      orgId: v.id('organizations'),
+      createdBy: v.id('students'),
+      subtopicId: v.string(),
+      /** 'practica': 10 questions, each corrected; 'tiquete': the 3-question exit ticket, corrected at the end. */
+      kind: v.union(v.literal('practica'), v.literal('tiquete')),
+      /** Absent means the whole class. */
+      studentIds: v.optional(v.array(v.id('students'))),
+      dueAt: v.number(),
+      createdAt: v.number(),
+    }).index('by_classGroupId', ['classGroupId']),
+    // A two-week teaching cycle (F42): the week plan frozen at its start, so its
+    // end can show before and after. Groups are the teacher's to edit (F39).
+    classCycles: defineTable({
+      classGroupId: v.id('classGroups'),
+      orgId: v.id('organizations'),
+      createdBy: v.id('students'),
+      startedAt: v.number(),
+      endsAt: v.number(),
+      subtopics: v.array(v.object({
+        subtopicId: v.string(),
+        subjectId: v.string(),
+        tier: v.union(v.literal('curso'), v.literal('grupo')),
+        belowCount: v.number(),
+        evidencedCount: v.number(),
+      })),
+      groups: v.array(v.object({ subtopicId: v.string(), studentIds: v.array(v.id('students')) })),
+    }).index('by_classGroupId', ['classGroupId'])
+      .index('by_orgId', ['orgId']),
     sessionQuestions: defineTable({
       sessionId: v.id('sessions'),
       questionId: v.id('questions'),
@@ -132,6 +168,17 @@ export default defineSchema(
       diagnosticBaseline: v.optional(studentSummaryValidator),
       overallSummary: studentSummaryValidator,
     }).index('by_studentId', ['studentId']),
+    // A printable class guide per subtopic for teachers (F41), cached like lessons.
+    classGuides: defineTable({
+      subtopicId: v.string(),
+      status: conceptLessonStatusValidator,
+      body: v.optional(v.string()),
+      modelId: v.string(),
+      promptVersion: v.string(),
+      failureReason: v.optional(v.string()),
+      createdAt: v.number(),
+      updatedAt: v.number(),
+    }).index('by_subtopicId', ['subtopicId']),
     conceptLessons: defineTable(conceptLessonDocumentValidator)
       .index('by_subtopicId', ['subtopicId'])
       .index('by_status', ['status']),

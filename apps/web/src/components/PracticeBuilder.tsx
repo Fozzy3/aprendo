@@ -5,14 +5,12 @@ import { officialMsPerQuestion } from '@aprendo/convex/pacing'
 import {
   MAX_PRACTICE_QUESTIONS,
   MIN_PRACTICE_QUESTIONS,
-  PRACTICE_DIFFICULTIES,
   PRACTICE_SOURCES,
 } from '@aprendo/convex/practiceBuilder'
 import { SESSION_KIND_CONFIG } from '@aprendo/convex/sessionKinds'
 import {
   COUNT_OPTIONS,
   DEFAULT_BUILDER,
-  DIFFICULTY_LABELS,
   SOURCE_LABELS,
   availableLabel,
   builderFilters,
@@ -164,24 +162,6 @@ export function PracticeBuilder({
                 ))}
               </Field>
             ) : null}
-
-            <Field legend="Dificultad">
-              <Choice pressed={state.difficulty == null} onClick={() => update({ difficulty: null })}>
-                Cualquiera
-              </Choice>
-              {PRACTICE_DIFFICULTIES.map((difficulty) => (
-                <Choice
-                  key={difficulty}
-                  pressed={state.difficulty === difficulty}
-                  onClick={() => update({ difficulty })}
-                >
-                  {DIFFICULTY_LABELS[difficulty]}
-                  {counts != null ? (
-                    <span className="tabular-nums opacity-70">{counts.byDifficulty[difficulty]}</span>
-                  ) : null}
-                </Choice>
-              ))}
-            </Field>
 
             <Field legend="Preguntas">
               {PRACTICE_SOURCES.map((source) => (

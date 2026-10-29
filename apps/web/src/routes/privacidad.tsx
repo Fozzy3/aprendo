@@ -1,8 +1,10 @@
 import { Link, createFileRoute } from '@tanstack/react-router'
 import { Wordmark } from '../components/BrandMark.tsx'
 import { CONTACT_EMAIL } from '../lib/contact.ts'
+import { publicHead } from '../lib/site.ts'
 
 export const Route = createFileRoute('/privacidad')({
+  head: () => publicHead({"title":"Política de tratamiento de datos | Aprendo","description":"Cómo trata Aprendo los datos de estudiantes, docentes y colegios, según la Ley 1581 de 2012.","path":"/privacidad"}),
   component: PrivacyPage,
 })
 
@@ -41,7 +43,9 @@ function PrivacyPage() {
 
       <h2>Quién más los recibe</h2>
       <ul>
-        <li>Tus docentes y los administradores de tu colegio ven tu nivel y tu actividad mientras estés en un curso. Pueden leer, nunca responder por ti.</li>
+        <li>Tus docentes y los administradores de tu colegio ven tu nivel y tu actividad mientras estés en un curso. Pueden asignarte práctica, nunca responder por ti ni ver tus respuestas mientras resuelves.</li>
+        <li>Si eliges una carrera, tus docentes la ven junto a tu nivel, para orientarte. Puedes cambiarla en Progreso.</li>
+        <li>Si le hablas al tutor con el micrófono, el dictado lo hace tu navegador: en Chrome, por ejemplo, Google procesa ese audio. Aprendo no recibe ni guarda el audio, solo el texto que tú decides enviar.</li>
         <li>Convex, que aloja la aplicación y su base de datos.</li>
         <li>
           OpenRouter y el proveedor del modelo de lenguaje, que reciben el texto de tus mensajes al tutor y de

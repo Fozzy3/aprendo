@@ -2,11 +2,12 @@ import { generateObject } from 'ai'
 import { z } from 'zod'
 import { ConvexError, v } from 'convex/values'
 import { internal } from './_generated/api'
-import { internalAction, internalMutation, mutation, query } from './_generated/server'
+import { internalAction, internalMutation, mutation, query, type QueryCtx } from './_generated/server'
 import { requireAuthenticatedStudentId } from './auth'
 import { type ClaimableRow, decideClaim } from './aiCache'
 import { type SubtopicContext, getSubtopicContext } from './taxonomy'
 import { APRENDO_MODEL_ID, aprendoModel } from './aiProvider'
+import { listAccountOrganizations } from './schools'
 
 /** Model + prompt version. Bump PROMPT_VERSION to invalidate and regenerate cached lessons. */
 const LESSON_MODEL = APRENDO_MODEL_ID
@@ -83,6 +84,10 @@ que vas a explicar.
 - Una idea central por lección, explicada hasta el fondo. Es mejor que entienda
   una cosa que reconocer cinco.
 - Empieza por un ejemplo concreto y sube a la regla general, no al revés.
+- **Haz que prediga antes de leer la regla.** Después del ejemplo, plantea en
+  una línea una pregunta de predicción ("¿Qué crees que pasa si…?") y
+  respóndela justo después. No es un ejercicio calificado: es una pausa para que
+  pruebe su intuición antes de que se la des.
 - Usa situaciones colombianas y cotidianas cuando aporten: un recibo de la luz,
   el Transmilenio, un partido, una tienda de barrio. Solo si de verdad aclaran;
   un ejemplo forzado estorba más que uno genérico.
@@ -346,5 +351,113 @@ export const markConceptLessonFailed = internalMutation({
       failureReason: args.failureReason,
       updatedAt: Date.now(),
     })
+  },
+})
+
+// ── Class guide for teachers (F41) ──────────────────────────────────────────
+// The generic half of a class on one subtopic, cached for every teacher: the
+// objective, the typical error, and an explicit "I do, we do, you do" sequence
+// (the same scaffolding levels as the Socratic tutor). The class-specific half
+// (the trap this class chose, the exit ticket) comes from the class's own data.
+export const CLASS_GUIDE_PROMPT_VERSION = 'g1'
+
+const guideSchema = z.object({
+  objective: z.string().describe('El objetivo de la clase en una frase: qué podrá hacer el estudiante al final.'),
+  misconception: z.string().describe('El error típico de este tema, en 1-2 frases, y por qué parece correcto.'),
+  iDo: z.string().describe('"Yo lo hago": un ejemplo resuelto por el docente pensando en voz alta, paso a paso. Markdown, $...$ para fórmulas.'),
+  weDo: z.string().describe('"Lo hacemos juntos": un ejemplo parecido para resolver con el curso, con las preguntas que el docente hace en cada paso.'),
+  youDo: z.string().describe('"Lo haces tú": 1 o 2 ejercicios para que cada estudiante resuelva solo, con su respuesta al final.'),
+  discussion: z.array(z.string()).length(3).describe('3 preguntas socráticas para discutir en clase: una que diagnostique, una que destape el error típico con una contradicción, una que pida explicar con sus palabras.'),
+})
+
+const GUIDE_SYSTEM = `
+Eres un docente experto en preparar el ICFES Saber 11 en Colombia y escribes
+guías de clase para otros docentes. Una guía es para una clase corta de 15 a 20
+minutos sobre un solo tema, con enseñanza explícita: el docente modela, el curso
+practica con guía, cada estudiante practica solo.
+
+- Escribe para el docente, en español de Colombia, directo y sin relleno.
+- Ejemplos concretos y cotidianos, con el nivel de dificultad del Saber 11.
+- No inventes datos ni cifras; si un ejemplo usa números, que sean simples.
+- Matemáticas en LaTeX: $...$ en línea, $$...$$ en bloque.
+`.trim()
+
+function guideMarkdown(guide: z.infer<typeof guideSchema>) {
+  return [
+    `## Objetivo\n\n${guide.objective}`,
+    `## El error típico\n\n${guide.misconception}`,
+    `## Yo lo hago (5 min)\n\n${guide.iDo}`,
+    `## Lo hacemos juntos (5 min)\n\n${guide.weDo}`,
+    `## Lo haces tú (5 min)\n\n${guide.youDo}`,
+    `## Para discutir\n\n${guide.discussion.map((question, index) => `${index + 1}. ${question}`).join('\n')}`,
+  ].join('\n\n')
+}
+
+/** Only teaching staff (a teacher or school admin anywhere) spend model budget on guides. */
+async function requireTeachingStaff(ctx: QueryCtx) {
+  const accountId = await requireAuthenticatedStudentId(ctx)
+  const isStaff = (await listAccountOrganizations(ctx, accountId))
+    .some(({ membership }) => membership.role === 'teacher' || membership.role === 'org_admin')
+  if (!isStaff) throw new ConvexError('Las guías de clase son para docentes.')
+}
+
+export const getClassGuide = query({
+  args: { subtopicId: v.string() },
+  handler: async (ctx, args) => {
+    await requireTeachingStaff(ctx)
+    return ctx.db.query('classGuides').withIndex('by_subtopicId', (q) => q.eq('subtopicId', args.subtopicId)).unique()
+  },
+})
+
+export const requestClassGuide = mutation({
+  args: { subtopicId: v.string() },
+  handler: async (ctx, args) => {
+    await requireTeachingStaff(ctx)
+    if (getSubtopicContext(args.subtopicId) == null) throw new ConvexError('Subtema no válido.')
+    const existing = await ctx.db
+      .query('classGuides')
+      .withIndex('by_subtopicId', (q) => q.eq('subtopicId', args.subtopicId))
+      .unique()
+    const now = Date.now()
+    const decision = decideClaim({ existing, promptVersion: CLASS_GUIDE_PROMPT_VERSION, now })
+    if (decision === 'skip') return { status: existing!.status }
+    const row = { status: 'generating' as const, modelId: LESSON_MODEL, promptVersion: CLASS_GUIDE_PROMPT_VERSION, failureReason: undefined, updatedAt: now }
+    if (existing == null) await ctx.db.insert('classGuides', { subtopicId: args.subtopicId, createdAt: now, ...row })
+    else await ctx.db.patch('classGuides', existing._id, row)
+    await ctx.scheduler.runAfter(0, internal.lessons.generateClassGuide, { subtopicId: args.subtopicId })
+    return { status: 'generating' as const }
+  },
+})
+
+export const generateClassGuide = internalAction({
+  args: { subtopicId: v.string() },
+  handler: async (ctx, args) => {
+    const context = getSubtopicContext(args.subtopicId)!
+    try {
+      const { object } = await generateObject({
+        model: aprendoModel(LESSON_MODEL),
+        schema: guideSchema,
+        system: GUIDE_SYSTEM,
+        prompt: `Guía de clase para el tema "${context.label}" (${context.categoryLabel}, ${context.subjectLabel}) del Saber 11.`,
+        maxOutputTokens: 4000,
+      })
+      await ctx.runMutation(internal.lessons.settleClassGuide, { subtopicId: args.subtopicId, body: guideMarkdown(object) })
+    } catch (error) {
+      await ctx.runMutation(internal.lessons.settleClassGuide, {
+        subtopicId: args.subtopicId,
+        failureReason: error instanceof Error ? error.message : 'Error de generación.',
+      })
+    }
+  },
+})
+
+export const settleClassGuide = internalMutation({
+  args: { subtopicId: v.string(), body: v.optional(v.string()), failureReason: v.optional(v.string()) },
+  handler: async (ctx, args) => {
+    const guide = await ctx.db.query('classGuides').withIndex('by_subtopicId', (q) => q.eq('subtopicId', args.subtopicId)).unique()
+    if (guide == null) return
+    await ctx.db.patch('classGuides', guide._id, args.body != null
+      ? { status: 'ready', body: args.body, failureReason: undefined, updatedAt: Date.now() }
+      : { status: 'failed', failureReason: args.failureReason, updatedAt: Date.now() })
   },
 })

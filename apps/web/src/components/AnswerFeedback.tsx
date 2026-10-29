@@ -38,7 +38,7 @@ export function AnswerFeedback({
   const hasExplanation = picked != null || solutionMarkdown != null || others.length > 0
 
   return (
-    <section ref={ref} className="answer-feedback" aria-label="Resultado de tu respuesta">
+    <section ref={ref} className={`answer-feedback${scrollIntoView ? ' is-arriving' : ''}`} aria-label="Resultado de tu respuesta">
       <p
         ref={verdictRef}
         tabIndex={-1}

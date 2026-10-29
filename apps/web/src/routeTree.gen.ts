@@ -32,6 +32,7 @@ import { Route as TeacherIndexRouteImport } from './routes/teacher.index'
 import { Route as TeacherClassGroupIdRouteImport } from './routes/teacher.$classGroupId'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 import { Route as PracticeSessionIdReviewRouteImport } from './routes/practice.$sessionId.review'
+import { Route as TeacherGuiaSubtopicIdRouteImport } from './routes/teacher.guia.$subtopicId'
 import { Route as TeacherStudentStudentIdRouteImport } from './routes/teacher.student.$studentId'
 
 const IndexRoute = IndexRouteImport.update({
@@ -149,6 +150,11 @@ const PracticeSessionIdReviewRoute = PracticeSessionIdReviewRouteImport.update({
   path: '/review',
   getParentRoute: () => PracticeSessionIdRoute,
 } as any)
+const TeacherGuiaSubtopicIdRoute = TeacherGuiaSubtopicIdRouteImport.update({
+  id: '/teacher/guia/$subtopicId',
+  path: '/teacher/guia/$subtopicId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const TeacherStudentStudentIdRoute = TeacherStudentStudentIdRouteImport.update({
   id: '/teacher/student/$studentId',
   path: '/teacher/student/$studentId',
@@ -179,6 +185,7 @@ export interface FileRoutesByFullPath {
   '/teacher/': typeof TeacherIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/practice/$sessionId/review': typeof PracticeSessionIdReviewRoute
+  '/teacher/guia/$subtopicId': typeof TeacherGuiaSubtopicIdRoute
   '/teacher/student/$studentId': typeof TeacherStudentStudentIdRoute
 }
 export interface FileRoutesByTo {
@@ -205,6 +212,7 @@ export interface FileRoutesByTo {
   '/teacher': typeof TeacherIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/practice/$sessionId/review': typeof PracticeSessionIdReviewRoute
+  '/teacher/guia/$subtopicId': typeof TeacherGuiaSubtopicIdRoute
   '/teacher/student/$studentId': typeof TeacherStudentStudentIdRoute
 }
 export interface FileRoutesById {
@@ -232,6 +240,7 @@ export interface FileRoutesById {
   '/teacher/': typeof TeacherIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/practice/$sessionId/review': typeof PracticeSessionIdReviewRoute
+  '/teacher/guia/$subtopicId': typeof TeacherGuiaSubtopicIdRoute
   '/teacher/student/$studentId': typeof TeacherStudentStudentIdRoute
 }
 export interface FileRouteTypes {
@@ -260,6 +269,7 @@ export interface FileRouteTypes {
     | '/teacher/'
     | '/api/auth/$'
     | '/practice/$sessionId/review'
+    | '/teacher/guia/$subtopicId'
     | '/teacher/student/$studentId'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -286,6 +296,7 @@ export interface FileRouteTypes {
     | '/teacher'
     | '/api/auth/$'
     | '/practice/$sessionId/review'
+    | '/teacher/guia/$subtopicId'
     | '/teacher/student/$studentId'
   id:
     | '__root__'
@@ -312,6 +323,7 @@ export interface FileRouteTypes {
     | '/teacher/'
     | '/api/auth/$'
     | '/practice/$sessionId/review'
+    | '/teacher/guia/$subtopicId'
     | '/teacher/student/$studentId'
   fileRoutesById: FileRoutesById
 }
@@ -337,6 +349,7 @@ export interface RootRouteChildren {
   TeacherClassGroupIdRoute: typeof TeacherClassGroupIdRoute
   TeacherIndexRoute: typeof TeacherIndexRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
+  TeacherGuiaSubtopicIdRoute: typeof TeacherGuiaSubtopicIdRoute
   TeacherStudentStudentIdRoute: typeof TeacherStudentStudentIdRoute
 }
 
@@ -503,6 +516,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PracticeSessionIdReviewRouteImport
       parentRoute: typeof PracticeSessionIdRoute
     }
+    '/teacher/guia/$subtopicId': {
+      id: '/teacher/guia/$subtopicId'
+      path: '/teacher/guia/$subtopicId'
+      fullPath: '/teacher/guia/$subtopicId'
+      preLoaderRoute: typeof TeacherGuiaSubtopicIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/teacher/student/$studentId': {
       id: '/teacher/student/$studentId'
       path: '/teacher/student/$studentId'
@@ -558,6 +578,7 @@ const rootRouteChildren: RootRouteChildren = {
   TeacherClassGroupIdRoute: TeacherClassGroupIdRoute,
   TeacherIndexRoute: TeacherIndexRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
+  TeacherGuiaSubtopicIdRoute: TeacherGuiaSubtopicIdRoute,
   TeacherStudentStudentIdRoute: TeacherStudentStudentIdRoute,
 }
 export const routeTree = rootRouteImport

@@ -14,6 +14,7 @@ import { MIN_ATTEMPTS_FOR_LEVEL, estimatedScoreFromAccuracy, getLevelForScore } 
 import { averagePace, slowestQuestions } from './pacing'
 import { getSimulacroSubjectTargets } from './sessionKinds'
 import { scoreSimulacroSubjects } from './simulacroForm'
+import { competencyBreakdown } from './taxonomy'
 
 /** One served question of a completed session, as the reports need it. */
 export type ReportItem = {
@@ -22,6 +23,8 @@ export type ReportItem = {
   position: number
   subjectId: string
   subtopicId: string | null
+  /** The official ICFES competencia, when the question is tagged with one (F35). */
+  competencia?: string | null
   /** Null when left blank — scored as wrong, like ICFES scores it. */
   isCorrect: boolean | null
   confidence?: ConfidenceLevel
@@ -223,6 +226,9 @@ export function buildSimulacroReport(args: {
       level: getLevelForScore(score.subjectId, score.score),
       pace: averagePace(items),
       subtopics: subtopicBreakdown(items),
+      competencias: competencyBreakdown(
+        items.map((item) => ({ subjectId: item.subjectId, competencia: item.competencia ?? null, isCorrect: item.isCorrect === true })),
+      ),
       flaggedCount: flagged.length,
       flaggedWrongCount: flagged.filter((item) => item.isCorrect !== true).length,
       confidence: summarizeConfidence(items),

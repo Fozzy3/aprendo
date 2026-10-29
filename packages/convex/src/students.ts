@@ -1,4 +1,5 @@
 import { mutation, query, type MutationCtx, type QueryCtx } from './_generated/server'
+import { getCareerFamily } from './careers'
 import { ConvexError, v } from 'convex/values'
 import type { Doc, Id, TableNames } from './_generated/dataModel'
 import { assertIsStudent } from './auth'
@@ -44,6 +45,24 @@ export const setExamDate = mutation({
 })
 
 /** Set (or clear) the global score the student is aiming for. */
+/** The career family the student studies for (plans/meta-carrera.md); null clears it. */
+export const setCareerFamily = mutation({
+  args: {
+    studentId: v.id('students'),
+    careerFamily: v.union(v.string(), v.null()),
+  },
+  handler: async (ctx, args) => {
+    await assertIsStudent(ctx, args.studentId)
+    if (args.careerFamily != null && getCareerFamily(args.careerFamily) == null) {
+      throw new ConvexError('Esa familia de carreras no existe.')
+    }
+    await ctx.db.patch('students', args.studentId, {
+      careerFamily: args.careerFamily ?? undefined,
+      updatedAt: Date.now(),
+    })
+  },
+})
+
 export const setTargetGlobalScore = mutation({
   args: {
     studentId: v.id('students'),

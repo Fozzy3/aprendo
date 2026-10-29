@@ -1,4 +1,4 @@
-import { MASTERY_LEVELS, summarizeMastery, type MasteryLevel } from '@aprendo/convex/mastery'
+import { MASTERY_LEVELS, MASTERY_LEVEL_LABELS, summarizeMastery, type MasteryLevel } from '@aprendo/convex/mastery'
 
 /**
  * Khan's five mastery levels as Temario, Ruta and Progreso read them. The
@@ -50,30 +50,45 @@ export function countByLevel(levels: MasteryLevel[], total: number): Record<Mast
   return counts
 }
 
-export type PathState = 'mastered' | 'current' | 'available' | 'locked' | 'empty'
+export type PathState = 'mastered' | 'current' | 'available' | 'empty'
 
 /**
- * Ruta: a node opens once the one before it reaches Familiar. Competente and
- * Dominado count as done. A subtopic with no questions is skipped instead of
- * blocking the rest, and one already practised from elsewhere is never locked.
+ * Ruta: the taxonomy order, nothing locked (the ICFES areas have no strict
+ * prerequisites, and a lock only slowed students down). "Estás aquí" goes on
+ * the plan's pick for this area (`studyPlan.nextSubtopics`), or on the first
+ * open subtopic when the plan picks none here. Competente and Dominado are done.
  */
-export function resolvePathStates(nodes: { questionCount: number; level: MasteryLevel }[]): PathState[] {
-  let gateOpen = true
-  let currentAssigned = false
+export function resolvePathStates(
+  nodes: { subtopicId: string; questionCount: number; level: MasteryLevel }[],
+  recommendedIds: string[],
+): PathState[] {
+  const isOpen = (node: (typeof nodes)[number]) =>
+    rank(node.level) < rank('competente') && !(node.questionCount === 0 && node.level === 'sin_empezar')
+  const current =
+    nodes.find((node) => isOpen(node) && recommendedIds.includes(node.subtopicId)) ?? nodes.find(isOpen)
   return nodes.map((node) => {
-    if (rank(node.level) >= rank('competente')) {
-      gateOpen = true
-      return 'mastered'
-    }
+    if (rank(node.level) >= rank('competente')) return 'mastered'
     if (node.questionCount === 0 && node.level === 'sin_empezar') return 'empty'
-
-    const unlocked = gateOpen || node.level !== 'sin_empezar'
-    gateOpen = rank(node.level) >= rank('familiar')
-    if (!unlocked) return 'locked'
-    if (!currentAssigned) {
-      currentAssigned = true
-      return 'current'
-    }
-    return 'available'
+    return node === current ? 'current' : 'available'
   })
+}
+
+// What each level needs to climb, in the rules of `mastery.ts`.
+const NEXT_STEP: Record<MasteryLevel, string> = {
+  sin_empezar: 'Para Familiar: acierta 7 de cada 10 en una práctica del tema.',
+  intentado: 'Para Familiar: acierta 7 de cada 10 en una práctica del tema.',
+  familiar: 'Para Competente: una práctica perfecta de 4 o más preguntas, sin pedir ayuda al tutor.',
+  competente: 'Para Dominado: acierta todo el tema en un reto, una nivelación o un simulacro.',
+  dominado: 'Es el nivel más alto: el repaso y los retos lo mantienen.',
+}
+
+/** One line of a session's close: the step it took, or what the next one needs. */
+export function closingLine(change: { from: MasteryLevel; to: MasteryLevel }): { moved: 'up' | 'down' | 'same'; text: string } {
+  if (change.from === change.to) {
+    return { moved: 'same', text: `Sigue en ${MASTERY_LEVEL_LABELS[change.to]}. ${NEXT_STEP[change.to]}` }
+  }
+  return {
+    moved: rank(change.to) > rank(change.from) ? 'up' : 'down',
+    text: `${MASTERY_LEVEL_LABELS[change.from]} → ${MASTERY_LEVEL_LABELS[change.to]}`,
+  }
 }

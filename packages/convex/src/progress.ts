@@ -1,4 +1,5 @@
 import { internalMutation, query } from './_generated/server'
+import { careerScore, getCareerFamily } from './careers'
 import { v } from 'convex/values'
 import type { Doc } from './_generated/dataModel'
 import { assertCanViewStudent } from './auth'
@@ -11,7 +12,7 @@ import {
   getSubjectLevels,
 } from './levels'
 import { DEFAULT_RATING, expectedScore } from './elo'
-import { estimateGlobalScore, highestLeverageSubject } from './globalScore'
+import { estimateGlobalScore, highestLeverageSubject, provisionalGlobalRange } from './globalScore'
 import { getNationalPercentileAtOrBelow, getNationalShare } from './national'
 import { summarizeConfidence, type ConfidenceLevel } from './confidence'
 import { settledAttempts } from './sessionIntegrity'
@@ -46,7 +47,6 @@ function evidenceLevel(attemptCount: number) {
 function masteryScore(metrics: {
   accuracy: number
   recentAccuracy: number
-  hintRate: number
   tutorRate: number
   attemptCount: number
 }) {
@@ -58,7 +58,6 @@ function masteryScore(metrics: {
       metrics.recentAccuracy * 0.55
       + metrics.accuracy * 0.4
       + evidenceBoost
-      - metrics.hintRate * 0.08
       - metrics.tutorRate * 0.04,
     ),
   )
@@ -101,7 +100,6 @@ function summarizeAttempts(attempts: AttemptMetric[]) {
     masteryScore: masteryScore({
       accuracy,
       recentAccuracy,
-      hintRate,
       tutorRate,
       attemptCount,
     }),
@@ -204,7 +202,12 @@ export const rebuildStudentProgress = internalMutation({
     const masteryBySubtopicId = new Map(
       existingSubtopicAggregates.map((aggregate) => [
         aggregate.subtopicId,
-        { masteryLevel: aggregate.masteryLevel, masteryUpdatedAt: aggregate.masteryUpdatedAt },
+        {
+          masteryLevel: aggregate.masteryLevel,
+          masteryUpdatedAt: aggregate.masteryUpdatedAt,
+          reviewBox: aggregate.reviewBox,
+          reviewDueAt: aggregate.reviewDueAt,
+        },
       ]),
     )
     for (const aggregate of existingSubtopicAggregates) {
@@ -405,8 +408,20 @@ function buildGlobalScore(
 
   const target = student?.targetGlobalScore ?? null
 
+  const family = getCareerFamily(student?.careerFamily)
   return {
     estimate,
+    // The career's weighted 0-100 next to the global (plans/meta-carrera.md); the global stays official.
+    career: family == null ? null : {
+      familyId: family.id,
+      label: family.label,
+      source: family.source,
+      score: careerScore(family.id, scored.map((level) => ({ subjectId: level.subjectId, score: level.currentScore! }))),
+    },
+    // Before all five areas: a wide range that narrows with each one (F35).
+    provisional: estimate != null ? null : provisionalGlobalRange(
+      scored.map((level) => ({ subjectId: level.subjectId, score: level.currentScore!, attemptCount: level.attemptCount })),
+    ),
     missingSubjectIds,
     target,
     pointsToTarget: estimate == null || target == null ? null : Math.max(0, target - estimate.score),

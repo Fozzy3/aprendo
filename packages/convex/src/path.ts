@@ -17,7 +17,7 @@ import type { QuestionEligibilityPool } from './sessionKinds'
  * ICFES level.
  *
  * Node *state* (locked / available / mastered) is deliberately NOT computed
- * here: the mastery bands live in `apps/web/src/lib/syllabus-status.ts` and are
+ * here: the mastery bands live in `apps/web/src/lib/mastery-display.ts` and are
  * shared with the Temario and Progreso, so the client derives state from the raw
  * mastery this returns. Duplicating the thresholds server-side is exactly how
  * the two surfaces would drift apart.

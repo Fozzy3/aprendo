@@ -4,8 +4,30 @@ import { Wordmark } from '../components/BrandMark.tsx'
 import { ThemeToggle } from '../components/ThemeToggle.tsx'
 import { CONTACT_EMAIL } from '../lib/contact.ts'
 import { useCurrentStudent } from '../lib/student-session.ts'
+import { SITE_URL, publicHead } from '../lib/site.ts'
 
 export const Route = createFileRoute('/')({
+  head: () => {
+    const head = publicHead({"title":"Aprendo: el nivel ICFES de cada estudiante, para colegios","description":"Aprendo es una plataforma de preparación para el Saber 11 del ICFES, para colegios de Colombia: ubica a cada estudiante de grado 11 en los niveles del examen, le arma un plan diario y le muestra al docente quién necesita apoyo y en qué competencia.","path":"/"})
+    if (SITE_URL == null) return head
+    // Organization, not EducationalOrganization: Aprendo makes software, it is not a school.
+    const jsonLd = {
+      '@context': 'https://schema.org',
+      '@graph': [
+        {
+          '@type': 'Organization',
+          '@id': `${SITE_URL}/#org`,
+          name: 'Aprendo',
+          url: `${SITE_URL}/`,
+          description: 'Plataforma de preparación para el examen Saber 11 para colegios de Colombia. No está afiliada al ICFES.',
+          areaServed: { '@type': 'Country', name: 'Colombia' },
+          ...(CONTACT_EMAIL != null ? { email: CONTACT_EMAIL } : {}),
+        },
+        { '@type': 'WebSite', url: `${SITE_URL}/`, name: 'Aprendo', inLanguage: 'es-CO', publisher: { '@id': `${SITE_URL}/#org` } },
+      ],
+    }
+    return { ...head, scripts: [{ type: 'application/ld+json', children: JSON.stringify(jsonLd) }] }
+  },
   component: LandingPage,
 })
 
@@ -46,8 +68,9 @@ function LandingPage() {
           <div>
             <h1 className="landing-title">El nivel ICFES de cada estudiante, área por área, antes del examen.</h1>
             <p className="landing-lede">
-              Aprendo ubica a sus estudiantes de grado 11 en los niveles del Saber 11, les arma un plan de
-              estudio diario y le muestra a cada docente quién necesita apoyo y en qué competencia.
+              Aprendo es una plataforma de preparación para el Saber 11 del ICFES, para colegios de Colombia.
+              Ubica a sus estudiantes de grado 11 en los niveles del examen, les arma un plan de estudio diario
+              y le muestra a cada docente quién necesita apoyo y en qué competencia.
             </p>
             <div className="landing-cta">
               {contactHref != null ? (
@@ -67,7 +90,9 @@ function LandingPage() {
               <p className="landing-artifact-title">11A · Nivel por área</p>
               <span className="text-xs text-[var(--text-tertiary)]">Panel docente</span>
             </div>
-            <table className="data-table">
+            {/* On a phone the sample scrolls sideways instead of wrapping "Nivel 3". */}
+            <div className="overflow-x-auto">
+            <table className="data-table landing-sample">
               <thead>
                 <tr>
                   <th scope="col">Estudiante</th>
@@ -92,6 +117,7 @@ function LandingPage() {
                 ))}
               </tbody>
             </table>
+            </div>
             <figcaption>Ejemplo con estudiantes ficticios. «—» quiere decir que aún no hay respuestas suficientes para dar un nivel.</figcaption>
           </figure>
         </section>
@@ -136,15 +162,17 @@ function LandingPage() {
             <h2 id="teacher-title" className="landing-h2">Lo que ve el docente</h2>
             <p className="landing-copy">
               Cada curso tiene su código. Los estudiantes se unen con él y el docente ve, sin hacer nada más,
-              el nivel de cada uno por área, quién no se ha nivelado, quién lleva dos semanas sin practicar y
-              qué temas le cuestan al grupo entero.
+              qué enseñar esta semana a todo el curso, qué grupos pequeños armar, con quién hablar uno a uno,
+              las preguntas que más falla el grupo y su desempeño por competencia ICFES. Puede asignar práctica
+              al curso o a un grupo y ver quién la hizo.
             </p>
           </div>
           <div>
             <h2 className="landing-h2">Y lo que no puede hacer</h2>
             <p className="landing-copy">
-              Responder por un estudiante. El docente lee; solo el estudiante practica y presenta sus
-              simulacros. Así el nivel que aparece en el panel es del estudiante.
+              Responder por un estudiante, calificarlo o ver sus respuestas en vivo. El docente asigna
+              práctica; solo el estudiante practica y presenta sus simulacros. Así el nivel que aparece en el
+              panel es del estudiante.
             </p>
           </div>
         </section>

@@ -50,3 +50,51 @@ export function getSubjectLabel(subjectId: string): string {
 export function getSubtopicLabel(subtopicId: string): string {
   return subtopicContextById.get(subtopicId)?.label ?? subtopicId
 }
+
+/**
+ * The official ICFES competencias (afirmaciones in Lectura Crítica), in the
+ * order the ICFES reports them. Questions carry one as the secondary dimension
+ * `competencia_oficial`; schools read their results in these words (F35).
+ */
+const COMPETENCIA_ORDER: string[] = Object.values(taxonomyContract.secondary_dimensions.competencia_oficial.values).flat()
+
+const COMPETENCIA_LABELS: Record<string, string> = {
+  interpretacion_representacion: 'Interpretación y representación',
+  formulacion_ejecucion: 'Formulación y ejecución',
+  argumentacion: 'Argumentación',
+  pensamiento_social: 'Pensamiento social',
+  analisis_perspectivas: 'Interpretación y análisis de perspectivas',
+  pensamiento_reflexivo_sistemico: 'Pensamiento reflexivo y sistémico',
+  uso_comprensivo: 'Uso comprensivo del conocimiento científico',
+  explicacion_fenomenos: 'Explicación de fenómenos',
+  indagacion: 'Indagación',
+  afirmacion_1_local: 'Identificar y entender contenidos locales',
+  afirmacion_2_global: 'Comprender cómo se articulan las partes',
+  afirmacion_3_critica: 'Reflexionar y evaluar',
+  linguistica: 'Lingüística',
+  pragmatica: 'Pragmática',
+  sociolinguistica: 'Sociolingüística',
+}
+
+export function getCompetenciaLabel(competencia: string): string {
+  return COMPETENCIA_LABELS[competencia] ?? competencia
+}
+
+/** The competencia a question is tagged with, when the enrichment found one. */
+export function competenciaOf(question: { secondaryDimensions?: { dimension: string; value: string }[] }) {
+  return question.secondaryDimensions?.find((item) => item.dimension === 'competencia_oficial')?.value ?? null
+}
+
+/** Answers per area and competencia, official order; untagged answers are left out. */
+export function competencyBreakdown(answers: { subjectId: string; competencia: string | null; isCorrect: boolean }[]) {
+  const rows = new Map<string, { subjectId: string; competencia: string; answered: number; correct: number }>()
+  for (const answer of answers) {
+    if (answer.competencia == null) continue
+    const key = `${answer.subjectId}:${answer.competencia}`
+    const row = rows.get(key) ?? { subjectId: answer.subjectId, competencia: answer.competencia, answered: 0, correct: 0 }
+    row.answered += 1
+    if (answer.isCorrect) row.correct += 1
+    rows.set(key, row)
+  }
+  return [...rows.values()].sort((a, b) => COMPETENCIA_ORDER.indexOf(a.competencia) - COMPETENCIA_ORDER.indexOf(b.competencia))
+}

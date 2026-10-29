@@ -5,8 +5,9 @@ import { BookOpen, Play } from 'lucide-react'
 import { useState, type CSSProperties } from 'react'
 import { api } from '@aprendo/convex/api'
 import type { MasteryLevel } from '@aprendo/convex/mastery'
-import { learningPathQuery, pathSubjectsQuery, studentProgressQuery } from '../lib/student-queries.ts'
+import { learningPathQuery, pathSubjectsQuery, studentProgressQuery, todayDashboardQuery } from '../lib/student-queries.ts'
 import { getSubjectTheme } from '../lib/subject-theme.ts'
+import { focusSubjectId } from '../lib/progress-display.ts'
 import { readConvexError } from '../lib/convex-error.ts'
 import {
   levelFor,
@@ -31,10 +32,14 @@ type PathNode = {
 }
 
 export function LearningPathPage({ studentId }: { studentId: string }) {
-  const [subjectId, setSubjectId] = useState(DEFAULT_SUBJECT_ID)
+  const [pickedSubjectId, setSubjectId] = useState<string | null>(null)
+  const progress = useQuery(studentProgressQuery(studentId))
+  // The plan's picks are the one compass (F33): Ruta opens on their area and marks them.
+  const today = useQuery(todayDashboardQuery(studentId))
+  const nextSubtopics = today.data?.plan.nextSubtopics ?? []
+  const subjectId = pickedSubjectId ?? focusSubjectId(nextSubtopics, progress.data?.subjectAggregates ?? []) ?? DEFAULT_SUBJECT_ID
   const subjects = useQuery(pathSubjectsQuery(studentId))
   const path = useQuery(learningPathQuery(studentId, subjectId))
-  const progress = useQuery(studentProgressQuery(studentId))
 
   const theme = getSubjectTheme(subjectId)
   const nodes =
@@ -120,7 +125,7 @@ export function LearningPathPage({ studentId }: { studentId: string }) {
                 </EmptyState>
               ) : (
                 <>
-                  <PathLines nodes={nodes} studentId={studentId} />
+                  <PathLines nodes={nodes} studentId={studentId} recommendedIds={nextSubtopics.map((item) => item.subtopicId)} />
                   <div className="mt-5">
                     <MasteryLegend />
                   </div>
@@ -162,7 +167,7 @@ function LevelSection({ level }: { level: SubjectLevel }) {
       <h2 id="path-level-title" className="section-title">Tu nivel ICFES</h2>
       {placement == null ? (
         <>
-          <p className="m-0 font-display text-2xl font-semibold text-[var(--text-primary)]">Sin nivel aún</p>
+          <p className="empty-state-title m-0">Sin nivel aún</p>
           <p className="mt-1 max-w-[60ch] text-sm text-[var(--text-secondary)]">
             Te faltan {level.attemptsNeeded} preguntas en esta área para calcular tu nivel ICFES con
             confianza. Haz la nivelación o practica un poco más.
@@ -171,7 +176,7 @@ function LevelSection({ level }: { level: SubjectLevel }) {
       ) : (
         <>
           <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
-            <p className="m-0 font-display text-2xl font-semibold text-[var(--text-primary)]">
+            <p className="figure m-0">
               {placement.band.labelEs}
             </p>
             {placement.nextBand != null && placement.pointsToNextBand != null ? (
@@ -204,8 +209,8 @@ function LevelSection({ level }: { level: SubjectLevel }) {
 }
 
 /** The path as numbered lines: the line you are on is inked, the rest wait. */
-function PathLines({ nodes, studentId }: { nodes: PathNode[]; studentId: string }) {
-  const states = resolvePathStates(nodes)
+function PathLines({ nodes, studentId, recommendedIds }: { nodes: PathNode[]; studentId: string; recommendedIds: string[] }) {
+  const states = resolvePathStates(nodes, recommendedIds)
   return (
     <ol className="plan-lines">
       {nodes.map((node, index) => (
@@ -213,7 +218,7 @@ function PathLines({ nodes, studentId }: { nodes: PathNode[]; studentId: string 
           key={node.subtopicId}
           node={node}
           number={index + 1}
-          state={states[index] ?? 'locked'}
+          state={states[index] ?? 'available'}
           studentId={studentId}
         />
       ))}
@@ -240,10 +245,9 @@ function PathLine({
     },
   })
 
-  const isLocked = state === 'locked'
   const isCurrent = state === 'current'
   const hasQuestions = node.questionCount > 0
-  const isMuted = isLocked || state === 'empty'
+  const isMuted = state === 'empty'
 
   return (
     <li className={`plan-line path-line${isCurrent ? ' is-first' : ''}`} aria-current={isCurrent ? 'step' : undefined}>
@@ -259,9 +263,8 @@ function PathLine({
           <MasteryBadge level={node.level} />
         </span>
         <span className="plan-line-reason">
-          {isCurrent && 'Estás aquí · '}
-          {hasQuestions ? `${node.questionCount} preguntas` : 'Sin preguntas aún: no bloquea tu ruta'}
-          {isLocked && ' · se abre cuando llegues a Familiar en el tema anterior'}
+          {isCurrent && 'Recomendado ahora · '}
+          {hasQuestions ? `${node.questionCount} preguntas` : 'Sin preguntas aún'}
         </span>
 
         {createSession.error ? (
@@ -271,35 +274,33 @@ function PathLine({
         ) : null}
       </div>
 
-      {!isLocked ? (
-        <span className="path-line-actions">
-          <Link
-            to="/lesson/$subtopicId"
-            params={{ subtopicId: node.subtopicId }}
-            className="btn-ghost text-xs no-underline"
+      <span className="path-line-actions">
+        <Link
+          to="/lesson/$subtopicId"
+          params={{ subtopicId: node.subtopicId }}
+          className="btn-ghost no-underline"
+        >
+          <BookOpen size={13} aria-hidden />
+          {node.hasLesson ? 'Ver lección' : 'Aprender el tema'}
+        </Link>
+        {hasQuestions ? (
+          <button
+            type="button"
+            disabled={createSession.isPending}
+            onClick={() =>
+              createSession.mutate({
+                studentId: studentId as never,
+                kind: 'topic',
+                subtopicId: node.subtopicId,
+              })
+            }
+            className={`${isCurrent ? 'btn-primary' : 'btn-secondary'}`}
           >
-            <BookOpen size={13} aria-hidden />
-            {node.hasLesson ? 'Ver lección' : 'Aprender el tema'}
-          </Link>
-          {hasQuestions ? (
-            <button
-              type="button"
-              disabled={createSession.isPending}
-              onClick={() =>
-                createSession.mutate({
-                  studentId: studentId as never,
-                  kind: 'topic',
-                  subtopicId: node.subtopicId,
-                })
-              }
-              className={`${isCurrent ? 'btn-primary' : 'btn-secondary'} text-xs`}
-            >
-              <Play size={13} aria-hidden />
-              {createSession.isPending ? 'Preparando…' : 'Practicar'}
-            </button>
-          ) : null}
-        </span>
-      ) : null}
+            <Play size={13} aria-hidden />
+            {createSession.isPending ? 'Preparando…' : 'Practicar'}
+          </button>
+        ) : null}
+      </span>
     </li>
   )
 }

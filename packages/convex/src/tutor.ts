@@ -1,4 +1,5 @@
 import { abortStream, Agent, createTool, extractText, listMessages, listStreams, syncStreams, vStreamArgs, vStreamMessagesReturnValue } from '@convex-dev/agent'
+import { getCareerFamily } from './careers'
 import { stepCountIs } from 'ai'
 import { z } from 'zod'
 import { internal } from './_generated/api'
@@ -103,17 +104,38 @@ cercano, en conversación. No das clases magistrales ni escribes ensayos.
    mucho más que un párrafo que suene bien.
 5. Nunca cites datos, fechas, cifras o fuentes que no estén en el contexto.
 
-## Cómo enseñas
+## Cómo enseñas: método socrático con andamiaje
 
-- **Antes de responder**: si el estudiante todavía no ha contestado la pregunta,
-  no le des la respuesta. Dale una pista, una pregunta que lo empuje, o el
-  criterio para descartar una opción. El objetivo es que la resuelva él.
-- **Después de responder**: responde solo lo que te preguntó. Si falló, dile en
-  una o dos frases **por qué la opción que eligió parecía correcta** — ese es el
-  error que hay que corregir — y por qué la correcta lo es.
-- No lo cubras todo de una vez. Si quiere más (la competencia ICFES, la trampa
-  típica, otro ejemplo), lo pedirá: ofrécelo en una frase corta.
-- Cuando sirva, termina con una pregunta corta que lo ponga a pensar o a probar.
+La meta es que el estudiante llegue a la idea él mismo. Cada mensaje tuyo lleva
+**una sola pregunta**, y esa pregunta tiene un propósito: avanzar un paso o
+destapar un error. Si una pregunta no ayuda, explica directo.
+
+1. **Diagnostica primero.** Si falló y no sabes por qué, pregúntale qué lo llevó
+   a su opción ("¿Qué te hizo pensar en la B?"). Su respuesta te dice cuál es el
+   error de fondo. Esa opción parecía correcta por algo: esa es la trampa que
+   tiene que aprender a ver.
+2. **Sube por escalones.** De lo concreto a lo abstracto: primero un dato del
+   enunciado o un ejemplo cotidiano, luego el concepto, luego la regla. Cada
+   pregunta es un paso pequeño que sí puede dar.
+3. **Destapa el error con una contradicción.** No corrijas una idea equivocada
+   de una vez: pídele que la pruebe donde falla ("Si eso fuera cierto, ¿qué
+   pasaría con la opción D?").
+4. **Ajusta la ayuda.** Empieza con la pista más pequeña. Si se traba dos veces
+   seguidas, muéstrale el primer paso resuelto y pídele el siguiente. Si sigue
+   trabado, explícaselo directo en dos frases. Cuando acierte, quita ayuda.
+5. **Cierra comprobando.** Cuando lo entienda, pídele que lo diga con sus
+   palabras u ofrécele una pregunta parecida para probarse.
+
+Límites del método:
+- **Si todavía no ha contestado la pregunta**, nunca le des la respuesta: solo
+  pistas, preguntas o el criterio para descartar una opción.
+- Si pide la explicación directa ("solo explícame", "no entiendo nada"), dásela
+  corta y termina con una pregunta de comprobación. No conviertas el chat en un
+  interrogatorio: está ansioso y tiene poco tiempo.
+- No le hagas adivinar la palabra que tienes en mente. Si razona bien por otro
+  camino, síguelo.
+- No lo cubras todo de una vez. Si quiere más (la competencia ICFES, otro
+  ejemplo), lo pedirá: ofrécelo en una frase corta.
 
 ## Formato
 
@@ -324,6 +346,8 @@ type QuestionContext = {
   officialExplanation: string | null
   /** The kind of demo that suits this question (see `DEMO_IDEAS`). */
   demoIdea: string | null
+  /** The career family the student studies for (`careers.ts`), when chosen. */
+  careerLabel?: string | null
   attempt: {
     selectedOption: string
     /** `null` until the session is completed: no correctness signal mid-session. */
@@ -341,6 +365,7 @@ const CLOSING_REMINDER = `
 - Si el mensaje no es sobre esta pregunta ni sobre prepararse para el Saber 11,
   responde exactamente: "${OFF_TOPIC_REPLY}"
 - De 1 a 3 frases cortas, como un profe en conversación.
+- Una sola pregunta por mensaje, con propósito. Si se traba dos veces, explícale directo.
 - Nada de HTML, CSS ni JavaScript en el chat: las demos van solo por \`create_artifact\`.
 `.trim()
 
@@ -369,6 +394,10 @@ export function buildTutorSystemPrompt(question: QuestionContext | null): string
   lines.push(`Asignatura: ${question.subjectLabel}`)
   lines.push(`Subtema: ${question.subtopicLabel}`)
   lines.push(`Número: ${question.questionNumber}`)
+  if (question.careerLabel != null) {
+    // Utility value (plans/meta-carrera.md): one line, only when it fits; the scope does not change.
+    lines.push(`Quiere estudiar: ${question.careerLabel}. Si viene al caso, dile en una frase para qué le sirve esto en esa carrera.`)
+  }
   if (question.demoIdea != null) {
     lines.push(`Demostración que funciona bien para este tema: ${question.demoIdea}`)
   }
@@ -433,7 +462,7 @@ async function requireOwnedPracticeSession(
   if (session.studentId !== args.studentId) {
     throw new ConvexError('Session does not belong to this student.')
   }
-  if (!canUseTutor(session.kind, session.status)) {
+  if (!canUseTutor(session.kind, session.status, session.feedbackMode ?? 'al_final')) {
     throw new ConvexError('El tutor no está disponible mientras resuelves esta sesión.')
   }
   return session
@@ -700,7 +729,9 @@ export const getPracticeQuestionContext = internalQuery({
       .withIndex('by_sessionId', (q) => q.eq('sessionId', open._id))
       .filter((q) => q.eq(q.field('questionId'), args.questionId))
       .first()))
-    const canReviewAnswers = session.status === 'completed' && sealedElsewhere.every((row) => row == null)
+    // In review every key is out; mid-practice only a checked one (immediate feedback).
+    const keyShown = session.status === 'completed' || attempt?.checkedAt != null
+    const canReviewAnswers = keyShown && sealedElsewhere.every((row) => row == null)
 
     const group = question.groupId == null ? null : await ctx.db.get("questionGroups", question.groupId)
 
@@ -717,6 +748,7 @@ export const getPracticeQuestionContext = internalQuery({
       correctOption: canReviewAnswers ? question.answerCorrectOption ?? null : null,
       officialExplanation: canReviewAnswers ? question.answerSolutionMarkdown ?? null : null,
       demoIdea: demoIdeaFor(question.subjectId, question.primarySubtopicId),
+      careerLabel: getCareerFamily((await ctx.db.get('students', args.studentId))?.careerFamily)?.label ?? null,
       attempt: isAnswered
         ? {
             selectedOption: attempt.selectedOption!,
@@ -790,6 +822,10 @@ export const sendPracticeTutorMessage = action({
     if (!allowed) {
       throw new ConvexError('Llegaste al límite de mensajes del tutor por hoy. Mañana puedes seguir preguntando.')
     }
+    await ctx.runMutation(internal.sessions.recordTutorUse, {
+      sessionId: args.practiceSessionId,
+      questionId: args.questionId,
+    })
 
     const questionContext = await ctx.runQuery(internal.tutor.getPracticeQuestionContext, {
       practiceSessionId: args.practiceSessionId,

@@ -36,7 +36,7 @@ export const LEARNING_STATE_DISPLAY: Record<
   { label: string; description: string; tone: 'good' | 'warn' | 'danger' | 'neutral' }
 > = {
   mastered: {
-    label: 'Dominado',
+    label: 'Seguro y bien',
     description: 'Respondiste bien y sabías por qué.',
     tone: 'good',
   },

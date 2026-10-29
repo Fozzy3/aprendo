@@ -7,8 +7,9 @@ import { api } from '@aprendo/convex/api'
 import { SESSION_KIND_CONFIG } from '@aprendo/convex/sessionKinds'
 import { MarkdownBlock } from './MarkdownBlock.tsx'
 import { DailyPlan } from './DailyPlan.tsx'
-import { ExamCountdown, TargetGap } from './ExamCountdown.tsx'
-import { StudyTimeCard } from './StudyTimeCard.tsx'
+import { TeacherAssignments } from './TeacherAssignments.tsx'
+import { CareerCard } from './CareerPicker.tsx'
+import { ExamCountdown } from './ExamCountdown.tsx'
 import {
   activeSessionQuery,
   coachSummaryQuery,
@@ -18,6 +19,7 @@ import {
 } from '../lib/student-queries.ts'
 import { readConvexError } from '../lib/convex-error.ts'
 import { getSubjectTheme } from '../lib/subject-theme.ts'
+import { focusSubjectId } from '../lib/progress-display.ts'
 import { PageLoader } from '../components/FullScreenLoader.tsx'
 
 function greeting(): string {
@@ -52,13 +54,9 @@ export function TodayPage({ studentId }: { studentId: string }) {
   }
 
   const streakDays = dashboard.data?.streakDays ?? 0
-  const activeDaysThisWeek = dashboard.data?.activeDaysThisWeek ?? 0
-  const weeklyGoal = dashboard.data?.weeklyGoal ?? 5
 
-  const subjectAggregates = [...(progress.data?.subjectAggregates ?? [])].sort(
-    (a, b) => a.masteryScore - b.masteryScore,
-  )
-  const weakestSubject = subjectAggregates[0] ?? null
+  const focusId = focusSubjectId(dashboard.data?.plan.nextSubtopics ?? [], progress.data?.subjectAggregates ?? [])
+  const weakestSubject = progress.data?.subjectAggregates.find((aggregate) => aggregate.subjectId === focusId) ?? null
 
   // Frame the weekly focus in ICFES-level language when there is enough
   // evidence to name a level; fall back to the generic nudge otherwise.
@@ -85,12 +83,15 @@ export function TodayPage({ studentId }: { studentId: string }) {
       <aside className="ruled-page-margin" aria-label="Tu semana">
         <p className="ruled-page-date">{today}</p>
         <dl className="margin-facts">
-          <div>
-            <dt>Días de estudio</dt>
-            <dd>
-              {activeDaysThisWeek} de {weeklyGoal}
-            </dd>
-          </div>
+          {dashboard.data != null ? (
+            // One weekly goal, in minutes: effort, not attendance (F33).
+            <div>
+              <dt>Esta semana</dt>
+              <dd>
+                {dashboard.data.studyTime.minutesThisWeek} de {dashboard.data.studyTime.goalMinutes} min
+              </dd>
+            </div>
+          ) : null}
           <div>
             <dt>Días seguidos</dt>
             <dd>{streakDays}</dd>
@@ -111,17 +112,14 @@ export function TodayPage({ studentId }: { studentId: string }) {
 
         {dashboard.data != null ? (
           <>
+            <TeacherAssignments studentId={studentId} />
             <DailyPlan studentId={studentId} tasks={dashboard.data.plan.tasks} />
+            <CareerCard studentId={studentId} mode="invite" />
             <ExamCountdown
               studentId={studentId}
               examDate={dashboard.data.examDate}
               plan={dashboard.data.examPlan}
             />
-            <TargetGap
-              data={dashboard.data.globalScore}
-              daysRemaining={dashboard.data.examPlan?.daysRemaining ?? null}
-            />
-            <StudyTimeCard studentId={studentId} studyTime={dashboard.data.studyTime} />
           </>
         ) : dashboard.isError ? (
           // The plan needs this query; without it Hoy still offers a way in.
@@ -140,7 +138,7 @@ export function TodayPage({ studentId }: { studentId: string }) {
         ) : null}
 
         <section className="ruled-section" aria-labelledby="today-week-title">
-          <h2 id="today-week-title" className="section-title">Esta semana</h2>
+          <h2 id="today-week-title" className="section-title">Tu foco</h2>
           <ul className="ruled-list">
             <li>
               {weakestSubject != null && weakestTheme != null ? (

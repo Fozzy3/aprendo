@@ -64,7 +64,8 @@ export const Route = createRootRouteWithContext<{
       },
       {
         name: 'viewport',
-        content: 'width=device-width, initial-scale=1',
+        // The keyboard resizes the page, so the fixed tutor sheet stays above it.
+        content: 'width=device-width, initial-scale=1, interactive-widget=resizes-content',
       },
       {
         title: 'Aprendo | ICFES Saber 11',
@@ -74,12 +75,22 @@ export const Route = createRootRouteWithContext<{
         content:
           'Aprendo ubica a cada estudiante de grado 11 en los niveles del Saber 11, le arma un plan diario y le muestra al docente quién necesita apoyo.',
       },
+      // Private by default: the app's routes guard on the client, so the server
+      // answers them with a loader. Public pages opt back in (lib/site.ts).
+      { name: 'robots', content: 'noindex, nofollow' },
+      { name: 'theme-color', content: '#16233f' },
+      { property: 'og:type', content: 'website' },
+      { property: 'og:site_name', content: 'Aprendo' },
+      { property: 'og:locale', content: 'es_CO' },
+      { name: 'twitter:card', content: 'summary' },
     ],
     links: [
       {
         rel: 'stylesheet',
         href: appCss,
       },
+      { rel: 'icon', href: '/favicon.svg', type: 'image/svg+xml' },
+      { rel: 'manifest', href: '/manifest.json' },
     ],
   }),
   component: RootComponent,
@@ -104,7 +115,7 @@ function RootComponent() {
       authClient={authClient}
       initialToken={ctx.token ?? undefined}
     >
-      <html lang="es" suppressHydrationWarning>
+      <html lang="es-CO" suppressHydrationWarning>
         <head>
           <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
           <HeadContent />

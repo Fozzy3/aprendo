@@ -1,5 +1,6 @@
 import { describe, expect, test } from 'bun:test'
 import {
+  provisionalGlobalRange,
   MAX_GLOBAL_SCORE,
   REQUIRED_SUBJECT_IDS,
   SUBJECT_WEIGHTS,
@@ -150,5 +151,28 @@ describe('highestLeverageSubject', () => {
     expect(
       highestLeverageSubject([{ subjectId: 'filosofia', score: 10, attemptCount: 50 }]),
     ).toBeNull()
+  })
+})
+
+describe('provisionalGlobalRange', () => {
+  test('one area in: a wide but honest range around it, narrowing as areas arrive', () => {
+    const one = provisionalGlobalRange([{ subjectId: 'matematicas', score: 60, attemptCount: 15 }])!
+    expect(one.missingCount).toBe(4)
+    expect(one.low).toBeLessThan(300)
+    expect(one.high).toBeGreaterThan(300)
+    const four = provisionalGlobalRange([
+      { subjectId: 'matematicas', score: 60, attemptCount: 15 },
+      { subjectId: 'lectura_critica', score: 60, attemptCount: 15 },
+      { subjectId: 'ciencias_naturales', score: 60, attemptCount: 15 },
+      { subjectId: 'sociales_ciudadanas', score: 60, attemptCount: 15 },
+    ])!
+    expect(four.high - four.low).toBeLessThan(one.high - one.low)
+  })
+
+  test('nothing measured, or everything measured, is not provisional', () => {
+    expect(provisionalGlobalRange([])).toBeNull()
+    const all = ['lectura_critica', 'matematicas', 'ciencias_naturales', 'sociales_ciudadanas', 'ingles']
+      .map((subjectId) => ({ subjectId, score: 50, attemptCount: 15 }))
+    expect(provisionalGlobalRange(all)).toBeNull()
   })
 })

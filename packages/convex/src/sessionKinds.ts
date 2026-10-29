@@ -88,6 +88,12 @@ export interface SessionKindConfig {
    * before the end (see `sessionIntegrity.canCheckAnswers`).
    */
   allowsImmediateFeedback: boolean
+  /**
+   * What a session gets when the launcher does not choose. Practice teaches, so
+   * it corrects each answer; exams and the reto measure, so they correct at the
+   * end (plans/ruta-mejora-pedagogica.md, F31).
+   */
+  defaultFeedbackMode: FeedbackMode
 }
 
 export interface SubjectQuestionTarget {
@@ -118,6 +124,7 @@ export const SESSION_KIND_CONFIG: Record<SessionKind, SessionKindConfig> = {
     launchableFromHub: false,
     requiresSubject: false,
     allowsImmediateFeedback: false,
+    defaultFeedbackMode: 'al_final',
   },
   nivelacion: {
     kind: 'nivelacion',
@@ -137,6 +144,7 @@ export const SESSION_KIND_CONFIG: Record<SessionKind, SessionKindConfig> = {
     launchableFromHub: true,
     requiresSubject: true,
     allowsImmediateFeedback: false,
+    defaultFeedbackMode: 'al_final',
   },
   recommended: {
     kind: 'recommended',
@@ -146,11 +154,12 @@ export const SESSION_KIND_CONFIG: Record<SessionKind, SessionKindConfig> = {
     totalQuestions: 10,
     eligibilityPools: ['diagnostic', 'practice_only'],
     timeLimitMs: null,
-    tutorInSolve: false,
+    tutorInSolve: true,
     requiresDiagnostic: true,
     launchableFromHub: true,
     requiresSubject: false,
     allowsImmediateFeedback: true,
+    defaultFeedbackMode: 'inmediata',
   },
   topic: {
     kind: 'topic',
@@ -160,25 +169,27 @@ export const SESSION_KIND_CONFIG: Record<SessionKind, SessionKindConfig> = {
     totalQuestions: 10,
     eligibilityPools: ['diagnostic', 'practice_only'],
     timeLimitMs: null,
-    tutorInSolve: false,
+    tutorInSolve: true,
     requiresDiagnostic: true,
     launchableFromHub: true,
     requiresSubject: true,
     allowsImmediateFeedback: true,
+    defaultFeedbackMode: 'inmediata',
   },
   repaso: {
     kind: 'repaso',
-    labelEs: 'Repaso de errores',
-    taglineEs: 'Vuelve a las preguntas que fallaste para afianzarlas.',
+    labelEs: 'Repaso espaciado',
+    taglineEs: 'Los temas que tocan hoy vuelven con preguntas nuevas, espaciados en el tiempo.',
     strategy: 'review_mistakes',
     totalQuestions: 10,
     eligibilityPools: ['diagnostic', 'practice_only'],
     timeLimitMs: null,
-    tutorInSolve: false,
+    tutorInSolve: true,
     requiresDiagnostic: true,
     launchableFromHub: true,
     requiresSubject: false,
     allowsImmediateFeedback: true,
+    defaultFeedbackMode: 'inmediata',
   },
   simulacro: {
     kind: 'simulacro',
@@ -216,6 +227,7 @@ export const SESSION_KIND_CONFIG: Record<SessionKind, SessionKindConfig> = {
     launchableFromHub: true,
     requiresSubject: false,
     allowsImmediateFeedback: false,
+    defaultFeedbackMode: 'al_final',
   },
   personalizada: {
     kind: 'personalizada',
@@ -235,6 +247,7 @@ export const SESSION_KIND_CONFIG: Record<SessionKind, SessionKindConfig> = {
     launchableFromHub: false,
     requiresSubject: false,
     allowsImmediateFeedback: true,
+    defaultFeedbackMode: 'al_final',
   },
   reto: {
     kind: 'reto',
@@ -249,8 +262,12 @@ export const SESSION_KIND_CONFIG: Record<SessionKind, SessionKindConfig> = {
     launchableFromHub: true,
     requiresSubject: false,
     allowsImmediateFeedback: false,
+    defaultFeedbackMode: 'al_final',
   },
 }
+
+/** Questions per teacher assignment (F40): a topic practice, or the exit ticket. */
+export const ASSIGNMENT_QUESTION_COUNT = { practica: 10, tiquete: 3 } as const
 
 export function getSessionKindConfig(kind: SessionKind): SessionKindConfig {
   return SESSION_KIND_CONFIG[kind]

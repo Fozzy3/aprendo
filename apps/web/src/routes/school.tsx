@@ -10,7 +10,8 @@ import { FullScreenLoader, PageLoader } from '../components/FullScreenLoader.tsx
 import { StaffShell } from '../components/StaffShell.tsx'
 import { readConvexError } from '../lib/convex-error.ts'
 import { mySchoolsQuery } from '../lib/student-queries.ts'
-import { studentDisplayName } from '../lib/teacher-display.ts'
+import { belowShareLabel, studentDisplayName } from '../lib/teacher-display.ts'
+import { getSubtopicLabel } from '@aprendo/convex/taxonomy'
 import { useSignedIn } from '../lib/use-signed-in.ts'
 
 type SchoolSearch = { colegio?: string }
@@ -122,6 +123,7 @@ function SchoolAdminBody({ admin, selfEmail }: { admin: SchoolAdmin; selfEmail: 
 
         <IdentitySection admin={admin} />
         <ClassesSection admin={admin} teachers={teachers} />
+        <CyclesSection orgId={admin.organization._id} />
         <TeachersSection admin={admin} teachers={teachers} selfEmail={selfEmail} />
         <StudentsSection students={students} />
       </div>
@@ -510,6 +512,43 @@ function StudentsSection({ students }: { students: SchoolAdmin['members'] }) {
           {readConvexError(removeMutation.error, 'No se pudo quitar.')}
         </p>
       ) : null}
+    </section>
+  )
+}
+
+/**
+ * What each class worked on in its latest teaching cycle and how it moved
+ * (F42): the school's view for the coordinator and the PMI.
+ */
+function CyclesSection({ orgId }: { orgId: string }) {
+  const cycles = useQuery(convexQuery(api.teacher.listSchoolCycles, { orgId: orgId as never }))
+  if (cycles.data == null || cycles.data.length === 0) return null
+  return (
+    <section className="ruled-section" aria-labelledby="cycles-title">
+      <h2 id="cycles-title" className="section-title">Ciclos de enseñanza</h2>
+      <div className="overflow-x-auto">
+      <table className="data-table">
+        <thead>
+          <tr>
+            <th>Curso</th>
+            <th>Tema</th>
+            <th className="is-number">Bajo Familiar al empezar</th>
+            <th className="is-number">Hoy</th>
+          </tr>
+        </thead>
+        <tbody>
+          {cycles.data.flatMap((cycle) =>
+            cycle.progress.map((row, index) => (
+              <tr key={`${cycle.cycleId}-${row.subtopicId}`}>
+                <td>{index === 0 ? cycle.classGroupName : ''}</td>
+                <td>{getSubtopicLabel(row.subtopicId)}</td>
+                <td className="is-number">{belowShareLabel(row.before)}</td>
+                <td className="is-number">{belowShareLabel(row.after)}</td>
+              </tr>
+            )))}
+        </tbody>
+      </table>
+      </div>
     </section>
   )
 }

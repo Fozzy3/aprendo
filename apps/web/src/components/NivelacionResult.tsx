@@ -4,7 +4,9 @@ import { Link } from '@tanstack/react-router'
 import { ArrowRight, BookOpen, ListChecks } from 'lucide-react'
 import type { CSSProperties } from 'react'
 import { api } from '@aprendo/convex/api'
+import { MIN_ATTEMPTS_FOR_LEVEL } from '@aprendo/convex/levels'
 import { PageLoader } from './FullScreenLoader.tsx'
+import { CareerCard } from './CareerPicker.tsx'
 import { PracticeSubtopicButton } from './PracticeSubtopicButton.tsx'
 import { celebrationFor, previousPlacementIndex } from '../lib/result-display.ts'
 import { sessionHistoryQuery, studentAppStateQuery } from '../lib/student-queries.ts'
@@ -134,7 +136,7 @@ export function NivelacionResult({
         {!result.hasEnoughEvidence ? (
           <p className="notice">
             <strong className="text-[var(--text-primary)]">Estimación preliminar.</strong> Respondiste
-            menos de 12 preguntas, así que este nivel puede cambiar. Nivela de nuevo esta área cuando
+            menos de {MIN_ATTEMPTS_FOR_LEVEL} preguntas, así que este nivel puede cambiar. Nivela de nuevo esta área cuando
             quieras para confirmarlo.
           </p>
         ) : null}
@@ -222,6 +224,9 @@ export function NivelacionResult({
           </Link>
         )}
       </section>
+
+      {/* Right after seeing the level: what is this score for? Never a gate. */}
+      <CareerCard studentId={studentId} mode="invite" />
 
       <div className="border-t border-[var(--border-strong)] pt-5">{reviewLink}</div>
     </div>

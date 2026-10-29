@@ -133,6 +133,17 @@ describe('teachers see their school, never act for a student', () => {
     await expect(outsider.as.query(api.teacher.getClassOverview, { classGroupId })).rejects.toThrow()
   })
 
+  test('the week plan: only class staff read it, and a new student is someone to talk to', async () => {
+    const { t, profe, classGroupId, inviteCode } = await schoolWithClass()
+    const ana = await signUp(t, 'ana@x.co')
+    await ana.as.mutation(api.schools.joinClassGroup, { inviteCode })
+    const plan = await profe.as.query(api.teacher.getClassTeachingPlan, { classGroupId })
+    expect(plan.wholeClass).toEqual([])
+    expect(plan.items).toEqual([])
+    expect(plan.individual).toMatchObject([{ studentId: ana.studentId, name: null, riskReasons: ['sin_nivelacion', 'inactivo'] }])
+    await expect(ana.as.query(api.teacher.getClassTeachingPlan, { classGroupId })).rejects.toThrow()
+  })
+
   test('a teacher lists only the classes assigned to them; the school admin lists all', async () => {
     const { profe, rector, orgId } = await schoolWithClass()
     await rector.as.mutation(api.schools.createClassGroup, { orgId, name: '11B', grade: '11' })
@@ -184,5 +195,15 @@ describe('Aprendo staff name another school admin', () => {
     await platform.as.mutation(api.schools.addOrgAdmin, { orgId, email: 'coordinadora@colegio.co' })
     const schools = await nueva.as.query(api.schools.getMySchools, {})
     expect(schools[0]?.role).toBe('org_admin')
+  })
+})
+
+describe('competencias for the class', () => {
+  test('class staff read the class per ICFES competencia; nobody else does', async () => {
+    const { t, profe, classGroupId, inviteCode } = await schoolWithClass()
+    const ana = await signUp(t, 'ana@x.co')
+    await ana.as.mutation(api.schools.joinClassGroup, { inviteCode })
+    expect(await profe.as.query(api.teacher.getClassCompetencias, { classGroupId })).toEqual([])
+    await expect(ana.as.query(api.teacher.getClassCompetencias, { classGroupId })).rejects.toThrow()
   })
 })

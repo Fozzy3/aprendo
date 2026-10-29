@@ -2,6 +2,7 @@ import { describe, expect, test } from 'bun:test'
 import { SESSION_KIND_CONFIG } from '../src/sessionKinds'
 import type { MasteryLevel } from '../src/mastery'
 import { RETEST_INTERVAL_DAYS, buildStudyPlan, type StudyPlanInput } from '../src/studyPlan'
+import { careerWeights } from '../src/careers'
 
 const TODAY = 20_000
 const SUBJECTS = ['lectura_critica', 'matematicas', 'ciencias_naturales', 'sociales_ciudadanas', 'ingles']
@@ -39,6 +40,35 @@ function input(overrides: Partial<StudyPlanInput> = {}): StudyPlanInput {
 }
 
 const kinds = (plan: ReturnType<typeof buildStudyPlan>) => plan.tasks.map((task) => task.kind)
+
+describe('nextSubtopics — the one compass', () => {
+  test('ranks by global points within reach and skips what is already competente', () => {
+    const plan = buildStudyPlan(input({
+      areas: [
+        { subjectId: 'matematicas', score: 30, hasEnoughEvidence: true, isPlaced: true },
+        { subjectId: 'ingles', score: 30, hasEnoughEvidence: true, isPlaced: true },
+        { subjectId: 'lectura_critica', score: 80, hasEnoughEvidence: true, isPlaced: true },
+      ],
+      subtopics: [
+        subtopic('mat.a', 'matematicas', 0.2),
+        subtopic('mat.b', 'matematicas', 0.9, 'competente'),
+        subtopic('ing.a', 'ingles', 0.1),
+        subtopic('lc.a', 'lectura_critica', 0.2),
+      ],
+    }))
+    // Gains: Matemáticas 3 × 0.7 × 0.8 = 1.68; Inglés 1 × 0.7 × 0.9 = 0.63; a strong
+    // Lectura has little room, 3 × 0.2 × 0.8 = 0.48.
+    expect(plan.nextSubtopics.map((item) => item.subtopicId)).toEqual(['mat.a', 'ing.a', 'lc.a'])
+  })
+})
+
+describe('nextSubtopics — weighted by the career', () => {
+  const same = { subtopics: [subtopic('lc.a', 'lectura_critica', 0.3), subtopic('mat.a', 'matematicas', 0.3)] }
+  test('Derecho picks Lectura, Ingenierías picks Matemáticas, with the same room in both', () => {
+    expect(buildStudyPlan(input({ ...same, subjectWeights: careerWeights('derecho')! })).nextSubtopics[0]?.subtopicId).toBe('lc.a')
+    expect(buildStudyPlan(input({ ...same, subjectWeights: careerWeights('ingenierias')! })).nextSubtopics[0]?.subtopicId).toBe('mat.a')
+  })
+})
 
 describe('buildStudyPlan — placement first', () => {
   test('a pending nivelación leads, heaviest area first, with a launchable action', () => {

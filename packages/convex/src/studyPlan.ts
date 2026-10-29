@@ -52,6 +52,12 @@ export interface StudyPlanInput {
   /** Completed simulacro sittings (Sesión 1 or 2), by Colombia day. */
   simulacroSittings: { day: number; sessionNumber: number }[]
   weeklyGoalMinutes: number
+  /**
+   * The career's area weights (`careers.careerWeights`), when the student chose
+   * one: the plan then works where the career's weighted score gains most. Absent,
+   * the official global weights.
+   */
+  subjectWeights?: Record<string, number>
 }
 
 export type StudyTaskKind = 'lesson' | 'practice' | 'repaso' | 'reto' | 'simulacro' | 'nivelacion'
@@ -84,7 +90,17 @@ function practiceMinutes(questionCount: number) {
 
 const TOPIC_MINUTES = practiceMinutes(SESSION_KIND_CONFIG.topic.totalQuestions ?? 10)
 
-export function buildStudyPlan(input: StudyPlanInput): { tasks: StudyTask[] } {
+/** How many of the next subtopics the other screens show (Progreso, Ruta, Hoy). */
+const NEXT_SUBTOPIC_COUNT = 3
+
+export function buildStudyPlan(input: StudyPlanInput): {
+  tasks: StudyTask[]
+  /**
+   * The subtopics worth the most global points now, best first: the one answer
+   * to "¿qué estudio?" every screen reads (plans/ruta-mejora-pedagogica.md, F33).
+   */
+  nextSubtopics: { subtopicId: string; subjectId: string; level: MasteryLevel }[]
+} {
   const areaScore = new Map(input.areas.map((area) => [area.subjectId, area.score]))
   // Global points within reach: area weight × room left in the area × room
   // left in the subtopic. An unmeasured area counts as halfway.
@@ -92,7 +108,7 @@ export function buildStudyPlan(input: StudyPlanInput): { tasks: StudyTask[] } {
     const score = areaScore.get(subjectId)
     return 1 - (score ?? 50) / 100
   }
-  const weight = (subjectId: string) => SUBJECT_WEIGHTS[subjectId] ?? 0
+  const weight = (subjectId: string) => (input.subjectWeights ?? SUBJECT_WEIGHTS)[subjectId] ?? 0
 
   const measured = new Set(input.subtopics.map((subtopic) => subtopic.subtopicId))
   const unstarted = input.launchableSubtopics
@@ -107,7 +123,11 @@ export function buildStudyPlan(input: StudyPlanInput): { tasks: StudyTask[] } {
     }))
     .sort((a, b) => b.gain - a.gain)
 
-  const main = ranked.find((subtopic) => subtopic.level !== 'competente' && subtopic.level !== 'dominado')
+  const open = ranked.filter((subtopic) => subtopic.level !== 'competente' && subtopic.level !== 'dominado')
+  const main = open[0]
+  const nextSubtopics = open
+    .slice(0, NEXT_SUBTOPIC_COUNT)
+    .map((subtopic) => ({ subtopicId: subtopic.subtopicId, subjectId: subtopic.subjectId, level: subtopic.level }))
   // The familiar subtopic nearest Competente, whatever its gain.
   const quickWin = ranked
     .filter((subtopic) => subtopic.level === 'familiar' && subtopic !== main)
@@ -126,25 +146,26 @@ export function buildStudyPlan(input: StudyPlanInput): { tasks: StudyTask[] } {
           action: { type: 'session', kind: 'topic', subtopicId: quickWin.subtopicId },
         }
 
-  const reviewQuestions = Math.min(input.reviewDueCount, SESSION_KIND_CONFIG.repaso.totalQuestions ?? 10)
+  // A repaso serves 2 new questions per due subtopic (sessions.REVIEW_QUESTIONS_PER_SUBTOPIC).
+  const reviewQuestions = Math.min(input.reviewDueCount * 2, SESSION_KIND_CONFIG.repaso.totalQuestions ?? 10)
   const repasoTask: StudyTask | null =
     input.reviewDueCount <= 0
       ? null
       : {
           id: 'repaso',
           kind: 'repaso',
-          title: 'Repaso de errores',
+          title: 'Repaso espaciado',
           reason:
             input.reviewDueCount === 1
-              ? 'Tienes 1 pregunta que fallaste esperando repaso.'
-              : `Tienes ${input.reviewDueCount} preguntas que fallaste esperando repaso.`,
+              ? '1 tema toca repaso hoy: vuelve con preguntas nuevas.'
+              : `${input.reviewDueCount} temas tocan repaso hoy: vuelven con preguntas nuevas.`,
           minutes: practiceMinutes(reviewQuestions),
           action: { type: 'session', kind: 'repaso' },
         }
 
   const daysToExam = input.examDay == null ? null : input.examDay - input.today
   if (daysToExam != null && daysToExam >= 0 && daysToExam <= LIGHT_DAYS_BEFORE_EXAM) {
-    return { tasks: [repasoTask, quickWinTask].filter((task) => task != null) }
+    return { tasks: [repasoTask, quickWinTask].filter((task) => task != null), nextSubtopics }
   }
 
   const pendingArea = input.areas
@@ -205,7 +226,9 @@ export function buildStudyPlan(input: StudyPlanInput): { tasks: StudyTask[] } {
 
   if (main != null) {
     const label = getSubtopicLabel(main.subtopicId)
-    const why = `${label} (${getSubjectLabel(main.subjectId)}) es donde más puntos del global puedes ganar.`
+    const why = input.subjectWeights != null
+      ? `${label} (${getSubjectLabel(main.subjectId)}) es donde más puntos ganas para tu carrera.`
+      : `${label} (${getSubjectLabel(main.subjectId)}) es donde más puntos del global puedes ganar.`
     if (main.level === 'sin_empezar' || main.level === 'intentado') {
       candidates.push({
         id: `lesson:${main.subtopicId}`,
@@ -280,5 +303,5 @@ export function buildStudyPlan(input: StudyPlanInput): { tasks: StudyTask[] } {
   }
   // A 4 h 30 sitting rarely fits a weekday: it leads, but outside the daily
   // budget, so the weak block is still there on a day it does not fit.
-  return { tasks: simulacro == null ? tasks : [simulacro, ...tasks].slice(0, MAX_TASKS) }
+  return { tasks: simulacro == null ? tasks : [simulacro, ...tasks].slice(0, MAX_TASKS), nextSubtopics }
 }

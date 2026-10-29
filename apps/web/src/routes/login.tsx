@@ -4,10 +4,12 @@ import { Wordmark } from '../components/BrandMark.tsx'
 import { authClient } from '../lib/auth-client.ts'
 import { safeNext } from '../lib/safe-next.ts'
 import { useCurrentStudent } from '../lib/student-session.ts'
+import { publicHead } from '../lib/site.ts'
 
 type LoginSearch = { next?: string }
 
 export const Route = createFileRoute('/login')({
+  head: () => publicHead({"title":"Entrar | Aprendo","description":"Entra a Aprendo para seguir tu preparación para el Saber 11.","path":"/login"}),
   validateSearch: (search: Record<string, unknown>): LoginSearch => ({
     next: typeof search.next === 'string' ? search.next : undefined,
   }),

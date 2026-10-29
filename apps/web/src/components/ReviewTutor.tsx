@@ -1,7 +1,7 @@
 import { useConvexMutation } from '@convex-dev/react-query'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { Bot, PanelRightClose, Sparkles, SquarePlay, Trash2 } from 'lucide-react'
+import { Bot, Mic, PanelRightClose, Sparkles, SquarePlay, Trash2, Volume2, VolumeX } from 'lucide-react'
 import { extractText } from '@convex-dev/agent'
 import { useThreadMessages } from '@convex-dev/agent/react'
 import { api } from '@aprendo/convex/api'
@@ -19,10 +19,11 @@ import { MarkdownBlock } from './MarkdownBlock.tsx'
 import { Conversation, ConversationContent, ConversationEmptyState, ConversationScrollButton } from './ai-elements/conversation.tsx'
 import { Message, MessageContent } from './ai-elements/message.tsx'
 import { PromptInput, PromptInputBody, PromptInputFooter, PromptInputSubmit, PromptInputTextarea } from './ai-elements/prompt-input.tsx'
-import { Shimmer } from './ai-elements/shimmer.tsx'
 import { practiceTutorThreadQuery } from '../lib/student-queries.ts'
 import { readConvexError } from '../lib/convex-error.ts'
 import { cleanTutorReply } from '../lib/tutor-reply.ts'
+import { canSpeak, createRecognition, speak, stopSpeaking } from '../lib/speech.ts'
+import { readStored, writeStored } from '../lib/solve-state.ts'
 
 type ChatRole = 'assistant' | 'user'
 
@@ -41,12 +42,21 @@ type ChatMessage = {
   artifactPending?: boolean
 }
 
-const QUICK_PROMPTS = [
-  'Explícame la respuesta',
-  'Muéstramelo en una demo interactiva',
-  'Dame un problema similar',
-  '¿Qué debo repasar?',
-] as const
+const QUICK_PROMPTS = {
+  review: [
+    'Explícame la respuesta',
+    'Muéstramelo en una demo interactiva',
+    'Dame un problema similar',
+    '¿Qué debo repasar?',
+  ],
+  // Before the key is out the tutor only nudges (tutor.ts): the prompts ask for that.
+  solve: [
+    'Dame una pista',
+    '¿Qué me está preguntando?',
+    '¿Cómo descarto opciones?',
+    'Muéstramelo en una demo interactiva',
+  ],
+} as const
 
 /**
  * The review tutor: thread, composer, and the demos it can open.
@@ -69,6 +79,7 @@ export default function ReviewTutor({
   onClose,
   draft,
   onDraftChange,
+  mode = 'review',
 }: {
   sessionId: string
   practiceSessionId: Id<'sessions'>
@@ -80,6 +91,8 @@ export default function ReviewTutor({
   /** Owned by the route so a collapse/expand remount doesn't lose it. */
   draft: string
   onDraftChange: (value: string) => void
+  /** 'solve' while the question is open: hint prompts, no "explain the answer". */
+  mode?: 'solve' | 'review'
 }) {
   const queryClient = useQueryClient()
 
@@ -89,6 +102,12 @@ export default function ReviewTutor({
   const sendTutorMessage = useAction(api.tutor.sendPracticeTutorMessage)
 
   const [isAborting, setIsAborting] = useState(false)
+  // Voice, phase 0 (plans/tutor-voz.md): the browser listens and reads aloud; no audio is kept.
+  const [readAloud, setReadAloud] = useState(() => readStored('aprendo:tutor-voice') === '1')
+  const [isListening, setIsListening] = useState(false)
+  const [canListen] = useState(() => createRecognition() != null)
+  const recognitionRef = useRef<ReturnType<typeof createRecognition>>(null)
+  const spokenIdRef = useRef<string | null | undefined>(undefined)
   const [openArtifactId, setOpenArtifactId] = useState<Id<'practiceTutorArtifacts'> | null>(null)
   // The composer's latest text, read when a send fails after it was cleared.
   const draftRef = useRef(draft)
@@ -218,6 +237,44 @@ export default function ReviewTutor({
   }, [tutorMessagesResult.results])
 
   const lastMessage = tutorMessages.at(-1)
+  // Read each finished reply once. What was on screen when the chat loaded is
+  // history (null for an empty chat, so its first reply is read).
+  const hasLoadedMessages = tutorThreadQuery.isSuccess
+    && (tutorThreadId == null || tutorMessagesResult.status !== 'LoadingFirstPage')
+  useEffect(() => {
+    if (!hasLoadedMessages) return
+    if (spokenIdRef.current === undefined) {
+      spokenIdRef.current = lastMessage?.id ?? null
+      return
+    }
+    if (lastMessage == null || lastMessage.role !== 'assistant' || lastMessage.streaming === true) return
+    if (spokenIdRef.current === lastMessage.id) return
+    spokenIdRef.current = lastMessage.id
+    if (readAloud) speak(lastMessage.content)
+  }, [hasLoadedMessages, lastMessage, readAloud])
+  // Leaving the question (the chat is keyed by it) stops the mic and the voice.
+  useEffect(() => () => {
+    recognitionRef.current?.stop()
+    stopSpeaking()
+  }, [])
+  const toggleListening = () => {
+    if (isListening) {
+      recognitionRef.current?.stop()
+      return
+    }
+    const recognition = createRecognition()
+    if (recognition == null) return
+    recognition.onresult = (event) => {
+      const transcript = Array.from(event.results).map((result) => result[0]?.transcript ?? '').join(' ').trim()
+      // The student sees what was understood and sends it themselves.
+      if (transcript.length > 0) onDraftChange(`${draftRef.current} ${transcript}`.trim())
+    }
+    recognition.onend = () => setIsListening(false)
+    recognition.onerror = () => setIsListening(false)
+    recognitionRef.current = recognition
+    recognition.start()
+    setIsListening(true)
+  }
   // A reply still streaming counts too: coming back to its question remounts
   // this without the pending send, and the thread must not get a second one.
   const isGenerating = tutorMutation.isPending || streamingOrder != null
@@ -279,10 +336,27 @@ export default function ReviewTutor({
           <span className="tutor-avatar" aria-hidden><Bot size={15} /></span>
           <div className="flex flex-col leading-none">
             <span className="tutor-title">Tutor</span>
-            <span className="tutor-subtitle"><Sparkles size={10} /> revisión</span>
+            <span className="tutor-subtitle"><Sparkles size={10} /> {mode === 'solve' ? 'pistas' : 'revisión'}</span>
           </div>
         </div>
         <div className="inline-flex items-center gap-1">
+          {canSpeak() ? (
+            <button
+              type="button"
+              onClick={() => {
+                const next = !readAloud
+                setReadAloud(next)
+                writeStored('aprendo:tutor-voice', next ? '1' : null)
+                if (!next) stopSpeaking()
+              }}
+              aria-pressed={readAloud}
+              title={readAloud ? 'Dejar de leer en voz alta' : 'Leer las respuestas en voz alta'}
+              aria-label={readAloud ? 'Dejar de leer en voz alta' : 'Leer las respuestas en voz alta'}
+              className="tutor-icon-btn"
+            >
+              {readAloud ? <Volume2 size={14} /> : <VolumeX size={14} />}
+            </button>
+          ) : null}
           <button type="button" onClick={handleClearTutorChat} disabled={!canClearTutorChat} title="Borrar conversación" aria-label="Borrar conversación" className="tutor-icon-btn">
             <Trash2 size={14} />
           </button>
@@ -305,10 +379,12 @@ export default function ReviewTutor({
               <div className="tutor-empty-mark" aria-hidden><Bot size={20} /></div>
               <h3 className="tutor-empty-title">Pregunta lo que necesites.</h3>
               <p className="tutor-empty-copy">
-                Este chat es solo de esta pregunta. Pídeme que la explique, te la muestre en una demo, te dé otra parecida o te diga qué repasar.
+                {mode === 'solve'
+                  ? 'Este chat es solo de esta pregunta. No te doy la respuesta: te ayudo a llegar a ella con pistas y preguntas.'
+                  : 'Este chat es solo de esta pregunta. Pídeme que la explique, te la muestre en una demo, te dé otra parecida o te diga qué repasar.'}
               </p>
               <div className="mt-[0.65rem] flex flex-col gap-[0.4rem]" role="group" aria-label="Sugerencias">
-                {QUICK_PROMPTS.map((prompt) => (
+                {QUICK_PROMPTS[mode].map((prompt) => (
                   <button key={prompt} type="button" disabled={!canSendTutorMessage} onClick={() => sendTutorPrompt(prompt)} className="tutor-quick-prompt">
                     {prompt}
                   </button>
@@ -345,7 +421,7 @@ export default function ReviewTutor({
                     </button>
                   ) : null}
                   {message.role === 'assistant' && message.artifactPending && message.artifactRef == null ? (
-                    <Shimmer className="tutor-artifact-pending text-xs">Preparando demostración…</Shimmer>
+                    <span className="tutor-artifact-pending text-xs inline-flex items-center gap-2"><span className="page-loader-dots" aria-hidden><span /><span /><span /></span>Preparando demostración…</span>
                   ) : null}
                 </MessageContent>
               </Message>
@@ -355,7 +431,7 @@ export default function ReviewTutor({
             <Message from="assistant" className="flex flex-row items-start gap-[0.55rem]">
               <span className="tutor-msg-avatar" aria-hidden><Bot size={12} /></span>
               <MessageContent className="tutor-bubble tutor-bubble-assistant">
-                <Shimmer className="text-sm">Pensando…</Shimmer>
+                <span className="text-sm inline-flex items-center gap-2"><span className="page-loader-dots" aria-hidden><span /><span /><span /></span>Pensando…</span>
               </MessageContent>
             </Message>
           ) : null}
@@ -369,11 +445,24 @@ export default function ReviewTutor({
             data-tutor-input
             value={draft}
             onChange={(event) => onDraftChange(event.target.value)}
-            placeholder="Escribe un mensaje para el tutor…  (⌘K)"
+            placeholder="Escribe un mensaje para el tutor…"
+            enterKeyHint="send"
           />
         </PromptInputBody>
         <PromptInputFooter>
           <span className="tutor-composer-hint"><kbd>Enter</kbd> para enviar</span>
+          {canListen ? (
+            <button
+              type="button"
+              className={`tutor-icon-btn${isListening ? ' is-listening' : ''}`}
+              onClick={toggleListening}
+              aria-pressed={isListening}
+              aria-label={isListening ? 'Dejar de escuchar' : 'Hablarle al tutor'}
+              title={isListening ? 'Dejar de escuchar' : 'Hablarle al tutor'}
+            >
+              <Mic size={14} />
+            </button>
+          ) : null}
           <PromptInputSubmit
             status={isGenerating ? 'streaming' : 'ready'}
             onStop={handleStopTutor}

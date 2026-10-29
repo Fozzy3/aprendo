@@ -6,8 +6,10 @@ import { colombiaDayNumber, colombiaDayStartMs, colombiaWeekIndex } from './colo
 import { buildExamPlan, observedSessionsPerWeek, targetPace } from './examPlan'
 import { estimateGlobalScore, weeklyGlobalEstimates } from './globalScore'
 import { LEVELLED_SUBJECT_IDS, MIN_ATTEMPTS_FOR_LEVEL, getLevelForScore } from './levels'
+import { careerWeights } from './careers'
+import { isReviewDue } from './mastery'
 import { areaScore } from './progress'
-import { collectUsableQuestionsBySubject, hasUsableMetadata, isInEligibilityPool } from './questionPool'
+import { collectUsableQuestionsBySubject } from './questionPool'
 import { settledAttempts } from './sessionIntegrity'
 import { SESSION_KIND_CONFIG } from './sessionKinds'
 import { buildStudyPlan } from './studyPlan'
@@ -21,8 +23,6 @@ import { DEFAULT_WEEKLY_GOAL_MINUTES, weeklyStudyMinutes } from './studyTime'
  * Every count built from grades (study minutes, review queue, the weekly global
  * trend) reads `settledAttempts` only: an open simulacro must not leak its key.
  */
-const WEEKLY_GOAL = 5
-
 export const getTodayDashboard = query({
   args: {
     studentId: v.id('students'),
@@ -165,25 +165,9 @@ export const getTodayDashboard = query({
       weeklyEstimates,
     })
 
-    // Questions whose latest settled answer was wrong and that a repaso can
-    // still serve — the same rule `getReviewQueue` counts with.
-    const latestByQuestion = new Map<Id<'questions'>, { answeredAt: number; isCorrect: boolean }>()
-    for (const attempt of graded) {
-      const previous = latestByQuestion.get(attempt.questionId)
-      if (previous == null || attempt.answeredAt > previous.answeredAt) {
-        latestByQuestion.set(attempt.questionId, attempt)
-      }
-    }
-    const missed = await Promise.all(
-      [...latestByQuestion.entries()]
-        .filter(([, latest]) => !latest.isCorrect)
-        .map(([questionId]) => getQuestion(questionId)),
-    )
-    const reviewDueCount = missed.filter(
-      (question) =>
-        question != null
-        && hasUsableMetadata(question)
-        && isInEligibilityPool(question, SESSION_KIND_CONFIG.repaso.eligibilityPools),
+    // Subtopics due for spaced review: the same rule `getReviewQueue` counts with (F34).
+    const reviewDueCount = subtopicAggregates.filter(
+      (aggregate) => aggregate.subtopicId != null && isReviewDue(aggregate, now),
     ).length
 
     const weeklyGoalMinutes = student?.weeklyGoalMinutes ?? DEFAULT_WEEKLY_GOAL_MINUTES
@@ -235,13 +219,13 @@ export const getTodayDashboard = query({
           : [],
       ),
       weeklyGoalMinutes,
+      subjectWeights: careerWeights(student?.careerFamily) ?? undefined,
     })
 
     return {
       streakDays,
       practicedToday: activeDays.has(today),
       activeDaysThisWeek,
-      weeklyGoal: WEEKLY_GOAL,
       examDate: student?.examDate ?? null,
       examPlan,
       globalScore: {

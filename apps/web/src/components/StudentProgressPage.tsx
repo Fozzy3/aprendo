@@ -3,12 +3,16 @@ import { useMutation, useQuery } from '@tanstack/react-query'
 import { Link, useNavigate } from '@tanstack/react-router'
 import { Play } from 'lucide-react'
 import { api } from '@aprendo/convex/api'
+import { MASTERY_LEVEL_LABELS, type MasteryLevel } from '@aprendo/convex/mastery'
 import { getSubjectLabel, getSubtopicLabel } from '@aprendo/convex/taxonomy'
-import { progressTrendsQuery, studentProgressQuery } from '../lib/student-queries.ts'
-import { areaChartRow } from '../lib/progress-display.ts'
+import { progressTrendsQuery, studentProgressQuery, todayDashboardQuery } from '../lib/student-queries.ts'
+import { areaChartRow, changeSincePlacement } from '../lib/progress-display.ts'
 import { readConvexError } from '../lib/convex-error.ts'
 import { AreaLevelsChart } from './AreaLevelsChart.tsx'
 import { GlobalScoreCard } from './GlobalScoreCard.tsx'
+import { CareerCard } from './CareerPicker.tsx'
+import { TargetGap } from './ExamCountdown.tsx'
+import { StudyTimeCard } from './StudyTimeCard.tsx'
 import { PageLoader } from '../components/FullScreenLoader.tsx'
 import { EmptyState } from './EmptyState.tsx'
 
@@ -87,6 +91,8 @@ function TrendChart({ points }: { points: Array<{ weekStartMs: number; accuracy:
 export function StudentProgressPage({ studentId }: { studentId: string }) {
   const progressQuery = useQuery({ ...studentProgressQuery(studentId), enabled: true })
   const trendsQuery = useQuery({ ...progressTrendsQuery(studentId), enabled: true })
+  const todayQuery = useQuery({ ...todayDashboardQuery(studentId), enabled: true })
+  const nextSubtopics = todayQuery.data?.plan.nextSubtopics ?? []
 
   if (progressQuery.isPending || trendsQuery.isPending) {
     return <PageLoader message="Preparando tu resumen…" />
@@ -117,8 +123,7 @@ export function StudentProgressPage({ studentId }: { studentId: string }) {
     )
   }
 
-  const baselineAccuracy = progress.snapshot?.diagnosticBaseline?.accuracy ?? null
-  const overallDelta = baselineAccuracy != null ? overallSummary.accuracy - baselineAccuracy : null
+  const overallDelta = changeSincePlacement(progress.subjectLevels)
   const firstWeek = weekly[0] ?? null
   const lastWeek = weekly.at(-1) ?? null
   const trendDelta = firstWeek != null && lastWeek != null && weekly.length >= 2 ? lastWeek.accuracy - firstWeek.accuracy : null
@@ -152,13 +157,24 @@ export function StudentProgressPage({ studentId }: { studentId: string }) {
               'Practica un poco más para comparar contra tu nivelación.'
             ) : (
               <>
-                Desde tu nivelación: <Delta delta={overallDelta} /> de precisión.
+                Desde tu nivelación: <Delta delta={overallDelta} /> en promedio por área.
               </>
             )}
           </p>
         </header>
 
         <GlobalScoreCard studentId={studentId} data={progress.globalScore} />
+        <CareerCard studentId={studentId} mode="summary" career={progress.globalScore.career} />
+        {/* Moved here from Hoy (F33): Hoy keeps one action; the numbers live with the progress. */}
+        {todayQuery.data != null ? (
+          <>
+            <TargetGap
+              data={todayQuery.data.globalScore}
+              daysRemaining={todayQuery.data.examPlan?.daysRemaining ?? null}
+            />
+            <StudyTimeCard studentId={studentId} studyTime={todayQuery.data.studyTime} />
+          </>
+        ) : null}
 
         <section className="ruled-section" aria-labelledby="progress-areas-title">
           <div className="section-head">
@@ -202,24 +218,21 @@ export function StudentProgressPage({ studentId }: { studentId: string }) {
           )}
         </section>
 
-        {progress.weakestSubtopics.length > 0 ? (
+        {nextSubtopics.length > 0 ? (
           <section className="ruled-section" aria-labelledby="progress-next-title">
             <h2 id="progress-next-title" className="section-title">Practica esto ahora</h2>
+            {/* The plan's picks (studyPlan.nextSubtopics): the same answer Hoy and Ruta give. */}
             <ol className="plan-lines">
-              {progress.weakestSubtopics
-                .filter((aggregate) => aggregate.subtopicId != null)
-                .slice(0, 3)
-                .map((aggregate, index) => (
-                  <PracticeNowLine
-                    key={aggregate._id}
-                    number={index + 1}
-                    studentId={studentId}
-                    subjectId={aggregate.subjectId}
-                    subtopicId={aggregate.subtopicId!}
-                    correctCount={aggregate.correctCount}
-                    attemptCount={aggregate.attemptCount}
-                  />
-                ))}
+              {nextSubtopics.map((item, index) => (
+                <PracticeNowLine
+                  key={item.subtopicId}
+                  number={index + 1}
+                  studentId={studentId}
+                  subjectId={item.subjectId}
+                  subtopicId={item.subtopicId}
+                  level={item.level}
+                />
+              ))}
             </ol>
           </section>
         ) : null}
@@ -234,15 +247,13 @@ function PracticeNowLine({
   studentId,
   subjectId,
   subtopicId,
-  correctCount,
-  attemptCount,
+  level,
 }: {
   number: number
   studentId: string
   subjectId: string
   subtopicId: string
-  correctCount: number
-  attemptCount: number
+  level: MasteryLevel
 }) {
   const navigate = useNavigate()
   const createSession = useMutation({
@@ -262,7 +273,7 @@ function PracticeNowLine({
           {getSubtopicLabel(subtopicId)}
         </Link>
         <span className="plan-line-reason">
-          {getSubjectLabel(subjectId)} · acertaste {correctCount} de {attemptCount}
+          {getSubjectLabel(subjectId)} · {MASTERY_LEVEL_LABELS[level]}
         </span>
         {createSession.error ? (
           <p role="alert" className="notice is-danger">

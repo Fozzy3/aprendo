@@ -1,5 +1,7 @@
 import { describe, expect, test } from 'bun:test'
 import {
+  isReviewDue,
+  nextReviewState,
   MASTERY_LEVELS,
   MASTERY_POINTS,
   interleaveBlocks,
@@ -37,9 +39,12 @@ describe('masteryContext', () => {
     expect(masteryContext({ kind: 'personalizada', practiceSource: 'no_vistas' }, 2)).toBe('practica')
   })
 
-  test('items whose key the student already saw are a repaso, whatever the mode', () => {
-    expect(masteryContext({ kind: 'repaso' }, 5)).toBe('repaso')
-    expect(masteryContext({ kind: 'repaso', feedbackMode: 'inmediata' }, 5)).toBe('repaso')
+  test('the spaced repaso serves unseen siblings: practice evidence (originals drop out as revealed)', () => {
+    expect(masteryContext({ kind: 'repaso' }, 5)).toBe('practica')
+    expect(masteryContext({ kind: 'repaso', feedbackMode: 'inmediata' }, 5)).toBe('practica')
+  })
+
+  test('builder sources made of seen items are a repaso, whatever the mode', () => {
     expect(masteryContext({ kind: 'personalizada', practiceSource: 'falladas' }, 2)).toBe('repaso')
     expect(masteryContext({ kind: 'personalizada', practiceSource: 'marcadas' }, 2)).toBe('repaso')
   })
@@ -77,6 +82,11 @@ describe('nextMasteryLevel in focused practice', () => {
   test('a perfect practice of 4 or more questions jumps straight to competente', () => {
     expect(nextMasteryLevel('sin_empezar', evidence(4, 4), 'practica')).toBe('competente')
     expect(nextMasteryLevel('intentado', evidence(5, 5), 'practica')).toBe('competente')
+  })
+
+  test('a perfect practice where the tutor helped counts as right, but stops at familiar', () => {
+    expect(nextMasteryLevel('sin_empezar', { ...evidence(5, 5), tutorAssistedCount: 1 }, 'practica')).toBe('familiar')
+    expect(nextMasteryLevel('competente', { ...evidence(5, 5), tutorAssistedCount: 2 }, 'practica')).toBe('competente')
   })
 
   test('a perfect practice of fewer than 4 questions is only familiar', () => {
@@ -255,5 +265,31 @@ describe('revealedQuestionIds', () => {
     const scored = [{ _id: 's-now', status: 'completed' }]
     expect(revealedQuestionIds([{ questionId: 'q1', sessionId: 's-now', checkedAt: 5 }], scored, 's-now'))
       .toEqual(new Set())
+  })
+})
+
+describe('spaced review per subtopic (Leitner)', () => {
+  const DAY = 86_400_000
+  const now = 1_000 * DAY
+
+  test('cramming does not space: an all-right session before the date keeps the box and its date', () => {
+    const notDue = { reviewBox: 1, reviewDueAt: now + 2 * DAY }
+    expect(nextReviewState(1, true, now, notDue.reviewDueAt)).toEqual(notDue)
+    expect(nextReviewState(1, false, now, notDue.reviewDueAt)).toEqual({ reviewBox: 0, reviewDueAt: now + DAY })
+  })
+
+  test('all right climbs a box and waits longer; any miss starts over tomorrow', () => {
+    expect(nextReviewState(undefined, true, now)).toEqual({ reviewBox: 1, reviewDueAt: now + 3 * DAY })
+    expect(nextReviewState(1, true, now)).toEqual({ reviewBox: 2, reviewDueAt: now + 7 * DAY })
+    expect(nextReviewState(3, true, now)).toEqual({ reviewBox: 4, reviewDueAt: now + 60 * DAY })
+    expect(nextReviewState(4, true, now)).toEqual({ reviewBox: 4, reviewDueAt: now + 60 * DAY })
+    expect(nextReviewState(3, false, now)).toEqual({ reviewBox: 0, reviewDueAt: now + DAY })
+  })
+
+  test('a subtopic is due once its date passes; one from before spacing is due if it has misses', () => {
+    expect(isReviewDue({ reviewDueAt: now - 1, attemptCount: 5, correctCount: 5 }, now)).toBe(true)
+    expect(isReviewDue({ reviewDueAt: now + 1, attemptCount: 5, correctCount: 1 }, now)).toBe(false)
+    expect(isReviewDue({ attemptCount: 5, correctCount: 4 }, now)).toBe(true)
+    expect(isReviewDue({ attemptCount: 5, correctCount: 5 }, now)).toBe(false)
   })
 })

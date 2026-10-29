@@ -144,7 +144,7 @@ export function DailyPlan({ studentId, tasks }: { studentId: string; tasks: Stud
       </ol>
 
       {launch.error ? (
-        <p role="alert" className="mt-3 text-sm text-[var(--danger-text)]">
+        <p role="alert" className="notice is-danger mt-3">
           {readConvexError(launch.error, 'No se pudo abrir esta tarea. Intenta de nuevo.')}
         </p>
       ) : null}

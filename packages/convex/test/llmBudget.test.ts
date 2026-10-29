@@ -47,6 +47,22 @@ describe('MAX_TUTOR_PROMPT_CHARS', () => {
   })
 })
 
+describe('practice teaches, exams measure', () => {
+  test('practice kinds correct each answer and open the tutor while solving; exams and the reto do neither', () => {
+    for (const kind of ['recommended', 'topic', 'repaso'] as const) {
+      expect(SESSION_KIND_CONFIG[kind].defaultFeedbackMode).toBe('inmediata')
+      expect(canUseTutor(kind, 'in_progress')).toBe(true)
+    }
+    // A practice that corrects at the end measures (the exit ticket): no tutor while solving.
+    expect(canUseTutor('topic', 'in_progress', 'al_final')).toBe(false)
+    expect(canUseTutor('topic', 'completed', 'al_final')).toBe(true)
+    for (const kind of ['nivelacion', 'simulacro', 'reto'] as const) {
+      expect(SESSION_KIND_CONFIG[kind].defaultFeedbackMode).toBe('al_final')
+      expect(canUseTutor(kind, 'in_progress')).toBe(false)
+    }
+  })
+})
+
 describe('canUseTutor', () => {
   test('every kind gets the tutor once the session is completed', () => {
     for (const kind of SESSION_KINDS) {

@@ -276,6 +276,23 @@ describe('buildSimulacroReport', () => {
     expect(report.areas.map((area) => area.subjectId)).not.toContain('ingles')
   })
 
+  test('per area: the official ICFES competencias, blanks counted as misses', () => {
+    const report = buildSimulacroReport({
+      sittings: [sesion1, sesion2],
+      previousSittings: null,
+      items: [
+        item({ competencia: 'argumentacion', isCorrect: true }),
+        item({ competencia: 'argumentacion', isCorrect: null }),
+        item({ competencia: 'formulacion_ejecucion', isCorrect: true }),
+      ],
+      missingSessionNumbers: [],
+    })
+    expect(report.areas.find((area) => area.subjectId === 'matematicas')!.competencias).toEqual([
+      { subjectId: 'matematicas', competencia: 'formulacion_ejecucion', answered: 1, correct: 1 },
+      { subjectId: 'matematicas', competencia: 'argumentacion', answered: 2, correct: 1 },
+    ])
+  })
+
   test('per area: subtopics weakest first, flags, confidence and pace', () => {
     const items = [
       item({ subtopicId: 'x', isCorrect: true, confidence: 'sure', timeMs: 100_000 }),

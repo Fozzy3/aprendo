@@ -1,7 +1,6 @@
 import taxonomyContract from '../../../../docs/taxonomy.v1.json'
 import {
   MIN_PRACTICE_QUESTIONS,
-  type PracticeDifficulty,
   type PracticeSource,
 } from '@aprendo/convex/practiceBuilder'
 import type { FeedbackMode } from '@aprendo/convex/sessionKinds'
@@ -10,7 +9,6 @@ import type { FeedbackMode } from '@aprendo/convex/sessionKinds'
 export type BuilderState = {
   subjectId: string | null
   subtopicIds: string[]
-  difficulty: PracticeDifficulty | null
   source: PracticeSource
   count: number
   timed: boolean
@@ -20,7 +18,6 @@ export type BuilderState = {
 export const DEFAULT_BUILDER: BuilderState = {
   subjectId: null,
   subtopicIds: [],
-  difficulty: null,
   source: 'todas',
   count: 10,
   timed: false,
@@ -29,12 +26,6 @@ export const DEFAULT_BUILDER: BuilderState = {
 }
 
 export const COUNT_OPTIONS = [5, 10, 20, 30] as const
-
-export const DIFFICULTY_LABELS: Record<PracticeDifficulty, string> = {
-  basico: 'Básico',
-  medio: 'Medio',
-  avanzado: 'Avanzado',
-}
 
 export const SOURCE_LABELS: Record<PracticeSource, string> = {
   todas: 'Todas',
@@ -60,7 +51,6 @@ export function builderFilters(state: BuilderState) {
   return {
     ...(state.subjectId != null ? { subjectId: state.subjectId } : {}),
     ...(state.subtopicIds.length > 0 ? { subtopicIds: state.subtopicIds } : {}),
-    ...(state.difficulty != null ? { difficulty: state.difficulty } : {}),
     source: state.source,
   }
 }

@@ -56,9 +56,9 @@ export function MasteryLegend() {
         ))}
       </ul>
       <p className="text-xs text-[var(--text-tertiary)]">
-        Practicando un tema llegas hasta Competente. Dominado se gana en sesiones que
-        mezclan temas (reto, nivelación, simulacro, práctica recomendada), y fallar ahí
-        puede bajarte un nivel.
+        Practicando un tema llegas hasta Competente, si aciertas sin pedir ayuda al
+        tutor. Dominado se gana en sesiones que miden sin ayuda (reto, nivelación,
+        simulacro), y fallar ahí puede bajarte un nivel.
       </p>
     </div>
   )

@@ -60,8 +60,8 @@ export function LessonPage({ subtopicId, studentId }: { subtopicId: string; stud
       <EmptyState
         title="Este tema no existe"
         action={
-          <Link to="/syllabus" className="btn-primary no-underline">
-            Volver al temario
+          <Link to="/path" className="btn-primary no-underline">
+            Volver a tu ruta
           </Link>
         }
       />
@@ -83,8 +83,9 @@ export function LessonPage({ subtopicId, studentId }: { subtopicId: string; stud
   // A Read surface: one column at reading width, sections opened by a rule.
   return (
     <article className="page-sheet fade-in max-w-3xl">
-      <Link to="/syllabus" className="back-link no-underline">
-        <ArrowLeft size={14} aria-hidden /> {getSubjectLabel(subjectId)}
+      {/* Ruta is the map (Temario is its "ver todo", F33). */}
+      <Link to="/path" className="back-link no-underline">
+        <ArrowLeft size={14} aria-hidden /> Ruta · {getSubjectLabel(subjectId)}
       </Link>
       <header className="ruled-page-head">
         <h1 className="page-title">{getSubtopicLabel(subtopicId)}</h1>

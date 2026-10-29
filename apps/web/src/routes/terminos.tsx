@@ -1,7 +1,9 @@
 import { Link, createFileRoute } from '@tanstack/react-router'
 import { Wordmark } from '../components/BrandMark.tsx'
+import { publicHead } from '../lib/site.ts'
 
 export const Route = createFileRoute('/terminos')({
+  head: () => publicHead({"title":"Términos de uso | Aprendo","description":"Términos de uso de Aprendo, la plataforma de preparación para el Saber 11 para colegios de Colombia.","path":"/terminos"}),
   component: TermsPage,
 })
 

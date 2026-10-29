@@ -1,5 +1,7 @@
 import { BotOff, Flag, Hourglass, ListChecks, Play } from 'lucide-react'
 import { useEffect, useId, useRef, useState, type CSSProperties } from 'react'
+import { getSubjectLabel } from '@aprendo/convex/taxonomy'
+import { AREA_STRATEGY, GENERAL_STRATEGY } from '../lib/exam-strategy.ts'
 import { formatTimeLimit } from '../lib/session-display.ts'
 
 /**
@@ -25,6 +27,7 @@ export function TimedSessionIntro({
   cancelLabel,
   onStart,
   onCancel,
+  strategySubjectIds,
 }: {
   title: string
   subjectColor?: string
@@ -35,6 +38,8 @@ export function TimedSessionIntro({
   cancelLabel: string
   onStart: () => void
   onCancel: () => void
+  /** A simulacro shows the exam strategy for these areas before its clock starts (F35). */
+  strategySubjectIds?: string[]
 }) {
   const titleId = useId()
   const titleRef = useRef<HTMLHeadingElement>(null)
@@ -103,8 +108,25 @@ export function TimedSessionIntro({
         </li>
       </ul>
 
+      {strategySubjectIds != null ? (
+        <details className="timed-intro-strategy">
+          <summary>Estrategia para el examen</summary>
+          <ul>
+            {GENERAL_STRATEGY.map((tip) => <li key={tip}>{tip}</li>)}
+          </ul>
+          {strategySubjectIds.map((subjectId) => (
+            <div key={subjectId}>
+              <p className="timed-intro-strategy-area">{getSubjectLabel(subjectId)}</p>
+              <ul>
+                {(AREA_STRATEGY[subjectId] ?? []).map((tip) => <li key={tip}>{tip}</li>)}
+              </ul>
+            </div>
+          ))}
+        </details>
+      ) : null}
+
       {error ? (
-        <p className="timed-intro-error" role="alert">
+        <p className="notice is-danger" role="alert">
           {error}
         </p>
       ) : null}

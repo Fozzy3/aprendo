@@ -139,3 +139,16 @@ it is disabled under `prefers-reduced-motion`.
 The AI-generated demos inherit these tokens through `lib/demo-document.ts` and
 are told the same rules in `DEMO_FRAGMENT_RULES` (`packages/convex/src/lessons.ts`).
 Changing the tokens or fonts means changing both and bumping `PROMPT_VERSION`.
+
+## Ajustes del audit de diseño (2026-10-29)
+
+- **Botón pequeño:** `.btn-sm` (2rem) solo en pantallas de docente. En las del estudiante los botones conservan 40 px por el tacto. `text-xs` no sirve sobre `.btn-*`: las clases de `styles.css` no están en capa y le ganan a las utilidades de Tailwind. Lo mismo pasa con `text-right` en `.data-table`: para números se usa `.is-number`.
+- **Iconos:** dentro de un botón miden 1rem (0.875rem en `.btn-sm`), lo fija una sola regla.
+- **Controles:** todos rectangulares (`--radius-md`). Nada de `999px` ni sombras en reposo.
+- **Hover:** solo con `@media (hover: hover) and (pointer: fine)`. En pantallas táctiles el mismo aspecto aparece en `:active`. Sin resaltado azul al tocar.
+- **Movimiento:**
+  - `.fade-in` es solo opacidad, 180 ms y `backwards`. Una transformación que se queda aplicada atrapaba a los hijos `position: fixed`.
+  - La hoja del tutor entra desde su borde: abajo en el teléfono, a la derecha en pantallas anchas. Se cierra al instante.
+  - Solo un tema que sube de nivel se anima, en el cierre de sesión.
+- **Cifras:** tabulares en tablas y contadores, proporcionales en la prosa (`.page-lede`, `.markdown-body`).
+- **Errores:** siempre `.notice.is-danger`, nunca una caja rellena.

@@ -72,12 +72,12 @@ Current routes:
 - `/today`, `/path`, `/syllabus`, `/lesson/$subtopicId`, `/progress`, `/history`
 - `/practice` hub, `/practice/$sessionId` solve, `/practice/$sessionId/review` review and results
 - `/join` join a class with its code, `/cuenta` account and deletion
-- `/teacher`, `/teacher/$classGroupId`, `/teacher/student/$studentId` teacher panel (read-only)
+- `/teacher`, `/teacher/$classGroupId`, `/teacher/student/$studentId` teacher panel (week plan, groups, assignments, cycles; never grades or acts for a student), `/teacher/guia/$subtopicId` printable class guide
 - `/school` school admin: name and crest, classes and codes, teachers, students, seats
 - `/admin` Aprendo staff: PDF ingest, question browser, question reports, school licences
 - `/reset-password`, `/terminos`, `/privacidad`
 
-Visual system: `DESIGN.md` (Cuaderno cuadriculado). The institutional redesign and the school (B2B) model are tracked in `plans/rediseno-institucional.md`; the planned ENEM (Brazil) version, not started, in `plans/enem-brasil.md`; the career-goal methodology (study weighted by the student's career family), researched and designed but not built, in `plans/meta-carrera.md`; tenants and roles are specified in `specs/DATA_MODEL_SPEC.md` §7.
+Visual system: `DESIGN.md` (Cuaderno cuadriculado). The institutional redesign and the school (B2B) model are tracked in `plans/rediseno-institucional.md`; the planned ENEM (Brazil) version, not started, in `plans/enem-brasil.md`; the career-goal methodology (study weighted by the student's career family), built as V1, in `plans/meta-carrera.md`; the voice tutor (speech to speech), phase 0 built (browser speech), in `plans/tutor-voz.md`; the pedagogical audit in `plans/analisis-pedagogico.md` and its phased roadmap (F30–F37) in `plans/ruta-mejora-pedagogica.md`; tenants and roles are specified in `specs/DATA_MODEL_SPEC.md` §7.
 
 #### `packages/convex`
 

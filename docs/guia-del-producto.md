@@ -428,13 +428,13 @@ Toma tareas hasta 4, mínimo 2, y para cuando los minutos llegan a la meta seman
 
 #### Ruta de aprendizaje ✅
 
-*Lo que ve el estudiante.* En `/path` elige un área (empieza en Lectura Crítica) y ve un camino vertical de nodos, un subtema por nodo en el orden de la taxonomía. Cada nodo muestra su categoría, su nivel de maestría y sus preguntas, y tiene uno de 5 estados: hecho (círculo relleno; Competente o Dominado), actual («Estás aquí», con el color del área), disponible, bloqueado («se abre cuando llegues a Familiar en el tema anterior») o vacío («Sin preguntas aún: no bloquea tu ruta»). Los nodos abiertos tienen «Ver lección» (o «Aprender el tema») y «Practicar». Arriba, una tarjeta con el dominio del área y los puntos. Abajo, «Ver todo el temario».
+*Lo que ve el estudiante.* En `/path` elige un área (abre en el área del Foco de Hoy) y ve un camino vertical de nodos, un subtema por nodo en el orden de la taxonomía. Cada nodo muestra su categoría, su nivel de maestría y sus preguntas, y tiene uno de 4 estados: hecho (Competente o Dominado), recomendado («Recomendado ahora»), disponible o vacío («Sin preguntas aún: no bloquea tu ruta»). Todos tienen «Ver lección» (o «Aprender el tema») y «Practicar». Arriba, una tarjeta con el dominio del área y los puntos. Abajo, «Ver todo el temario».
 
-*Cómo funciona.* Un nodo se abre si el anterior llegó a Familiar o más, o si el estudiante ya lo practicó desde otra pantalla. Un subtema sin preguntas se salta sin bloquear. El primer nodo abierto que no está en Competente ni en Dominado es el actual.
+*Cómo funciona.* Nada se bloquea (F33): las áreas del ICFES no tienen prerrequisitos estrictos y el candado solo frenaba. «Recomendado ahora» va en la elección del plan para esa área (`studyPlan.nextSubtopics`, la misma que leen Hoy y Progreso), o en el primer nodo abierto si el plan no elige ninguno ahí.
 
 *Por qué.* Un camino guiado, "un tema a la vez, hasta tu siguiente nivel", como la ruta de Duolingo o las unidades de Khan, para no dejar al estudiante solo frente a 33 subtemas.
 
-*Límites.* El orden es el de la taxonomía, no un orden de prerrequisitos. El bloqueo es solo visual: el Temario deja practicar cualquier subtema.
+*Límites.* El orden es el de la taxonomía, no un orden de prerrequisitos.
 
 `apps/web/src/components/LearningPathPage.tsx`; `apps/web/src/lib/mastery-display.ts`; `packages/convex/src/path.ts`
 
@@ -448,14 +448,14 @@ Toma tareas hasta 4, mínimo 2, y para cuando los minutos llegan a la meta seman
 
 #### Niveles de maestría por subtema ✅
 
-*Lo que ve el estudiante.* Cada subtema tiene uno de 5 niveles, con una insignia de barras tipo señal: Sin empezar, Intentado, Familiar, Competente y Dominado. La leyenda explica: «Practicando un tema llegas hasta Competente. Dominado se gana en sesiones que mezclan temas (reto, nivelación, simulacro, práctica recomendada), y fallar ahí puede bajarte un nivel». Ejemplo: 4 de 4 aciertos practicando «Funciones y gráficas» lo dejan en Competente. Para llegar a Dominado tiene que acertar todas las de ese subtema en un simulacro o un reto.
+*Lo que ve el estudiante.* Cada subtema tiene uno de 5 niveles, con una insignia de barras tipo señal: Sin empezar, Intentado, Familiar, Competente y Dominado. La leyenda explica: «Practicando un tema llegas hasta Competente, si aciertas sin pedir ayuda al tutor. Dominado se gana en sesiones que miden sin ayuda (reto, nivelación, simulacro), y fallar ahí puede bajarte un nivel». Ejemplo: 4 de 4 aciertos practicando «Funciones y gráficas» lo dejan en Competente. Para llegar a Dominado tiene que acertar todas las de ese subtema en un simulacro o un reto.
 
 *Cómo funciona.* El nivel se mueve una vez por sesión entregada, y la regla depende del tipo de sesión:
 
-- Práctica enfocada (por tema, a tu medida, cualquier práctica con retroalimentación inmediata, o recomendada con menos de 3 subtemas): todo bien con 4 o más preguntas da Competente; 70 % o más da Familiar; menos da Intentado. Nunca baja.
+- Práctica enfocada (por tema, a tu medida, repaso espaciado, cualquier práctica con retroalimentación inmediata, o recomendada con menos de 3 subtemas): todo bien con 4 o más preguntas da Competente, salvo que haya pedido ayuda al tutor en alguna, que la deja en Familiar; 70 % o más da Familiar; menos da Intentado. Nunca baja.
 - Sesión mixta (nivelación, simulacro, diagnóstico antiguo, recomendada con 3 o más subtemas): todo bien sube un nivel (si estaba por debajo de Familiar, salta a Familiar) y cualquier fallo baja uno, sin bajar de Intentado.
 - Reto: todo bien sube, todo mal baja, mixto se queda.
-- Repaso de errores y «Arma tu práctica» con la fuente Falladas o Marcadas: no mueven el nivel, porque el estudiante ya vio esas claves.
+- «Arma tu práctica» con la fuente Falladas o Marcadas: no mueve el nivel, porque el estudiante ya vio esas claves.
 
 Las preguntas en blanco cuentan como fallo, con una excepción: si todas las preguntas del subtema en esa sesión quedaron en blanco, el nivel no cambia. Solo cuenta el subtema principal de cada pregunta. Tampoco cuentan las preguntas cuya clave el estudiante ya vio (en la revisión de una sesión entregada o con «Comprobar»): acertarlas es memoria, no dominio. Los subtemas que ya tenían práctica antes de este sistema no se migran: muestran un nivel conservador (Familiar si su precisión es de 70 % o más; si no, Intentado) hasta su siguiente sesión con ese subtema.
 
@@ -532,14 +532,14 @@ Las preguntas en blanco cuentan como fallo, con una excepción: si todas las pre
 |---|---|---|---|
 | Diagnóstico inicial (antiguo, ya no se lanza) | 20 (4 por área) | No | No |
 | Nivelación | 15 de un área | 30 min | No |
-| Práctica recomendada | 10 | No | Sí |
-| Práctica por tema | 10 | No | Sí |
-| Repaso de errores | 10 (hasta 30 si viene de "Repetir las que fallé") | No | Sí |
+| Práctica recomendada | 10 | No | Sí (por defecto) |
+| Práctica por tema | 10 | No | Sí (por defecto) |
+| Repaso espaciado | 2 por tema vencido, hasta 10 (hasta 30 si viene de "Repetir las que fallé") | No | Sí (por defecto) |
 | Práctica a tu medida | 5 a 30 | Opcional | Sí (por defecto) |
 | Simulacro | 120 (Sesión 1), 134 (Sesión 2) o el total de un área | 4 h 30 por sesión, o al ritmo oficial por área | No |
 | Reto de dominio | 6 | No | No |
 
-*Cómo funciona.* Un solo archivo configura cada tipo: cantidad, cómo elige las preguntas, de qué grupo del banco, reloj, si exige nivelación y si admite retroalimentación inmediata. Ningún tipo tiene tutor durante la resolución. Si ya hay una sesión igual en curso (mismo tipo, área, subtema y modo), se reutiliza; la práctica a tu medida nunca se reutiliza.
+*Cómo funciona.* Un solo archivo configura cada tipo: cantidad, cómo elige las preguntas, de qué grupo del banco, reloj, si exige nivelación y si admite retroalimentación inmediata. La práctica recomendada, la de tema y el repaso tienen tutor socrático durante la resolución (solo pistas antes de comprobar); los exámenes y el reto no. Si ya hay una sesión igual en curso (mismo tipo, área, subtema y modo), se reutiliza; la práctica a tu medida nunca se reutiliza.
 
 *Por qué.* Una sola maquinaria evita duplicar lógica. Ajustar un tipo es editar una línea.
 
@@ -549,11 +549,11 @@ Las preguntas en blanco cuentan como fallo, con una excepción: si todas las pre
 
 #### El hub de práctica ✅
 
-*Lo que ve el estudiante.* En `/practice`, «¿Qué quieres practicar hoy?» con tarjetas en este orden: Nivelación, Práctica recomendada, Práctica por tema, Arma tu práctica, Simulacro de examen, Repaso de errores y Reto de dominio. Las que piden elegir algo se despliegan; las demás arrancan con un toque. Debajo, el aviso «Día de examen: te falta la Sesión 2» si aplica, las sesiones en curso con «Continuar» y el historial «Tus sesiones» con filtros. Cada fila muestra el resultado («7/10») y un porcentaje coloreado: verde desde 70 %, medio desde 40 %, bajo si es menos.
+*Lo que ve el estudiante.* En `/practice`, «¿Qué quieres practicar hoy?» con tarjetas en este orden: Nivelación, Práctica recomendada, Práctica por tema, Arma tu práctica, Simulacro de examen, Repaso espaciado y Reto de dominio. Las que piden elegir algo se despliegan; las demás arrancan con un toque. Debajo, el aviso «Día de examen: te falta la Sesión 2» si aplica, las sesiones en curso con «Continuar» y un enlace al historial.
 
 *Cómo funciona.* Las sesiones cronometradas pasan por la intro. El reto se deshabilita con «Se abre cuando hayas practicado al menos 3 subtemas» hasta que haya 3 subtemas practicados.
 
-*Límites.* Desde el hub, la recomendada, la de tema y el repaso arrancan siempre en modo "respuestas al final"; solo el constructor deja elegir. Se puede tocar Repaso aunque no haya errores pendientes, y entonces sale un mensaje genérico de banco vacío que confunde. El historial del hub trae 100 sesiones.
+*Límites.* La recomendada, la de tema y el repaso corrigen al momento por defecto (F31). La tarjeta de Repaso dice cuántos temas vencen y se bloquea sin ninguno.
 
 `apps/web/src/routes/practice.tsx`
 
@@ -592,15 +592,15 @@ Las preguntas en blanco cuentan como fallo, con una excepción: si todas las pre
 
 `packages/convex/src/elo.ts`; `packages/convex/src/adaptive.ts`
 
-#### Repaso de errores ✅
+#### Repaso espaciado ✅
 
-*Lo que ve el estudiante.* La tarjeta «Repaso de errores» (y la tarea de Hoy «Tienes N preguntas que fallaste esperando repaso») arma hasta 10 preguntas que falló y aún no ha corregido. Si falló una pregunta marcando «Seguro», esa sale primero.
+*Lo que ve el estudiante.* La tarjeta «Repaso espaciado» (y la tarea de Hoy «3 temas tocan repaso hoy: vuelven con preguntas nuevas») arma 2 preguntas por tema vencido, hasta 10. Son preguntas hermanas que no ha visto, del mismo tema y, si están etiquetadas, de la misma competencia.
 
-*Cómo funciona.* Una pregunta está pendiente si su último intento en una sesión entregada fue incorrecto. Primero salen los errores de concepto (estaba seguro y falló), luego los fallos sin confianza declarada y las lagunas (dudó o adivinó y falló). A igual prioridad, el error más antiguo primero. Sale de la cola al acertarla en otra sesión entregada. El contador de Hoy usa la misma regla, así que coincide con lo que se puede lanzar.
+*Cómo funciona.* Cajas de Leitner por subtema (F34): una sesión que acierta todo un subtema lo sube de caja (vuelve en 1, 3, 7, 21 o 60 días); un error lo devuelve a la primera, para el día siguiente. Primero salen los temas con un error de concepto reciente, luego la caja más baja, luego el más vencido. La pregunta original fallada vuelve solo si el tema no tiene nada nuevo. Hoy, el hub y el plan cuentan temas vencidos con la misma regla.
 
 *Por qué.* Volver sobre los errores hasta corregirlos, empezando por los que el estudiante no revisaría solo: los que creía saber.
 
-*Límites.* No es repaso espaciado con intervalos de días. Es "último intento incorrecto, el más viejo primero".
+*Límites.* Los intervalos son fijos, no ajustados por estudiante.
 
 `packages/convex/src/sessions.ts`; `packages/convex/src/confidence.ts`
 
@@ -618,7 +618,7 @@ Las preguntas en blanco cuentan como fallo, con una excepción: si todas las pre
 
 #### Arma tu práctica (constructor) ✅
 
-*Lo que ve el estudiante.* En el hub, junto a Práctica por tema, la tarjeta se despliega con chips: Área (todas o una), Subtemas (al elegir un área), Dificultad (Cualquiera, o Básico, Medio y Avanzado, estas tres con su conteo), Preguntas (Todas, No vistas, Falladas, Marcadas), Cuántas (5, 10, 20 o 30), Reloj (sin o con) y Respuestas (Inmediata o Al final). Muestra en vivo «N preguntas disponibles» y explica por qué no puede empezar si algo no cuadra. Ejemplo: Matemáticas, Avanzado, Falladas, 10, con reloj (23 min), Inmediata.
+*Lo que ve el estudiante.* En el hub, junto a Práctica por tema, la tarjeta se despliega con chips: Área (todas o una), Subtemas (al elegir un área), Preguntas (Todas, No vistas, Falladas, Marcadas), Cuántas (5, 10, 20 o 30), Reloj (sin o con) y Respuestas (Inmediata o Al final). Muestra en vivo «N preguntas disponibles» y explica por qué no puede empezar si algo no cuadra. Ejemplo: Matemáticas, Falladas, 10, con reloj (23 min), Inmediata. (El selector de dificultad se quitó en F33: elegir «fácil» daba ilusión de dominio, y el Elo ya ajusta.)
 
 *Cómo funciona.* La dificultad se reparte en tercios, de más fácil a más difícil, calculados solo sobre las preguntas del banco elegido que ya tienen calificación Elo. Las que no la tienen cuentan como Medio. "No vistas" excluye cualquier pregunta que se le haya mostrado, aunque no la respondiera. "Falladas" son las que tienen el último intento incorrecto en una sesión entregada y "Marcadas" las que tiene marcadas con bandera en alguna sesión. Sirve primero las no vistas y mantiene completos los textos compartidos. Con reloj, cada pregunta da 2 min 15 s. Por defecto: 10 preguntas, sin reloj, respuestas inmediatas. Cada vez crea una sesión nueva; nunca retoma una anterior.
 
@@ -867,7 +867,7 @@ Con menos de 12 respuestas en un área no se afirma ningún nivel. Un test fija 
 
 #### Simulacro completo: Sesión 1 y Sesión 2 ✅
 
-*Lo que ve el estudiante.* En Práctica, la tarjeta «Simulacro de examen» («254 preguntas en 2 sesiones») ofrece «Día de examen completo · Sesión 1, descanso y Sesión 2», «Sesión 1 · 120 preguntas · 4 h 30 min» y «Sesión 2 · 134 preguntas · 4 h 30 min». Antes del reloj, la intro con las reglas. Durante el examen no hay tutor ni respuestas, pero sí todas las herramientas de examen.
+*Lo que ve el estudiante.* En Práctica, la tarjeta «Simulacro de examen» («254 preguntas en 2 sesiones») ofrece «Sesión 1 · 120 preguntas · 4 h 30 min» (al terminarla, el descanso y la Sesión 2) y «Sesión 2 · 134 preguntas · 4 h 30 min». Antes del reloj, la intro con las reglas. Durante el examen no hay tutor ni respuestas, pero sí todas las herramientas de examen.
 
 *Cómo funciona.* Distribución oficial:
 
@@ -1027,7 +1027,7 @@ Cada sesión dura 4 h 30. Usa todo el banco aprobado (los grupos `diagnostic` y 
 
 *Lo que ve el estudiante.* Debajo del nivel puede aparecer, por ejemplo, «El 48% del país está en Nivel 2 (ICFES 2024)» en Lectura Crítica o «El 50% del país está en Nivel 3» en Matemáticas. Donde no hay dato oficial, no aparece nada.
 
-*Cómo funciona.* Solo se registraron las cifras que el informe nacional Saber 11 2024 dice en texto: Lectura nivel 2 = 48 %; Matemáticas nivel 3 = 50 % y nivel 4 = 8 %; Ciencias nivel 1 = 18 % y nivel 2 = 47 %. Sociales e Inglés quedan vacíos, con la razón anotada. El mensaje «Estás por encima del X% del país» existe, pero nunca se muestra, porque ninguna área tiene la distribución completa.
+*Cómo funciona.* Solo se registraron las cifras que el informe nacional Saber 11 2024 dice en texto: Lectura nivel 2 = 48 %; Matemáticas nivel 3 = 50 % y nivel 4 = 8 %; Ciencias nivel 1 = 18 % y nivel 2 = 47 %. Sociales e Inglés quedan vacíos, con la razón anotada. Se muestra como nota bajo la gráfica de áreas de Progreso (estudiante y docente). El mensaje «Estás por encima del X% del país» se quitó: ninguna área tiene la distribución completa.
 
 *Por qué.* Un punto de referencia público y verificable en lugar de un ranking entre usuarios. Prefiere no decir nada antes que inventar.
 
@@ -1399,3 +1399,25 @@ Rol de docente o coordinador, grupos con código de invitación, lista de estudi
 **Convex.** La base de datos y el servidor de Aprendo.
 
 **OpenRouter.** El servicio por el que Aprendo accede al modelo de IA DeepSeek.
+
+## Ruta de mejora pedagógica (F30–F42, 2026-10-29)
+
+El detalle de cada cambio, con su porqué y sus archivos, está en `plans/ruta-mejora-pedagogica.md`. En resumen:
+
+- **Estudiante.**
+  - Bienvenida de 3 pantallas antes de la primera nivelación.
+  - La práctica corrige al momento y tiene tutor socrático, que solo da pistas antes de comprobar.
+  - Cada sesión cierra con lo que subió o lo que falta.
+  - Una sola brújula: `studyPlan.nextSubtopics` para Hoy, Ruta y Progreso.
+  - Repaso espaciado por subtema, con preguntas hermanas.
+  - Rango del puntaje global desde la primera área, y competencias ICFES en el informe del simulacro.
+  - Estrategia del examen en la intro del simulacro.
+  - Meta de carrera, que pondera el plan.
+  - Micrófono y lectura en voz alta en el tutor.
+- **Docente.**
+  - Plan de la semana en tres niveles: todo el curso (40 % o más por debajo de Familiar), grupo pequeño (15–40 %) y uno a uno.
+  - Análisis de las preguntas que más falla el curso.
+  - Asignaciones (práctica o tiquete de salida) y ciclos de 2 semanas con antes y después.
+  - Grupos editables y guía de clase imprimible por subtema.
+  - Desempeño por competencia ICFES.
+- **Colegio.** El último ciclo de cada curso, con su antes y después.

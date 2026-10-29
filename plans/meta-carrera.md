@@ -2,7 +2,7 @@
 
 > Investigado y diseñado el 2026-10-19.
 >
-> **Estado: diseño para revisar, sin ejecutar.** No hay nada de esto en el código. La V1 se construye cuando se apruebe este documento.
+> **Estado: V1 construida** (2026-10-29, F36 de `plans/ruta-mejora-pedagogica.md`). Falta cruzar los pesos con una segunda universidad.
 
 ## Decisiones tomadas
 

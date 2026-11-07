@@ -14,6 +14,7 @@ import type * as aiProvider from "../aiProvider.js";
 import type * as answerStats from "../answerStats.js";
 import type * as auth from "../auth.js";
 import type * as booklets from "../booklets.js";
+import type * as careers from "../careers.js";
 import type * as coach from "../coach.js";
 import type * as colombiaTime from "../colombiaTime.js";
 import type * as confidence from "../confidence.js";
@@ -69,6 +70,7 @@ declare const fullApi: ApiFromModules<{
   answerStats: typeof answerStats;
   auth: typeof auth;
   booklets: typeof booklets;
+  careers: typeof careers;
   coach: typeof coach;
   colombiaTime: typeof colombiaTime;
   confidence: typeof confidence;

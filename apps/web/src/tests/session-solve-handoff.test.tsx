@@ -10,8 +10,8 @@ vi.mock('lucide-react', () => {
   return Object.fromEntries(
     [
       'AArrowDown', 'AArrowUp', 'Activity', 'ArrowLeft', 'BookOpen', 'Bot', 'Check', 'ChevronLeft', 'ChevronRight',
-      'CircleCheck', 'CircleX', 'ClipboardCheck', 'CloudOff', 'EyeOff', 'Flag', 'Gauge', 'Hourglass',
-      'LayoutGrid', 'MessageSquareWarning', 'RotateCcw', 'Send', 'SlidersHorizontal', 'Sparkles',
+      'CircleCheck', 'CircleX', 'ClipboardCheck', 'CloudOff', 'Ellipsis', 'EyeOff', 'Flag', 'Gauge', 'Hourglass',
+      'LayoutGrid', 'Lightbulb', 'MessageSquareWarning', 'RotateCcw', 'Send', 'SlidersHorizontal', 'Sparkles',
       'Strikethrough', 'Timer', 'Trophy', 'Undo2', 'X',
     ].map((name) => [name, Icon]),
   )

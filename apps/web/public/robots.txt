@@ -1,3 +1,6 @@
 # https://www.robotstxt.org/robotstxt.html
+# App routes stay crawlable on purpose: they carry noindex, and a blocked page's noindex is never seen.
 User-agent: *
 Disallow:
+
+Sitemap: https://aprendo-nine.vercel.app/sitemap.xml

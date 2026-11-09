@@ -1,5 +1,5 @@
 import { Link, createFileRoute } from '@tanstack/react-router'
-import { Wordmark } from '../components/BrandMark.tsx'
+import { LegalPage } from '../components/PublicPage.tsx'
 import { publicHead } from '../lib/site.ts'
 
 export const Route = createFileRoute('/terminos')({
@@ -10,12 +10,7 @@ export const Route = createFileRoute('/terminos')({
 /** Términos de uso, in plain Spanish and limited to what the product does. */
 function TermsPage() {
   return (
-    <div className="legal">
-      <Link to="/" className="no-underline">
-        <Wordmark />
-      </Link>
-      <h1>Términos de uso</h1>
-
+    <LegalPage title="Términos de uso" updated="8 de noviembre de 2026">
       <h2>Qué es Aprendo</h2>
       <p>
         Una herramienta de preparación para el examen Saber 11. Los niveles y puntajes que muestra son
@@ -25,9 +20,10 @@ function TermsPage() {
 
       <h2>Las preguntas</h2>
       <p>
-        Muchas preguntas provienen de los cuadernillos publicados por el ICFES y se muestran con su fuente y
-        sin modificar. Las explicaciones generadas con inteligencia artificial se marcan como tales y pueden
-        tener errores: repórtalos desde la pregunta.
+        Las hay de dos tipos, y cada una dice de dónde viene. Las escritas por Aprendo con inteligencia
+        artificial, que son las que usa un colegio con licencia, y las de los cuadernillos publicados por el
+        ICFES, que se muestran con su fuente y sin modificar. Las explicaciones generadas con inteligencia
+        artificial se marcan como tales y pueden tener errores: repórtalos desde la pregunta.
       </p>
 
       <h2>Tu cuenta</h2>
@@ -53,6 +49,6 @@ function TermsPage() {
         Los tratamos según la <Link to="/privacidad">política de tratamiento de datos</Link>. Puedes eliminar
         tu cuenta en cualquier momento desde <Link to="/cuenta">Tu cuenta</Link>.
       </p>
-    </div>
+    </LegalPage>
   )
 }

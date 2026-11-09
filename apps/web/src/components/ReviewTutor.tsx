@@ -8,6 +8,7 @@ import { api } from '@aprendo/convex/api'
 import type { Id } from '@aprendo/convex/dataModel'
 import { useAction } from 'convex/react'
 import { ArtifactPane } from './ArtifactPane.tsx'
+import { confirmDialog } from './ConfirmDialog.tsx'
 import {
   Dialog,
   DialogContent,
@@ -320,13 +321,15 @@ export default function ReviewTutor({
     && tutorMessages.length > 0
     && !tutorMutation.isPending
     && !clearTutorMutation.isPending
-  const handleClearTutorChat = () => {
+  const handleClearTutorChat = async () => {
     if (!canClearTutorChat) return
-    if (typeof window !== 'undefined'
-      && !window.confirm('¿Borrar la conversación con el tutor? Esta acción no se puede deshacer.')) {
-      return
-    }
-    clearTutorMutation.mutate()
+    const confirmed = await confirmDialog({
+      title: '¿Borrar la conversación con el tutor?',
+      body: 'Esta acción no se puede deshacer.',
+      confirmLabel: 'Borrar',
+      destructive: true,
+    })
+    if (confirmed) clearTutorMutation.mutate()
   }
 
   return (
@@ -357,7 +360,7 @@ export default function ReviewTutor({
               {readAloud ? <Volume2 size={14} /> : <VolumeX size={14} />}
             </button>
           ) : null}
-          <button type="button" onClick={handleClearTutorChat} disabled={!canClearTutorChat} title="Borrar conversación" aria-label="Borrar conversación" className="tutor-icon-btn">
+          <button type="button" onClick={() => void handleClearTutorChat()} disabled={!canClearTutorChat} title="Borrar conversación" aria-label="Borrar conversación" className="tutor-icon-btn">
             <Trash2 size={14} />
           </button>
           {!isCompact ? (

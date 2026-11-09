@@ -1,7 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { useState, type FormEvent } from 'react'
+import { AuthFrame } from '../components/PublicPage.tsx'
 import { authClient } from '../lib/auth-client.ts'
-import { AuthFrame } from './login.tsx'
 
 type ResetSearch = { token?: string; error?: string }
 

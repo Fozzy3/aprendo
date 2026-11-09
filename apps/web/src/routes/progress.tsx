@@ -15,7 +15,7 @@ function ProgressRoutePage() {
 
   return (
     <StudentAppShell session={guard.session} activeSection="progress">
-      <StudentProgressPage studentId={guard.session.studentId} />
+      <StudentProgressPage session={guard.session} />
     </StudentAppShell>
   )
 }

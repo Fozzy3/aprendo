@@ -5,9 +5,10 @@ import { studentAppStateQuery } from './student-queries.ts'
 import { type ActiveStudentSession, useCurrentStudent } from './student-session.ts'
 
 /**
- * The shared gate for student-only surfaces (Hoy, Temario, Progreso): resolves
- * the session, redirects to login when signed out and to the diagnostic when it
+ * The shared gate for student-only surfaces (Hoy, Aprende, Yo): resolves the
+ * session, redirects to login when signed out and to the diagnostic when it
  * hasn't been completed, and reports a single status the caller can switch on.
+ * Staff never sit placement, so that second redirect skips them.
  *
  * Centralizing it keeps the redirect rules in one place — routes only decide
  * what to render once `status === 'ready'`.
@@ -29,6 +30,9 @@ export function useStudentGuard(): StudentGuard {
     ...studentAppStateQuery(session?.studentId),
     enabled: isReady && session != null,
   })
+  const needsPlacement = appStateQuery.data != null
+    && !appStateQuery.data.hasPlacement
+    && !appStateQuery.data.isStaff
 
   useEffect(() => {
     if (isReady && session == null) {
@@ -37,11 +41,11 @@ export function useStudentGuard(): StudentGuard {
   }, [isReady, navigate, session])
 
   useEffect(() => {
-    if (!isReady || session == null || appStateQuery.data == null) return
-    if (!appStateQuery.data.hasPlacement) {
+    if (!isReady || session == null) return
+    if (needsPlacement) {
       void navigate({ to: '/diagnostic' })
     }
-  }, [appStateQuery.data, isReady, navigate, session])
+  }, [isReady, navigate, needsPlacement, session])
 
   if (!isReady) return { status: 'loading', session: null }
   if (session == null) {
@@ -52,7 +56,7 @@ export function useStudentGuard(): StudentGuard {
     }
   }
   if (appStateQuery.isPending) return { status: 'loading', session: null }
-  if (appStateQuery.data != null && !appStateQuery.data.hasPlacement) {
+  if (needsPlacement) {
     // A redirect that happens with no explanation reads as the app ignoring the
     // tap. Saying why costs one sentence and turns a dead end into a step.
     return {

@@ -2,15 +2,17 @@ import { useConvexMutation } from '@convex-dev/react-query'
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { Link, useNavigate } from '@tanstack/react-router'
 import { ArrowLeft, Loader2, Play } from 'lucide-react'
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, type CSSProperties } from 'react'
 import { api } from '@aprendo/convex/api'
 import { EmptyState } from './EmptyState.tsx'
+import { LessonSteps } from './LessonSteps.tsx'
 import { MarkdownBlock } from './MarkdownBlock.tsx'
 import { buildDemoDocument } from '../lib/demo-document.ts'
 import { conceptLessonQuery } from '../lib/student-queries.ts'
 import { getSubjectIdForSubtopic, getSubjectLabel, getSubtopicLabel } from '@aprendo/convex/taxonomy'
 import { useResolvedTheme } from '../lib/use-resolved-theme.ts'
 import { readConvexError } from '../lib/convex-error.ts'
+import { getSubjectTheme } from '../lib/subject-theme.ts'
 
 /** A line of status in place of a section that is still being written. */
 function Writing({ children }: { children: React.ReactNode }) {
@@ -71,6 +73,7 @@ export function LessonPage({ subtopicId, studentId }: { subtopicId: string; stud
   // Text lands in phase 1; the demo (phase 2) may still be generating. Render the
   // text as soon as it exists so the lesson is readable while the demo builds.
   const hasText = lesson?.ideaBody != null
+  const steps = lesson?.steps ?? []
   // A failed generation, or a request that never reached the server, leaves
   // nothing to wait for. Without text, offer a retry instead of a skeleton that
   // spins forever. With text (a stale lesson whose rewrite failed keeps the old
@@ -82,14 +85,12 @@ export function LessonPage({ subtopicId, studentId }: { subtopicId: string; stud
 
   // A Read surface: one column at reading width, sections opened by a rule.
   return (
-    <article className="page-sheet fade-in max-w-3xl">
-      {/* Ruta is the map (Temario is its "ver todo", F33). */}
-      <Link to="/path" className="back-link no-underline">
-        <ArrowLeft size={14} aria-hidden /> Ruta · {getSubjectLabel(subjectId)}
-      </Link>
-      <header className="ruled-page-head">
-        <h1 className="page-title">{getSubtopicLabel(subtopicId)}</h1>
-        <p className="page-lede">Lee la idea, explórala y luego ponla a prueba con preguntas reales.</p>
+    <article className="lesson fade-in" style={{ '--field': getSubjectTheme(subjectId).color } as CSSProperties}>
+      <header className="lesson-cover">
+        <Link to="/path" className="lesson-back no-underline">
+          <ArrowLeft size={18} aria-hidden /> {getSubjectLabel(subjectId)}
+        </Link>
+        <h1 className="lesson-name">{getSubtopicLabel(subtopicId)}</h1>
       </header>
 
       {isFailed ? (
@@ -126,12 +127,17 @@ export function LessonPage({ subtopicId, studentId }: { subtopicId: string; stud
             </div>
           ) : null}
 
-          <section className="ruled-section" aria-labelledby="lesson-idea-title">
-            <h2 id="lesson-idea-title" className="section-title">La idea</h2>
-            <div className="max-w-[68ch]">
-              {lesson?.ideaBody ? <MarkdownBlock markdown={lesson.ideaBody} /> : null}
-            </div>
-          </section>
+          {steps.length > 0 ? (
+            <LessonSteps key={subtopicId} steps={steps} />
+          ) : (
+            // A lesson generated before F56: no steps, just its text.
+            <section className="ruled-section" aria-labelledby="lesson-idea-title">
+              <h2 id="lesson-idea-title" className="section-title">La idea</h2>
+              <div className="max-w-[68ch]">
+                {lesson?.ideaBody ? <MarkdownBlock markdown={lesson.ideaBody} /> : null}
+              </div>
+            </section>
+          )}
 
           {lesson?.demoHtml ? (
             <section className="ruled-section" aria-labelledby="lesson-demo-title">

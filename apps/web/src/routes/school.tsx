@@ -5,20 +5,32 @@ import { RefreshCw, Trash2 } from 'lucide-react'
 import { useState, type FormEvent } from 'react'
 import type { FunctionReturnType } from 'convex/server'
 import { api } from '@aprendo/convex/api'
+import { confirmDialog } from '../components/ConfirmDialog.tsx'
 import { EmptyState } from '../components/EmptyState.tsx'
 import { FullScreenLoader, PageLoader } from '../components/FullScreenLoader.tsx'
+import { SchoolTests } from '../components/SchoolTests.tsx'
 import { StaffShell } from '../components/StaffShell.tsx'
+import { CONTACT_EMAIL } from '../lib/contact.ts'
 import { readConvexError } from '../lib/convex-error.ts'
 import { mySchoolsQuery } from '../lib/student-queries.ts'
 import { belowShareLabel, studentDisplayName } from '../lib/teacher-display.ts'
-import { getSubtopicLabel } from '@aprendo/convex/taxonomy'
+import { SCHOOL_GRADES, getSubtopicLabel } from '@aprendo/convex/taxonomy'
 import { useSignedIn } from '../lib/use-signed-in.ts'
 
-type SchoolSearch = { colegio?: string }
+type SchoolTab = 'cursos' | 'personas' | 'pruebas' | 'institucion'
+type SchoolSearch = { colegio?: string; tab?: SchoolTab }
+
+const SCHOOL_TABS: { id: SchoolTab; label: string }[] = [
+  { id: 'cursos', label: 'Cursos' },
+  { id: 'personas', label: 'Personas' },
+  { id: 'pruebas', label: 'Pruebas' },
+  { id: 'institucion', label: 'Institución' },
+]
 
 export const Route = createFileRoute('/school')({
   validateSearch: (search: Record<string, unknown>): SchoolSearch => ({
     colegio: typeof search.colegio === 'string' ? search.colegio : undefined,
+    tab: SCHOOL_TABS.find((item) => item.id === search.tab)?.id,
   }),
   component: SchoolAdminPage,
 })
@@ -26,9 +38,8 @@ export const Route = createFileRoute('/school')({
 type SchoolAdmin = FunctionReturnType<typeof api.schools.getSchoolAdmin>
 
 /**
- * The school admin's page: the school's name and crest (the co-branding), its
- * license and seats, its classes with their invite codes and teachers, and
- * everyone in it. A person who administers two schools picks one.
+ * The school admin's page, in four tabs: its classes, its people, its periodic
+ * tests, and the institution itself. A person who administers two schools picks one.
  */
 function SchoolAdminPage() {
   const session = useSignedIn()
@@ -61,6 +72,10 @@ function SchoolAdminPage() {
 
       {schoolsQuery.isPending || (orgId != null && adminQuery.isPending) ? (
         <PageLoader message="Cargando el colegio…" />
+      ) : schoolsQuery.isError ? (
+        <EmptyState title="No pudimos abrir el colegio">
+          {readConvexError(schoolsQuery.error, 'Inténtalo de nuevo en un momento.')}
+        </EmptyState>
       ) : orgId == null ? (
         <EmptyState title="No administras ningún colegio">
           Si tu colegio contrató Aprendo, el equipo de Aprendo te da acceso con este correo: {session.email}.
@@ -70,13 +85,23 @@ function SchoolAdminPage() {
           {readConvexError(adminQuery.error, 'Puede que ya no lo administres.')}
         </EmptyState>
       ) : (
-        <SchoolAdminBody admin={adminQuery.data} selfEmail={session.email} />
+        <SchoolAdminBody admin={adminQuery.data} selfEmail={session.email} tab={search.tab ?? 'cursos'} colegio={search.colegio} />
       )}
     </StaffShell>
   )
 }
 
-function SchoolAdminBody({ admin, selfEmail }: { admin: SchoolAdmin; selfEmail: string }) {
+function SchoolAdminBody({
+  admin,
+  selfEmail,
+  tab,
+  colegio,
+}: {
+  admin: SchoolAdmin
+  selfEmail: string
+  tab: SchoolTab
+  colegio: string | undefined
+}) {
   const { organization } = admin
   const teachers = admin.members.filter((member) => member.role !== 'student')
   const students = admin.members.filter((member) => member.role === 'student')
@@ -110,8 +135,8 @@ function SchoolAdminBody({ admin, selfEmail }: { admin: SchoolAdmin; selfEmail: 
           <h1 className="page-title">{organization.name}</h1>
           {!organization.licenseActive ? (
             <p role="status" className="notice is-danger">
-              La licencia venció: los estudiantes no pueden unirse a cursos. Escríbele al equipo de Aprendo
-              para renovarla; los datos se conservan.
+              La licencia venció: los estudiantes no pueden unirse a cursos. Los datos se conservan; la renovación está
+              en Institución.
             </p>
           ) : admin.seatsUsed >= organization.seatLimit ? (
             <p role="status" className="notice is-danger">
@@ -121,11 +146,38 @@ function SchoolAdminBody({ admin, selfEmail }: { admin: SchoolAdmin; selfEmail: 
           ) : null}
         </header>
 
-        <IdentitySection admin={admin} />
-        <ClassesSection admin={admin} teachers={teachers} />
-        <CyclesSection orgId={admin.organization._id} />
-        <TeachersSection admin={admin} teachers={teachers} selfEmail={selfEmail} />
-        <StudentsSection students={students} />
+        <nav className="tab-nav mb-6" aria-label="Secciones del colegio">
+          {SCHOOL_TABS.map(({ id, label }) => (
+            <Link
+              key={id}
+              to="/school"
+              search={{ colegio, ...(id === 'cursos' ? {} : { tab: id }) }}
+              className={`tab-item${id === tab ? ' is-active' : ''}`}
+              aria-current={id === tab ? 'page' : undefined}
+            >
+              {label}
+            </Link>
+          ))}
+        </nav>
+
+        {tab === 'cursos' ? (
+          <ClassesSection admin={admin} teachers={teachers} />
+        ) : tab === 'personas' ? (
+          <>
+            <TeachersSection admin={admin} teachers={teachers} selfEmail={selfEmail} />
+            <StudentsSection students={students} orgId={organization._id} />
+          </>
+        ) : tab === 'pruebas' ? (
+          <>
+            <SchoolTests orgId={organization._id} />
+            <CyclesSection orgId={organization._id} />
+          </>
+        ) : (
+          <>
+            <IdentitySection admin={admin} />
+            <RenewalSection admin={admin} />
+          </>
+        )}
       </div>
     </div>
   )
@@ -208,6 +260,28 @@ function IdentitySection({ admin }: { admin: SchoolAdmin }) {
   )
 }
 
+/** Who to write to, in the place the admin looks when the license runs out. */
+function RenewalSection({ admin }: { admin: SchoolAdmin }) {
+  const { organization } = admin
+  const subject = encodeURIComponent(`Renovación de licencia · ${organization.name}`)
+  return (
+    <section className="ruled-section" aria-labelledby="renewal-title">
+      <h2 id="renewal-title" className="section-title">Licencia</h2>
+      <p className="text-sm text-[var(--text-secondary)]">
+        {organization.licenseActive ? 'Vigente hasta' : 'Venció el'}{' '}
+        {new Date(organization.licenseEndsAt).toLocaleDateString('es-CO', { day: 'numeric', month: 'long', year: 'numeric' })}.
+      </p>
+      {CONTACT_EMAIL != null ? (
+        <a className="btn-secondary no-underline" href={`mailto:${CONTACT_EMAIL}?subject=${subject}`}>
+          Escribir para renovar
+        </a>
+      ) : (
+        <p className="text-sm text-[var(--text-secondary)]">Para renovarla, escríbale a su contacto en el equipo de Aprendo.</p>
+      )}
+    </section>
+  )
+}
+
 function ClassesSection({ admin, teachers }: { admin: SchoolAdmin; teachers: SchoolAdmin['members'] }) {
   const orgId = admin.organization._id
   const createClassGroup = useConvexMutation(api.schools.createClassGroup)
@@ -239,12 +313,13 @@ function ClassesSection({ admin, teachers }: { admin: SchoolAdmin; teachers: Sch
         </label>
         <label className="field">
           <span>Grado</span>
-          <input
+          <select
             className="input"
-            required
             value={draft.grade}
             onChange={(event) => setDraft({ ...draft, grade: event.target.value })}
-          />
+          >
+            {SCHOOL_GRADES.map((grade) => <option key={grade} value={grade}>{grade}</option>)}
+          </select>
         </label>
         <div className="flex items-end">
           <button type="submit" className="btn-primary" disabled={createMutation.isPending}>
@@ -375,10 +450,14 @@ function ClassRow({
           aria-label={`Eliminar el curso ${classGroup.name}`}
           title="Eliminar el curso (los estudiantes siguen en el colegio)"
           disabled={mutation.isPending}
-          onClick={() => {
-            if (window.confirm(`¿Eliminar ${classGroup.name}? Los estudiantes siguen en el colegio y conservan su progreso.`)) {
-              mutation.mutate(() => deleteClassGroup({ classGroupId: classGroup._id }))
-            }
+          onClick={async () => {
+            const confirmed = await confirmDialog({
+              title: `¿Eliminar ${classGroup.name}?`,
+              body: 'Los estudiantes siguen en el colegio y conservan su progreso.',
+              confirmLabel: 'Eliminar curso',
+              destructive: true,
+            })
+            if (confirmed) mutation.mutate(() => deleteClassGroup({ classGroupId: classGroup._id }))
           }}
         >
           <Trash2 size={14} aria-hidden />
@@ -446,8 +525,13 @@ function TeachersSection({
                 type="button"
                 className="btn-ghost"
                 disabled={removeMutation.isPending}
-                onClick={() => {
-                  if (window.confirm(`¿Quitar a ${studentDisplayName(teacher)} del colegio?`)) removeMutation.mutate(teacher.membershipId)
+                onClick={async () => {
+                  const confirmed = await confirmDialog({
+                    title: `¿Quitar a ${studentDisplayName(teacher)} del colegio?`,
+                    confirmLabel: 'Quitar',
+                    destructive: true,
+                  })
+                  if (confirmed) removeMutation.mutate(teacher.membershipId)
                 }}
               >
                 Quitar
@@ -465,7 +549,7 @@ function TeachersSection({
   )
 }
 
-function StudentsSection({ students }: { students: SchoolAdmin['members'] }) {
+function StudentsSection({ students, orgId }: { students: SchoolAdmin['members']; orgId: string }) {
   const removeMember = useConvexMutation(api.schools.removeMember)
   const removeMutation = useMutation({ mutationFn: (membershipId: string) => removeMember({ membershipId: membershipId as never }) })
 
@@ -484,21 +568,28 @@ function StudentsSection({ students }: { students: SchoolAdmin['members'] }) {
           {students.map((student) => (
             <li key={student.membershipId} className="ruled-row">
               <span className="ruled-row-main">
-                <span className="font-semibold">{studentDisplayName(student)}</span>
+                <Link
+                  to="/teacher/student/$studentId"
+                  params={{ studentId: student.accountId }}
+                  search={{ colegio: orgId }}
+                  className="font-semibold"
+                >
+                  {studentDisplayName(student)}
+                </Link>
                 {student.name != null ? <span className="ruled-row-note">{student.email}</span> : null}
               </span>
               <button
                 type="button"
                 className="btn-ghost"
                 disabled={removeMutation.isPending}
-                onClick={() => {
-                  if (
-                    window.confirm(
-                      `¿Quitar a ${studentDisplayName(student)} del colegio? Libera su cupo; su cuenta y su progreso siguen siendo suyos.`,
-                    )
-                  ) {
-                    removeMutation.mutate(student.membershipId)
-                  }
+                onClick={async () => {
+                  const confirmed = await confirmDialog({
+                    title: `¿Quitar a ${studentDisplayName(student)} del colegio?`,
+                    body: 'Libera su cupo; su cuenta y su progreso siguen siendo suyos.',
+                    confirmLabel: 'Quitar',
+                    destructive: true,
+                  })
+                  if (confirmed) removeMutation.mutate(student.membershipId)
                 }}
               >
                 Quitar
@@ -522,6 +613,9 @@ function StudentsSection({ students }: { students: SchoolAdmin['members'] }) {
  */
 function CyclesSection({ orgId }: { orgId: string }) {
   const cycles = useQuery(convexQuery(api.teacher.listSchoolCycles, { orgId: orgId as never }))
+  if (cycles.isError) {
+    return <p role="alert" className="notice is-danger">{readConvexError(cycles.error, 'No pudimos cargar los ciclos de enseñanza.')}</p>
+  }
   if (cycles.data == null || cycles.data.length === 0) return null
   return (
     <section className="ruled-section" aria-labelledby="cycles-title">

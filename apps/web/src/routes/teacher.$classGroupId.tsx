@@ -1,46 +1,51 @@
 import { convexQuery } from '@convex-dev/react-query'
-import { useQuery } from '@tanstack/react-query'
-import { Link, createFileRoute } from '@tanstack/react-router'
+import { useConvexMutation } from '@convex-dev/react-query'
+import { useMutation, useQuery } from '@tanstack/react-query'
+import { Link, createFileRoute, useNavigate } from '@tanstack/react-router'
 import { ArrowLeft, Copy, Printer } from 'lucide-react'
 import { useState, type CSSProperties } from 'react'
 import type { FunctionReturnType } from 'convex/server'
 import { api } from '@aprendo/convex/api'
-import { getCompetenciaLabel, getSubjectLabel, getSubtopicLabel } from '@aprendo/convex/taxonomy'
+import { getSubjectLabel, getSubtopicLabel } from '@aprendo/convex/taxonomy'
 import { getCareerFamily } from '@aprendo/convex/careers'
 import { ClassAssignments, ClassWeekPlan } from '../components/ClassWeekPlan.tsx'
 import { ClassCycle } from '../components/ClassCycle.tsx'
+import { ClassRounds } from '../components/ClassRounds.tsx'
+import { ClassWeakSpots } from '../components/ClassWeakSpots.tsx'
 import { EmptyState } from '../components/EmptyState.tsx'
 import { FullScreenLoader, PageLoader } from '../components/FullScreenLoader.tsx'
 import { StaffShell } from '../components/StaffShell.tsx'
 import { readConvexError } from '../lib/convex-error.ts'
-import { levelDistribution, weakestCompetencies } from '../lib/progress-display.ts'
+import { levelDistribution } from '../lib/progress-display.ts'
 import { getSubjectTheme } from '../lib/subject-theme.ts'
-import { lastActivityLabel, studentDisplayName } from '../lib/teacher-display.ts'
+import { familyWeeklyMessage, guidedShareLabel, lastActivityLabel, studentDisplayName } from '../lib/teacher-display.ts'
 import { useSignedIn } from '../lib/use-signed-in.ts'
 
+type ClassTab = 'semana' | 'resultados' | 'plan'
+
+const CLASS_TABS: { id: ClassTab; label: string }[] = [
+  { id: 'semana', label: 'Esta semana' },
+  { id: 'resultados', label: 'Resultados' },
+  { id: 'plan', label: 'Plan' },
+]
+
 export const Route = createFileRoute('/teacher/$classGroupId')({
+  validateSearch: (search: Record<string, unknown>): { tab?: ClassTab } =>
+    search.tab === 'resultados' || search.tab === 'plan' ? { tab: search.tab } : {},
   component: ClassOverviewPage,
 })
 
 /**
- * One class, for its teacher: the code to invite students, who needs attention
- * and why, every student's level per area with its evidence, and the
- * competencies the class gets wrong. No number without evidence: an area
- * without enough answers shows a dash, never a guess.
+ * One class, for its teacher, in three tabs: what to do this week, how the
+ * class is doing, and the plan it is working on. No number without evidence: an
+ * area without enough answers shows a dash, never a guess.
  */
 function ClassOverviewPage() {
   const { classGroupId } = Route.useParams()
+  const tab = Route.useSearch().tab ?? 'semana'
   const session = useSignedIn()
   const overviewQuery = useQuery({
     ...convexQuery(api.teacher.getClassOverview, { classGroupId: classGroupId as never }),
-    enabled: session != null,
-  })
-  const competencyQuery = useQuery({
-    ...convexQuery(api.teacher.getCompetencyReport, { classGroupId: classGroupId as never }),
-    enabled: session != null,
-  })
-  const competenciasQuery = useQuery({
-    ...convexQuery(api.teacher.getClassCompetencias, { classGroupId: classGroupId as never }),
     enabled: session != null,
   })
   const planQuery = useQuery({
@@ -105,21 +110,62 @@ function ClassOverviewPage() {
               </EmptyState>
             ) : (
               <>
-                {planQuery.data != null ? (
-                  <ClassWeekPlan plan={planQuery.data} now={now} classGroupId={classGroupId} />
-                ) : planQuery.isError ? (
-                  <p role="alert" className="notice is-danger">
-                    {readConvexError(planQuery.error, 'No pudimos armar el plan de la semana.')}
-                  </p>
+                <nav className="tab-nav mb-6" aria-label="Secciones del curso">
+                  {CLASS_TABS.map(({ id, label }) => (
+                    <Link
+                      key={id}
+                      to="/teacher/$classGroupId"
+                      params={{ classGroupId }}
+                      search={id === 'semana' ? {} : { tab: id }}
+                      className={`tab-item${id === tab ? ' is-active' : ''}`}
+                      aria-current={id === tab ? 'page' : undefined}
+                    >
+                      {label}
+                    </Link>
+                  ))}
+                </nav>
+
+                {tab === 'semana' ? (
+                  <>
+                    <WeekActions
+                      classGroupId={classGroupId}
+                      className={overview.classGroup.name}
+                      canWrite={overview.canWrite}
+                      topics={(planQuery.data?.wholeClass ?? []).map((item) => getSubtopicLabel(item.subtopicId))}
+                    />
+                    {planQuery.data != null ? (
+                      <ClassWeekPlan plan={planQuery.data} now={now} classGroupId={classGroupId} canWrite={overview.canWrite} />
+                    ) : planQuery.isError ? (
+                      <p role="alert" className="notice is-danger">
+                        {readConvexError(planQuery.error, 'No pudimos armar el plan de la semana.')}
+                      </p>
+                    ) : (
+                      <PageLoader message="Armando la semana…" />
+                    )}
+                  </>
+                ) : tab === 'resultados' ? (
+                  <>
+                    <ClassLevelsChart overview={overview} />
+                    <StudentsGrid overview={overview} now={now} classGroupId={classGroupId} />
+                    <ClassWeakSpots
+                      classGroupId={classGroupId}
+                      items={planQuery.data?.items ?? []}
+                      itemsError={planQuery.isError ? planQuery.error : null}
+                    />
+                    {planQuery.data != null && guidedShareLabel(planQuery.data.guided) != null ? (
+                      <section className="ruled-section" aria-labelledby="guided-signal-title">
+                        <h2 id="guided-signal-title" className="section-title">Estudio guiado</h2>
+                        <p className="m-0 text-sm text-[var(--text-secondary)]">{guidedShareLabel(planQuery.data.guided)}.</p>
+                      </section>
+                    ) : null}
+                  </>
                 ) : (
-                  <PageLoader message="Armando la semana…" />
+                  <>
+                    <ClassAssignments classGroupId={classGroupId} canWrite={overview.canWrite} />
+                    <ClassCycle classGroupId={classGroupId} canWrite={overview.canWrite} />
+                    <ClassRounds classGroupId={classGroupId} canWrite={overview.canWrite} />
+                  </>
                 )}
-                <ClassLevelsChart overview={overview} />
-                <StudentsGrid overview={overview} now={now} />
-                <CompetencyBars rows={competencyQuery.data ?? []} isPending={competencyQuery.isPending} />
-                <IcfesCompetencias rows={competenciasQuery.data ?? []} />
-                <ClassAssignments classGroupId={classGroupId} />
-                <ClassCycle classGroupId={classGroupId} />
               </>
             )}
           </div>
@@ -130,7 +176,6 @@ function ClassOverviewPage() {
 }
 
 type Overview = FunctionReturnType<typeof api.teacher.getClassOverview>
-type CompetencyRow = FunctionReturnType<typeof api.teacher.getCompetencyReport>[number]
 
 function InviteCode({ code }: { code: string }) {
   const [copied, setCopied] = useState(false)
@@ -149,6 +194,56 @@ function InviteCode({ code }: { code: string }) {
         <Copy size={14} aria-hidden />
         {copied ? 'Enlace copiado' : 'Copiar enlace'}
       </button>
+    </div>
+  )
+}
+
+/** Two things for the class this week that are not about one topic: the game and the note home. */
+function WeekActions({
+  classGroupId,
+  className,
+  canWrite,
+  topics,
+}: {
+  classGroupId: string
+  className: string
+  canWrite: boolean
+  topics: string[]
+}) {
+  const navigate = useNavigate()
+  const openDuel = useMutation({
+    mutationFn: useConvexMutation(api.duels.openDuel),
+    onSuccess: (duelId: string) => navigate({ to: '/teacher/duelo/$id', params: { id: duelId } }),
+  })
+  const [copyState, setCopyState] = useState<'idle' | 'copied' | 'failed'>('idle')
+
+  return (
+    <div className="mb-2 flex flex-wrap items-center gap-2">
+      {canWrite ? (
+        <button
+          type="button"
+          className="btn-primary btn-sm"
+          disabled={openDuel.isPending}
+          onClick={() => openDuel.mutate({ classGroupId: classGroupId as never })}
+        >
+          {openDuel.isPending ? 'Abriendo…' : 'Iniciar duelo'}
+        </button>
+      ) : null}
+      <button
+        type="button"
+        className="btn-secondary btn-sm"
+        onClick={() => {
+          navigator.clipboard.writeText(familyWeeklyMessage({ className, topics })).then(
+            () => setCopyState('copied'),
+            () => setCopyState('failed'),
+          )
+        }}
+      >
+        {copyState === 'copied' ? 'Mensaje copiado' : copyState === 'failed' ? 'No se pudo copiar' : 'Copiar mensaje para las familias'}
+      </button>
+      {openDuel.error != null ? (
+        <p role="alert" className="notice is-danger w-full">{readConvexError(openDuel.error, 'No se pudo abrir el duelo.')}</p>
+      ) : null}
     </div>
   )
 }
@@ -223,7 +318,7 @@ function ClassLevelsChart({ overview }: { overview: Overview }) {
 }
 
 /** Every student and area as a grid of level chips: the pattern, not the prose. */
-function StudentsGrid({ overview, now }: { overview: Overview; now: number }) {
+function StudentsGrid({ overview, now, classGroupId }: { overview: Overview; now: number; classGroupId: string }) {
   return (
     <section className="ruled-section" aria-labelledby="levels-title">
       <div className="section-head">
@@ -252,7 +347,7 @@ function StudentsGrid({ overview, now }: { overview: Overview; now: number }) {
             {overview.students.map((student) => (
               <tr key={student.studentId}>
                 <th scope="row">
-                  <Link to="/teacher/student/$studentId" params={{ studentId: student.studentId }}>
+                  <Link to="/teacher/student/$studentId" params={{ studentId: student.studentId }} search={{ curso: classGroupId }}>
                     {studentDisplayName(student)}
                   </Link>
                   {/* The career the student studies for (meta de carrera). */}
@@ -287,87 +382,3 @@ function StudentsGrid({ overview, now }: { overview: Overview; now: number }) {
     </section>
   )
 }
-
-/** The five competencies the class misses most, as bars of its accuracy. */
-function CompetencyBars({ rows, isPending }: { rows: CompetencyRow[]; isPending: boolean }) {
-  const weakest = weakestCompetencies(rows)
-  return (
-    <section className="ruled-section" aria-labelledby="competency-title">
-      <h2 id="competency-title" className="section-title">Lo que más le cuesta al curso</h2>
-      {isPending ? (
-        <PageLoader message="Calculando competencias…" />
-      ) : weakest.length === 0 ? (
-        <p className="text-sm text-[var(--text-tertiary)]">Todavía nadie del curso ha practicado temas.</p>
-      ) : (
-        <ul className="area-chart-rows">
-          {weakest.map((row) => {
-            const percent = Math.round(row.accuracy * 100)
-            return (
-              <li
-                key={row.subtopicId}
-                className="area-chart-row"
-                style={{ '--subject-color': getSubjectTheme(row.subjectId).color } as CSSProperties}
-              >
-                <span className="area-chart-label is-topic">
-                  <span aria-hidden className="subject-dot" />
-                  <span className="min-w-0">
-                    <span className="block truncate" title={getSubtopicLabel(row.subtopicId)}>{getSubtopicLabel(row.subtopicId)}</span>
-                    <span className="area-chart-score">{getSubjectLabel(row.subjectId)}</span>
-                  </span>
-                </span>
-                <span className="area-chart-track" role="img" aria-label={`${percent}% de aciertos`}>
-                  <span className={`area-chart-fill is-ink${row.accuracy < 0.5 ? ' is-low' : ''}`} style={{ width: `${percent}%` }} />
-                </span>
-                <span className={`area-chart-level${row.accuracy < 0.5 ? ' is-low' : ''}`}>
-                  <strong>{percent}%</strong>
-                  <span className="area-chart-score">
-                    {row.studentCount} {row.studentCount === 1 ? 'estudiante' : 'estudiantes'}
-                  </span>
-                </span>
-              </li>
-            )
-          })}
-        </ul>
-      )}
-    </section>
-  )
-}
-
-/**
- * The class per official ICFES competencia (F35), in the words of the school's
- * Informe por Colegio. Only tagged questions count, so a competencia with few
- * answers says so instead of claiming a percentage.
- */
-function IcfesCompetencias({ rows }: { rows: FunctionReturnType<typeof api.teacher.getClassCompetencias> }) {
-  if (rows.length === 0) return null
-  const subjectIds = [...new Set(rows.map((row) => row.subjectId))]
-  return (
-    <section className="ruled-section" aria-labelledby="icfes-competencias-title">
-      <h2 id="icfes-competencias-title" className="section-title">Por competencia ICFES</h2>
-      {subjectIds.map((subjectId) => (
-        <div key={subjectId} className="mb-4">
-          <h3 className="m-0 mb-1 text-sm font-semibold">{getSubjectLabel(subjectId)}</h3>
-          <div className="overflow-x-auto">
-          <table className="data-table">
-            <tbody>
-              {rows.filter((row) => row.subjectId === subjectId).map((row) => (
-                <tr key={row.competencia}>
-                  <td>{getCompetenciaLabel(row.competencia)}</td>
-                  <td className="is-number">
-                    {row.answered < MIN_COMPETENCIA_ANSWERS
-                      ? `${row.answered} respuestas: aún pocas`
-                      : `${Math.round((row.correct / row.answered) * 100)}% de acierto · ${row.answered} respuestas`}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-          </div>
-        </div>
-      ))}
-    </section>
-  )
-}
-
-/** Below this many answers a competencia percentage would be noise. */
-const MIN_COMPETENCIA_ANSWERS = 10

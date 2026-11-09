@@ -26,12 +26,14 @@ import { Route as SchoolRouteImport } from './routes/school'
 import { Route as SyllabusRouteImport } from './routes/syllabus'
 import { Route as TerminosRouteImport } from './routes/terminos'
 import { Route as TodayRouteImport } from './routes/today'
+import { Route as DueloIdRouteImport } from './routes/duelo.$id'
 import { Route as LessonSubtopicIdRouteImport } from './routes/lesson.$subtopicId'
 import { Route as PracticeSessionIdRouteImport } from './routes/practice.$sessionId'
 import { Route as TeacherIndexRouteImport } from './routes/teacher.index'
 import { Route as TeacherClassGroupIdRouteImport } from './routes/teacher.$classGroupId'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 import { Route as PracticeSessionIdReviewRouteImport } from './routes/practice.$sessionId.review'
+import { Route as TeacherDueloIdRouteImport } from './routes/teacher.duelo.$id'
 import { Route as TeacherGuiaSubtopicIdRouteImport } from './routes/teacher.guia.$subtopicId'
 import { Route as TeacherStudentStudentIdRouteImport } from './routes/teacher.student.$studentId'
 
@@ -120,6 +122,11 @@ const TodayRoute = TodayRouteImport.update({
   path: '/today',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DueloIdRoute = DueloIdRouteImport.update({
+  id: '/duelo/$id',
+  path: '/duelo/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LessonSubtopicIdRoute = LessonSubtopicIdRouteImport.update({
   id: '/lesson/$subtopicId',
   path: '/lesson/$subtopicId',
@@ -150,6 +157,11 @@ const PracticeSessionIdReviewRoute = PracticeSessionIdReviewRouteImport.update({
   path: '/review',
   getParentRoute: () => PracticeSessionIdRoute,
 } as any)
+const TeacherDueloIdRoute = TeacherDueloIdRouteImport.update({
+  id: '/teacher/duelo/$id',
+  path: '/teacher/duelo/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const TeacherGuiaSubtopicIdRoute = TeacherGuiaSubtopicIdRouteImport.update({
   id: '/teacher/guia/$subtopicId',
   path: '/teacher/guia/$subtopicId',
@@ -179,12 +191,14 @@ export interface FileRoutesByFullPath {
   '/syllabus': typeof SyllabusRoute
   '/terminos': typeof TerminosRoute
   '/today': typeof TodayRoute
+  '/duelo/$id': typeof DueloIdRoute
   '/lesson/$subtopicId': typeof LessonSubtopicIdRoute
   '/practice/$sessionId': typeof PracticeSessionIdRouteWithChildren
   '/teacher/$classGroupId': typeof TeacherClassGroupIdRoute
   '/teacher/': typeof TeacherIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/practice/$sessionId/review': typeof PracticeSessionIdReviewRoute
+  '/teacher/duelo/$id': typeof TeacherDueloIdRoute
   '/teacher/guia/$subtopicId': typeof TeacherGuiaSubtopicIdRoute
   '/teacher/student/$studentId': typeof TeacherStudentStudentIdRoute
 }
@@ -206,12 +220,14 @@ export interface FileRoutesByTo {
   '/syllabus': typeof SyllabusRoute
   '/terminos': typeof TerminosRoute
   '/today': typeof TodayRoute
+  '/duelo/$id': typeof DueloIdRoute
   '/lesson/$subtopicId': typeof LessonSubtopicIdRoute
   '/practice/$sessionId': typeof PracticeSessionIdRouteWithChildren
   '/teacher/$classGroupId': typeof TeacherClassGroupIdRoute
   '/teacher': typeof TeacherIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/practice/$sessionId/review': typeof PracticeSessionIdReviewRoute
+  '/teacher/duelo/$id': typeof TeacherDueloIdRoute
   '/teacher/guia/$subtopicId': typeof TeacherGuiaSubtopicIdRoute
   '/teacher/student/$studentId': typeof TeacherStudentStudentIdRoute
 }
@@ -234,12 +250,14 @@ export interface FileRoutesById {
   '/syllabus': typeof SyllabusRoute
   '/terminos': typeof TerminosRoute
   '/today': typeof TodayRoute
+  '/duelo/$id': typeof DueloIdRoute
   '/lesson/$subtopicId': typeof LessonSubtopicIdRoute
   '/practice/$sessionId': typeof PracticeSessionIdRouteWithChildren
   '/teacher/$classGroupId': typeof TeacherClassGroupIdRoute
   '/teacher/': typeof TeacherIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/practice/$sessionId/review': typeof PracticeSessionIdReviewRoute
+  '/teacher/duelo/$id': typeof TeacherDueloIdRoute
   '/teacher/guia/$subtopicId': typeof TeacherGuiaSubtopicIdRoute
   '/teacher/student/$studentId': typeof TeacherStudentStudentIdRoute
 }
@@ -263,12 +281,14 @@ export interface FileRouteTypes {
     | '/syllabus'
     | '/terminos'
     | '/today'
+    | '/duelo/$id'
     | '/lesson/$subtopicId'
     | '/practice/$sessionId'
     | '/teacher/$classGroupId'
     | '/teacher/'
     | '/api/auth/$'
     | '/practice/$sessionId/review'
+    | '/teacher/duelo/$id'
     | '/teacher/guia/$subtopicId'
     | '/teacher/student/$studentId'
   fileRoutesByTo: FileRoutesByTo
@@ -290,12 +310,14 @@ export interface FileRouteTypes {
     | '/syllabus'
     | '/terminos'
     | '/today'
+    | '/duelo/$id'
     | '/lesson/$subtopicId'
     | '/practice/$sessionId'
     | '/teacher/$classGroupId'
     | '/teacher'
     | '/api/auth/$'
     | '/practice/$sessionId/review'
+    | '/teacher/duelo/$id'
     | '/teacher/guia/$subtopicId'
     | '/teacher/student/$studentId'
   id:
@@ -317,12 +339,14 @@ export interface FileRouteTypes {
     | '/syllabus'
     | '/terminos'
     | '/today'
+    | '/duelo/$id'
     | '/lesson/$subtopicId'
     | '/practice/$sessionId'
     | '/teacher/$classGroupId'
     | '/teacher/'
     | '/api/auth/$'
     | '/practice/$sessionId/review'
+    | '/teacher/duelo/$id'
     | '/teacher/guia/$subtopicId'
     | '/teacher/student/$studentId'
   fileRoutesById: FileRoutesById
@@ -345,10 +369,12 @@ export interface RootRouteChildren {
   SyllabusRoute: typeof SyllabusRoute
   TerminosRoute: typeof TerminosRoute
   TodayRoute: typeof TodayRoute
+  DueloIdRoute: typeof DueloIdRoute
   LessonSubtopicIdRoute: typeof LessonSubtopicIdRoute
   TeacherClassGroupIdRoute: typeof TeacherClassGroupIdRoute
   TeacherIndexRoute: typeof TeacherIndexRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
+  TeacherDueloIdRoute: typeof TeacherDueloIdRoute
   TeacherGuiaSubtopicIdRoute: typeof TeacherGuiaSubtopicIdRoute
   TeacherStudentStudentIdRoute: typeof TeacherStudentStudentIdRoute
 }
@@ -474,6 +500,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TodayRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/duelo/$id': {
+      id: '/duelo/$id'
+      path: '/duelo/$id'
+      fullPath: '/duelo/$id'
+      preLoaderRoute: typeof DueloIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/lesson/$subtopicId': {
       id: '/lesson/$subtopicId'
       path: '/lesson/$subtopicId'
@@ -515,6 +548,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/practice/$sessionId/review'
       preLoaderRoute: typeof PracticeSessionIdReviewRouteImport
       parentRoute: typeof PracticeSessionIdRoute
+    }
+    '/teacher/duelo/$id': {
+      id: '/teacher/duelo/$id'
+      path: '/teacher/duelo/$id'
+      fullPath: '/teacher/duelo/$id'
+      preLoaderRoute: typeof TeacherDueloIdRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/teacher/guia/$subtopicId': {
       id: '/teacher/guia/$subtopicId'
@@ -574,10 +614,12 @@ const rootRouteChildren: RootRouteChildren = {
   SyllabusRoute: SyllabusRoute,
   TerminosRoute: TerminosRoute,
   TodayRoute: TodayRoute,
+  DueloIdRoute: DueloIdRoute,
   LessonSubtopicIdRoute: LessonSubtopicIdRoute,
   TeacherClassGroupIdRoute: TeacherClassGroupIdRoute,
   TeacherIndexRoute: TeacherIndexRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
+  TeacherDueloIdRoute: TeacherDueloIdRoute,
   TeacherGuiaSubtopicIdRoute: TeacherGuiaSubtopicIdRoute,
   TeacherStudentStudentIdRoute: TeacherStudentStudentIdRoute,
 }

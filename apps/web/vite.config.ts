@@ -9,6 +9,8 @@ import viteReact from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 
 const config = defineConfig({
+  // Streamdown carries its own copy of React otherwise: hooks then break in tests that render it for real.
+  test: { server: { deps: { inline: [/streamdown/] } } },
   plugins: [
     devtools(),
     tsconfigPaths({ projects: ['./tsconfig.json'] }),

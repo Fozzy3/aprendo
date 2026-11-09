@@ -7,6 +7,17 @@ import {
 import { LIGHT_DAYS_BEFORE_EXAM, type StudyTaskAction } from '@aprendo/convex/studyPlan'
 import { MAX_WEEKLY_GOAL_MINUTES, MIN_WEEKLY_GOAL_MINUTES } from '@aprendo/convex/studyTime'
 
+/** When a teacher's task is due, in calendar days. A late one still on the list can still be done (G5). */
+export function dueLabel(dueAt: number, now: number): string {
+  const startOfDay = (ms: number) => new Date(ms).setHours(0, 0, 0, 0)
+  const days = Math.round((startOfDay(dueAt) - startOfDay(now)) / 86_400_000)
+  if (days < 0) return 'todavía puedes hacerla'
+  if (days === 0) return 'vence hoy'
+  if (days === 1) return 'vence mañana'
+  const date = new Date(dueAt)
+  return `para el ${date.toLocaleDateString('es-CO', { weekday: 'long' })} ${date.getDate()}`
+}
+
 /** A plan task's session action, as `createSession` takes it (plus studentId). */
 export function taskSessionArgs(action: Extract<StudyTaskAction, { type: 'session' }>) {
   const { type: _type, ...args } = action

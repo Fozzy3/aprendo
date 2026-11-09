@@ -6,11 +6,13 @@ import { Wordmark } from './BrandMark.tsx'
 /**
  * The notebook's cover label: "Colegio · Curso · Estudiante". This is where a
  * school's co-branding lives (its crest and name); Aprendo stays as the small
- * wordmark beside it. A student with no school sees only the wordmark.
+ * wordmark beside it. Student chrome only, so it names the school the account
+ * studies at: a teacher who also studies elsewhere sees that one, and an
+ * account with no student seat sees only the wordmark.
  */
 export function SchoolLabel({ studentName, subtitle }: { studentName: string | null; subtitle?: string }) {
   const schoolsQuery = useQuery(mySchoolsQuery)
-  const school = schoolsQuery.data?.[0] ?? null
+  const school = schoolsQuery.data?.find((entry) => entry.role === 'student') ?? null
 
   return (
     <Link to="/app" className="school-label no-underline" aria-label="Ir al inicio">

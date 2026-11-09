@@ -20,6 +20,7 @@ const KIND_ICON: Record<SessionKind, LucideIcon> = {
   repaso: RotateCcw,
   personalizada: SlidersHorizontal,
   reto: Trophy,
+  prueba: Timer,
 }
 
 export function getKindIcon(kind: SessionKind): LucideIcon {

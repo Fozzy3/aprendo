@@ -1,8 +1,10 @@
 import { ArrowRight, Gauge, MessageCircleQuestion, Sun, Target, Timer, TrendingUp } from 'lucide-react'
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { flushSync } from 'react-dom'
+import { ExamCountdown } from './ExamCountdown.tsx'
+import { FirstWeekCommit } from './FirstWeek.tsx'
 
-type Step = { title: string; lede?: string; points?: { icon: ReactNode; title: string; text: string }[] }
+type Step = { title: string; lede?: string; points?: { icon: ReactNode; title: string; text: string }[]; isPlanStep?: boolean }
 
 const STEPS: Step[] = [
   {
@@ -27,17 +29,21 @@ const STEPS: Step[] = [
   },
 ]
 
+/** Asked of a signed-in student before the first placement: the first week's commitment, the exam date. */
+const PLAN_STEP: Step = { title: 'Tu primera semana', isPlanStep: true }
+
 /**
  * First-run welcome, shown once before the first nivelación.
  *
  * Steps crossfade with the native View Transitions API (fade out, fade in);
  * browsers without it just swap the step.
  */
-export function Welcome({ onDone }: { onDone: () => void }) {
+export function Welcome({ studentId, onDone }: { studentId?: string; onDone: () => void }) {
   const [index, setIndex] = useState(0)
   const titleRef = useRef<HTMLHeadingElement>(null)
-  const step = STEPS[index]!
-  const isLast = index === STEPS.length - 1
+  const steps = studentId == null ? STEPS : [...STEPS, PLAN_STEP]
+  const step = steps[index]!
+  const isLast = index === steps.length - 1
 
   useEffect(() => {
     titleRef.current?.focus()
@@ -69,10 +75,16 @@ export function Welcome({ onDone }: { onDone: () => void }) {
           ))}
         </ul>
       ) : null}
+      {step.isPlanStep === true && studentId != null ? (
+        <>
+          <FirstWeekCommit studentId={studentId} />
+          <ExamCountdown studentId={studentId} examDate={null} plan={null} />
+        </>
+      ) : null}
 
       <div className="welcome-footer">
-        <div className="welcome-dots" role="img" aria-label={`Paso ${index + 1} de ${STEPS.length}`}>
-          {STEPS.map((s, i) => (
+        <div className="welcome-dots" role="img" aria-label={`Paso ${index + 1} de ${steps.length}`}>
+          {steps.map((s, i) => (
             <span key={s.title} className={i === index ? 'is-current' : undefined} />
           ))}
         </div>

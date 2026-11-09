@@ -1,5 +1,24 @@
 import { describe, expect, it } from 'vitest'
-import { hoursToGoalMinutes, targetGapLines, taskSessionArgs, timedIntro } from '../lib/today-display'
+import { dueLabel, hoursToGoalMinutes, targetGapLines, taskSessionArgs, timedIntro } from '../lib/today-display'
+
+describe('dueLabel', () => {
+  const monday = new Date(2026, 10, 9, 10).getTime()
+  const on = (day: number) => new Date(2026, 10, day, 18).getTime()
+
+  it('names the close dates in words', () => {
+    expect(dueLabel(on(9), monday)).toBe('vence hoy')
+    expect(dueLabel(on(10), monday)).toBe('vence mañana')
+  })
+
+  it('names a later date by its weekday', () => {
+    expect(dueLabel(on(13), monday)).toBe('para el viernes 13')
+  })
+
+  // G5: no red "vencida". A task still listed is one that can still be done.
+  it('does not scold a late task', () => {
+    expect(dueLabel(on(8), monday)).toBe('todavía puedes hacerla')
+  })
+})
 
 describe('taskSessionArgs', () => {
   it('drops the action type and keeps what createSession takes', () => {

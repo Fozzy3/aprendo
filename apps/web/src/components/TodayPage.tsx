@@ -1,205 +1,139 @@
-import { useConvexMutation } from '@convex-dev/react-query'
-import { useQuery } from '@tanstack/react-query'
-import { Link } from '@tanstack/react-router'
-import { ArrowRight, Play } from 'lucide-react'
-import { useEffect, useRef, type CSSProperties } from 'react'
+import { convexQuery, useConvexMutation } from '@convex-dev/react-query'
+import { useMutation, useQuery } from '@tanstack/react-query'
+import { Link, useNavigate } from '@tanstack/react-router'
+import { Shield } from 'lucide-react'
+import type { CSSProperties } from 'react'
 import { api } from '@aprendo/convex/api'
 import { SESSION_KIND_CONFIG } from '@aprendo/convex/sessionKinds'
-import { MarkdownBlock } from './MarkdownBlock.tsx'
-import { DailyPlan } from './DailyPlan.tsx'
-import { TeacherAssignments } from './TeacherAssignments.tsx'
-import { CareerCard } from './CareerPicker.tsx'
-import { ExamCountdown } from './ExamCountdown.tsx'
+import type { StudyTaskAction } from '@aprendo/convex/studyPlan'
+import { hoyPage } from '../lib/album-view.ts'
+import { readConvexError } from '../lib/convex-error.ts'
 import {
   activeSessionQuery,
-  coachSummaryQuery,
   mySchoolsQuery,
-  studentProgressQuery,
   todayDashboardQuery,
 } from '../lib/student-queries.ts'
-import { readConvexError } from '../lib/convex-error.ts'
 import { getSubjectTheme } from '../lib/subject-theme.ts'
-import { focusSubjectId } from '../lib/progress-display.ts'
-import { PageLoader } from '../components/FullScreenLoader.tsx'
+import { taskSessionArgs } from '../lib/today-display.ts'
+import { ActiveDuelBanner } from './ActiveDuelBanner.tsx'
+import { PageLoader } from './FullScreenLoader.tsx'
+import { FirstWeek } from './FirstWeek.tsx'
+import { StickerAlbum } from './StickerAlbum.tsx'
+import { TeacherAssignments } from './TeacherAssignments.tsx'
 
-function greeting(): string {
-  const hour = new Date().getHours()
-  if (hour < 12) return 'Buenos días'
-  if (hour < 19) return 'Buenas tardes'
-  return 'Buenas noches'
+function days(count: number) {
+  return `${count} ${count === 1 ? 'día' : 'días'}`
 }
 
+/**
+ * Hoy: the page of the area the student is working on, the one sticker it asks
+ * for, and one yellow button that goes and gets it. Everything else a student
+ * might want lives one tab away (Aprende, Retos, Yo).
+ */
 export function TodayPage({ studentId }: { studentId: string }) {
+  const navigate = useNavigate()
   const dashboard = useQuery({ ...todayDashboardQuery(studentId), enabled: true })
-  const progress = useQuery({ ...studentProgressQuery(studentId), enabled: true })
+  const album = useQuery(convexQuery(api.today.getStickerAlbum, { studentId: studentId as never }))
   const active = useQuery({ ...activeSessionQuery(studentId), enabled: true })
-  const coachSummary = useQuery({ ...coachSummaryQuery(studentId), enabled: true })
   const schools = useQuery(mySchoolsQuery)
 
-  // Generate this week's coach summary once, only if the student studied this week.
-  const requestSummary = useConvexMutation(api.coach.requestWeeklyCoachSummary)
-  const requestedSummaryRef = useRef(false)
-  const weeklyActiveDays = dashboard.data?.activeDaysThisWeek ?? 0
-  useEffect(() => {
-    if (weeklyActiveDays > 0 && coachSummary.data === null && !requestedSummaryRef.current) {
-      requestedSummaryRef.current = true
-      void requestSummary({ studentId: studentId as never })
-    }
-  }, [weeklyActiveDays, coachSummary.data, requestSummary, studentId])
+  const createSession = useConvexMutation(api.sessions.createSession)
+  type Launch = Omit<Parameters<typeof createSession>[0], 'studentId'>
+  const launch = useMutation({
+    mutationFn: (args: Launch) => createSession({ studentId: studentId as never, ...args }),
+    onSuccess: (sessionId) => navigate({ to: '/practice/$sessionId', params: { sessionId } }),
+  })
 
-  if (dashboard.isPending || progress.isPending) {
+  if (dashboard.isError || album.isError) {
     return (
-      <PageLoader message="Preparando tu día…" />
+      <div className="hoy-error" role="alert">
+        <h1 className="page-title">No pudimos abrir tu álbum</h1>
+        <p className="page-lede">{readConvexError(dashboard.error ?? album.error, 'Intenta recargar en un momento.')}</p>
+        <Link to="/practice" className="btn-primary no-underline">Ir a Retos</Link>
+      </div>
     )
   }
 
-  const streakDays = dashboard.data?.streakDays ?? 0
+  if (dashboard.data == null || album.data == null) return <PageLoader message="Abriendo tu álbum…" />
 
-  const focusId = focusSubjectId(dashboard.data?.plan.nextSubtopics ?? [], progress.data?.subjectAggregates ?? [])
-  const weakestSubject = progress.data?.subjectAggregates.find((aggregate) => aggregate.subjectId === focusId) ?? null
+  const { plan, streakDays, shields, xp, firstWeek } = dashboard.data
+  const { subject, next } = hoyPage(album.data, plan.nextSubtopics)
+  const { hero } = plan
+  const openSession = active.data ?? null
+  const isBusy = launch.isPending
 
-  // Frame the weekly focus in ICFES-level language when there is enough
-  // evidence to name a level; fall back to the generic nudge otherwise.
-  const weakestSubjectLevel =
-    weakestSubject == null
-      ? null
-      : (progress.data?.subjectLevels ?? []).find(
-          (level) => level.subjectId === weakestSubject.subjectId,
-        ) ?? null
-  const weakestSubjectHint =
-    weakestSubjectLevel?.current?.nextBand != null
-    && weakestSubjectLevel.current.pointsToNextBand != null
-      ? `Te faltan ${weakestSubjectLevel.current.pointsToNextBand} puntos para ${weakestSubjectLevel.current.nextBand.labelEs}`
-      : 'Sigue tu ruta en esta área'
-  const activeSession = active.data ?? null
-  const weakestTheme = weakestSubject == null ? null : getSubjectTheme(weakestSubject.subjectId)
-
-  const today = new Date().toLocaleDateString('es-CO', { weekday: 'long', day: 'numeric', month: 'long' })
+  const heroArgs: Launch = next != null
+    ? { kind: 'topic', subtopicId: next.subtopicId, questionLimit: hero.questionCount }
+    : taskSessionArgs(hero.action as Extract<StudyTaskAction, { type: 'session' }>)
+  const heroTitle = next != null ? `Te falta ${next.label}` : 'Practica hoy'
+  const heroLine = `${next != null ? 'Consíguela · ' : ''}${hero.questionCount} preguntas · ${hero.minutes} min`
 
   return (
-    <div className="ruled-page fade-in">
-      {/* The margin column: the date and the week's study days, where a
-          student writes them at the top of a notebook page. */}
-      <aside className="ruled-page-margin" aria-label="Tu semana">
-        <p className="ruled-page-date">{today}</p>
-        <dl className="margin-facts">
-          {dashboard.data != null ? (
-            // One weekly goal, in minutes: effort, not attendance (F33).
-            <div>
-              <dt>Esta semana</dt>
-              <dd>
-                {dashboard.data.studyTime.minutesThisWeek} de {dashboard.data.studyTime.goalMinutes} min
-              </dd>
-            </div>
+    <div className="hoy fade-in" style={{ '--field': getSubjectTheme(subject.subjectId).color } as CSSProperties}>
+      <section className="hoy-field" aria-labelledby="hoy-area">
+        <ActiveDuelBanner studentId={studentId} />
+        <h1 id="hoy-area" className="hoy-area">{subject.label}</h1>
+        <p className="hoy-count">
+          {subject.earnedCount} de {subject.stickers.length} láminas
+          {streakDays > 0 ? ` · racha de ${days(streakDays)}` : ''}
+        </p>
+
+        <StickerAlbum stickers={subject.stickers} nextId={next?.subtopicId ?? null} />
+
+        <p className="hoy-stats">
+          <span>{xp.today} XP hoy</span>
+          <span>{xp.thisWeek} XP esta semana</span>
+          {shields > 0 ? (
+            <span className="hoy-shields" aria-label={`${shields} ${shields === 1 ? 'escudo' : 'escudos'} para tu racha`}>
+              <Shield size={15} strokeWidth={2.4} aria-hidden /> {shields}
+            </span>
           ) : null}
-          <div>
-            <dt>Días seguidos</dt>
-            <dd>{streakDays}</dd>
+        </p>
+
+        {openSession != null ? (
+          <Link
+            to="/practice/$sessionId"
+            params={{ sessionId: openSession._id }}
+            className="btn-primary hoy-go no-underline"
+          >
+            <span>Sigue donde ibas</span>
+            <small>{SESSION_KIND_CONFIG[openSession.kind].labelEs} · {openSession.questionCount} preguntas</small>
+          </Link>
+        ) : hero.missionComplete ? (
+          <div className="hoy-done">
+            <p className="hoy-done-title">Misión cumplida</p>
+            {next != null ? (
+              <button type="button" className="hoy-more" disabled={isBusy} onClick={() => launch.mutate(heroArgs)}>
+                {isBusy ? 'Preparando…' : `Sigue con ${next.label}`}
+              </button>
+            ) : null}
           </div>
-        </dl>
+        ) : (
+          <button type="button" className="btn-primary hoy-go" disabled={isBusy} onClick={() => launch.mutate(heroArgs)}>
+            <span>{isBusy ? 'Preparando…' : heroTitle}</span>
+            <small>{heroLine}</small>
+          </button>
+        )}
+
+        {launch.error != null ? (
+          <p role="alert" className="hoy-launch-error">
+            {readConvexError(launch.error, 'No se pudo empezar. Intenta de nuevo.')}
+          </p>
+        ) : null}
+      </section>
+
+      <aside className="hoy-side">
+        <TeacherAssignments studentId={studentId} />
+        {firstWeek.active ? <FirstWeek studentId={studentId} firstWeek={firstWeek} /> : null}
         {schools.data != null && schools.data.length === 0 ? (
-          <Link to="/join" className="margin-link">
-            Unirme a mi curso
+          <Link to="/join" className="task no-underline">
+            <span className="task-text">
+              <b>Unirme a mi curso</b>
+              <span>Con el código de tu profe</span>
+            </span>
           </Link>
         ) : null}
       </aside>
-
-      <div className="ruled-page-body">
-        <header className="ruled-page-head">
-          <h1 className="page-title">{greeting()}</h1>
-          <p className="page-lede">Esto es lo que te toca hoy para tu Saber 11.</p>
-        </header>
-
-        {dashboard.data != null ? (
-          <>
-            <TeacherAssignments studentId={studentId} />
-            <DailyPlan studentId={studentId} tasks={dashboard.data.plan.tasks} />
-            <CareerCard studentId={studentId} mode="invite" />
-            <ExamCountdown
-              studentId={studentId}
-              examDate={dashboard.data.examDate}
-              plan={dashboard.data.examPlan}
-            />
-          </>
-        ) : dashboard.isError ? (
-          // The plan needs this query; without it Hoy still offers a way in.
-          <div role="alert" className="ruled-section">
-            <p className="text-sm font-semibold text-[var(--text-primary)]">
-              No pudimos armar tu plan de hoy
-            </p>
-            <p className="mt-0.5 text-sm text-[var(--text-secondary)]">
-              {readConvexError(dashboard.error, 'Intenta recargar la página en un momento.')}
-            </p>
-            <Link to="/practice" className="btn-primary mt-4 no-underline">
-              <Play size={16} />
-              Elegir una práctica
-            </Link>
-          </div>
-        ) : null}
-
-        <section className="ruled-section" aria-labelledby="today-week-title">
-          <h2 id="today-week-title" className="section-title">Tu foco</h2>
-          <ul className="ruled-list">
-            <li>
-              {weakestSubject != null && weakestTheme != null ? (
-                <Link to="/path" className="ruled-row no-underline">
-                  <span className="ruled-row-label">Foco</span>
-                  <span className="ruled-row-main">
-                    <span className="flex items-center gap-2 font-semibold">
-                      <span
-                        aria-hidden
-                        className="subject-dot"
-                        style={{ '--subject-color': weakestTheme.color } as CSSProperties}
-                      />
-                      {weakestTheme.label}
-                    </span>
-                    <span className="ruled-row-note">{weakestSubjectHint}</span>
-                  </span>
-                  <ArrowRight size={16} aria-hidden className="shrink-0 text-[var(--text-tertiary)]" />
-                </Link>
-              ) : (
-                <p className="ruled-row">
-                  <span className="ruled-row-label">Foco</span>
-                  <span className="ruled-row-note">Haz tu primera práctica para descubrir tu foco.</span>
-                </p>
-              )}
-            </li>
-            <li>
-              {activeSession != null ? (
-                <Link
-                  to="/practice/$sessionId"
-                  params={{ sessionId: activeSession._id }}
-                  className="ruled-row no-underline"
-                >
-                  <span className="ruled-row-label">En curso</span>
-                  <span className="ruled-row-main">
-                    <span className="font-semibold">{SESSION_KIND_CONFIG[activeSession.kind].labelEs}</span>
-                    <span className="ruled-row-note">{activeSession.questionCount} preguntas · continúa donde quedaste</span>
-                  </span>
-                  <ArrowRight size={16} aria-hidden className="shrink-0 text-[var(--text-tertiary)]" />
-                </Link>
-              ) : (
-                <p className="ruled-row">
-                  <span className="ruled-row-label">En curso</span>
-                  <span className="ruled-row-note">No tienes sesiones abiertas.</span>
-                </p>
-              )}
-            </li>
-          </ul>
-        </section>
-
-        {coachSummary.data?.status === 'ready' && coachSummary.data.body ? (
-          <section className="ruled-section" aria-labelledby="today-coach-title">
-            <h2 id="today-coach-title" className="section-title">Tu semana, en resumen</h2>
-            <MarkdownBlock markdown={coachSummary.data.body} />
-          </section>
-        ) : coachSummary.data?.status === 'generating' ? (
-          <section className="ruled-section" aria-labelledby="today-coach-title">
-            <h2 id="today-coach-title" className="section-title">Tu semana, en resumen</h2>
-            <p className="text-sm text-[var(--text-tertiary)]">Preparando tu resumen…</p>
-          </section>
-        ) : null}
-      </div>
     </div>
   )
 }

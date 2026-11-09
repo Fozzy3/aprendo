@@ -7,6 +7,7 @@ import { createRouter as createTanStackRouter } from '@tanstack/react-router'
 import { setupRouterSsrQueryIntegration } from '@tanstack/react-router-ssr-query'
 import { routeTree } from './routeTree.gen'
 import { reloadOnNewDeploy } from './lib/stale-deploy.ts'
+import { NotFoundPage, RouteErrorPage } from './components/RouteStates.tsx'
 
 export function getRouter() {
   if (typeof document !== 'undefined') {
@@ -38,6 +39,8 @@ export function getRouter() {
     scrollRestoration: true,
     defaultPreload: 'intent',
     defaultPreloadStaleTime: 0,
+    defaultNotFoundComponent: NotFoundPage,
+    defaultErrorComponent: RouteErrorPage,
   })
 
   setupRouterSsrQueryIntegration({

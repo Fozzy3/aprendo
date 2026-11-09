@@ -87,8 +87,8 @@ export function ThemeToggle() {
 
   const label =
     mode === 'auto'
-      ? 'Theme: auto. Click for light.'
-      : `Theme: ${mode}. Click to switch.`
+      ? 'Tema: automático. Toca para cambiar a claro.'
+      : `Tema: ${mode === 'light' ? 'claro' : 'oscuro'}. Toca para cambiar.`
 
   return (
     <button

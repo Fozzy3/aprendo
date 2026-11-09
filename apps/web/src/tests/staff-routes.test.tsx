@@ -14,11 +14,14 @@ const state = vi.hoisted(() => ({
   mutation: vi.fn(),
   navigate: vi.fn(),
   deleteUser: vi.fn(),
+  confirm: vi.fn(),
 }))
+
+vi.mock('../components/ConfirmDialog.tsx', () => ({ confirmDialog: state.confirm, ConfirmDialogHost: () => null }))
 
 vi.mock('lucide-react', () => {
   const Icon = () => null
-  return { ArrowLeft: Icon, ArrowRight: Icon, Copy: Icon, Printer: Icon, RefreshCw: Icon, Trash2: Icon }
+  return { ArrowLeft: Icon, ArrowRight: Icon, BookOpen: Icon, Copy: Icon, House: Icon, Printer: Icon, RefreshCw: Icon, Trash2: Icon, Trophy: Icon, UserRound: Icon }
 })
 
 vi.mock('@tanstack/react-router', () => ({
@@ -98,6 +101,7 @@ beforeEach(() => {
   state.params = {}
   state.mutation.mockReset()
   state.deleteUser.mockReset()
+  state.confirm.mockReset().mockResolvedValue(true)
   container = document.createElement('main')
   document.body.append(container)
   root = createRoot(container)
@@ -169,12 +173,13 @@ describe('/cuenta', () => {
   it('asks for the password before deleting, and says when it is wrong', async () => {
     state.deleteUser.mockResolvedValue({ error: { code: 'INVALID_PASSWORD' } })
     await render('../routes/cuenta.tsx')
-    expect(container.querySelector('input[type="password"]')).toBeNull()
+    const section = container.querySelector('[aria-labelledby="cuenta-delete-title"]')!
+    expect(section.querySelector('input[type="password"]')).toBeNull()
     act(() => button('Eliminar mi cuenta…').click())
-    type(container.querySelector('input[type="password"]')!, 'equivocada')
-    await submit(container.querySelector('form')!)
+    type(section.querySelector('input[type="password"]')!, 'equivocada')
+    await submit(section.querySelector('form')!)
     expect(state.deleteUser).toHaveBeenCalledWith({ password: 'equivocada' })
-    expect(container.querySelector('[role="alert"]')?.textContent).toBe('La contraseña no coincide.')
+    expect(section.querySelector('[role="alert"]')?.textContent).toBe('La contraseña no coincide.')
   })
 
   it('lists the schools that can see the student, with role and classes', async () => {
@@ -255,10 +260,78 @@ describe('/teacher/$classGroupId', () => {
     expect(oneToOne.textContent).toContain('Luis Gómez')
     expect(oneToOne.textContent).toContain('Para abrir la charla')
     expect(oneToOne.textContent).not.toContain('Sara Díaz')
+    expect(container.textContent).toContain('ABCD2345')
+  })
+
+  it('splits the class into three tabs, and the grid lives under Resultados', async () => {
+    state.params = { classGroupId: 'c1' }
+    state.search = { tab: 'resultados' }
+    state.queries['teacher:getClassOverview'] = { isPending: false, isError: false, data: overview }
+    state.queries['teacher:getCompetencyReport'] = { isPending: false, data: [] }
+    await render('../routes/teacher.$classGroupId.tsx')
+    expect([...container.querySelectorAll('.tab-nav a')].map((link) => link.textContent)).toEqual(['Esta semana', 'Resultados', 'Plan'])
+    expect(container.querySelector('[aria-labelledby="week-individual-title"]')).toBeNull()
     const rows = [...container.querySelectorAll('[aria-labelledby="levels-title"] tbody tr')]
     expect(rows.find((row) => row.textContent?.includes('Luis Gómez'))?.textContent).toContain('—')
     expect(rows.find((row) => row.textContent?.includes('Sara Díaz'))?.textContent).toContain('Nivel 3')
-    expect(container.textContent).toContain('ABCD2345')
+  })
+
+  const weekPlan = {
+    wholeClass: [{ subtopicId: 'matematicas.functions_variation.functions_graphs', subjectId: 'matematicas', belowCount: 3, evidencedCount: 5, misconceptionShare: 0, priority: 1, share: 0.6 }],
+    groups: [],
+    items: [],
+    individual: [],
+    guided: { guidedCount: 0, revealedCount: 0 },
+  }
+
+  it('offers no write control to a teacher not assigned to the class', async () => {
+    state.params = { classGroupId: 'c1' }
+    state.queries['teacher:getClassOverview'] = { isPending: false, isError: false, data: { ...overview, canWrite: false } }
+    state.queries['teacher:getClassTeachingPlan'] = { isPending: false, data: weekPlan }
+    await render('../routes/teacher.$classGroupId.tsx')
+    expect(container.textContent).toContain('Esta semana con todo el curso')
+    expect(container.textContent).not.toContain('Asignar práctica al curso')
+    expect(container.textContent).not.toContain('Iniciar duelo')
+    expect(container.textContent).toContain('Guía de clase')
+  })
+
+  it('offers the assigned teacher the duel, the assignments and the weekly message', async () => {
+    const writeText = vi.fn().mockResolvedValue(undefined)
+    Object.defineProperty(navigator, 'clipboard', { value: { writeText }, configurable: true })
+    state.params = { classGroupId: 'c1' }
+    state.queries['teacher:getClassOverview'] = { isPending: false, isError: false, data: { ...overview, canWrite: true } }
+    state.queries['teacher:getClassTeachingPlan'] = { isPending: false, data: weekPlan }
+    await render('../routes/teacher.$classGroupId.tsx')
+    expect(container.textContent).toContain('Asignar práctica al curso')
+    expect(container.textContent).toContain('Iniciar duelo')
+    await act(async () => button('Copiar mensaje para las familias').click())
+    expect(writeText.mock.calls[0]![0]).toContain('11B')
+    expect(writeText.mock.calls[0]![0]).not.toContain('Luis')
+  })
+
+  it('merges the weak spots, and a failed query never reads as "nobody practiced"', async () => {
+    state.params = { classGroupId: 'c1' }
+    state.search = { tab: 'resultados' }
+    state.queries['teacher:getClassOverview'] = { isPending: false, isError: false, data: overview }
+    state.queries['teacher:getCompetencyReport'] = { isPending: false, isError: true, error: new Error('x'), data: undefined }
+    state.queries['teacher:getClassCompetencias'] = { isPending: false, data: [] }
+    state.queries['teacher:getClassTeachingPlan'] = { isPending: false, data: weekPlan }
+    await render('../routes/teacher.$classGroupId.tsx')
+    const weak = container.querySelector('[aria-labelledby="weak-spots-title"]')!
+    expect(weak.querySelector('[role="alert"]')).not.toBeNull()
+    expect(weak.textContent).not.toContain('Todavía nadie')
+    expect(container.querySelector('[aria-labelledby="competency-title"]')).toBeNull()
+  })
+
+  it('shows the share of guided paths that needed the answer', async () => {
+    state.params = { classGroupId: 'c1' }
+    state.search = { tab: 'resultados' }
+    state.queries['teacher:getClassOverview'] = { isPending: false, isError: false, data: overview }
+    state.queries['teacher:getCompetencyReport'] = { isPending: false, data: [] }
+    state.queries['teacher:getClassCompetencias'] = { isPending: false, data: [] }
+    state.queries['teacher:getClassTeachingPlan'] = { isPending: false, data: { ...weekPlan, guided: { guidedCount: 10, revealedCount: 4 } } }
+    await render('../routes/teacher.$classGroupId.tsx')
+    expect(container.textContent).toContain('4 de 10 caminos guiados (40%)')
   })
 
   it('prints the class report', async () => {
@@ -280,6 +353,38 @@ describe('/teacher/$classGroupId', () => {
   })
 })
 
+describe('/teacher/student/$studentId', () => {
+  const progress = {
+    account: { name: 'Luis Gómez', email: 'luis@x.co' },
+    globalScore: { estimate: null, missingSubjectIds: [] },
+    subjectLevels: [],
+    weakestSubtopics: [],
+  }
+
+  beforeEach(() => {
+    state.params = { studentId: 'st1' }
+    state.queries['progress:getStudentProgress'] = { isPending: false, isError: false, data: progress }
+  })
+
+  it('goes back to the class it came from, even from a shared link', async () => {
+    state.search = { curso: 'c1' }
+    await render('../routes/teacher.student.$studentId.tsx')
+    expect(container.querySelector('a[href="/teacher/$classGroupId"]')?.textContent).toContain('Volver al curso')
+  })
+
+  it('never promises a class it does not know', async () => {
+    await render('../routes/teacher.student.$studentId.tsx')
+    expect(container.textContent).not.toContain('Volver al curso')
+    expect(container.querySelector('a.back-link[href="/teacher"]')?.textContent).toContain('Tus cursos')
+  })
+
+  it('shows the guided-study signal', async () => {
+    state.queries['teacher:getStudentGuidedSignal'] = { isPending: false, data: { guidedCount: 5, revealedCount: 1 } }
+    await render('../routes/teacher.student.$studentId.tsx')
+    expect(container.textContent).toContain('1 de 5 caminos guiados (20%)')
+  })
+})
+
 describe('/school', () => {
   const admin = {
     organization: { _id: 'o1', name: 'Colegio San José', seatLimit: 2, licenseActive: true, licenseEndsAt: Date.now() + 86_400_000, crestUrl: null },
@@ -298,7 +403,33 @@ describe('/school', () => {
       data: [{ orgId: 'o1', name: 'Colegio San José', role: 'org_admin', classGroups: [] }],
     }
     state.queries['schools:getSchoolAdmin'] = { isPending: false, isError: false, data: admin }
-    vi.spyOn(window, 'confirm').mockReturnValue(true)
+  })
+
+  it('is split into four tabs', async () => {
+    await render('../routes/school.tsx')
+    expect([...container.querySelectorAll('.tab-nav a')].map((link) => link.textContent)).toEqual(['Cursos', 'Personas', 'Pruebas', 'Institución'])
+    expect(container.querySelector('[aria-labelledby="teachers-title"]')).toBeNull()
+  })
+
+  it('links each student to their report and asks before removing them', async () => {
+    state.search = { tab: 'personas' }
+    state.mutation.mockResolvedValue(undefined)
+    state.confirm.mockResolvedValue(false)
+    await render('../routes/school.tsx')
+    const students = container.querySelector('[aria-labelledby="students-title"]')!
+    expect(students.querySelector('a[href="/teacher/student/$studentId"]')?.textContent).toContain('Luis Gómez')
+    await act(async () => {
+      ;(students.querySelector('.ruled-row button') as HTMLButtonElement).click()
+    })
+    expect(state.confirm).toHaveBeenCalledOnce()
+    expect(state.mutation).not.toHaveBeenCalled()
+  })
+
+  it('offers the grades from 6 to 11 when creating a class', async () => {
+    await render('../routes/school.tsx')
+    const select = container.querySelector('[aria-labelledby="classes-title"] form select') as HTMLSelectElement
+    expect([...select.options].map((option) => option.value)).toEqual(['6', '7', '8', '9', '10', '11'])
+    expect(select.value).toBe('11')
   })
 
   it('warns when every seat is taken', async () => {
@@ -316,6 +447,7 @@ describe('/school', () => {
   })
 
   it('never offers the admin to remove themself', async () => {
+    state.search = { tab: 'personas' }
     await render('../routes/school.tsx')
     const rows = [...container.querySelectorAll('[aria-labelledby="teachers-title"] .ruled-row')]
     expect(rows.find((row) => row.textContent?.includes('Ana Ruiz'))?.querySelector('button')).toBeNull()
@@ -325,6 +457,7 @@ describe('/school', () => {
   it('says why a teacher could not be removed', async () => {
     const { ConvexError } = await import('convex/values')
     state.mutation.mockRejectedValue(new ConvexError('El colegio necesita al menos un administrador.'))
+    state.search = { tab: 'personas' }
     await render('../routes/school.tsx')
     const teachers = container.querySelector('[aria-labelledby="teachers-title"]')!
     await act(async () => {

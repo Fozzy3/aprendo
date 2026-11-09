@@ -41,7 +41,12 @@ export function SharedStimulus({
       <div className="shared-stimulus-body">
         {group.imageUrl != null ? (
           <>
-            <img src={group.imageUrl} alt="" className="question-scan" loading="lazy" />
+            <img
+              src={group.imageUrl}
+              alt={group.contextMarkdown === '' ? 'Texto compartido, como aparece en el cuadernillo' : ''}
+              className="question-scan"
+              loading="lazy"
+            />
             <span className="sr-only">{group.contextMarkdown}</span>
           </>
         ) : (

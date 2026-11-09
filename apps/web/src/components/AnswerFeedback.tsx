@@ -7,87 +7,79 @@ type AnswerFeedbackProps = {
   feedback: NonNullable<ReturnType<typeof answerFeedback>>
   explanationSource: 'icfes' | 'ai_generated' | 'human' | null
   isLast: boolean
-  /** Bring the verdict into view: only right after "Comprobar", not on a revisit. */
-  scrollIntoView: boolean
+  /** The verdict just arrived: bring focus to it. Not on a revisit. */
+  justChecked: boolean
+  /** How the guided path ended, for a wrong first answer; null when there was none. */
+  outcome: 'self_corrected' | 'revealed' | null
+  reveal: string | null
   onNext: () => void
 }
 
 /**
- * The verdict on one checked answer, in an immediate-feedback practice: right
- * or wrong (in the semantic colours, with words, never colour alone), why the
- * chosen option looked right, the solution, then the other options.
+ * The close of one answer: the verdict, and "¿por qué funciona?" one tap away.
+ * Only a right answer, or the end of a guided path (F56), reaches this screen.
  */
 export function AnswerFeedback({
   feedback,
   explanationSource,
   isLast,
-  scrollIntoView,
+  justChecked,
+  outcome,
+  reveal,
   onNext,
 }: AnswerFeedbackProps) {
-  const ref = useRef<HTMLElement | null>(null)
   const verdictRef = useRef<HTMLParagraphElement | null>(null)
   useEffect(() => {
-    if (!scrollIntoView) return
-    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    ref.current?.scrollIntoView({ block: 'start', behavior: reduce ? 'auto' : 'smooth' })
-    // "Comprobar" unmounts with the check: focus lands on the verdict, which is read aloud.
-    verdictRef.current?.focus({ preventScroll: true })
-  }, [scrollIntoView])
+    if (justChecked) verdictRef.current?.focus({ preventScroll: true })
+  }, [justChecked])
 
   const { isCorrect, correctOption, picked, solutionMarkdown, others } = feedback
+  const discovered = outcome === 'self_corrected'
+  const isGood = isCorrect || discovered
   const hasExplanation = picked != null || solutionMarkdown != null || others.length > 0
 
   return (
-    <section ref={ref} className={`answer-feedback${scrollIntoView ? ' is-arriving' : ''}`} aria-label="Resultado de tu respuesta">
-      <p
-        ref={verdictRef}
-        tabIndex={-1}
-        className={`answer-verdict ${isCorrect ? 'is-correct' : 'is-incorrect'}`}
-      >
-        {isCorrect ? <CircleCheck size={20} aria-hidden /> : <CircleX size={20} aria-hidden />}
-        <strong>{isCorrect ? 'Correcta' : 'Incorrecta'}</strong>
-        {isCorrect ? null : <span>La respuesta es la {correctOption}.</span>}
-      </p>
+    <section className={`verdict${isGood ? ' is-good' : ''}`} aria-label="Resultado de tu respuesta">
+      <div className="verdict-inner">
+        <p ref={verdictRef} tabIndex={-1} className={`answer-verdict ${isGood ? 'is-correct' : 'is-incorrect'}`}>
+          {isGood ? <CircleCheck size={22} aria-hidden /> : <CircleX size={22} aria-hidden />}
+          <strong>{discovered ? 'Lo descubriste' : isCorrect ? 'Correcta' : `La respuesta es la ${correctOption}.`}</strong>
+        </p>
 
-      {picked != null ? (
-        <div className="review-explanation is-distractor">
-          <h3 className="answer-feedback-heading">Por qué la {picked.label} parece correcta</h3>
-          <MarkdownBlock markdown={picked.rationaleMarkdown} />
-        </div>
-      ) : null}
+        {reveal != null ? <div className="verdict-reveal"><MarkdownBlock markdown={reveal} /></div> : null}
 
-      {solutionMarkdown != null ? (
-        <div className="review-explanation">
-          <h3 className="answer-feedback-heading">Explicación</h3>
-          <MarkdownBlock markdown={solutionMarkdown} />
-        </div>
-      ) : null}
-
-      {others.length > 0 ? (
-        <details className="answer-feedback-others">
-          <summary>Por qué no son las otras opciones</summary>
-          {others.map((item) => (
-            <div key={item.label} className="answer-feedback-other">
-              <span className="option-label" aria-hidden>{item.label}</span>
-              <div className="min-w-0 flex-1">
-                <span className="sr-only">Opción {item.label}: </span>
-                <MarkdownBlock markdown={item.rationaleMarkdown} />
+        {hasExplanation ? (
+          <details className="verdict-more">
+            <summary>¿Por qué funciona?</summary>
+            {picked != null ? (
+              <div className="review-explanation is-distractor">
+                <h3 className="answer-feedback-heading">Por qué la {picked.label} parece correcta</h3>
+                <MarkdownBlock markdown={picked.rationaleMarkdown} />
               </div>
-            </div>
-          ))}
-        </details>
-      ) : null}
+            ) : null}
+            {solutionMarkdown != null ? (
+              <div className="review-explanation">
+                <MarkdownBlock markdown={solutionMarkdown} />
+              </div>
+            ) : null}
+            {others.map((item) => (
+              <div key={item.label} className="answer-feedback-other">
+                <span className="option-label" aria-hidden>{item.label}</span>
+                <div className="min-w-0 flex-1">
+                  <span className="sr-only">Opción {item.label}: </span>
+                  <MarkdownBlock markdown={item.rationaleMarkdown} />
+                </div>
+              </div>
+            ))}
+            {explanationSource === 'ai_generated' ? <p className="answer-feedback-note">Explicación escrita con IA.</p> : null}
+          </details>
+        ) : null}
 
-      {!hasExplanation ? (
-        <p className="answer-feedback-note">Esta pregunta todavía no tiene una explicación escrita.</p>
-      ) : explanationSource === 'ai_generated' ? (
-        <p className="answer-feedback-note">Explicación escrita con IA.</p>
-      ) : null}
-
-      <button type="button" className="btn-primary answer-feedback-next" onClick={onNext}>
-        {isLast ? 'Terminar' : 'Siguiente'}
-        <ChevronRight size={16} aria-hidden />
-      </button>
+        <button type="button" className="btn-primary answer-feedback-next" onClick={onNext}>
+          {isLast ? 'Terminar' : 'Siguiente'}
+          <ChevronRight size={18} aria-hidden />
+        </button>
+      </div>
     </section>
   )
 }

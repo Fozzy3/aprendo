@@ -1,6 +1,7 @@
-import { useConvexMutation } from '@convex-dev/react-query'
+import { convexQuery, useConvexMutation } from '@convex-dev/react-query'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useBlocker, type ShouldBlockFn } from '@tanstack/react-router'
+import * as Dialog from '@radix-ui/react-dialog'
 import {
   AArrowDown,
   AArrowUp,
@@ -10,14 +11,15 @@ import {
   ChevronRight,
   ClipboardCheck,
   CloudOff,
+  Ellipsis,
   EyeOff,
   Flag,
   Gauge,
   Hourglass,
   LayoutGrid,
+  Lightbulb,
   MessageSquareWarning,
   Strikethrough,
-  Timer,
   Undo2,
   X,
 } from 'lucide-react'
@@ -28,9 +30,7 @@ import { MarkdownBlock } from './MarkdownBlock.tsx'
 import { CONFIDENCE_OPTIONS, type ConfidenceLevel } from '../lib/confidence-display.ts'
 import { SharedStimulus } from './SharedStimulus.tsx'
 import { sessionQuery } from '../lib/student-queries.ts'
-import { getKindIcon, getKindLabel } from '../lib/session-display.ts'
 import { formatClock, useSessionTimer } from '../lib/use-session-timer.ts'
-import { getSubjectLabel } from '@aprendo/convex/taxonomy'
 import { EmptyState } from './EmptyState.tsx'
 import { readConvexError } from '../lib/convex-error.ts'
 import type { QueueItem, QuestionOverlay } from '../lib/answer-queue.ts'
@@ -55,6 +55,11 @@ import { CheckYourWork } from './CheckYourWork.tsx'
 import { ReportProblemSheet } from './ReportProblemSheet.tsx'
 import { PageLoader } from './FullScreenLoader.tsx'
 import { stopSpeaking } from '../lib/speech.ts'
+import { confirmDialog } from './ConfirmDialog.tsx'
+import { GuidedPath } from './GuidedPath.tsx'
+import { stickerFor } from '../lib/album-view.ts'
+import { beadStates, guideQueryArgs, isSettled, optionMark, solveMoment, type GuideView, type OptionMark } from '../lib/solve-view.ts'
+import { getSubjectTheme } from '../lib/subject-theme.ts'
 
 // The chat stack is heavy (see ReviewTutor): fetched the first time the student opens it.
 const ReviewTutor = lazy(() => import('./ReviewTutor.tsx'))
@@ -72,6 +77,18 @@ const TEXT_SCALE_KEY = 'aprendo:solve-text-scale'
 /** The proctor's "quedan 5 minutos"; the clock also comes back on if hidden. */
 const WARN_BEFORE_MS = 5 * 60_000
 const LONG_PRESS_MS = 500
+/** A reading passage is set smaller than a short question. */
+const LONG_STEM = 240
+
+const OPTION_CLASS: Record<OptionMark, string> = {
+  none: '',
+  selected: ' is-selected',
+  eliminated: ' is-eliminated',
+  wrong: ' is-incorrect',
+  correct: ' is-correct',
+}
+
+type GuideAction = { type: 'choose'; choiceIndex: number } | { type: 'retry'; label: string } | { type: 'reveal' }
 
 type ServerQuestion = {
   attempt: { selectedOption?: string; confidence?: string } | null
@@ -109,6 +126,9 @@ export function SessionSolve({ sessionId, onExit, onCompleted }: SessionSolvePro
   const [currentIndex, setCurrentIndex] = useState(0)
   const [isMapOpen, setIsMapOpen] = useState(false)
   const [isReportOpen, setIsReportOpen] = useState(false)
+  const [isMoreOpen, setIsMoreOpen] = useState(false)
+  // Touch screens hide the strike buttons (a long press does it) until asked for.
+  const [isStriking, setIsStriking] = useState(false)
   // Practice kinds open the tutor while solving (F31); it only gives hints before the key is out.
   const [isTutorOpen, setIsTutorOpen] = useState(false)
   const [hasOpenedTutor, setHasOpenedTutor] = useState(false)
@@ -127,6 +147,10 @@ export function SessionSolve({ sessionId, onExit, onCompleted }: SessionSolvePro
   const recordQuestionTime = useConvexMutation(api.sessions.recordQuestionTime)
   const completeSession = useConvexMutation(api.sessions.completeSession)
   const checkAnswer = useConvexMutation(api.sessions.checkAnswer)
+  const answerGuideStep = useConvexMutation(api.guides.answerGuideStep)
+  const retryGuidedAnswer = useConvexMutation(api.guides.retryGuidedAnswer)
+  const revealGuidedAnswer = useConvexMutation(api.guides.revealGuidedAnswer)
+  const takeGuideHint = useConvexMutation(api.guides.takeGuideHint)
 
   const query = useQuery(sessionQuery(sessionId))
   const data = query.data
@@ -165,8 +189,8 @@ export function SessionSolve({ sessionId, onExit, onCompleted }: SessionSolvePro
   const queue = useAnswerQueue(sessionId, send)
 
   // "Comprobar": the answer has to be on the server before it can be graded,
-  // so any unsent write goes first. The graded question then comes back
-  // unsealed through `getSession`, which is what the feedback renders from.
+  // so any unsent write goes first. A right answer then comes back unsealed
+  // through `getSession`; a wrong one stays sealed and its guided path opens.
   const [justCheckedId, setJustCheckedId] = useState<string | null>(null)
   const checkMutation = useMutation({
     mutationFn: async (sessionQuestionId: string) => {
@@ -193,17 +217,24 @@ export function SessionSolve({ sessionId, onExit, onCompleted }: SessionSolvePro
   const isOpen = session != null && !isClosed
     && (session.status === 'in_progress' || session.status === 'created')
 
-  // Reopening a session lands on the first question still blank, not on 1.
+  // Reopening a session lands on the first question still to close, not on 1.
   const hasResumedRef = useRef(false)
   useEffect(() => {
     if (hasResumedRef.current || questions.length === 0) return
     hasResumedRef.current = true
-    setCurrentIndex(firstUnansweredIndex(views.map((view) => view.selectedOption != null)))
-  }, [questions.length, views])
+    const canCheck = session != null && canCheckAnswers(session)
+    setCurrentIndex(firstUnansweredIndex(views.map((item, index) => isSettled({
+      immediate: canCheck,
+      isAnswered: item.selectedOption != null,
+      isChecked: questions[index]?.attempt?.checkedAt != null,
+      hasKey: questions[index]?.question.answerCorrectOption != null,
+    }))))
+  }, [questions, session, views])
 
   useEffect(() => {
     questionStartedAtRef.current = Date.now()
     setJustCheckedId(null)
+    setLastCorrect(null)
     // Both panels go back to the top on a question change. Keeping the previous
     // offset opened the next question already scrolled past its own stem.
     workRef.current?.scrollTo({ top: 0 })
@@ -226,6 +257,41 @@ export function SessionSolve({ sessionId, onExit, onCompleted }: SessionSolvePro
 
   const current = questions[currentIndex]
   const currentQuestionId = current?.sessionQuestionId ?? null
+
+  // Immediate feedback only where the kind allows it: never an exam or a reto.
+  const immediate = session != null && canCheckAnswers(session)
+  const isChecked = immediate && current?.attempt?.checkedAt != null
+  const guideArgs = current == null
+    ? ('skip' as const)
+    : guideQueryArgs({ immediate, isChecked, sessionId, sessionQuestionId: current.sessionQuestionId })
+  const guideQuery = useQuery(convexQuery(api.guides.getGuideStep, guideArgs as never))
+  const guide = guideArgs === 'skip' ? null : (guideQuery.data as GuideView | null | undefined)
+  const moment = solveMoment({ immediate, isChecked, hasKey: current?.question.answerCorrectOption != null, guide })
+
+  // Each tap on the path comes back through the reactive step; `correct` only
+  // colours the line above the next prompt.
+  const [lastCorrect, setLastCorrect] = useState<boolean | null>(null)
+  const guideAction = useMutation({
+    mutationFn: async (action: GuideAction) => {
+      const ids = { sessionId: sessionId as never, sessionQuestionId: currentQuestionId as never }
+      if (action.type === 'choose') return answerGuideStep({ ...ids, choiceIndex: action.choiceIndex })
+      if (action.type === 'retry') return retryGuidedAnswer({ ...ids, selectedOption: action.label })
+      return revealGuidedAnswer(ids)
+    },
+    onSuccess: (result) => {
+      if (currentQuestionId != null) setJustCheckedId(currentQuestionId)
+      setLastCorrect('correct' in result ? result.correct : null)
+    },
+  })
+
+  // "Pista": a guiding question, by question; null is a question without one yet.
+  const [hints, setHints] = useState<Record<string, string | null>>({})
+  const hintMutation = useMutation({
+    mutationFn: (sessionQuestionId: string) =>
+      takeGuideHint({ sessionId: sessionId as never, sessionQuestionId: sessionQuestionId as never }),
+    onSuccess: (result, sessionQuestionId) =>
+      setHints((previous) => ({ ...previous, [sessionQuestionId]: result.hint })),
+  })
 
   // The next sheet is already loaded when the student turns the page: its
   // scanned stem (the only slow part) is fetched while they work on this one.
@@ -336,17 +402,18 @@ export function SessionSolve({ sessionId, onExit, onCompleted }: SessionSolvePro
   const hasConfirmedLeaveRef = useRef(false)
   const confirmLeave = useCallback(
     () =>
-      typeof window === 'undefined'
-      || window.confirm(
-        `El reloj sigue corriendo aunque salgas: te quedan ${formatClock(remainingMsRef.current ?? 0)}. Puedes volver y seguir mientras quede tiempo. ¿Salir de todas formas?`,
-      ),
+      confirmDialog({
+        title: 'El reloj sigue corriendo',
+        body: `Te quedan ${formatClock(remainingMsRef.current ?? 0)}. Puedes volver y seguir mientras quede tiempo.`,
+        confirmLabel: 'Salir de todas formas',
+      }),
     [],
   )
   const shouldBlockLeave = useCallback<ShouldBlockFn>(
-    ({ next }) => {
+    async ({ next }) => {
       // Finishing (or running out of time) hands off to the review: not leaving.
       if (hasConfirmedLeaveRef.current || next.pathname.endsWith('/review')) return false
-      return !confirmLeave()
+      return !(await confirmLeave())
     },
     [confirmLeave],
   )
@@ -355,8 +422,8 @@ export function SessionSolve({ sessionId, onExit, onCompleted }: SessionSolvePro
     disabled: !guardsLeaving,
     enableBeforeUnload: false,
   })
-  const exit = () => {
-    if (guardsLeaving && !confirmLeave()) return
+  const exit = async () => {
+    if (guardsLeaving && !(await confirmLeave())) return
     hasConfirmedLeaveRef.current = true
     onExit()
   }
@@ -367,8 +434,6 @@ export function SessionSolve({ sessionId, onExit, onCompleted }: SessionSolvePro
   const isFirst = currentIndex === 0
   const isFinishing = isFlushing || completeMutation.isPending
   const locked = !isOpen || isFinishing
-  // Immediate feedback only where the kind allows it: never an exam or a reto.
-  const immediate = session != null && canCheckAnswers(session)
   // Only a session that corrects at once teaches; the exit ticket measures (F40).
   const tutorInSolve = session != null && SESSION_KIND_CONFIG[session.kind].tutorInSolve && session.feedbackMode === 'inmediata'
   // The sheet stays mounted (display:none), so closing it must silence its voice.
@@ -376,8 +441,11 @@ export function SessionSolve({ sessionId, onExit, onCompleted }: SessionSolvePro
     setIsTutorOpen(false)
     stopSpeaking()
   }
-  const isChecked = immediate && current?.attempt?.checkedAt != null
-  // A checked answer has seen its key: it can no longer change.
+  const openTutor = () => {
+    setHasOpenedTutor(true)
+    setIsTutorOpen(true)
+  }
+  // A checked answer can no longer change; the retry is a separate tap.
   const answerLocked = locked || isChecked || checkMutation.isPending
 
   const goTo = useCallback(
@@ -404,6 +472,10 @@ export function SessionSolve({ sessionId, onExit, onCompleted }: SessionSolvePro
 
   const selectOption = useCallback(
     (label: string) => {
+      if (moment === 'retry') {
+        if (label !== view?.selectedOption && !locked && !guideAction.isPending) guideAction.mutate({ type: 'retry', label })
+        return
+      }
       if (current == null || view == null || answerLocked) return
       const sessionQuestionId = current.sessionQuestionId
       // Picking a crossed-out option takes the stroke off: the student changed
@@ -426,7 +498,7 @@ export function SessionSolve({ sessionId, onExit, onCompleted }: SessionSolvePro
         })
       }
     },
-    [answerLocked, current, queue, view],
+    [answerLocked, current, guideAction, locked, moment, queue, view],
   )
 
   // Declaring confidence re-submits the same answer: one mutation, one source of
@@ -598,8 +670,6 @@ export function SessionSolve({ sessionId, onExit, onCompleted }: SessionSolvePro
     )
   }
 
-  const KindIcon = getKindIcon(session.kind)
-  const progress = questions.length === 0 ? 0 : (answeredCount / questions.length) * 100
   const lowTime = timer.timed && timer.remainingMs != null && timer.remainingMs <= 60_000
   // Hidden like a watch in a pocket — until the last five minutes, when the
   // proctor would announce them anyway.
@@ -619,7 +689,7 @@ export function SessionSolve({ sessionId, onExit, onCompleted }: SessionSolvePro
     ?? (completeMutation.error
       ? readConvexError(completeMutation.error, 'No se pudo entregar la sesión.')
       : null)
-  const feedback = isChecked && current.attempt?.selectedOption != null
+  const feedback = moment === 'closed' && current.attempt?.selectedOption != null
     ? answerFeedback(current.question, current.attempt.selectedOption)
     : null
   const submitLabel = isFlushing
@@ -627,66 +697,64 @@ export function SessionSolve({ sessionId, onExit, onCompleted }: SessionSolvePro
     : completeMutation.isPending
       ? 'Entregando…'
       : 'Entregar'
+  const beads = beadStates(views.map((item) => item.selectedOption != null), currentIndex)
+  // Practice shows the sticker at stake; an exam, just where the student is.
+  const slot = immediate ? stickerFor(current.question.primarySubtopicId)?.number : currentIndex + 1
+  const allAnswered = answeredCount === questions.length
+  const finishNow = () => {
+    if (!isFinishing && isOpen) void finishSession(false)
+  }
+  const hint = hints[current.sessionQuestionId]
+  const openPath = guide != null && guide.phase !== 'ended' ? guide : null
 
   return (
     <div
       className="solve fade-in"
-      style={{ '--solve-text-scale': textScale } as CSSProperties}
+      style={{
+        '--solve-text-scale': textScale,
+        '--field': getSubjectTheme(current.question.subjectId ?? '').color,
+      } as CSSProperties}
     >
-      <header className="solve-topbar">
-        <div className="solve-meta">
-          <span className="solve-kind">
-            <KindIcon size={15} />
-            {getKindLabel(session.kind)}
-          </span>
-          <span className="chip chip-accent">
-            {getSubjectLabel(current.question.subjectId ?? 'sin_asignar')}
-          </span>
-        </div>
+      <header className="solve-bar">
+        <button type="button" className="solve-bar-btn" onClick={() => void exit()} aria-label="Salir de la sesión">
+          <X size={24} strokeWidth={2.6} aria-hidden />
+        </button>
 
-        <div className="solve-progress">
-          <strong>{currentIndex + 1}</strong>
-          <span>/ {questions.length}</span>
-          <div className="solve-progress-track" aria-hidden>
-            <span style={{ transform: `scaleX(${progress / 100})` }} />
+        {beads != null ? (
+          <div className="beads" role="img" aria-label={`Pregunta ${currentIndex + 1} de ${questions.length}`}>
+            {beads.map((state, index) => <i key={index} className={`is-${state}`} />)}
           </div>
-        </div>
+        ) : (
+          <div className="solve-bar-track" role="img" aria-label={`${answeredCount} de ${questions.length} respondidas`}>
+            <span style={{ transform: `scaleX(${answeredCount / questions.length})` }} />
+          </div>
+        )}
 
-        <div className="solve-actions">
+        {timer.timed ? (
           <button
             type="button"
-            className={`solve-clock${lowTime ? ' is-low' : ''}${timer.timed ? '' : ' is-muted'}`}
+            className={`solve-clock${lowTime ? ' is-low' : ''}`}
             onClick={toggleClock}
             disabled={inFinalMinutes}
-            aria-label={
-              clockVisible
-                ? `${timer.timed ? 'Tiempo restante' : 'Tiempo'} ${formatClock(timer.timed ? timer.remainingMs ?? 0 : timer.elapsedMs)}. Ocultar el reloj`
-                : 'Mostrar el reloj'
-            }
-            title={clockVisible ? 'Ocultar el reloj' : 'Mostrar el reloj'}
+            aria-label={clockVisible ? `Tiempo restante ${formatClock(timer.remainingMs ?? 0)}. Ocultar el reloj` : 'Mostrar el reloj'}
           >
-            {clockVisible ? (
-              <>
-                {timer.timed ? <Hourglass size={15} aria-hidden /> : <Timer size={15} aria-hidden />}
-                {formatClock(timer.timed ? timer.remainingMs ?? 0 : timer.elapsedMs)}
-              </>
-            ) : (
-              <>
-                <EyeOff size={15} aria-hidden />
-                <span className="max-sm:sr-only">Reloj</span>
-              </>
-            )}
+            {clockVisible ? formatClock(timer.remainingMs ?? 0) : <EyeOff size={16} aria-hidden />}
           </button>
-          <button
-            type="button"
-            className="solve-icon-btn"
-            onClick={exit}
-            aria-label="Salir de la sesión"
-            title="Salir"
-          >
-            <X size={18} />
-          </button>
-        </div>
+        ) : null}
+
+        {slot != null ? (
+          <div className={`solve-slot${view.flagged ? ' is-marked' : ''}`} aria-hidden>{slot}</div>
+        ) : null}
+
+        <button
+          type="button"
+          className="solve-bar-btn"
+          onClick={() => setIsMoreOpen(true)}
+          aria-haspopup="dialog"
+          aria-label="Más opciones"
+        >
+          <Ellipsis size={24} strokeWidth={2.6} aria-hidden />
+        </button>
       </header>
 
       {queue.isOffline && queue.pendingCount > 0 ? (
@@ -723,10 +791,7 @@ export function SessionSolve({ sessionId, onExit, onCompleted }: SessionSolvePro
           submitLabel={submitLabel}
           onJump={goTo}
           onBack={() => setIsChecking(false)}
-          onSubmit={() => {
-            if (isFinishing || !isOpen) return
-            void finishSession(false)
-          }}
+          onSubmit={finishNow}
         />
       ) : (
         <>
@@ -735,58 +800,26 @@ export function SessionSolve({ sessionId, onExit, onCompleted }: SessionSolvePro
               <SharedStimulus group={current.group} panelRef={stimulusRef} />
             ) : null}
 
-            <div className="solve-work sheet" ref={workRef}>
-              <div className="solve-qbar">
-                <span
-                  className={`solve-number${view.flagged ? ' is-marked' : ''}`}
-                  aria-label={`Pregunta ${currentIndex + 1}${view.flagged ? ', marcada para revisar' : ''}`}
+            <div className={`solve-work sheet${isStriking ? ' is-striking' : ''}`} ref={workRef}>
+              {pace != null ? (
+                <p
+                  className={`solve-pace is-${pace.status}`}
+                  title={paceDescription(pace, data?.officialMsPerQuestion ?? 135_000)}
                 >
-                  {currentIndex + 1}
-                </span>
-                {pace != null ? (
-                  <span
-                    className={`solve-pace is-${pace.status}`}
-                    title={paceDescription(pace, data?.officialMsPerQuestion ?? 135_000)}
-                  >
-                    <Gauge size={14} aria-hidden />
-                    {paceLabel(pace)}
-                    <span className="sr-only">
-                      {paceDescription(pace, data?.officialMsPerQuestion ?? 135_000)}
-                    </span>
+                  <Gauge size={14} aria-hidden />
+                  {paceLabel(pace)}
+                  <span className="sr-only">
+                    {paceDescription(pace, data?.officialMsPerQuestion ?? 135_000)}
                   </span>
-                ) : (
-                  <span />
-                )}
-                <div className="solve-textsize" role="group" aria-label="Tamaño del texto">
-                  <button
-                    type="button"
-                    className="solve-icon-btn"
-                    onClick={() => changeTextScale(-1)}
-                    disabled={textScale === TEXT_SCALES[0]}
-                    aria-label="Texto más pequeño"
-                    title="Texto más pequeño"
-                  >
-                    <AArrowDown size={18} />
-                  </button>
-                  <button
-                    type="button"
-                    className="solve-icon-btn"
-                    onClick={() => changeTextScale(1)}
-                    disabled={textScale === TEXT_SCALES[TEXT_SCALES.length - 1]}
-                    aria-label="Texto más grande"
-                    title="Texto más grande"
-                  >
-                    <AArrowUp size={18} />
-                  </button>
-                </div>
-              </div>
+                </p>
+              ) : null}
 
-              <article className="solve-question">
+              <article className={`solve-question${current.question.bodyMarkdown.length > LONG_STEM ? ' is-long' : ''}`}>
                 {current.stemImageUrl != null ? (
-                  /* The stem as the booklet prints it, diagram included. The markdown
+                  /* A figure the question truly needs (`stemDisplay`). The markdown
                      stays in the DOM but visually hidden: it is what a screen reader
                      announces, what find-in-page matches, and what the tutor is given
-                     as context — the image only replaces the *look*. */
+                     as context. */
                   <>
                     <img
                       src={current.stemImageUrl}
@@ -804,18 +837,23 @@ export function SessionSolve({ sessionId, onExit, onCompleted }: SessionSolvePro
 
               <div className="solve-options" role="group" aria-label="Opciones de respuesta">
                 {current.question.options.map((option) => {
+                  const mark = optionMark({
+                    moment,
+                    label: option.label,
+                    selectedOption: view.selectedOption,
+                    correctOption: current.question.answerCorrectOption ?? null,
+                    isEliminated: view.eliminated.includes(option.label),
+                  })
                   const isSelected = view.selectedOption === option.label
-                  const isEliminated = view.eliminated.includes(option.label)
-                  const isKey = feedback != null && option.label === feedback.correctOption
-                  const isWrongPick = feedback != null && isSelected && !isKey
-                  const stateClass = feedback == null
-                    ? `${isSelected ? ' is-selected' : ''}${isEliminated ? ' is-eliminated' : ''}`
-                    : `${isKey ? ' is-correct' : ''}${isWrongPick ? ' is-incorrect' : ''}`
+                  const isEliminated = mark === 'eliminated'
+                  const canStrike = moment === 'answering'
+                  // At the retry the first pick is the one option already ruled out.
+                  const isDisabled = moment === 'retry' ? locked || isSelected || guideAction.isPending : answerLocked
                   return (
                     <div key={option.label} className="solve-option-row">
                       <button
                         type="button"
-                        disabled={answerLocked}
+                        disabled={isDisabled}
                         aria-pressed={isSelected}
                         onClick={() => {
                           if (longPressedRef.current) {
@@ -830,17 +868,23 @@ export function SessionSolve({ sessionId, onExit, onCompleted }: SessionSolvePro
                         onPointerLeave={cancelPress}
                         onPointerCancel={cancelPress}
                         onContextMenu={(event) => event.preventDefault()}
-                        className={`option-card solve-option${stateClass}`}
+                        className={`option-card solve-option${OPTION_CLASS[mark]}`}
                       >
                         <span className="option-label">{option.label}</span>
                         <span className="solve-option-body min-w-0 flex-1 text-left">
                           <MarkdownBlock markdown={option.bodyMarkdown} />
-                          {isKey ? <span className="review-option-meta is-correct">Respuesta correcta</span> : null}
-                          {isWrongPick ? <span className="review-option-meta is-incorrect">Tu respuesta</span> : null}
+                          {moment === 'closed' && mark === 'correct' ? (
+                            <span className="review-option-meta is-correct">Respuesta correcta</span>
+                          ) : null}
+                          {moment === 'closed' && mark === 'wrong' ? (
+                            <span className="review-option-meta is-incorrect">Tu respuesta</span>
+                          ) : null}
                         </span>
-                        {isEliminated && feedback == null ? <span className="sr-only">(tachada)</span> : null}
+                        {mark === 'wrong' ? <X size={20} strokeWidth={2.8} className="solve-option-mark" aria-hidden /> : null}
+                        {mark === 'correct' ? <Check size={20} strokeWidth={2.8} className="solve-option-mark" aria-hidden /> : null}
+                        {isEliminated ? <span className="sr-only">(tachada)</span> : null}
                       </button>
-                      {feedback != null ? null : (
+                      {canStrike ? (
                         <button
                           type="button"
                           className={`solve-strike${isEliminated ? ' is-active' : ''}`}
@@ -856,13 +900,13 @@ export function SessionSolve({ sessionId, onExit, onCompleted }: SessionSolvePro
                         >
                           {isEliminated ? <Undo2 size={16} /> : <Strikethrough size={16} />}
                         </button>
-                      )}
+                      ) : null}
                     </div>
                   )
                 })}
               </div>
 
-              {view.selectedOption != null && feedback == null ? (
+              {view.selectedOption != null && moment === 'answering' ? (
                 <div className="confidence-strip fade-in">
                   <span className="confidence-strip-label">¿Qué tan seguro estás?</span>
                   <div className="confidence-strip-options" role="group" aria-label="Nivel de confianza">
@@ -886,134 +930,119 @@ export function SessionSolve({ sessionId, onExit, onCompleted }: SessionSolvePro
                 </div>
               ) : null}
 
-              {immediate && !isChecked && view.selectedOption != null ? (
-                <div className="solve-verify">
-                  <button
-                    type="button"
-                    className="btn-primary"
-                    disabled={locked || checkMutation.isPending}
-                    onClick={() => checkMutation.mutate(current.sessionQuestionId)}
-                  >
-                    <Check size={16} aria-hidden />
-                    {checkMutation.isPending ? 'Comprobando…' : 'Comprobar'}
-                  </button>
-                </div>
-              ) : null}
-
-              {errorMessage != null ? (
-                <div className="stage-alert" role="alert">
-                  {errorMessage}
-                </div>
-              ) : null}
-
-              {feedback != null ? (
-                <AnswerFeedback
-                  feedback={feedback}
-                  explanationSource={current.question.explanationSource ?? null}
-                  isLast={isLast}
-                  scrollIntoView={justCheckedId === current.sessionQuestionId}
-                  onNext={isLast ? openCheck : goNext}
-                />
-              ) : null}
-
-              <div className="solve-question-foot">
-                <p className="solve-hint" aria-hidden>
-                  <kbd>A</kbd>
-                  <kbd>B</kbd>
-                  <kbd>C</kbd>
-                  <kbd>D</kbd>
-                  <span>responder</span>
-                  <span className="solve-hint-sep">·</span>
-                  <kbd>←</kbd>
-                  <kbd>→</kbd>
-                  <span>navegar</span>
-                  <span className="solve-hint-sep">·</span>
-                  <kbd>F</kbd>
-                  <span>marcar</span>
+              {moment === 'answering' && hint !== undefined ? (
+                <p className="solve-pista" role="status">
+                  <Lightbulb size={18} aria-hidden />
+                  {hint != null ? <MarkdownBlock markdown={hint} /> : 'Esta pregunta todavía no tiene pista.'}
                 </p>
-                <button
-                  type="button"
-                  className="solve-report-link"
-                  onClick={() => setIsReportOpen(true)}
-                >
-                  <MessageSquareWarning size={14} aria-hidden />
-                  Reportar un problema
-                </button>
-              </div>
+              ) : null}
             </div>
           </main>
 
-          <footer className="solve-footer">
-            <button
-              type="button"
-              className="solve-nav-btn"
-              disabled={isFirst}
-              onClick={goPrev}
-              aria-label="Pregunta anterior"
-            >
-              <ChevronLeft size={16} aria-hidden />
-              <span className="max-sm:hidden">Anterior</span>
-            </button>
+          <div className="solve-dock">
+            {errorMessage != null ? (
+              <div className="stage-alert" role="alert">{errorMessage}</div>
+            ) : null}
 
-            <div className="solve-footer-tools">
-              <button
-                type="button"
-                className="solve-map-toggle"
-                onClick={() => setIsMapOpen(true)}
-                aria-haspopup="dialog"
-                aria-label={`Mapa de preguntas: ${answeredCount} de ${questions.length} respondidas`}
-              >
-                <LayoutGrid size={15} aria-hidden />
-                <span>
-                  <strong>{answeredCount}</strong>/{questions.length}
-                </span>
-              </button>
-              <button
-                type="button"
-                className={`solve-flag-btn${view.flagged ? ' is-active' : ''}`}
-                onClick={toggleFlag}
-                disabled={locked}
-                aria-pressed={view.flagged}
-                aria-label="Marcar para revisar"
-                title="Marcar para revisar (F)"
-              >
-                <Flag size={16} fill={view.flagged ? 'currentColor' : 'none'} aria-hidden />
-                <span className="max-sm:hidden">{view.flagged ? 'Marcada' : 'Marcar'}</span>
-              </button>
-              {tutorInSolve ? (
+            {openPath != null && (moment === 'guiding' || moment === 'why' || moment === 'retry') ? (
+              <GuidedPath
+                guide={openPath}
+                lastCorrect={lastCorrect}
+                isBusy={guideAction.isPending}
+                error={guideAction.error != null ? readConvexError(guideAction.error, 'No se pudo guardar tu respuesta. Intenta de nuevo.') : null}
+                onChoose={(choiceIndex) => guideAction.mutate({ type: 'choose', choiceIndex })}
+                onReveal={() => guideAction.mutate({ type: 'reveal' })}
+                onAskTutor={tutorInSolve ? openTutor : undefined}
+              />
+            ) : moment === 'closed' && feedback != null ? (
+              <AnswerFeedback
+                feedback={feedback}
+                explanationSource={current.question.explanationSource ?? null}
+                isLast={isLast}
+                justChecked={justCheckedId === current.sessionQuestionId}
+                outcome={guide?.phase === 'ended' ? guide.outcome : null}
+                reveal={guide?.phase === 'ended' ? guide.reveal : null}
+                onNext={isLast ? (allAnswered ? finishNow : openCheck) : goNext}
+              />
+            ) : moment === 'waiting' ? (
+              <p className="solve-waiting" role="status">Un momento…</p>
+            ) : immediate ? (
+              <footer className="solve-footer">
+                <button type="button" className="solve-nav-btn" disabled={isFirst} onClick={goPrev} aria-label="Pregunta anterior">
+                  <ChevronLeft size={20} aria-hidden />
+                </button>
                 <button
                   type="button"
-                  className="solve-flag-btn"
-                  onClick={() => {
-                    setHasOpenedTutor(true)
-                    setIsTutorOpen(true)
-                  }}
-                  aria-haspopup="dialog"
-                  title="Pedir una pista al tutor"
+                  className="solve-nav-btn"
+                  disabled={locked || hintMutation.isPending || hint !== undefined}
+                  onClick={() => hintMutation.mutate(current.sessionQuestionId)}
                 >
-                  <Bot size={16} aria-hidden />
-                  <span className="max-sm:hidden">Tutor</span>
+                  <Lightbulb size={18} aria-hidden />
+                  {hintMutation.isPending ? 'Pensando…' : 'Pista'}
                 </button>
-              ) : null}
-            </div>
-
-            {isLast ? (
-              <button type="button" className="btn-primary" disabled={locked} onClick={openCheck}>
-                <ClipboardCheck size={16} aria-hidden />
-                Revisar
-              </button>
+                {view.selectedOption != null ? (
+                  <button
+                    type="button"
+                    className="btn-primary solve-primary"
+                    disabled={locked || checkMutation.isPending}
+                    onClick={() => checkMutation.mutate(current.sessionQuestionId)}
+                  >
+                    {checkMutation.isPending ? 'Comprobando…' : 'Comprobar'}
+                  </button>
+                ) : (
+                  <button type="button" className="solve-nav-btn solve-skip" onClick={isLast ? openCheck : goNext} disabled={locked}>
+                    {isLast ? 'Revisar' : 'Saltar'}
+                  </button>
+                )}
+              </footer>
             ) : (
-              <button
-                type="button"
-                className="solve-nav-btn is-primary"
-                onClick={goNext}
-                aria-label="Pregunta siguiente"
-              >
-                Siguiente
-                <ChevronRight size={16} aria-hidden />
-              </button>
+              <footer className="solve-footer">
+                <button type="button" className="solve-nav-btn" disabled={isFirst} onClick={goPrev} aria-label="Pregunta anterior">
+                  <ChevronLeft size={20} aria-hidden />
+                  <span className="max-sm:hidden">Anterior</span>
+                </button>
+
+                <div className="solve-footer-tools">
+                  <button
+                    type="button"
+                    className="solve-map-toggle"
+                    onClick={() => setIsMapOpen(true)}
+                    aria-haspopup="dialog"
+                    aria-label={`Mapa de preguntas: ${answeredCount} de ${questions.length} respondidas`}
+                  >
+                    <LayoutGrid size={15} aria-hidden />
+                    <span>
+                      <strong>{answeredCount}</strong>/{questions.length}
+                    </span>
+                  </button>
+                  <button
+                    type="button"
+                    className={`solve-flag-btn${view.flagged ? ' is-active' : ''}`}
+                    onClick={toggleFlag}
+                    disabled={locked}
+                    aria-pressed={view.flagged}
+                    aria-label="Marcar para revisar"
+                    title="Marcar para revisar (F)"
+                  >
+                    <Flag size={16} fill={view.flagged ? 'currentColor' : 'none'} aria-hidden />
+                    <span className="max-sm:hidden">{view.flagged ? 'Marcada' : 'Marcar'}</span>
+                  </button>
+                </div>
+
+                {isLast ? (
+                  <button type="button" className="btn-primary solve-primary" disabled={locked} onClick={openCheck}>
+                    <ClipboardCheck size={16} aria-hidden />
+                    Revisar
+                  </button>
+                ) : (
+                  <button type="button" className="btn-primary solve-primary" onClick={goNext} aria-label="Pregunta siguiente">
+                    Siguiente
+                    <ChevronRight size={18} aria-hidden />
+                  </button>
+                )}
+              </footer>
             )}
-          </footer>
+          </div>
         </>
       )}
 
@@ -1029,6 +1058,84 @@ export function SessionSolve({ sessionId, onExit, onCompleted }: SessionSolvePro
         onJump={goTo}
         onReview={openCheck}
       />
+
+      <Dialog.Root open={isMoreOpen} onOpenChange={setIsMoreOpen}>
+        <Dialog.Portal>
+          <Dialog.Overlay className="solve-sheet-scrim" />
+          <Dialog.Content className="solve-sheet" aria-describedby={undefined}>
+            <span className="solve-sheet-handle" aria-hidden />
+            <Dialog.Title className="solve-sheet-title">Más opciones</Dialog.Title>
+            <div className="solve-more-row" role="group" aria-label="Tamaño del texto">
+              <span>Texto</span>
+              <button
+                type="button"
+                className="solve-more-size"
+                onClick={() => changeTextScale(-1)}
+                disabled={textScale === TEXT_SCALES[0]}
+                aria-label="Texto más pequeño"
+              >
+                <AArrowDown size={22} aria-hidden />
+              </button>
+              <button
+                type="button"
+                className="solve-more-size"
+                onClick={() => changeTextScale(1)}
+                disabled={textScale === TEXT_SCALES[TEXT_SCALES.length - 1]}
+                aria-label="Texto más grande"
+              >
+                <AArrowUp size={22} aria-hidden />
+              </button>
+            </div>
+            <button
+              type="button"
+              className="solve-more-item"
+              aria-pressed={isStriking}
+              onClick={() => {
+                setIsStriking((value) => !value)
+                setIsMoreOpen(false)
+              }}
+            >
+              <Strikethrough size={20} aria-hidden />
+              {isStriking ? 'Ocultar tachar' : 'Tachar opciones'}
+            </button>
+            <button
+              type="button"
+              className="solve-more-item"
+              onClick={() => {
+                setIsMoreOpen(false)
+                setIsMapOpen(true)
+              }}
+            >
+              <LayoutGrid size={20} aria-hidden />
+              Mapa de preguntas
+            </button>
+            {tutorInSolve ? (
+              <button
+                type="button"
+                className="solve-more-item"
+                onClick={() => {
+                  setIsMoreOpen(false)
+                  openTutor()
+                }}
+              >
+                <Bot size={20} aria-hidden />
+                Pregúntale al tutor
+              </button>
+            ) : null}
+            <button
+              type="button"
+              className="solve-more-item"
+              onClick={() => {
+                setIsMoreOpen(false)
+                setIsReportOpen(true)
+              }}
+            >
+              <MessageSquareWarning size={20} aria-hidden />
+              Reportar un problema
+            </button>
+          </Dialog.Content>
+        </Dialog.Portal>
+      </Dialog.Root>
 
       {tutorInSolve && session != null ? (
         <div

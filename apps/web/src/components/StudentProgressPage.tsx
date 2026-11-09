@@ -1,24 +1,25 @@
-import { useConvexMutation } from '@convex-dev/react-query'
-import { useMutation, useQuery } from '@tanstack/react-query'
-import { Link, useNavigate } from '@tanstack/react-router'
-import { Play } from 'lucide-react'
+import { convexQuery } from '@convex-dev/react-query'
+import { useQuery } from '@tanstack/react-query'
+import { Link } from '@tanstack/react-router'
+import { ChevronRight } from 'lucide-react'
 import { api } from '@aprendo/convex/api'
-import { MASTERY_LEVEL_LABELS, type MasteryLevel } from '@aprendo/convex/mastery'
-import { getSubjectLabel, getSubtopicLabel } from '@aprendo/convex/taxonomy'
-import { progressTrendsQuery, studentProgressQuery, todayDashboardQuery } from '../lib/student-queries.ts'
+import { MASTERY_LEVELS } from '@aprendo/convex/mastery'
+import { activitySummaryQuery, progressTrendsQuery, studentProgressQuery, studentQuery, todayDashboardQuery } from '../lib/student-queries.ts'
 import { areaChartRow, changeSincePlacement } from '../lib/progress-display.ts'
-import { readConvexError } from '../lib/convex-error.ts'
+import type { ActiveStudentSession } from '../lib/student-session.ts'
+import { useSignOut } from '../lib/use-sign-out.ts'
 import { AreaLevelsChart } from './AreaLevelsChart.tsx'
 import { GlobalScoreCard } from './GlobalScoreCard.tsx'
 import { CareerCard } from './CareerPicker.tsx'
-import { TargetGap } from './ExamCountdown.tsx'
+import { ExamCountdown, TargetGap } from './ExamCountdown.tsx'
 import { StudyTimeCard } from './StudyTimeCard.tsx'
+import { CALENDAR_WEEKS, StudyHistory } from './StudyHistory.tsx'
+import { ThemeToggle } from './ThemeToggle.tsx'
 import { PageLoader } from '../components/FullScreenLoader.tsx'
 import { EmptyState } from './EmptyState.tsx'
-
-function formatPercent(value: number) {
-  return `${Math.round(value * 100)}%`
-}
+import { AvatarPortrait } from './AvatarPortrait.tsx'
+import { WeeklyCoach } from './WeeklyCoach.tsx'
+import { YoRewards } from './YoRewards.tsx'
 
 /** A signed point delta on the 0–100 scale (e.g. +12, -3, 0). */
 function formatDeltaPoints(delta: number) {
@@ -82,33 +83,52 @@ function TrendChart({ points }: { points: Array<{ weekStartMs: number; accuracy:
   )
 }
 
+/** Stickers are earned at Competente and up (the Álbum's one rule). */
+const STICKER_LEVELS: ReadonlySet<string> = new Set(MASTERY_LEVELS.slice(MASTERY_LEVELS.indexOf('competente')))
+
 /**
- * Progreso answers three questions and nothing else: where am I (the global
- * score and every area on one scale), am I moving (week by week) and what do I
- * do now (three topics). The topic-by-topic detail lives in the Temario and
- * the session-by-session detail in the Historial.
+ * Yo: the student's own page. Their sticker count on top, their levels, career
+ * and exam date, the study calendar and every session (the old Historial), and
+ * at the bottom the account, the theme and Salir, the place phones reach them.
  */
-export function StudentProgressPage({ studentId }: { studentId: string }) {
+export function StudentProgressPage({ session }: { session: ActiveStudentSession }) {
+  const { studentId } = session
   const progressQuery = useQuery({ ...studentProgressQuery(studentId), enabled: true })
   const trendsQuery = useQuery({ ...progressTrendsQuery(studentId), enabled: true })
   const todayQuery = useQuery({ ...todayDashboardQuery(studentId), enabled: true })
-  const nextSubtopics = todayQuery.data?.plan.nextSubtopics ?? []
+  const activity = useQuery(activitySummaryQuery(studentId, CALENDAR_WEEKS))
+  const student = useQuery(studentQuery(studentId))
+  const album = useQuery(convexQuery(api.today.getStickerAlbum, { studentId: studentId as never }))
 
   if (progressQuery.isPending || trendsQuery.isPending) {
     return <PageLoader message="Preparando tu resumen…" />
   }
 
   const progress = progressQuery.data
-  const trends = trendsQuery.data
   const overallSummary = progress?.snapshot?.overallSummary
-  const weekly = trends?.weekly ?? []
+  const stickers = (progress?.subtopicMastery ?? []).filter((entry) => STICKER_LEVELS.has(entry.masteryLevel)).length
+  const streak = activity.data?.stats.currentStreakDays ?? 0
+
+  const cover = (
+    <header className="yo-cover">
+      <div className="yo-portrait avatar-sticker" aria-hidden>
+        <AvatarPortrait avatar={student.data?.avatar} />
+      </div>
+      <div className="min-w-0">
+        <h1 className="yo-name">{session.name ?? 'Yo'}</h1>
+        <p className="yo-count">
+          {album.data != null ? `${album.data.earnedCount} de ${album.data.total} láminas` : `${stickers} ${stickers === 1 ? 'lámina' : 'láminas'}`}
+          {streak > 0 ? ` · racha de ${streak} ${streak === 1 ? 'día' : 'días'}` : ''}
+        </p>
+      </div>
+    </header>
+  )
 
   if (progress == null || overallSummary == null) {
     return (
-      <div className="page-sheet fade-in">
-        <header className="ruled-page-head">
-          <h1 className="page-title">Tu progreso</h1>
-        </header>
+      <div className="yo fade-in">
+        {cover}
+        <YoRewards studentId={studentId} student={student.data} medals={album.data?.medals ?? []} />
         <EmptyState
           title="Todavía no puedo medir nada"
           action={
@@ -117,181 +137,112 @@ export function StudentProgressPage({ studentId }: { studentId: string }) {
             </Link>
           }
         >
-          Nivélate en un área y desde ahí empiezo a seguir cuánto avanzas.
+          Nivélate en un área y desde ahí sigo cuánto avanzas.
         </EmptyState>
+        <YoSettings />
       </div>
     )
   }
 
+  const trends = trendsQuery.data
+  const weekly = trends?.weekly ?? []
   const overallDelta = changeSincePlacement(progress.subjectLevels)
   const firstWeek = weekly[0] ?? null
   const lastWeek = weekly.at(-1) ?? null
   const trendDelta = firstWeek != null && lastWeek != null && weekly.length >= 2 ? lastWeek.accuracy - firstWeek.accuracy : null
-  const today = new Date().toLocaleDateString('es-CO', { weekday: 'long', day: 'numeric', month: 'long' })
 
   return (
-    <div className="ruled-page fade-in">
-      <aside className="ruled-page-margin" aria-label="Tu actividad">
-        <p className="ruled-page-date">{today}</p>
-        <dl className="margin-facts">
-          <div>
-            <dt>Precisión general</dt>
-            <dd>{formatPercent(overallSummary.accuracy)}</dd>
-          </div>
-          <div>
-            <dt>Preguntas respondidas</dt>
-            <dd>{trends?.totalAttempts ?? 0}</dd>
-          </div>
-          <div>
-            <dt>Días de estudio</dt>
-            <dd>{trends?.activeDays ?? 0}</dd>
-          </div>
-        </dl>
-      </aside>
+    <div className="yo fade-in">
+      {cover}
 
-      <div className="ruled-page-body">
-        <header className="ruled-page-head">
-          <h1 className="page-title">Tu progreso</h1>
-          <p className="page-lede">
-            {overallDelta == null ? (
-              'Practica un poco más para comparar contra tu nivelación.'
-            ) : (
-              <>
-                Desde tu nivelación: <Delta delta={overallDelta} /> en promedio por área.
-              </>
-            )}
-          </p>
-        </header>
+      <YoRewards studentId={studentId} student={student.data} medals={album.data?.medals ?? []} />
 
-        <GlobalScoreCard studentId={studentId} data={progress.globalScore} />
-        <CareerCard studentId={studentId} mode="summary" career={progress.globalScore.career} />
-        {/* Moved here from Hoy (F33): Hoy keeps one action; the numbers live with the progress. */}
-        {todayQuery.data != null ? (
-          <>
-            <TargetGap
-              data={todayQuery.data.globalScore}
-              daysRemaining={todayQuery.data.examPlan?.daysRemaining ?? null}
-            />
-            <StudyTimeCard studentId={studentId} studyTime={todayQuery.data.studyTime} />
-          </>
-        ) : null}
+      <GlobalScoreCard studentId={studentId} data={progress.globalScore} />
 
-        <section className="ruled-section" aria-labelledby="progress-areas-title">
-          <div className="section-head">
-            <h2 id="progress-areas-title" className="section-title">Tus áreas</h2>
-            <Link to="/syllabus" className="section-meta">
-              Ver el temario
+      <section className="ruled-section" aria-labelledby="progress-areas-title">
+        <div className="section-head">
+          <h2 id="progress-areas-title" className="section-title">Tus áreas</h2>
+          {overallDelta != null ? (
+            <span className="section-meta">
+              Desde tu nivelación: <Delta delta={overallDelta} />
+            </span>
+          ) : null}
+        </div>
+        <AreaLevelsChart
+          rows={progress.subjectLevels.map(areaChartRow)}
+          emptyAction={() => (
+            <Link to="/diagnostic" className="area-chart-action">
+              Nivelarme
             </Link>
-          </div>
-          <AreaLevelsChart
-            rows={progress.subjectLevels.map(areaChartRow)}
-            emptyAction={() => (
-              <Link to="/diagnostic" className="area-chart-action">
-                Nivelarme
-              </Link>
-            )}
-          />
-        </section>
-
-        <section className="ruled-section" aria-labelledby="progress-trend-title">
-          <div className="section-head">
-            <h2 id="progress-trend-title" className="section-title">Semana a semana</h2>
-            {trendDelta != null ? (
-              <span className="section-meta">
-                <Delta delta={trendDelta} />
-              </span>
-            ) : null}
-          </div>
-          {weekly.length >= 2 ? (
-            <>
-              <TrendChart points={weekly} />
-              <div className="mt-1 flex justify-between text-xs text-[var(--text-tertiary)]">
-                <span>{firstWeek != null ? formatWeekLabel(firstWeek.weekStartMs) : ''}</span>
-                <span>Precisión por semana</span>
-                <span>{lastWeek != null ? formatWeekLabel(lastWeek.weekStartMs) : ''}</span>
-              </div>
-            </>
-          ) : (
-            <p className="m-0 text-sm text-[var(--text-tertiary)]">
-              Practica en al menos dos semanas distintas para ver tu tendencia.
-            </p>
           )}
-        </section>
+        />
+      </section>
 
-        {nextSubtopics.length > 0 ? (
-          <section className="ruled-section" aria-labelledby="progress-next-title">
-            <h2 id="progress-next-title" className="section-title">Practica esto ahora</h2>
-            {/* The plan's picks (studyPlan.nextSubtopics): the same answer Hoy and Ruta give. */}
-            <ol className="plan-lines">
-              {nextSubtopics.map((item, index) => (
-                <PracticeNowLine
-                  key={item.subtopicId}
-                  number={index + 1}
-                  studentId={studentId}
-                  subjectId={item.subjectId}
-                  subtopicId={item.subtopicId}
-                  level={item.level}
-                />
-              ))}
-            </ol>
-          </section>
-        ) : null}
-      </div>
+      <CareerCard studentId={studentId} mode="summary" career={progress.globalScore.career} />
+
+      {todayQuery.data != null ? (
+        <>
+          <ExamCountdown studentId={studentId} examDate={todayQuery.data.examDate} plan={todayQuery.data.examPlan} />
+          <TargetGap
+            data={todayQuery.data.globalScore}
+            daysRemaining={todayQuery.data.examPlan?.daysRemaining ?? null}
+          />
+          <StudyTimeCard studentId={studentId} studyTime={todayQuery.data.studyTime} />
+        </>
+      ) : null}
+
+      {weekly.length >= 2 ? (
+        <details className="yo-more">
+          <summary>
+            Ver más: semana a semana{' '}
+            {trendDelta != null ? <Delta delta={trendDelta} /> : null}
+          </summary>
+          <TrendChart points={weekly} />
+          <div className="mt-1 flex justify-between text-xs text-[var(--text-tertiary)]">
+            <span>{firstWeek != null ? formatWeekLabel(firstWeek.weekStartMs) : ''}</span>
+            <span>Precisión por semana</span>
+            <span>{lastWeek != null ? formatWeekLabel(lastWeek.weekStartMs) : ''}</span>
+          </div>
+        </details>
+      ) : null}
+
+      {todayQuery.data != null ? <WeeklyCoach studentId={studentId} activeDaysThisWeek={todayQuery.data.activeDaysThisWeek} /> : null}
+
+      <StudyHistory studentId={studentId} />
+
+      <YoSettings />
     </div>
   )
 }
 
-/** One weak topic: what it is, the evidence, and a way straight into practice. */
-function PracticeNowLine({
-  number,
-  studentId,
-  subjectId,
-  subtopicId,
-  level,
-}: {
-  number: number
-  studentId: string
-  subjectId: string
-  subtopicId: string
-  level: MasteryLevel
-}) {
-  const navigate = useNavigate()
-  const createSession = useMutation({
-    mutationFn: useConvexMutation(api.sessions.createSession),
-    onSuccess: (sessionId: string) => {
-      void navigate({ to: '/practice/$sessionId', params: { sessionId } })
-    },
-  })
-
+function YoSettings() {
+  const { signOut, isSigningOut } = useSignOut()
   return (
-    <li className={`plan-line path-line${number === 1 ? ' is-first' : ''}`}>
-      <span className="plan-line-number" aria-hidden>
-        {number}
-      </span>
-      <div className="flex min-w-0 flex-col gap-0.5 py-3">
-        <Link to="/lesson/$subtopicId" params={{ subtopicId }} className="plan-line-title text-[var(--text-primary)]">
-          {getSubtopicLabel(subtopicId)}
-        </Link>
-        <span className="plan-line-reason">
-          {getSubjectLabel(subjectId)} · {MASTERY_LEVEL_LABELS[level]}
-        </span>
-        {createSession.error ? (
-          <p role="alert" className="notice is-danger">
-            {readConvexError(createSession.error, 'No se pudo iniciar la práctica.')}
-          </p>
-        ) : null}
-      </div>
-      <span className="path-line-actions is-single">
-        <button
-          type="button"
-          disabled={createSession.isPending}
-          onClick={() => createSession.mutate({ studentId: studentId as never, kind: 'topic', subtopicId })}
-          className={`${number === 1 ? 'btn-primary' : 'btn-secondary'} text-xs`}
-        >
-          <Play size={13} aria-hidden />
-          {createSession.isPending ? 'Preparando…' : 'Practicar'}
-        </button>
-      </span>
-    </li>
+    <section className="ruled-section yo-settings" aria-labelledby="yo-settings-title">
+      <h2 id="yo-settings-title" className="section-title">Ajustes</h2>
+      <ul className="ruled-list">
+        <li>
+          <div className="ruled-row">
+            <span className="ruled-row-main font-semibold">Tema</span>
+            <ThemeToggle />
+          </div>
+        </li>
+        <li>
+          <Link to="/cuenta" className="ruled-row no-underline">
+            <span className="ruled-row-main font-semibold">Cuenta</span>
+            <ChevronRight size={18} aria-hidden />
+          </Link>
+        </li>
+        <li>
+          <Link to="/diagnostic" className="ruled-row no-underline">
+            <span className="ruled-row-main font-semibold">Nivelar otra área</span>
+            <ChevronRight size={18} aria-hidden />
+          </Link>
+        </li>
+      </ul>
+      <button type="button" className="btn-secondary mt-4 w-full" disabled={isSigningOut} onClick={() => void signOut()}>
+        {isSigningOut ? 'Saliendo…' : 'Salir'}
+      </button>
+    </section>
   )
 }

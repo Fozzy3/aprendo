@@ -1,13 +1,12 @@
 import { useConvexMutation } from '@convex-dev/react-query'
 import { useMutation, useQuery } from '@tanstack/react-query'
-import { Link, createFileRoute, useNavigate } from '@tanstack/react-router'
+import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { Check, ChevronRight } from 'lucide-react'
 import { useEffect, useState, type CSSProperties } from 'react'
 import { api } from '@aprendo/convex/api'
 import { SESSION_KIND_CONFIG, getConfiguredQuestionCount } from '@aprendo/convex/sessionKinds'
-import { SchoolLabel } from '../components/SchoolLabel.tsx'
 import { SessionSolve } from '../components/SessionSolve.tsx'
-import { ThemeToggle } from '../components/ThemeToggle.tsx'
+import { StudentAppShell } from '../components/StudentAppShell.tsx'
 import { TimedSessionIntro } from '../components/TimedSessionIntro.tsx'
 import { Welcome } from '../components/Welcome.tsx'
 import { findResumableSession } from '../lib/resume-session.ts'
@@ -89,19 +88,13 @@ function PlacementPage() {
     findResumableSession(nivelacionesQuery.data ?? [], { kind: 'nivelacion', subjectId }, Date.now())
 
   return (
-    <div className={`diagnostic-shell${sessionId != null ? ' is-immersive' : ''}`}>
-      <header className="diagnostic-topbar">
-        <div className="diagnostic-topbar-inner">
-          <SchoolLabel studentName={session.name} subtitle="Nivelación" />
-
-          <div className="diagnostic-topbar-actions">
-            <div className="student-pill">Sin tutor · medimos tu nivel</div>
-            <ThemeToggle />
-          </div>
-        </div>
-      </header>
-
-      <main className="diagnostic-solve-main">
+    <StudentAppShell
+      session={session}
+      activeSection="today"
+      immersive={sessionId != null}
+      hideTabs={!hasAnyPlacement}
+      topBarSupplement={<div className="student-pill">Sin tutor · medimos tu nivel</div>}
+    >
         {sessionId != null ? (
           <SessionSolve
             sessionId={sessionId}
@@ -113,6 +106,7 @@ function PlacementPage() {
         ) : !hasAnyPlacement && !hasSeenWelcome ? (
           <div className="diagnostic-intro">
             <Welcome
+              studentId={session.studentId}
               onDone={() => {
                 writeStored(WELCOME_SEEN_KEY, '1')
                 setHasSeenWelcome(true)
@@ -194,16 +188,8 @@ function PlacementPage() {
               })}
             </ul>
 
-            {hasAnyPlacement && (
-              <div className="mt-6">
-                <Link to="/today" className="btn-secondary no-underline">
-                  Ir a mi plan de hoy
-                </Link>
-              </div>
-            )}
           </div>
         )}
-      </main>
-    </div>
+    </StudentAppShell>
   )
 }

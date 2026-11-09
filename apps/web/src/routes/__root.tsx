@@ -5,16 +5,20 @@ import {
   Scripts,
   createRootRouteWithContext,
   useRouteContext,
+  useRouterState,
 } from '@tanstack/react-router'
 import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
 import { TanStackDevtools } from '@tanstack/react-devtools'
 import { createServerFn } from '@tanstack/react-start'
 import { ConvexBetterAuthProvider } from '@convex-dev/better-auth/react'
 import type { ConvexQueryClient } from '@convex-dev/react-query'
-import { TooltipProvider } from "@/components/ui/tooltip"
+import { ConfirmDialogHost } from '../components/ConfirmDialog'
+import { Toaster } from '../components/Toast'
 import { authClient } from '../lib/auth-client'
+import { lookForPath } from '../lib/student-look'
 
 import appCss from '../styles.css?url'
+import studentCss from '../student.css?url'
 
 const THEME_INIT_SCRIPT = `(function(){try{var stored=window.localStorage.getItem('theme');var mode=(stored==='light'||stored==='dark'||stored==='auto')?stored:'auto';var prefersDark=window.matchMedia('(prefers-color-scheme: dark)').matches;var resolved=mode==='auto'?(prefersDark?'dark':'light'):mode;var root=document.documentElement;root.classList.remove('light','dark');root.classList.add(resolved);if(mode==='auto'){root.removeAttribute('data-theme')}else{root.setAttribute('data-theme',mode)}root.style.colorScheme=resolved;}catch(e){}})();`
 
@@ -65,7 +69,7 @@ export const Route = createRootRouteWithContext<{
       {
         name: 'viewport',
         // The keyboard resizes the page, so the fixed tutor sheet stays above it.
-        content: 'width=device-width, initial-scale=1, interactive-widget=resizes-content',
+        content: 'width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content',
       },
       {
         title: 'Aprendo | ICFES Saber 11',
@@ -78,7 +82,6 @@ export const Route = createRootRouteWithContext<{
       // Private by default: the app's routes guard on the client, so the server
       // answers them with a loader. Public pages opt back in (lib/site.ts).
       { name: 'robots', content: 'noindex, nofollow' },
-      { name: 'theme-color', content: '#16233f' },
       { property: 'og:type', content: 'website' },
       { property: 'og:site_name', content: 'Aprendo' },
       { property: 'og:locale', content: 'es_CO' },
@@ -89,53 +92,48 @@ export const Route = createRootRouteWithContext<{
         rel: 'stylesheet',
         href: appCss,
       },
+      { rel: 'stylesheet', href: studentCss },
       { rel: 'icon', href: '/favicon.svg', type: 'image/svg+xml' },
+      { rel: 'apple-touch-icon', href: '/apple-touch-icon.png' },
       { rel: 'manifest', href: '/manifest.json' },
     ],
   }),
   component: RootComponent,
 })
 
-// The design direction, emitted as the first thing in <body> so the built page
-// carries it (see DESIGN.md).
-const DIRECTION_CONTRACT = `<!--
-THESIS: a 5 mm squared notebook as an instrument: a ruling everything respects and a red margin where the teacher's judgment lives; refuses the blue LMS of cards and the KPI dashboard.
-OWN-WORLD: cold white paper, pale blue ruling only on work sheets, navy ink, margin red for mistakes and risk, green ink for right, pencil grey for tentative; Source Serif 4 headings, Public Sans work; 1px rules, square controls, no cards, no shadows.
-STORY: the student knows what to study today and their ICFES level per area; the teacher knows who and which competency is at risk; the school sees it as its own.
-FIRST VIEWPORT (Hoy): cover label with the school crest top left; today's plan as numbered lines on the ruling, "Empezar" on the first line; date and study days in the margin column.
-FORM: Cuaderno cuadriculado, seed 6ffabd95.
-FINISH: unreviewed and undocumented is unfinished; this build ends with the finish review, the verdict, DESIGN.md, and every shipping raster carrying its provenance.
--->`
-
 function RootComponent() {
   const ctx = useRouteContext({ from: Route.id })
+  const look = useRouterState({ select: (state) => lookForPath(state.location.pathname) })
   return (
     <ConvexBetterAuthProvider
       client={ctx.convexQueryClient.convexClient}
       authClient={authClient}
       initialToken={ctx.token ?? undefined}
     >
-      <html lang="es-CO" suppressHydrationWarning>
+      <html lang="es-CO" data-look={look} suppressHydrationWarning>
         <head>
           <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
           <HeadContent />
+          {/* Matches the top bar: Álbum green for students, the navy cover for the rest. */}
+          <meta name="theme-color" content={look === 'student' ? '#097d52' : '#16233f'} />
         </head>
         <body className="font-sans antialiased">
-          <div hidden dangerouslySetInnerHTML={{ __html: DIRECTION_CONTRACT }} />
-          <TooltipProvider>
-            <Outlet />
-          </TooltipProvider>
-          <TanStackDevtools
-            config={{
-              position: 'bottom-right',
-            }}
-            plugins={[
-              {
-                name: 'Tanstack Router',
-                render: <TanStackRouterDevtoolsPanel />,
-              },
-            ]}
-          />
+          <Outlet />
+          <Toaster />
+          <ConfirmDialogHost />
+          {import.meta.env.DEV ? (
+            <TanStackDevtools
+              config={{
+                position: 'bottom-right',
+              }}
+              plugins={[
+                {
+                  name: 'Tanstack Router',
+                  render: <TanStackRouterDevtoolsPanel />,
+                },
+              ]}
+            />
+          ) : null}
           <Scripts />
         </body>
       </html>

@@ -28,9 +28,35 @@ export function optionExplanations(input: {
   return [...items.filter((item) => item.isPicked), ...items.filter((item) => !item.isPicked)]
 }
 
-/** Wrong or blank: what "Repetir las que fallé" would serve. */
-export function missedCount(questions: { attempt: { isCorrect?: boolean } | null }[]) {
-  return questions.filter((question) => question.attempt?.isCorrect !== true).length
+type GradedAttempt = { isCorrect?: boolean | null; selectedOption?: string | null }
+
+/** Answered, but its grade is still sealed (`sealAttempt`): neither right nor wrong yet. */
+export function isSealedAttempt(attempt: GradedAttempt | null | undefined) {
+  return attempt?.selectedOption != null && attempt.isCorrect == null
+}
+
+/** Wrong or blank: what "Repetir las que fallé" would serve. A sealed answer is neither. */
+export function missedCount(questions: { attempt: GradedAttempt | null }[]) {
+  return questions.filter((question) => question.attempt?.isCorrect !== true && !isSealedAttempt(question.attempt)).length
+}
+
+/** Which dot the question map shows: a sealed answer is answered, never marked. */
+export function reviewDotStatus(attempt: GradedAttempt | null | undefined) {
+  if (attempt == null) return 'pending'
+  if (isSealedAttempt(attempt)) return 'answered'
+  return attempt.isCorrect ? 'correct' : 'incorrect'
+}
+
+/** How one question went, for the report. A sealed answer is handed in, not blank. */
+export function reportItemOutcome(item: { isCorrect: boolean | null; answered?: boolean }) {
+  if (item.isCorrect === true) return 'Acertaste'
+  if (item.isCorrect === false) return 'Fallaste'
+  return item.answered === true ? 'Entregada' : 'En blanco'
+}
+
+/** The chip of a session with no score to show: completed means it was handed in and is still sealed. */
+export function sessionOutcomeChip(status: string) {
+  return status === 'completed' ? 'Entregada' : 'Sin terminar'
 }
 
 /** Within 20% of the median reads as "similar". */

@@ -15,8 +15,8 @@ const reasonLabel = (reason: string) =>
 
 /**
  * What students reported on questions ("Reportar un problema"), newest first.
- * Each row links to the question in the browser, where it gets fixed; then it
- * is marked resolved here.
+ * Each row links to the question's audit, where it gets fixed; then it is
+ * marked resolved here.
  */
 export function ReportsQueue() {
   const [status, setStatus] = useState<'open' | 'resolved'>('open')
@@ -76,10 +76,10 @@ export function ReportsQueue() {
                     </div>
                     <Link
                       to="/admin"
-                      search={{ tab: 'questions', pdfUploadId: report.question.pdfUploadId }}
+                      search={{ tab: 'audit', questionId: report.question._id }}
                       className="text-sm"
                     >
-                      Abrir en el navegador de preguntas
+                      Abrir en Auditoría
                     </Link>
                   </>
                 ) : (

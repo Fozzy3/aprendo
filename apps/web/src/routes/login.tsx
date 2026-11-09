@@ -1,17 +1,18 @@
-import { Link, createFileRoute } from '@tanstack/react-router'
+import { createFileRoute } from '@tanstack/react-router'
 import { useState } from 'react'
-import { Wordmark } from '../components/BrandMark.tsx'
+import { AuthFrame } from '../components/PublicPage.tsx'
 import { authClient } from '../lib/auth-client.ts'
 import { safeNext } from '../lib/safe-next.ts'
 import { useCurrentStudent } from '../lib/student-session.ts'
 import { publicHead } from '../lib/site.ts'
 
-type LoginSearch = { next?: string }
+type LoginSearch = { next?: string; modo?: 'registro' }
 
 export const Route = createFileRoute('/login')({
   head: () => publicHead({"title":"Entrar | Aprendo","description":"Entra a Aprendo para seguir tu preparación para el Saber 11.","path":"/login"}),
   validateSearch: (search: Record<string, unknown>): LoginSearch => ({
     next: typeof search.next === 'string' ? search.next : undefined,
+    modo: search.modo === 'registro' ? 'registro' : undefined,
   }),
   component: LoginPage,
 })
@@ -58,9 +59,10 @@ function readErrorMessage(error: unknown) {
 
 function LoginPage() {
   const { session, isReady } = useCurrentStudent()
-  const next = safeNext(Route.useSearch().next)
+  const search = Route.useSearch()
+  const next = safeNext(search.next)
 
-  const [mode, setMode] = useState<AuthMode>('sign-in')
+  const [mode, setMode] = useState<AuthMode>(search.modo === 'registro' ? 'sign-up' : 'sign-in')
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -270,23 +272,5 @@ function LoginPage() {
         )}
       </div>
     </AuthFrame>
-  )
-}
-
-/** The sign-in screens: one ruled sheet on the desk, the wordmark at its head. */
-export function AuthFrame({ children }: { children: React.ReactNode }) {
-  return (
-    <div className="auth-page">
-      <div className="auth-sheet sheet fade-in">
-        <Link to="/" className="no-underline">
-          <Wordmark subtitle="Saber 11" />
-        </Link>
-        <div className="mt-8">{children}</div>
-        <p className="auth-legal">
-          Al usar Aprendo aceptas los <Link to="/terminos">términos</Link> y la{' '}
-          <Link to="/privacidad">política de tratamiento de datos</Link>.
-        </p>
-      </div>
-    </div>
   )
 }

@@ -1,21 +1,8 @@
-import { createFileRoute } from '@tanstack/react-router'
-import { FullScreenLoader } from '../components/FullScreenLoader.tsx'
-import { StudentAppShell } from '../components/StudentAppShell.tsx'
-import { SyllabusPage } from '../components/SyllabusPage.tsx'
-import { useStudentGuard } from '../lib/use-student-guard.ts'
+import { createFileRoute, redirect } from '@tanstack/react-router'
 
+// Aprende (/path) absorbed the temario.
 export const Route = createFileRoute('/syllabus')({
-  component: SyllabusRoutePage,
+  beforeLoad: () => {
+    throw redirect({ to: '/path' })
+  },
 })
-
-function SyllabusRoutePage() {
-  const guard = useStudentGuard()
-  if (guard.status === 'redirecting') return <FullScreenLoader message={guard.reason} />
-  if (guard.status !== 'ready') return <FullScreenLoader />
-
-  return (
-    <StudentAppShell session={guard.session} activeSection="syllabus">
-      <SyllabusPage studentId={guard.session.studentId} />
-    </StudentAppShell>
-  )
-}

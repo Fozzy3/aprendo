@@ -23,7 +23,8 @@ import { NivelacionResult } from '../components/NivelacionResult.tsx'
 import { QuestionReportForm } from '../components/QuestionReportForm.tsx'
 import { SharedStimulus } from '../components/SharedStimulus.tsx'
 import { SimulacroReport } from '../components/SimulacroReport.tsx'
-import { SessionClose } from '../components/SessionClose.tsx'
+import { RewardScreen } from '../components/RewardScreen.tsx'
+import { ReviewDiscover } from '../components/GuidedPath.tsx'
 import { classifyAttempt } from '@aprendo/convex/confidence'
 import { LEARNING_STATE_DISPLAY, type ConfidenceLevel } from '../lib/confidence-display.ts'
 import { StudentAppShell } from '../components/StudentAppShell.tsx'
@@ -38,8 +39,9 @@ import { formatClock, hasResultScreen } from '../lib/result-display.ts'
 import { useCurrentStudent } from '../lib/student-session.ts'
 import { getSubjectLabel, getSubtopicLabel } from '@aprendo/convex/taxonomy'
 import { indexOfPosition } from '../lib/review-position.ts'
-import { missedCount, optionExplanations, timeVersusMedian } from '../lib/review-explanations.ts'
+import { isSealedAttempt, missedCount, optionExplanations, reviewDotStatus, timeVersusMedian } from '../lib/review-explanations.ts'
 import { readConvexError } from '../lib/convex-error.ts'
+import { reviewIsSealed, reviewShowsAnswer } from '../lib/solve-view.ts'
 import { FullScreenLoader, PageLoader } from '../components/FullScreenLoader.tsx'
 
 // The whole chat stack lives behind this import; see ReviewTutor.
@@ -54,6 +56,8 @@ const TIME_VERSUS_MEDIAN_COPY = {
 const TUTOR_COLLAPSED_STORAGE_KEY = 'aprendo:review:tutor-collapsed'
 const LAYOUT_STORAGE_KEY = 'aprendo:review:workspace-layout-v3'
 const STAGE_PANEL_ID = 'aprendo-review-stage'
+/** Only a session this recent plays the reward's count-up and landing. */
+const FRESH_CLOSE_MS = 2 * 60_000
 const TUTOR_PANEL_ID = 'aprendo-review-tutor'
 
 function readStoredLayout(): { [id: string]: number } | undefined {
@@ -104,6 +108,8 @@ function ReviewPage() {
         studentId: studentId as never,
         kind: 'repaso',
         retryFromSessionId: sessionId as never,
+        // The retry walks the guided path (F56).
+        feedbackMode: 'inmediata',
       }),
     onSuccess: async (newSessionId) => {
       await navigate({ to: '/practice/$sessionId', params: { sessionId: newSessionId } })
@@ -124,6 +130,20 @@ function ReviewPage() {
       sessionDoc?.status === 'completed' && statsQuestionId != null ? { questionIds: [statsQuestionId] } : 'skip',
     ),
   )
+  // "Descúbrelo" (F56): a wrong item's path, if it has one. Skipped for the rest.
+  const reviewedQuestion = questions[currentIndex]
+  const isWrongItem = sessionDoc?.status === 'completed' && reviewedQuestion?.attempt?.isCorrect === false
+  const reviewGuideQuery = useQuery(
+    convexQuery(
+      api.guides.getReviewGuide,
+      isWrongItem && reviewedQuestion != null
+        ? { sessionId: sessionId as never, sessionQuestionId: reviewedQuestion.sessionQuestionId as never }
+        : 'skip',
+    ),
+  )
+  const [shownAnswers, setShownAnswers] = useState<ReadonlySet<string>>(() => new Set())
+  // The reward comes before a nivelación's or simulacro's own result screen.
+  const [rewardDone, setRewardDone] = useState(false)
   const [draft, setDraft] = useState('')
   // Read up front, not only in the effect below: starting at `false` rendered
   // the desktop split for one frame on a phone, which mounted the tutor and
@@ -267,6 +287,51 @@ function ReviewPage() {
   }
 
   const opensOnResult = hasResultScreen(sessionDoc.kind)
+  const correctCount = questions.filter((q) => q.attempt?.isCorrect).length
+  // A sealed answer has no grade yet: it counts neither for nor against the score.
+  const gradedCount = questions.filter((q) => !isSealedAttempt(q.attempt)).length
+  const masteryChanges = sessionDoc.masteryChanges ?? []
+  const reward = sessionDoc.reward ?? null
+  const isSealed = reviewIsSealed(sessionDoc.kind, questions)
+  const showsReward = sessionDoc.status === 'completed' && !rewardDone
+    && (isSealed || (pregunta == null && (reward != null || (!opensOnResult && masteryChanges.length > 0))))
+  if (showsReward) {
+    return (
+      <StudentAppShell session={session} activeSection="practice">
+        <RewardScreen
+          studentId={session.studentId}
+          subjectId={sessionDoc.subjectId ?? null}
+          reward={reward}
+          changes={isSealed ? [] : masteryChanges}
+          correctCount={correctCount}
+          questionCount={gradedCount}
+          isFresh={sessionDoc.completedAt != null && Date.now() - sessionDoc.completedAt < FRESH_CLOSE_MS}
+          sealedNote={isSealed ? 'Tus resultados llegan cuando cierre la prueba.' : undefined}
+        >
+          {isSealed ? (
+            <Link to="/today" className="btn-primary reward-go no-underline">Seguir</Link>
+          ) : opensOnResult ? (
+            <button type="button" className="btn-primary reward-go" onClick={() => setRewardDone(true)}>
+              Ver mi resultado
+            </button>
+          ) : (
+            <>
+              <Link to="/today" className="btn-primary reward-go no-underline">Seguir</Link>
+              <Link
+                to="/practice/$sessionId/review"
+                params={{ sessionId }}
+                search={{ pregunta: 1 }}
+                className="reward-link"
+              >
+                Revisar pregunta por pregunta
+              </Link>
+            </>
+          )}
+        </RewardScreen>
+      </StudentAppShell>
+    )
+  }
+
   if (opensOnResult && pregunta == null && sessionDoc.status === 'completed') {
     return (
       <StudentAppShell session={session} activeSection="practice">
@@ -275,20 +340,6 @@ function ReviewPage() {
         ) : (
           <SimulacroReport sessionId={sessionDoc._id} studentId={session.studentId} />
         )}
-      </StudentAppShell>
-    )
-  }
-
-  const masteryChanges = sessionDoc.masteryChanges ?? []
-  if (!opensOnResult && pregunta == null && sessionDoc.status === 'completed' && masteryChanges.length > 0) {
-    return (
-      <StudentAppShell session={session} activeSection="practice">
-        <SessionClose
-          sessionId={sessionDoc._id}
-          correctCount={questions.filter((q) => q.attempt?.isCorrect).length}
-          questionCount={questions.length}
-          changes={masteryChanges}
-        />
       </StudentAppShell>
     )
   }
@@ -307,10 +358,23 @@ function ReviewPage() {
     )
   }
 
-  const correctCount = questions.filter((q) => q.attempt?.isCorrect).length
   const subjectScores = sessionDoc.summary?.subjectScores ?? []
   const selectedOption = currentQuestion.attempt?.selectedOption ?? null
   const hasAnswered = selectedOption != null
+
+  // A path with no steps has nothing to discover. Undefined while it loads.
+  const reviewGuide = !isWrongItem
+    ? null
+    : reviewGuideQuery.data === undefined
+      ? undefined
+      : reviewGuideQuery.data != null && reviewGuideQuery.data.steps.length > 0
+        ? reviewGuideQuery.data
+        : null
+  const showsAnswer = reviewShowsAnswer({
+    isWrong: isWrongItem,
+    guide: reviewGuide,
+    revealed: shownAnswers.has(currentQuestion.sessionQuestionId),
+  })
 
   // Every option explained (G06): the student's wrong pick first — their
   // specific wrong turn is the part that teaches — then the other distractors,
@@ -331,7 +395,7 @@ function ReviewPage() {
 
   const eliminatedOptions = new Set(currentQuestion.eliminatedOptions)
   const officialMs = data?.officialMsPerQuestion ?? 0
-  const learningState = classifyAttempt({
+  const learningState = isSealedAttempt(currentQuestion.attempt) ? null : classifyAttempt({
     confidence: currentQuestion.attempt?.confidence as ConfidenceLevel | undefined,
     isCorrect: currentQuestion.attempt?.isCorrect ?? false,
   })
@@ -372,7 +436,7 @@ function ReviewPage() {
           </div>
         </div>
         <span className="stage-score" aria-live="polite">
-          <strong>{correctCount}<span>/{questions.length}</span></strong>
+          <strong>{correctCount}<span>/{gradedCount}</span></strong>
           <span className="stage-score-label">correctas</span>
         </span>
       </header>
@@ -389,8 +453,7 @@ function ReviewPage() {
 
       <nav className="stage-palette" aria-label="Mapa de preguntas">
         {questions.map((question, index) => {
-          const attempt = question.attempt
-          const status = attempt == null ? 'pending' : attempt.isCorrect ? 'correct' : 'incorrect'
+          const status = reviewDotStatus(question.attempt)
           return (
             <button
               key={question.sessionQuestionId}
@@ -426,6 +489,9 @@ function ReviewPage() {
 
           <article className="stage-question sheet">
             <div className="stage-question-body">
+              {currentQuestion.question.voidedAt != null ? (
+                <p role="note" className="question-source">Retiramos esta pregunta del banco. Ya no cuenta en tu progreso.</p>
+              ) : null}
               {currentQuestion.stemImageUrl != null ? (
                 <>
                   <img
@@ -464,10 +530,12 @@ function ReviewPage() {
             <div className="review-options">
               {currentQuestion.question.options.map((option) => {
                 const isSelected = selectedOption === option.label
-                const isCorrect = option.label === currentQuestion.question.answerCorrectOption
-                const isWrongPick = hasAnswered && isSelected && !isCorrect
+                const isCorrect = showsAnswer && option.label === currentQuestion.question.answerCorrectOption
+                // A sealed question has no key to be wrong against.
+                const isWrongPick = hasAnswered && isSelected && currentQuestion.question.answerCorrectOption != null && option.label !== currentQuestion.question.answerCorrectOption
                 const wasEliminated = eliminatedOptions.has(option.label)
-                const percent = stats?.options.find((item) => item.label === option.label)?.percent ?? null
+                // What others chose points at the key, so it waits with the answer.
+                const percent = showsAnswer ? stats?.options.find((item) => item.label === option.label)?.percent ?? null : null
                 return (
                   <div
                     key={option.label}
@@ -520,7 +588,16 @@ function ReviewPage() {
               })}
             </div>
 
-            {stats != null ? (
+            {!showsAnswer && reviewGuide != null ? (
+              <ReviewDiscover
+                key={currentQuestion.sessionQuestionId}
+                guide={reviewGuide}
+                onShowAnswer={() => setShownAnswers((shown) => new Set(shown).add(currentQuestion.sessionQuestionId))}
+              />
+            ) : null}
+            {!showsAnswer && reviewGuide === undefined ? <p className="solve-waiting" role="status">Un momento…</p> : null}
+
+            {stats != null && showsAnswer ? (
               <p className="mt-2 text-xs text-[var(--text-tertiary)]">
                 {stats.hasEnoughData
                   ? `La respondieron ${stats.sampleSize} estudiantes.`
@@ -539,13 +616,19 @@ function ReviewPage() {
               </p>
             ) : null}
 
-            {isAiExplanation ? (
+            {showsAnswer && reviewGuide != null ? (
+              <div className="review-explanation">
+                <MarkdownBlock markdown={reviewGuide.reveal} />
+              </div>
+            ) : null}
+
+            {showsAnswer && isAiExplanation ? (
               <p className="chip mt-3">
                 <Sparkles size={11} aria-hidden /> Explicación generada con IA: si ves un error, repórtalo.
               </p>
             ) : null}
 
-            {explanations.map((item) =>
+            {!showsAnswer ? null : explanations.map((item) =>
               item.isPicked ? (
                 <div key={item.label} className="review-explanation is-distractor">
                   <p className="review-explanation-title">Por qué la {item.label} te pareció correcta</p>
@@ -563,7 +646,7 @@ function ReviewPage() {
               ),
             )}
 
-            {solutionMarkdown ? (
+            {showsAnswer && solutionMarkdown ? (
               <div className="review-explanation">
                 <p className="review-explanation-title">Explicación</p>
                 <MarkdownBlock markdown={solutionMarkdown} />

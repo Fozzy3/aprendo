@@ -1,5 +1,13 @@
 import { describe, expect, it } from 'vitest'
-import { missedCount, optionExplanations, timeVersusMedian } from '../lib/review-explanations'
+import {
+  isSealedAttempt,
+  missedCount,
+  optionExplanations,
+  reportItemOutcome,
+  reviewDotStatus,
+  sessionOutcomeChip,
+  timeVersusMedian,
+} from '../lib/review-explanations'
 
 const options = [{ label: 'A' }, { label: 'B' }, { label: 'C' }, { label: 'D' }]
 const rationales = [
@@ -51,6 +59,51 @@ describe('missedCount', () => {
         { attempt: {} },
       ]),
     ).toBe(3)
+  })
+
+  it('does not count a sealed answer as missed', () => {
+    expect(missedCount([{ attempt: { selectedOption: 'A' } }, { attempt: { selectedOption: 'A', isCorrect: null } }])).toBe(0)
+  })
+})
+
+describe('isSealedAttempt', () => {
+  it('is an answer with no grade yet, not a blank', () => {
+    expect(isSealedAttempt({ selectedOption: 'A' })).toBe(true)
+    expect(isSealedAttempt({ selectedOption: 'A', isCorrect: null })).toBe(true)
+    expect(isSealedAttempt({ selectedOption: 'A', isCorrect: false })).toBe(false)
+    expect(isSealedAttempt({ isCorrect: false })).toBe(false)
+    expect(isSealedAttempt({})).toBe(false)
+    expect(isSealedAttempt(null)).toBe(false)
+  })
+})
+
+describe('reviewDotStatus', () => {
+  it('keeps a sealed answer neutral', () => {
+    expect(reviewDotStatus({ selectedOption: 'A' })).toBe('answered')
+  })
+
+  it('still marks graded answers and empty questions', () => {
+    expect(reviewDotStatus({ selectedOption: 'A', isCorrect: true })).toBe('correct')
+    expect(reviewDotStatus({ selectedOption: 'A', isCorrect: false })).toBe('incorrect')
+    expect(reviewDotStatus({ isCorrect: false })).toBe('incorrect')
+    expect(reviewDotStatus(null)).toBe('pending')
+  })
+})
+
+describe('reportItemOutcome', () => {
+  it('names each state of a report item', () => {
+    expect(reportItemOutcome({ isCorrect: true })).toBe('Acertaste')
+    expect(reportItemOutcome({ isCorrect: false })).toBe('Fallaste')
+    expect(reportItemOutcome({ isCorrect: null, answered: true })).toBe('Entregada')
+    expect(reportItemOutcome({ isCorrect: null, answered: false })).toBe('En blanco')
+  })
+})
+
+describe('sessionOutcomeChip', () => {
+  it('a handed-in session still sealed is handed in, an open one is not', () => {
+    expect(sessionOutcomeChip('completed')).toBe('Entregada')
+    expect(sessionOutcomeChip('in_progress')).toBe('Sin terminar')
+    expect(sessionOutcomeChip('abandoned')).toBe('Sin terminar')
   })
 })
 

@@ -1,21 +1,8 @@
-import { createFileRoute } from '@tanstack/react-router'
-import { FullScreenLoader } from '../components/FullScreenLoader.tsx'
-import { HistoryPage } from '../components/HistoryPage.tsx'
-import { StudentAppShell } from '../components/StudentAppShell.tsx'
-import { useStudentGuard } from '../lib/use-student-guard.ts'
+import { createFileRoute, redirect } from '@tanstack/react-router'
 
+// Yo (/progress) absorbed the history.
 export const Route = createFileRoute('/history')({
-  component: HistoryRoutePage,
+  beforeLoad: () => {
+    throw redirect({ to: '/progress' })
+  },
 })
-
-function HistoryRoutePage() {
-  const guard = useStudentGuard()
-  if (guard.status === 'redirecting') return <FullScreenLoader message={guard.reason} />
-  if (guard.status !== 'ready') return <FullScreenLoader />
-
-  return (
-    <StudentAppShell session={guard.session} activeSection="history">
-      <HistoryPage studentId={guard.session.studentId} />
-    </StudentAppShell>
-  )
-}

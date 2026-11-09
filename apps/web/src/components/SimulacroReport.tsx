@@ -14,6 +14,7 @@ import {
   pickPracticeSubtopic,
   simulacroGapMessage,
 } from '../lib/result-display.ts'
+import { reportItemOutcome } from '../lib/review-explanations.ts'
 import { getSubjectTheme } from '../lib/subject-theme.ts'
 import { getSubjectLabel, getCompetenciaLabel, getSubtopicLabel } from '@aprendo/convex/taxonomy'
 
@@ -288,7 +289,7 @@ export function SimulacroReport({
                       {getSubjectLabel(item.subjectId)}
                       {item.flagged ? ' · marcada' : ''}
                       {' · '}
-                      {item.isCorrect === true ? 'Acertaste' : item.isCorrect === false ? 'Fallaste' : 'En blanco'}
+                      {reportItemOutcome(item)}
                     </span>
                   </span>
                   <span className="shrink-0 text-right text-xs text-[var(--text-tertiary)] tabular-nums">

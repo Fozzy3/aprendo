@@ -5,7 +5,7 @@ import type { FunctionReturnType } from 'convex/server'
 import { useState, type CSSProperties } from 'react'
 import { api } from '@aprendo/convex/api'
 import { getSubtopicLabel } from '@aprendo/convex/taxonomy'
-import { MarkdownBlock } from './MarkdownBlock.tsx'
+import { readConvexError } from '../lib/convex-error.ts'
 import { getSubjectTheme } from '../lib/subject-theme.ts'
 import { conversationOpener, lastActivityLabel, riskLabel, studentDisplayName } from '../lib/teacher-display.ts'
 
@@ -31,7 +31,7 @@ function SubtopicName({ subtopicId, subjectId }: { subtopicId: string; subjectId
  * teach the whole class, whom to pull into a small group, whom to talk to, and
  * the questions the class misses most. Every block says why in one line.
  */
-export function ClassWeekPlan({ plan, now, classGroupId }: { plan: WeekPlan; now: number; classGroupId: string }) {
+export function ClassWeekPlan({ plan, now, classGroupId, canWrite }: { plan: WeekPlan; now: number; classGroupId: string; canWrite: boolean }) {
   return (
     <>
       <section className="ruled-section" aria-labelledby="week-class-title">
@@ -53,11 +53,15 @@ export function ClassWeekPlan({ plan, now, classGroupId }: { plan: WeekPlan; now
                     {item.misconceptionShare >= 0.2
                       ? ` · ${percent(item.misconceptionShare, 1)} de sus errores fueron "seguros": hay un error de concepto`
                       : ''}
-                    . Clase corta de 15–20 min y una votación en parejas con una de las preguntas de abajo.
+                    . Clase corta de 15–20 min y una votación en parejas con una de las preguntas de Resultados.
                   </span>
                   <span className="mt-2 flex flex-wrap gap-2">
-                    <AssignButton classGroupId={classGroupId} subtopicId={item.subtopicId} kind="practica" label="Asignar práctica al curso" />
-                    <AssignButton classGroupId={classGroupId} subtopicId={item.subtopicId} kind="tiquete" label="Tiquete de salida (3 preguntas)" />
+                    {canWrite ? (
+                      <>
+                        <AssignButton classGroupId={classGroupId} subtopicId={item.subtopicId} kind="practica" label="Asignar práctica al curso" />
+                        <AssignButton classGroupId={classGroupId} subtopicId={item.subtopicId} kind="tiquete" label="Tiquete de salida (3 preguntas)" />
+                      </>
+                    ) : null}
                     <Link
                       to="/teacher/guia/$subtopicId"
                       params={{ subtopicId: item.subtopicId }}
@@ -92,13 +96,15 @@ export function ClassWeekPlan({ plan, now, classGroupId }: { plan: WeekPlan; now
                     cada uno solo.
                   </span>
                   <span className="mt-2 flex flex-wrap gap-2">
-                    <AssignButton
-                      classGroupId={classGroupId}
-                      subtopicId={group.subtopicId}
-                      kind="practica"
-                      studentIds={group.students.map((student) => student.studentId)}
-                      label="Asignar práctica al grupo"
-                    />
+                    {canWrite ? (
+                      <AssignButton
+                        classGroupId={classGroupId}
+                        subtopicId={group.subtopicId}
+                        kind="practica"
+                        studentIds={group.students.map((student) => student.studentId)}
+                        label="Asignar práctica al grupo"
+                      />
+                    ) : null}
                     <Link
                       to="/teacher/guia/$subtopicId"
                       params={{ subtopicId: group.subtopicId }}
@@ -128,6 +134,7 @@ export function ClassWeekPlan({ plan, now, classGroupId }: { plan: WeekPlan; now
                 <Link
                   to="/teacher/student/$studentId"
                   params={{ studentId: student.studentId }}
+                  search={{ curso: classGroupId }}
                   className="ruled-row no-underline"
                 >
                   <span className="ruled-row-main">
@@ -143,49 +150,6 @@ export function ClassWeekPlan({ plan, now, classGroupId }: { plan: WeekPlan; now
         )}
       </section>
 
-      {plan.items.length > 0 ? (
-        <section className="ruled-section" aria-labelledby="week-items-title">
-          <h2 id="week-items-title" className="section-title">Las preguntas que más falla el curso</h2>
-          <p className="text-sm text-[var(--text-secondary)]">
-            La opción equivocada más elegida es la trampa del curso. Ponla en el tablero: que voten, discutan en parejas y
-            vuelvan a votar.
-          </p>
-          <ul className="ruled-list">
-            {plan.items.map((item) => (
-              <li key={item.questionId} className="ruled-row">
-                <details className="ruled-row-main item-analysis">
-                  <summary>
-                    <span className="font-semibold">
-                      {item.subtopicId != null ? getSubtopicLabel(item.subtopicId) : 'Pregunta'}
-                    </span>{' '}
-                    <span className="ruled-row-note">
-                      {item.wrong} de {item.answered} la fallaron · {item.topWrongCount} eligieron {item.topWrongOption}
-                      {item.correctOption != null ? ` (la correcta es ${item.correctOption})` : ''}
-                    </span>
-                  </summary>
-                  <MarkdownBlock markdown={item.stem} />
-                  <ul className="item-analysis-options">
-                    {item.options.map((option) => (
-                      <li
-                        key={option.label}
-                        className={
-                          option.label === item.correctOption
-                            ? 'is-correct'
-                            : option.label === item.topWrongOption
-                              ? 'is-trap'
-                              : undefined
-                        }
-                      >
-                        <strong>{option.label})</strong> <MarkdownBlock markdown={option.bodyMarkdown} />
-                      </li>
-                    ))}
-                  </ul>
-                </details>
-              </li>
-            ))}
-          </ul>
-        </section>
-      ) : null}
     </>
   )
 }
@@ -229,8 +193,11 @@ function AssignButton({
 const ASSIGNMENT_KIND_LABEL = { practica: 'Práctica', tiquete: 'Tiquete de salida' } as const
 
 /** What the class was assigned and how it went: done, in progress, accuracy (F40). */
-export function ClassAssignments({ classGroupId }: { classGroupId: string }) {
+export function ClassAssignments({ classGroupId, canWrite }: { classGroupId: string; canWrite: boolean }) {
   const assignments = useQuery(convexQuery(api.teacher.getClassAssignments, { classGroupId: classGroupId as never }))
+  if (assignments.isError) {
+    return <p role="alert" className="notice is-danger">{readConvexError(assignments.error, 'No pudimos cargar las tareas del curso.')}</p>
+  }
   if (assignments.data == null || assignments.data.length === 0) return null
   return (
     <section className="ruled-section" aria-labelledby="class-assignments-title">
@@ -248,7 +215,7 @@ export function ClassAssignments({ classGroupId }: { classGroupId: string }) {
                 {assignment.accuracy != null ? ` · ${Math.round(assignment.accuracy * 100)}% de acierto` : ''}
               </span>
             </span>
-            <RemoveAssignment assignmentId={assignment.assignmentId} subtopicId={assignment.subtopicId} />
+            {canWrite ? <RemoveAssignment assignmentId={assignment.assignmentId} subtopicId={assignment.subtopicId} /> : null}
           </li>
         ))}
       </ul>

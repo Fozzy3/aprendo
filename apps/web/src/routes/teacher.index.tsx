@@ -6,6 +6,7 @@ import { api } from '@aprendo/convex/api'
 import { EmptyState } from '../components/EmptyState.tsx'
 import { FullScreenLoader, PageLoader } from '../components/FullScreenLoader.tsx'
 import { StaffShell } from '../components/StaffShell.tsx'
+import { readConvexError } from '../lib/convex-error.ts'
 import { mySchoolsQuery } from '../lib/student-queries.ts'
 import { useSignedIn } from '../lib/use-signed-in.ts'
 
@@ -20,6 +21,7 @@ function TeacherHomePage() {
   const schoolsQuery = useQuery({ ...mySchoolsQuery, enabled: session != null })
   if (session == null) return <FullScreenLoader />
 
+  const queryError = classesQuery.error ?? schoolsQuery.error
   const classes = classesQuery.data ?? []
   const staffSchools = (schoolsQuery.data ?? []).filter((school) => school.role !== 'student')
   const bySchool = new Map<string, typeof classes>()
@@ -40,6 +42,8 @@ function TeacherHomePage() {
 
         {classesQuery.isPending || schoolsQuery.isPending ? (
           <PageLoader message="Cargando tus cursos…" />
+        ) : queryError != null ? (
+          <p role="alert" className="notice is-danger">{readConvexError(queryError, 'No pudimos cargar tus cursos.')}</p>
         ) : staffSchools.length === 0 ? (
           <EmptyState
             title="Tu cuenta no es docente en ningún colegio"
@@ -69,6 +73,13 @@ function TeacherHomePage() {
           [...bySchool].map(([schoolName, schoolClasses]) => (
             <section key={schoolName} className="ruled-section" aria-label={schoolName}>
               {bySchool.size > 1 ? <h2 className="section-title">{schoolName}</h2> : null}
+              {schoolClasses[0]?.nextTest != null ? (
+                <p className="ruled-row-note">
+                  Próxima prueba del colegio: {schoolClasses[0].nextTest.title}, del{' '}
+                  {new Date(schoolClasses[0].nextTest.opensAt).toLocaleDateString('es-CO', { day: 'numeric', month: 'short' })} al{' '}
+                  {new Date(schoolClasses[0].nextTest.closesAt).toLocaleDateString('es-CO', { day: 'numeric', month: 'short' })}.
+                </p>
+              ) : null}
               {schoolClasses[0]?.licenseActive === false ? (
                 <p role="status" className="notice is-danger">
                   La licencia de {schoolName} venció: los estudiantes no pueden unirse a cursos nuevos. Los

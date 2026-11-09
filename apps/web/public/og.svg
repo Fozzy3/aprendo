@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <!-- Source of og.png. Render with Source Serif 4 and Public Sans installed:
+       magick -background none -density 96 og.svg og.png -->
+  <defs>
+    <pattern id="cell" width="30" height="30" patternUnits="userSpaceOnUse">
+      <path d="M30 0H0V30" fill="none" stroke="#c9d8ea" stroke-opacity="0.45" stroke-width="1"/>
+    </pattern>
+  </defs>
+  <rect width="1200" height="630" fill="#fbfcfe"/>
+  <rect width="1200" height="630" fill="url(#cell)"/>
+  <rect x="120" width="2" height="630" fill="#c3352b"/>
+
+  <g transform="translate(168 76)">
+    <rect x="1" y="1" width="46" height="46" fill="none" stroke="#16233f" stroke-width="3.5"/>
+    <path d="M1 17h46M1 32h46M32 1v46" stroke="#c9d8ea" stroke-width="2.5"/>
+    <path d="M17 1v46" stroke="#c3352b" stroke-width="3.5"/>
+    <text x="66" y="40" font-family="Source Serif 4" font-weight="600" font-size="46" fill="#16233f">Aprendo</text>
+  </g>
+
+  <text font-family="Source Serif 4" font-weight="600" font-size="106" letter-spacing="-3" fill="#16233f">
+    <tspan x="168" y="304">Saber 11: sepa qué</tspan>
+    <tspan x="168" y="420">enseñar cada semana</tspan>
+  </text>
+
+  <text x="168" y="528" font-family="Public Sans" font-weight="500" font-size="36" fill="#4a5263">Para colegios de Colombia</text>
+</svg>

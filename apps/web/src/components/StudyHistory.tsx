@@ -6,15 +6,17 @@ import { api } from '@aprendo/convex/api'
 import { SESSION_KINDS, type SessionKind } from '@aprendo/convex/sessionKinds'
 import { activitySummaryQuery } from '../lib/student-queries.ts'
 import { getKindLabel } from '../lib/session-display.ts'
+import { sessionOutcomeChip } from '../lib/review-explanations.ts'
 import { getSubjectTheme } from '../lib/subject-theme.ts'
 import { EmptyState } from './EmptyState.tsx'
 
-const CALENDAR_WEEKS = 16
+export const CALENDAR_WEEKS = 16
 const PAGE_SIZE = 20
 
 type KindFilter = SessionKind | 'all'
 
-export function HistoryPage({ studentId }: { studentId: string }) {
+/** On Yo: every day studied, and each session with a way back into it. */
+export function StudyHistory({ studentId }: { studentId: string }) {
   const [kindFilter, setKindFilter] = useState<KindFilter>('all')
 
   const summary = useQuery(activitySummaryQuery(studentId, CALENDAR_WEEKS))
@@ -27,64 +29,24 @@ export function HistoryPage({ studentId }: { studentId: string }) {
     { initialNumItems: PAGE_SIZE },
   )
 
-  const stats = summary.data?.stats
-
   return (
-    <div className="ruled-page fade-in">
-      <aside className="ruled-page-margin" aria-label={`Últimas ${CALENDAR_WEEKS} semanas`}>
-        <p className="ruled-page-date">Últimas {CALENDAR_WEEKS} semanas</p>
-        <dl className="margin-facts">
-          <div>
-            <dt>Días seguidos</dt>
-            <dd>{stats == null ? '—' : stats.currentStreakDays}</dd>
-          </div>
-          <div>
-            <dt>Racha más larga</dt>
-            <dd>{stats == null ? '—' : `${stats.longestStreakDays} días`}</dd>
-          </div>
-          <div>
-            <dt>Días de estudio</dt>
-            <dd>{stats == null ? '—' : stats.activeDayCount}</dd>
-          </div>
-          <div>
-            <dt>Preguntas</dt>
-            <dd>
-              {stats == null ? '—' : stats.totalAnswered}
-              {stats != null ? (
-                <span className="block text-xs font-normal text-[var(--text-tertiary)]">
-                  {stats.totalCorrect} correctas
-                </span>
-              ) : null}
-            </dd>
-          </div>
-          <div>
-            <dt>Aciertos</dt>
-            <dd>{stats?.accuracy == null ? '—' : `${Math.round(stats.accuracy * 100)}%`}</dd>
-          </div>
-        </dl>
-      </aside>
+    <>
+      <section className="ruled-section" aria-labelledby="history-days-title">
+        <div className="section-head">
+          <h2 id="history-days-title" className="section-title">Días de estudio</h2>
+          <span className="section-meta">Cada cuadro es un día</span>
+        </div>
+        {summary.data == null ? (
+          <div className="h-24 bg-[var(--bg-inset)]" aria-hidden />
+        ) : (
+          <ActivityCalendar days={summary.data.days} />
+        )}
+      </section>
 
-      <div className="ruled-page-body">
-        <header className="ruled-page-head">
-          <h1 className="page-title">Historial de estudio</h1>
-          <p className="page-lede">Cada día que estudiaste, y los que no.</p>
-        </header>
-
-        <section className="ruled-section" aria-labelledby="history-days-title">
-          <div className="section-head">
-            <h2 id="history-days-title" className="section-title">Días de estudio</h2>
-            <span className="section-meta">Cada cuadro es un día</span>
-          </div>
-          {summary.data == null ? (
-            <div className="h-24 bg-[var(--bg-inset)]" aria-hidden />
-          ) : (
-            <ActivityCalendar days={summary.data.days} />
-          )}
-        </section>
-
-        <section className="ruled-section" aria-labelledby="history-sessions-title">
-          <h2 id="history-sessions-title" className="section-title">Sesiones</h2>
-          <nav className="tab-nav mb-4 flex-wrap" aria-label="Tipo de sesión">
+      <section className="ruled-section" aria-labelledby="history-sessions-title">
+        <h2 id="history-sessions-title" className="section-title">Tus sesiones</h2>
+        <div className="tab-scroll mb-4">
+          <nav className="tab-nav" aria-label="Tipo de sesión">
             <FilterTab label="Todas" isActive={kindFilter === 'all'} onSelect={() => setKindFilter('all')} />
             {/* The legacy diagnostic is no longer offered; old ones still list under "Todas". */}
             {SESSION_KINDS.filter((kind) => kind !== 'diagnostic').map((kind) => (
@@ -96,43 +58,35 @@ export function HistoryPage({ studentId }: { studentId: string }) {
               />
             ))}
           </nav>
+        </div>
 
-          {history.status === 'LoadingFirstPage' ? (
-            <p className="text-sm text-[var(--text-tertiary)]">Cargando…</p>
-          ) : history.results.length === 0 ? (
-            <EmptyState
-              title={kindFilter === 'all' ? 'Tu historial está vacío' : 'Nada de este tipo todavía'}
-            >
-              {kindFilter === 'all'
-                ? 'Cuando termines tu primera sesión, va a aparecer acá con lo que respondiste.'
-                : 'Prueba con otro filtro, o haz una sesión de este tipo.'}
-            </EmptyState>
-          ) : (
-            <>
-              <ul className="ruled-list">
-                {history.results.map((session) => (
-                  <li key={session._id}>
-                    <HistoryRow session={session} />
-                  </li>
-                ))}
-              </ul>
-              {history.status === 'CanLoadMore' && (
-                <button
-                  type="button"
-                  className="btn-secondary mt-4"
-                  onClick={() => history.loadMore(PAGE_SIZE)}
-                >
-                  Ver más
-                </button>
-              )}
-              {history.status === 'LoadingMore' && (
-                <p className="mt-4 text-xs text-[var(--text-tertiary)]">Cargando…</p>
-              )}
-            </>
-          )}
-        </section>
-      </div>
-    </div>
+        {history.status === 'LoadingFirstPage' ? (
+          <p className="text-sm text-[var(--text-tertiary)]">Cargando…</p>
+        ) : history.results.length === 0 ? (
+          <EmptyState title={kindFilter === 'all' ? 'Aún no hay sesiones' : 'Nada de este tipo todavía'}>
+            {kindFilter === 'all' ? 'Cuando termines la primera, aparece acá.' : 'Prueba con otro filtro.'}
+          </EmptyState>
+        ) : (
+          <>
+            <ul className="ruled-list">
+              {history.results.map((session) => (
+                <li key={session._id}>
+                  <HistoryRow session={session} />
+                </li>
+              ))}
+            </ul>
+            {history.status === 'CanLoadMore' && (
+              <button type="button" className="btn-secondary mt-4" onClick={() => history.loadMore(PAGE_SIZE)}>
+                Ver más
+              </button>
+            )}
+            {history.status === 'LoadingMore' && (
+              <p className="mt-4 text-xs text-[var(--text-tertiary)]">Cargando…</p>
+            )}
+          </>
+        )}
+      </section>
+    </>
   )
 }
 
@@ -217,7 +171,7 @@ function FilterTab({
       type="button"
       onClick={onSelect}
       aria-pressed={isActive}
-      className={`tab-item${isActive ? ' is-active' : ''}`}
+      className={`tab-item shrink-0 whitespace-nowrap${isActive ? ' is-active' : ''}`}
     >
       {label}
     </button>
@@ -280,7 +234,7 @@ function HistoryRow({ session }: { session: HistorySession }) {
           <span className="block text-xs text-[var(--text-tertiary)]">{Math.round(summary.accuracy * 100)}%</span>
         </span>
       ) : (
-        <span className="chip">Sin terminar</span>
+        <span className="chip">{sessionOutcomeChip(session.status)}</span>
       )}
     </Link>
   )

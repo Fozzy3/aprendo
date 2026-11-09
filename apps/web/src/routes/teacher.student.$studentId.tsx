@@ -1,6 +1,6 @@
 import { convexQuery } from '@convex-dev/react-query'
 import { useQuery } from '@tanstack/react-query'
-import { createFileRoute, useRouter } from '@tanstack/react-router'
+import { Link, createFileRoute } from '@tanstack/react-router'
 import { ArrowLeft, Printer } from 'lucide-react'
 import { api } from '@aprendo/convex/api'
 import { getSubjectLabel, getSubtopicLabel } from '@aprendo/convex/taxonomy'
@@ -11,10 +11,14 @@ import { StaffShell } from '../components/StaffShell.tsx'
 import { readConvexError } from '../lib/convex-error.ts'
 import { areaChartRow } from '../lib/progress-display.ts'
 import { studentProgressQuery } from '../lib/student-queries.ts'
-import { studentDisplayName } from '../lib/teacher-display.ts'
+import { guidedShareLabel, studentDisplayName } from '../lib/teacher-display.ts'
 import { useSignedIn } from '../lib/use-signed-in.ts'
 
 export const Route = createFileRoute('/teacher/student/$studentId')({
+  validateSearch: (search: Record<string, unknown>): { curso?: string; colegio?: string } => ({
+    ...(typeof search.curso === 'string' ? { curso: search.curso } : {}),
+    ...(typeof search.colegio === 'string' ? { colegio: search.colegio } : {}),
+  }),
   component: TeacherStudentPage,
 })
 
@@ -26,24 +30,40 @@ export const Route = createFileRoute('/teacher/student/$studentId')({
  */
 function TeacherStudentPage() {
   const { studentId } = Route.useParams()
-  const router = useRouter()
+  const { curso, colegio } = Route.useSearch()
   const session = useSignedIn()
   const progressQuery = useQuery({ ...studentProgressQuery(studentId), enabled: session != null })
   const activityQuery = useQuery({
     ...convexQuery(api.history.getActivitySummary, { studentId: studentId as never, weeks: 8 }),
     enabled: session != null,
   })
+  const guidedQuery = useQuery({
+    ...convexQuery(api.teacher.getStudentGuidedSignal, { studentId: studentId as never }),
+    enabled: session != null,
+  })
   if (session == null) return <FullScreenLoader />
 
   const progress = progressQuery.data
+  const guidedLabel = guidedQuery.data == null ? null : guidedShareLabel(guidedQuery.data)
   const stats = activityQuery.data?.stats
 
   return (
     <StaffShell active="classes">
       <div className="report-actions">
-        <button type="button" className="back-link" onClick={() => router.history.back()}>
-          <ArrowLeft size={14} aria-hidden /> Volver al curso
-        </button>
+        {/* A shared link has no history to go back to, so the page says where it came from. */}
+        {curso != null ? (
+          <Link to="/teacher/$classGroupId" params={{ classGroupId: curso }} search={{ tab: 'resultados' }} className="back-link no-underline">
+            <ArrowLeft size={14} aria-hidden /> Volver al curso
+          </Link>
+        ) : colegio != null ? (
+          <Link to="/school" search={{ colegio, tab: 'personas' }} className="back-link no-underline">
+            <ArrowLeft size={14} aria-hidden /> Volver al colegio
+          </Link>
+        ) : (
+          <Link to="/teacher" className="back-link no-underline">
+            <ArrowLeft size={14} aria-hidden /> Tus cursos
+          </Link>
+        )}
         <button type="button" className="btn-secondary" onClick={() => window.print()}>
           <Printer size={14} aria-hidden /> Imprimir
         </button>
@@ -107,6 +127,13 @@ function TeacherStudentPage() {
               <h2 id="student-levels-title" className="section-title">Nivel por área</h2>
               <AreaLevelsChart rows={progress.subjectLevels.map(areaChartRow)} />
             </section>
+
+            {guidedLabel != null ? (
+              <section className="ruled-section" aria-labelledby="student-guided-title">
+                <h2 id="student-guided-title" className="section-title">Estudio guiado</h2>
+                <p className="m-0 text-sm text-[var(--text-secondary)]">{guidedLabel}.</p>
+              </section>
+            ) : null}
 
             <section className="ruled-section" aria-labelledby="student-weak-title">
               <h2 id="student-weak-title" className="section-title">Temas que más le cuestan</h2>

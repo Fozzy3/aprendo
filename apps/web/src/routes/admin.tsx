@@ -1,176 +1,171 @@
 import { convexQuery, useConvexMutation } from '@convex-dev/react-query'
-import {
-  useMutation,
-  useQuery,
-  useQueryClient,
-  useSuspenseQuery,
-} from '@tanstack/react-query'
-import { Link, createFileRoute, redirect } from '@tanstack/react-router'
+import { useMutation, useQuery, useQueryClient, useSuspenseQuery } from '@tanstack/react-query'
+import { Link, createFileRoute, redirect, useNavigate } from '@tanstack/react-router'
 import { UploadCloud, X } from 'lucide-react'
 import { useState } from 'react'
 import type { ChangeEvent, DragEvent } from 'react'
+import type { FunctionReturnType } from 'convex/server'
 import { api } from '@aprendo/convex/api'
-import { Wordmark } from '../components/BrandMark.tsx'
+import { AuditQueue } from '../components/admin/AuditQueue.tsx'
 import { ReportsQueue } from '../components/admin/ReportsQueue.tsx'
 import { SchoolsAdmin } from '../components/admin/SchoolsAdmin.tsx'
+import { FullScreenLoader } from '../components/FullScreenLoader.tsx'
 import { MarkdownBlock } from '../components/MarkdownBlock.tsx'
+import { StaffShell } from '../components/StaffShell.tsx'
+import { readConvexError } from '../lib/convex-error.ts'
 import { pdfUploadsQuery, questionBrowserQuery } from '../lib/pdf-queries.ts'
 import { uploadPdfToConvex } from '../lib/pdf-upload.ts'
-import { ThemeToggle } from '../components/ThemeToggle.tsx'
-import { FullScreenLoader } from '../components/FullScreenLoader.tsx'
-import { readConvexError } from '../lib/convex-error.ts'
 
-type AdminTab = 'uploads' | 'questions' | 'reports' | 'schools'
+type AdminTab = 'bank' | 'audit' | 'reports' | 'schools'
 
 type AdminSearch = {
   tab?: AdminTab
   pdfUploadId?: string
   sequence?: number
+  questionId?: string
+}
+
+const TAB_LABEL: Record<AdminTab, string> = { bank: 'Banco', audit: 'Auditoría', reports: 'Reportes', schools: 'Colegios' }
+
+/** The tab a link asks for; the old PDFs and Preguntas links land on Banco. */
+function parseTab(tab: unknown): AdminTab | undefined {
+  if (tab === 'uploads' || tab === 'questions' || tab === 'bank') return 'bank'
+  return tab === 'audit' || tab === 'reports' || tab === 'schools' ? tab : undefined
 }
 
 export const Route = createFileRoute('/admin')({
   beforeLoad: async ({ context: { queryClient } }) => {
-    const admin = await queryClient.ensureQueryData(
-      convexQuery(api.auth.getCurrentAdmin, {}),
-    )
-    if (admin == null) {
-      throw redirect({ to: '/login' })
-    }
-    return { admin }
+    const staff = await queryClient.ensureQueryData(convexQuery(api.auth.getCurrentStaffMember, {}))
+    if (staff == null) throw redirect({ to: '/login' })
+    return { staff }
   },
   validateSearch: (search: Record<string, unknown>): AdminSearch => ({
-    tab:
-      search.tab === 'questions' || search.tab === 'reports' || search.tab === 'schools'
-        ? search.tab
-        : undefined,
-    pdfUploadId:
-      typeof search.pdfUploadId === 'string' ? search.pdfUploadId : undefined,
+    tab: parseTab(search.tab),
+    pdfUploadId: typeof search.pdfUploadId === 'string' ? search.pdfUploadId : undefined,
     sequence:
       typeof search.sequence === 'number'
         ? search.sequence
         : typeof search.sequence === 'string'
           ? Number(search.sequence)
           : undefined,
+    questionId: typeof search.questionId === 'string' ? search.questionId : undefined,
   }),
-  loaderDeps: ({ search }) => ({
-    tab: search.tab ?? 'uploads',
-    pdfUploadId: search.pdfUploadId,
-    sequence: search.sequence ?? 1,
-  }),
-  loader: async ({ context: { queryClient }, deps }) => {
+  loaderDeps: ({ search }) => ({ tab: search.tab ?? 'bank', pdfUploadId: search.pdfUploadId, sequence: search.sequence ?? 1 }),
+  loader: async ({ context: { queryClient, staff }, deps }) => {
+    if (deps.tab !== 'bank' || !staff.isAdmin) return
     await queryClient.ensureQueryData(pdfUploadsQuery(50))
-    if (deps.tab === 'questions' && deps.pdfUploadId) {
-      await queryClient.ensureQueryData(
-        questionBrowserQuery(deps.pdfUploadId, deps.sequence),
-      )
-    }
+    if (deps.pdfUploadId) await queryClient.ensureQueryData(questionBrowserQuery(deps.pdfUploadId, deps.sequence))
   },
   component: AdminPage,
   pendingComponent: AdminPending,
 })
 
 function AdminPending() {
-  return (
-    <FullScreenLoader message="Cargando el panel…" />
-  )
+  return <FullScreenLoader message="Cargando el panel…" />
 }
 
+/** Aprendo staff see the whole panel; a reviewer only ever the audit. */
 function AdminPage() {
   const search = Route.useSearch()
-  const activeTab: AdminTab = search.tab ?? 'uploads'
+  const { staff } = Route.useRouteContext()
+  const navigate = useNavigate()
+  const activeTab: AdminTab = staff.isAdmin ? (search.tab ?? 'bank') : 'audit'
+  const tabs: AdminTab[] = staff.isAdmin ? ['bank', 'audit', 'reports', 'schools'] : ['audit']
 
   return (
-    <div className="min-h-screen bg-[var(--bg)]">
-      {/* Top bar */}
-      <header className="border-b border-[var(--border)] bg-[var(--bg)]">
-        <div className="page-container-wide flex flex-wrap items-center justify-between gap-3 py-3">
-          {/* Brand */}
-          <Link to="/" className="no-underline">
-            <Wordmark subtitle="Equipo Aprendo" />
-          </Link>
-
-          {/* Center tabs */}
-          <nav className="tab-nav">
-            <Link
-              to="/admin"
-              search={{}}
-              className={`tab-item ${activeTab === 'uploads' ? 'is-active' : ''}`}
-            >
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                <polyline points="17 8 12 3 7 8" />
-                <line x1="12" x2="12" y1="3" y2="15" />
-              </svg>
-              PDFs
-            </Link>
-            <Link
-              to="/admin"
-              search={{ tab: 'questions' }}
-              className={`tab-item ${activeTab === 'questions' ? 'is-active' : ''}`}
-            >
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z" />
-                <polyline points="14 2 14 8 20 8" />
-              </svg>
-              Preguntas
-            </Link>
-            <Link
-              to="/admin"
-              search={{ tab: 'reports' }}
-              className={`tab-item ${activeTab === 'reports' ? 'is-active' : ''}`}
-            >
-              Reportes
-            </Link>
-            <Link
-              to="/admin"
-              search={{ tab: 'schools' }}
-              className={`tab-item ${activeTab === 'schools' ? 'is-active' : ''}`}
-            >
-              Colegios
-            </Link>
-          </nav>
-
-          {/* Right side */}
-          <div className="flex items-center gap-2">
-            <ThemeToggle />
-            <Link
-              to="/app"
-              className="btn-ghost text-xs no-underline"
-            >
-              App
-            </Link>
-          </div>
-        </div>
-      </header>
-
-      {/* Content */}
-      <main className="page-container-wide px-4 py-8">
-        {activeTab === 'uploads' ? (
-          <UploadsTab />
-        ) : activeTab === 'reports' ? (
-          <ReportsQueue />
-        ) : activeTab === 'schools' ? (
-          <SchoolsAdmin />
-        ) : (
-          <QuestionsTab search={search} />
-        )}
-      </main>
-    </div>
+    <StaffShell
+      role={staff.isAdmin ? 'admin' : 'reviewer'}
+      home="/admin"
+      nav={tabs.map((tab) => (
+        <Link
+          key={tab}
+          to="/admin"
+          search={{ tab }}
+          className={`student-topnav-item${activeTab === tab ? ' is-active' : ''}`}
+          aria-current={activeTab === tab ? 'page' : undefined}
+        >
+          {TAB_LABEL[tab]}
+        </Link>
+      ))}
+    >
+      {activeTab === 'bank' ? (
+        <BankTab search={search} />
+      ) : activeTab === 'audit' ? (
+        <AuditQueue
+          questionId={search.questionId}
+          onSelect={(questionId) => void navigate({ to: '/admin', search: { tab: 'audit', questionId } })}
+        />
+      ) : activeTab === 'reports' ? (
+        <ReportsQueue />
+      ) : (
+        <SchoolsAdmin />
+      )}
+    </StaffShell>
   )
 }
 
-/* ─── Uploads Tab ─── */
+const UPLOAD_STATUS_LABEL: Record<string, string> = {
+  uploaded: 'En cola',
+  processing: 'Leyendo',
+  enriching: 'Completando',
+  completed: 'Listo',
+  failed: 'Falló',
+}
 
-function UploadsTab() {
-  const queryClient = useQueryClient()
+const ELIGIBILITY_LABEL: Record<string, string> = {
+  pending: 'Pendiente de auditoría',
+  diagnostic: 'En el banco',
+  practice_only: 'Solo práctica',
+  excluded: 'Fuera del banco',
+}
+
+const STATUS_LABEL: Record<string, string> = {
+  pending: 'Pendiente',
+  processing: 'Procesando',
+  completed: 'Lista',
+  failed: 'Falló',
+  needs_review: 'Por revisar',
+}
+
+/** PDFs and their questions, together: upload, follow the status, and read what came out. */
+function BankTab({ search }: { search: AdminSearch }) {
   const { data: uploads } = useSuspenseQuery(pdfUploadsQuery(50))
+  const browsable = uploads.filter((upload) => (upload.questionCount ?? 0) > 0)
+  const selectedId = search.pdfUploadId ?? browsable[0]?._id
+
+  return (
+    <section aria-labelledby="bank-title">
+      <h1 id="bank-title" className="page-title">Banco</h1>
+      <p className="page-lede">Cada PDF pasa por lectura, extracción y enriquecimiento; lo que sale espera en Auditoría antes de llegar a los estudiantes.</p>
+
+      <UploadForm />
+
+      <div className="ruled-section grid gap-6 lg:grid-cols-[320px_minmax(0,1fr)]">
+        <div>
+          <h2 className="section-title">Fuentes</h2>
+          <UploadList uploads={uploads} selectedId={selectedId} />
+        </div>
+        <div className="min-w-0">
+          <h2 className="section-title">Preguntas</h2>
+          {selectedId != null ? (
+            <QuestionViewer pdfUploadId={selectedId} sequence={search.sequence ?? 1} />
+          ) : (
+            <p className="m-0 text-sm text-[var(--text-tertiary)]">Sube un PDF para empezar.</p>
+          )}
+        </div>
+      </div>
+    </section>
+  )
+}
+
+function UploadForm() {
+  const queryClient = useQueryClient()
   const [selectedFiles, setSelectedFiles] = useState<File[]>([])
   const [isDraggingFiles, setIsDraggingFiles] = useState(false)
   const [uploadingFileName, setUploadingFileName] = useState<string | null>(null)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const generateUploadUrl = useConvexMutation(api.pdfs.generatePdfUploadUrl)
   const createPdfUpload = useConvexMutation(api.pdfs.createPdfUpload)
-  const retryPdfUpload = useConvexMutation(api.pdfs.retryPdfUpload)
 
   const addSelectedFiles = (files: FileList | File[]) => {
     const pdfFiles = Array.from(files).filter(
@@ -178,26 +173,20 @@ function UploadsTab() {
     )
 
     if (pdfFiles.length === 0) {
-      setErrorMessage('Select or drop one or more PDF files.')
+      setErrorMessage('Elige o suelta uno o más archivos PDF.')
       return
     }
 
     setErrorMessage(null)
     setSelectedFiles((currentFiles) => {
-      const knownFiles = new Set(
-        currentFiles.map((file) => `${file.name}:${file.size}:${file.lastModified}`),
-      )
-      const newFiles = pdfFiles.filter(
-        (file) => !knownFiles.has(`${file.name}:${file.size}:${file.lastModified}`),
-      )
+      const knownFiles = new Set(currentFiles.map((file) => `${file.name}:${file.size}:${file.lastModified}`))
+      const newFiles = pdfFiles.filter((file) => !knownFiles.has(`${file.name}:${file.size}:${file.lastModified}`))
       return [...currentFiles, ...newFiles]
     })
   }
 
   const handleFileInputChange = (event: ChangeEvent<HTMLInputElement>) => {
-    if (event.target.files) {
-      addSelectedFiles(event.target.files)
-    }
+    if (event.target.files) addSelectedFiles(event.target.files)
     event.target.value = ''
   }
 
@@ -207,21 +196,13 @@ function UploadsTab() {
   }
 
   const handleDragLeave = (event: DragEvent<HTMLLabelElement>) => {
-    if (!event.currentTarget.contains(event.relatedTarget as Node | null)) {
-      setIsDraggingFiles(false)
-    }
+    if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setIsDraggingFiles(false)
   }
 
   const handleDrop = (event: DragEvent<HTMLLabelElement>) => {
     event.preventDefault()
     setIsDraggingFiles(false)
     addSelectedFiles(event.dataTransfer.files)
-  }
-
-  const removeSelectedFile = (fileToRemove: File) => {
-    setSelectedFiles((currentFiles) =>
-      currentFiles.filter((file) => file !== fileToRemove),
-    )
   }
 
   const uploadMutation = useMutation({
@@ -243,244 +224,119 @@ function UploadsTab() {
     },
   })
 
-  const retryMutation = useMutation({
-    mutationFn: async (pdfUploadId: string) => {
-      await retryPdfUpload({ pdfUploadId: pdfUploadId as never })
-    },
-    onError: (error) => {
-      setErrorMessage(readConvexError(error, 'No se pudo reprocesar el PDF.'))
-    },
-  })
-
   return (
-    <div className="fade-in mx-auto max-w-3xl">
-      {/* Upload form */}
-      <div className="card mb-8 p-6">
-        <h2 className="mb-1 text-lg font-semibold text-[var(--text-primary)]">
-          Upload a PDF
-        </h2>
-        <p className="mb-5 text-sm text-[var(--text-secondary)]">
-          Each upload is processed through OCR, question extraction, and enrichment.
+    <div className="ruled-section">
+      <h2 className="section-title">Subir PDF</h2>
+      <label
+        onDragOver={handleDragOver}
+        onDragLeave={handleDragLeave}
+        onDrop={handleDrop}
+        className={[
+          'flex cursor-pointer flex-col items-center justify-center rounded-[var(--radius-md)] border border-dashed px-5 py-8 text-center transition-colors',
+          isDraggingFiles
+            ? 'border-[var(--border-accent)] bg-[var(--accent-soft)]'
+            : 'border-[var(--border-strong)] bg-[var(--bg-inset)] hover:border-[var(--border-accent)]',
+        ].join(' ')}
+      >
+        <input type="file" accept="application/pdf" multiple onChange={handleFileInputChange} className="sr-only" />
+        <UploadCloud aria-hidden="true" size={20} className="mb-2 text-[var(--accent)]" />
+        <span className="text-sm font-semibold text-[var(--text-primary)]">Suelta los PDF aquí o haz clic para elegirlos</span>
+        <span className="mt-1 text-xs text-[var(--text-tertiary)]">Cada PDF se procesa por separado.</span>
+      </label>
+
+      <div className="mt-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <p className="m-0 text-sm text-[var(--text-secondary)]">
+          {selectedFiles.length === 0 ? 'Ningún PDF elegido.' : `${selectedFiles.length} PDF ${selectedFiles.length === 1 ? 'elegido' : 'elegidos'}.`}
         </p>
-
-        <label
-          onDragOver={handleDragOver}
-          onDragLeave={handleDragLeave}
-          onDrop={handleDrop}
-          className={[
-            'flex cursor-pointer flex-col items-center justify-center rounded-[var(--radius-md)] border border-dashed px-5 py-8 text-center transition',
-            isDraggingFiles
-              ? 'border-[var(--border-accent)] bg-[var(--accent-soft)]'
-              : 'border-[var(--border-strong)] bg-[var(--bg-inset)] hover:border-[var(--border-accent)] hover:bg-[var(--bg-card-hover)]',
-          ].join(' ')}
+        <button
+          type="button"
+          disabled={selectedFiles.length === 0 || uploadMutation.isPending}
+          onClick={() => uploadMutation.mutate(selectedFiles)}
+          className="btn-primary"
         >
-          <input
-            type="file"
-            accept="application/pdf"
-            multiple
-            onChange={handleFileInputChange}
-            className="sr-only"
-          />
-          <span className="mb-3 flex h-11 w-11 items-center justify-center rounded-full border border-[var(--border-accent)] bg-[var(--accent-soft)] text-[var(--accent)]">
-            <UploadCloud aria-hidden="true" size={20} />
-          </span>
-          <span className="text-sm font-semibold text-[var(--text-primary)]">
-            Drop PDF files here or click to choose
-          </span>
-          <span className="mt-1 text-xs text-[var(--text-tertiary)]">
-            Multiple PDFs are uploaded as separate processing jobs.
-          </span>
-        </label>
-
-        <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <p className="text-sm text-[var(--text-secondary)]">
-            {selectedFiles.length === 0
-              ? 'No PDFs selected.'
-              : `${selectedFiles.length} PDF${selectedFiles.length === 1 ? '' : 's'} selected.`}
-          </p>
-          <button
-            type="button"
-            disabled={selectedFiles.length === 0 || uploadMutation.isPending}
-            onClick={() => uploadMutation.mutate(selectedFiles)}
-            className="btn-primary"
-          >
-            {uploadMutation.isPending ? 'Subiendo…' : 'Upload PDFs'}
-          </button>
-        </div>
-
-        {selectedFiles.length > 0 ? (
-          <ul className="mt-4 space-y-2">
-            {selectedFiles.map((file) => (
-              <li
-                key={`${file.name}:${file.size}:${file.lastModified}`}
-                className="flex items-center justify-between gap-3 rounded-[var(--radius-md)] border border-[var(--border)] bg-[var(--bg-card)] px-3 py-2"
-              >
-                <span className="min-w-0 text-sm text-[var(--text-secondary)]">
-                  <strong className="block truncate text-[var(--text-primary)]">{file.name}</strong>
-                  {Math.ceil(file.size / 1024)} KB
-                  {uploadingFileName === file.name ? ' · uploading' : ''}
-                </span>
-                <button
-                  type="button"
-                  aria-label={`Remove ${file.name}`}
-                  disabled={uploadMutation.isPending}
-                  onClick={() => removeSelectedFile(file)}
-                  className="btn-ghost p-2"
-                >
-                  <X aria-hidden="true" size={14} />
-                </button>
-              </li>
-            ))}
-          </ul>
-        ) : null}
-
-        {errorMessage ? (
-          <p className="mt-3 text-sm font-medium text-[var(--accent-text)]">
-            {errorMessage}
-          </p>
-        ) : null}
+          {uploadMutation.isPending ? 'Subiendo…' : 'Subir'}
+        </button>
       </div>
 
-      {/* Upload list */}
-      <div className="space-y-3">
-        {uploads.length === 0 ? (
-          <div className="card p-6 text-center">
-            <p className="text-sm text-[var(--text-tertiary)]">No PDFs uploaded yet.</p>
-          </div>
-        ) : (
-          uploads.map((upload) => (
-            <div key={upload._id} className="card p-5">
-              <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-                <div className="min-w-0 flex-1">
-                  <h3 className="mb-1 text-sm font-semibold text-[var(--text-primary)]">
-                    {upload.fileName}
-                  </h3>
-                  <div className="flex flex-wrap gap-1.5">
-                    <span className={`chip ${upload.status === 'completed' ? 'chip-success' : upload.status === 'failed' ? 'chip-accent' : ''}`}>
-                      {upload.status}
-                    </span>
-                    <span className="chip">{Math.ceil(upload.sizeBytes / 1024)} KB</span>
-                    {upload.questionCount != null ? <span className="chip">{upload.questionCount} questions</span> : null}
-                    {upload.answerCompletedCount != null ? <span className="chip">{upload.answerCompletedCount} answers</span> : null}
-                    {upload.taxonomyCompletedCount != null ? <span className="chip">{upload.taxonomyCompletedCount} tagged</span> : null}
-                    {upload.diagnosticEligibleCount != null ? <span className="chip chip-success">{upload.diagnosticEligibleCount} eligible</span> : null}
-                    {upload.excludedQuestionCount != null && upload.excludedQuestionCount > 0 ? <span className="chip chip-accent">{upload.excludedQuestionCount} excluded</span> : null}
-                  </div>
-                  {upload.errorMessage ? (
-                    <p className="mt-2 text-sm font-medium text-[var(--accent-text)]">
-                      {upload.errorMessage}
-                    </p>
+      {selectedFiles.length > 0 ? (
+        <ul className="ruled-list mt-3">
+          {selectedFiles.map((file) => (
+            <li key={`${file.name}:${file.size}:${file.lastModified}`} className="ruled-row">
+              <span className="ruled-row-main text-sm">
+                <strong className="block truncate">{file.name}</strong>
+                <span className="text-[var(--text-secondary)]">
+                  <span className="tabular-nums">{Math.ceil(file.size / 1024)}</span> KB
+                  {uploadingFileName === file.name ? ' · subiendo' : ''}
+                </span>
+              </span>
+              <button
+                type="button"
+                aria-label={`Quitar ${file.name}`}
+                disabled={uploadMutation.isPending}
+                onClick={() => setSelectedFiles((files) => files.filter((other) => other !== file))}
+                className="btn-ghost p-2"
+              >
+                <X aria-hidden="true" size={14} />
+              </button>
+            </li>
+          ))}
+        </ul>
+      ) : null}
+
+      {errorMessage ? <p role="alert" className="mt-3 text-sm font-medium text-[var(--danger-text)]">{errorMessage}</p> : null}
+    </div>
+  )
+}
+
+type Upload = FunctionReturnType<typeof api.pdfs.listPdfUploads>[number]
+
+function UploadList({ uploads, selectedId }: { uploads: Upload[]; selectedId: string | undefined }) {
+  const retryPdfUpload = useConvexMutation(api.pdfs.retryPdfUpload)
+  const retryMutation = useMutation({ mutationFn: (pdfUploadId: Upload['_id']) => retryPdfUpload({ pdfUploadId }) })
+
+  if (uploads.length === 0) return <p className="m-0 text-sm text-[var(--text-tertiary)]">Aún no hay PDF.</p>
+
+  return (
+    <>
+      <ul className="ruled-list">
+        {uploads.map((upload) => (
+          <li key={upload._id}>
+            <div className={`ruled-row items-start ${upload._id === selectedId ? 'bg-[var(--accent-soft)]' : ''}`}>
+              <div className="ruled-row-main gap-1.5">
+                <span className="truncate text-sm font-semibold">{upload.fileName}</span>
+                <div className="flex flex-wrap gap-1">
+                  <span className={`chip ${upload.status === 'completed' ? 'chip-success' : upload.status === 'failed' ? 'chip-accent' : ''}`}>
+                    {UPLOAD_STATUS_LABEL[upload.status] ?? upload.status}
+                  </span>
+                  {upload.questionCount != null ? <span className="chip tabular-nums">{upload.questionCount} preguntas</span> : null}
+                  {upload.excludedQuestionCount != null && upload.excludedQuestionCount > 0 ? (
+                    <span className="chip chip-accent tabular-nums">{upload.excludedQuestionCount} excluidas</span>
                   ) : null}
                 </div>
-
-                <div className="flex flex-shrink-0 flex-wrap gap-2">
-                  {upload.pdfUrl ? (
-                    <a
-                      href={upload.pdfUrl}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="btn-ghost text-xs no-underline"
-                    >
-                      Open PDF
-                    </a>
-                  ) : null}
-                  {upload.rawQuestionsUrl ? (
-                    <a
-                      href={upload.rawQuestionsUrl}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="btn-ghost text-xs no-underline"
-                    >
-                      Raw JSON
-                    </a>
-                  ) : null}
-                  {upload.questionCount != null && upload.questionCount > 0 ? (
-                    <Link
-                      to="/admin"
-                      search={{
-                        tab: 'questions',
-                        pdfUploadId: upload._id,
-                        sequence: 1,
-                      }}
-                      className="btn-ghost text-xs no-underline"
-                    >
-                      Browse
+                {upload.errorMessage ? <p className="m-0 text-xs font-medium text-[var(--danger-text)]">{upload.errorMessage}</p> : null}
+                <div className="flex flex-wrap gap-1">
+                  {(upload.questionCount ?? 0) > 0 ? (
+                    <Link to="/admin" search={{ tab: 'bank', pdfUploadId: upload._id, sequence: 1 }} className="btn-ghost text-xs no-underline">
+                      Explorar
                     </Link>
                   ) : null}
+                  {upload.pdfUrl ? <a href={upload.pdfUrl} target="_blank" rel="noreferrer" className="btn-ghost text-xs no-underline">Abrir PDF</a> : null}
+                  {upload.rawQuestionsUrl ? <a href={upload.rawQuestionsUrl} target="_blank" rel="noreferrer" className="btn-ghost text-xs no-underline">JSON crudo</a> : null}
                   {upload.status === 'failed' ? (
-                    <button
-                      type="button"
-                      onClick={() => retryMutation.mutate(upload._id)}
-                      disabled={retryMutation.isPending}
-                      className="btn-secondary text-xs"
-                    >
-                      Retry
+                    <button type="button" onClick={() => retryMutation.mutate(upload._id)} disabled={retryMutation.isPending} className="btn-secondary text-xs">
+                      Reintentar
                     </button>
                   ) : null}
                 </div>
               </div>
             </div>
-          ))
-        )}
-      </div>
-    </div>
-  )
-}
-
-/* ─── Questions Tab ─── */
-
-function QuestionsTab({ search }: { search: AdminSearch }) {
-  const { data: uploads } = useSuspenseQuery(pdfUploadsQuery(50))
-  const selectedSequence = search.sequence ?? 1
-  const completedUploads = uploads.filter((u) => u.questionCount != null && u.questionCount > 0)
-  const defaultUploadId = search.pdfUploadId ?? completedUploads[0]?._id
-
-  return (
-    <div className="fade-in">
-      <div className="grid gap-6 lg:grid-cols-[280px_minmax(0,1fr)]">
-        {/* Sidebar: PDF list */}
-        <aside className="space-y-2">
-          <p className="kicker mb-2 px-1">Question sets</p>
-          {completedUploads.length === 0 ? (
-            <div className="card-inset p-4">
-              <p className="text-sm text-[var(--text-tertiary)]">No processed sets yet.</p>
-            </div>
-          ) : (
-            completedUploads.map((upload) => (
-              <Link
-                key={upload._id}
-                to="/admin"
-                search={{
-                  tab: 'questions',
-                  pdfUploadId: upload._id,
-                  sequence: 1,
-                }}
-                className={[
-                  'block rounded-[var(--radius-md)] border px-4 py-3 no-underline transition',
-                  upload._id === defaultUploadId
-                    ? 'border-[var(--border-accent)] bg-[var(--accent-soft)]'
-                    : 'border-[var(--border)] bg-[var(--bg-card)] hover:bg-[var(--bg-card-hover)]',
-                ].join(' ')}
-              >
-                <p className="text-sm font-medium text-[var(--text-primary)]">{upload.fileName}</p>
-                <p className="mt-0.5 text-xs text-[var(--text-tertiary)]">{upload.questionCount} questions</p>
-              </Link>
-            ))
-          )}
-        </aside>
-
-        {/* Main: question viewer */}
-        <section>
-          {defaultUploadId ? (
-            <QuestionViewer pdfUploadId={defaultUploadId} sequence={selectedSequence} />
-          ) : (
-            <div className="card p-6">
-              <p className="text-sm text-[var(--text-tertiary)]">Select a processed PDF to start browsing.</p>
-            </div>
-          )}
-        </section>
-      </div>
-    </div>
+          </li>
+        ))}
+      </ul>
+      {retryMutation.error != null ? (
+        <p role="alert" className="mt-2 text-sm text-[var(--danger-text)]">{readConvexError(retryMutation.error, 'No se pudo reprocesar el PDF.')}</p>
+      ) : null}
+    </>
   )
 }
 
@@ -488,106 +344,57 @@ function QuestionViewer({ pdfUploadId, sequence }: { pdfUploadId: string; sequen
   const browserQuery = useQuery(questionBrowserQuery(pdfUploadId, sequence))
   const browser = browserQuery.data
 
-  if (browserQuery.isPending) {
-    return (
-      <div className="card p-6 text-center">
-        <p className="text-sm text-[var(--text-tertiary)]">Cargando pregunta…</p>
-      </div>
-    )
-  }
+  if (browserQuery.isPending) return <p className="m-0 text-sm text-[var(--text-tertiary)]">Cargando pregunta…</p>
+  if (browser == null || browser.question == null) return <p className="m-0 text-sm text-[var(--text-tertiary)]">No encontramos esa pregunta.</p>
 
-  if (!browser || browser.question == null) {
-    return (
-      <div className="card p-6">
-        <p className="text-sm text-[var(--text-tertiary)]">Question not found.</p>
-      </div>
-    )
-  }
+  const question = browser.question
 
   return (
     <div className="space-y-4">
-      {/* Question header */}
-      <div className="card p-5">
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-          <div>
-            <p className="mb-1 text-sm font-semibold text-[var(--text-primary)]">
-              {browser.upload.fileName}
-            </p>
-            <p className="text-xs text-[var(--text-secondary)]">
-              Question {browser.currentSequence} of {browser.totalQuestions}
-              {' \u00b7 '}
-              Original #{browser.question.questionNumber}
-            </p>
-          </div>
-          <div className="flex gap-2">
-            <Link
-              to="/admin"
-              search={{
-                tab: 'questions',
-                pdfUploadId: browser.upload._id,
-                sequence: Math.max(1, browser.currentSequence - 1),
-              }}
-              className="btn-secondary text-xs no-underline"
-            >
-              Previous
-            </Link>
-            <Link
-              to="/admin"
-              search={{
-                tab: 'questions',
-                pdfUploadId: browser.upload._id,
-                sequence: Math.min(browser.totalQuestions, browser.currentSequence + 1),
-              }}
-              className="btn-primary text-xs no-underline"
-            >
-              Next
-            </Link>
-          </div>
-        </div>
-
-        {/* Status chips */}
-        <div className="mt-3 flex flex-wrap gap-1.5">
-          <span className="chip">
-            eligibility: {browser.question.eligibility ?? 'legacy'}
-          </span>
-          <span className="chip">
-            answer: {browser.question.answerStatus ?? 'legacy'}
-          </span>
-          <span className="chip">
-            taxonomy: {browser.question.taxonomyStatus ?? 'legacy'}
-          </span>
-          {browser.question.subjectId ? (
-            <span className="chip chip-accent">{browser.question.subjectId}</span>
-          ) : null}
-          {browser.question.primarySubtopicId ? (
-            <span className="chip chip-accent">{browser.question.primarySubtopicId}</span>
-          ) : null}
-          {browser.question.answerCorrectOption ? (
-            <span className="chip chip-success">correct: {browser.question.answerCorrectOption}</span>
-          ) : null}
-        </div>
-      </div>
-
-      {/* Question body */}
-      <div className="card p-6">
-        <p className="kicker mb-3">Question body</p>
-        <MarkdownBlock markdown={browser.question.bodyMarkdown} />
-      </div>
-
-      {/* Options */}
-      <div className="space-y-2">
-        {browser.question.options.map((option) => (
-          <div
-            key={option.label}
-            className={`option-card cursor-default ${option.label === browser.question!.answerCorrectOption ? 'is-correct' : ''}`}
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <p className="m-0 text-sm text-[var(--text-secondary)]">
+          <span className="font-semibold text-[var(--text-primary)]">{browser.upload.fileName}</span>
+          {' · '}
+          <span className="tabular-nums">{browser.currentSequence} de {browser.totalQuestions}</span>
+          {' · '}
+          número original <span className="tabular-nums">{question.questionNumber}</span>
+        </p>
+        <div className="flex gap-2">
+          <Link
+            to="/admin"
+            search={{ tab: 'bank', pdfUploadId: browser.upload._id, sequence: Math.max(1, browser.currentSequence - 1) }}
+            className="btn-secondary text-xs no-underline"
           >
+            Anterior
+          </Link>
+          <Link
+            to="/admin"
+            search={{ tab: 'bank', pdfUploadId: browser.upload._id, sequence: Math.min(browser.totalQuestions, browser.currentSequence + 1) }}
+            className="btn-secondary text-xs no-underline"
+          >
+            Siguiente
+          </Link>
+          <Link to="/admin" search={{ tab: 'audit', questionId: question._id }} className="btn-primary text-xs no-underline">
+            Editar en Auditoría
+          </Link>
+        </div>
+      </div>
+
+      <div className="flex flex-wrap gap-1.5">
+        <span className="chip">{ELIGIBILITY_LABEL[question.eligibility ?? ''] ?? 'Sin clasificar'}</span>
+        <span className="chip">Clave: {STATUS_LABEL[question.answerStatus ?? ''] ?? 'sin estado'}</span>
+        <span className="chip">Taxonomía: {STATUS_LABEL[question.taxonomyStatus ?? ''] ?? 'sin estado'}</span>
+        {question.answerCorrectOption ? <span className="chip chip-success">Correcta: {question.answerCorrectOption}</span> : null}
+      </div>
+
+      <MarkdownBlock markdown={question.bodyMarkdown} />
+
+      <div className="space-y-2">
+        {question.options.map((option) => (
+          <div key={option.label} className={`option-card cursor-default ${option.label === question.answerCorrectOption ? 'is-correct' : ''}`}>
             <span className="option-label">{option.label}</span>
             <span className="flex-1">
-              {option.bodyMarkdown ? (
-                <MarkdownBlock markdown={option.bodyMarkdown} />
-              ) : (
-                <span className="text-sm text-[var(--text-tertiary)]">Empty option body.</span>
-              )}
+              {option.bodyMarkdown ? <MarkdownBlock markdown={option.bodyMarkdown} /> : <span className="text-sm text-[var(--text-tertiary)]">Opción vacía.</span>}
             </span>
           </div>
         ))}

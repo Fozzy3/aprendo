@@ -1,14 +1,19 @@
 import { Link, createFileRoute } from '@tanstack/react-router'
-import { ArrowRight } from 'lucide-react'
+import { SESSION_KIND_CONFIG } from '@aprendo/convex/sessionKinds'
+import { ArrowRight, BookOpen, House, Trophy, UserRound, X } from 'lucide-react'
+import type { CSSProperties, ReactNode } from 'react'
 import { Wordmark } from '../components/BrandMark.tsx'
+import { PublicFooter } from '../components/PublicPage.tsx'
 import { ThemeToggle } from '../components/ThemeToggle.tsx'
 import { CONTACT_EMAIL } from '../lib/contact.ts'
 import { useCurrentStudent } from '../lib/student-session.ts'
 import { SITE_URL, publicHead } from '../lib/site.ts'
+import { getSubjectTheme } from '../lib/subject-theme.ts'
+import { belowShareLabel } from '../lib/teacher-display.ts'
 
 export const Route = createFileRoute('/')({
   head: () => {
-    const head = publicHead({"title":"Aprendo: el nivel ICFES de cada estudiante, para colegios","description":"Aprendo es una plataforma de preparación para el Saber 11 del ICFES, para colegios de Colombia: ubica a cada estudiante de grado 11 en los niveles del examen, le arma un plan diario y le muestra al docente quién necesita apoyo y en qué competencia.","path":"/"})
+    const head = publicHead({"title":"Aprendo: preparación Saber 11 para colegios de Colombia","description":"Aprendo mide a cada estudiante de grado 11 en las cinco áreas del Saber 11 y le entrega a su docente el plan concreto de la semana. Para colegios de Colombia.","path":"/"})
     if (SITE_URL == null) return head
     // Organization, not EducationalOrganization: Aprendo makes software, it is not a school.
     const jsonLd = {
@@ -19,11 +24,12 @@ export const Route = createFileRoute('/')({
           '@id': `${SITE_URL}/#org`,
           name: 'Aprendo',
           url: `${SITE_URL}/`,
+          logo: `${SITE_URL}/icon-512.png`,
           description: 'Plataforma de preparación para el examen Saber 11 para colegios de Colombia. No está afiliada al ICFES.',
           areaServed: { '@type': 'Country', name: 'Colombia' },
           ...(CONTACT_EMAIL != null ? { email: CONTACT_EMAIL } : {}),
         },
-        { '@type': 'WebSite', url: `${SITE_URL}/`, name: 'Aprendo', inLanguage: 'es-CO', publisher: { '@id': `${SITE_URL}/#org` } },
+        { '@type': 'WebSite', '@id': `${SITE_URL}/#site`, url: `${SITE_URL}/`, name: 'Aprendo', inLanguage: 'es-CO', publisher: { '@id': `${SITE_URL}/#org` } },
       ],
     }
     return { ...head, scripts: [{ type: 'application/ld+json', children: JSON.stringify(jsonLd) }] }
@@ -31,25 +37,18 @@ export const Route = createFileRoute('/')({
   component: LandingPage,
 })
 
-/** A made-up class, labelled as such: the page shows the instrument, not a claim. */
-const SAMPLE_ROWS = [
-  { name: 'Valentina R.', levels: ['Nivel 3', 'Nivel 2', 'Nivel 3', 'Nivel 2', 'A2'], note: null },
-  { name: 'Santiago M.', levels: ['Nivel 2', 'Nivel 1', '—', 'Nivel 2', 'A1'], note: 'Nivel 1 en Matemáticas' },
-  { name: 'Mariana G.', levels: ['Nivel 4', 'Nivel 3', 'Nivel 3', 'Nivel 3', 'B1'], note: null },
-  { name: 'Juan D. P.', levels: ['—', '—', '—', '—', '—'], note: 'Sin nivelación' },
-]
-const AREAS = ['Lectura', 'Matemáticas', 'Ciencias', 'Sociales', 'Inglés']
+const PLACEMENT_QUESTIONS = SESSION_KIND_CONFIG.nivelacion.totalQuestions
 
 /**
- * The landing, written for the person who decides whether a school buys:
- * what Aprendo measures, what a teacher sees, where the questions come from,
- * how minors' data is handled, and how to get in touch. No prices: there is no
- * price list to show.
+ * The landing, written for the person who decides whether a school buys: what
+ * Aprendo measures, what a teacher gets, how a student studies, where the
+ * questions come from, how minors' data is handled, and how to get in touch.
+ * Everything shown of the product is an interface fragment with made-up data,
+ * labelled as an example: no school, number or result here is a real one.
  */
 function LandingPage() {
   const { session, isReady } = useCurrentStudent()
   const isSignedIn = isReady && session != null
-  const contactHref = CONTACT_EMAIL == null ? null : `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent('Aprendo para mi colegio')}`
 
   return (
     <div className="landing">
@@ -64,73 +63,35 @@ function LandingPage() {
       </header>
 
       <main>
-        <section className="landing-hero">
-          <div>
-            <h1 className="landing-title">El nivel ICFES de cada estudiante, área por área, antes del examen.</h1>
+        <section className="landing-hero fade-in">
+          <h1 className="landing-title">Saber 11: sepa qué enseñar cada semana</h1>
+          <div className="landing-hero-lead">
             <p className="landing-lede">
-              Aprendo es una plataforma de preparación para el Saber 11 del ICFES, para colegios de Colombia.
-              Ubica a sus estudiantes de grado 11 en los niveles del examen, les arma un plan de estudio diario
-              y le muestra a cada docente quién necesita apoyo y en qué competencia.
+              Aprendo mide a cada estudiante de grado 11 en las cinco áreas del examen y le entrega a su
+              docente un plan concreto para la semana. Una plataforma para colegios de Colombia.
             </p>
             <div className="landing-cta">
-              {contactHref != null ? (
-                <a href={contactHref} className="btn-primary no-underline">
-                  Hablar con nosotros
-                  <ArrowRight size={18} aria-hidden />
-                </a>
-              ) : null}
+              <ContactCta label="Hablar con nosotros" />
               <Link to={isSignedIn ? '/app' : '/login'} className="btn-secondary no-underline">
                 {isSignedIn ? 'Continuar donde iba' : 'Soy estudiante: entrar'}
               </Link>
             </div>
           </div>
-
-          <figure className="landing-artifact sheet">
-            <div className="landing-artifact-head">
-              <p className="landing-artifact-title">11A · Nivel por área</p>
-              <span className="text-xs text-[var(--text-tertiary)]">Panel docente</span>
-            </div>
-            {/* On a phone the sample scrolls sideways instead of wrapping "Nivel 3". */}
-            <div className="overflow-x-auto">
-            <table className="data-table landing-sample">
-              <thead>
-                <tr>
-                  <th scope="col">Estudiante</th>
-                  {AREAS.map((area) => (
-                    <th key={area} scope="col">{area}</th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {SAMPLE_ROWS.map((row) => (
-                  <tr key={row.name}>
-                    <th scope="row">
-                      {row.name}
-                      {row.note != null ? <span className="cell-note margin-note">{row.note}</span> : null}
-                    </th>
-                    {row.levels.map((level, index) => (
-                      <td key={AREAS[index]} className={level === 'Nivel 1' ? 'is-low' : undefined}>
-                        {level}
-                      </td>
-                    ))}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-            </div>
-            <figcaption>Ejemplo con estudiantes ficticios. «—» quiere decir que aún no hay respuestas suficientes para dar un nivel.</figcaption>
-          </figure>
+          <ClassReportFragment />
         </section>
 
         <section className="landing-section" aria-labelledby="measures-title">
           <h2 id="measures-title" className="landing-h2">Qué mide, y con cuánta evidencia</h2>
+          <p className="landing-copy">
+            Son estimaciones hechas con las respuestas en Aprendo, no resultados oficiales. Cuando no hay
+            evidencia suficiente, no aparece un número.
+          </p>
           <dl className="landing-terms">
             <div>
               <dt>Nivelación por área</dt>
               <dd>
-                Quince preguntas sin ayuda ubican al estudiante en los mismos cuatro niveles de desempeño
-                que reporta el ICFES (Pre A1 a B1 en inglés). Sin un mínimo de respuestas no se afirma
-                ningún nivel.
+                {PLACEMENT_QUESTIONS} preguntas sin ayuda ubican al estudiante en los niveles de desempeño que
+                reporta el ICFES. Sin un mínimo de respuestas no se afirma ningún nivel.
               </dd>
             </div>
             <div>
@@ -157,69 +118,372 @@ function LandingPage() {
           </dl>
         </section>
 
-        <section className="landing-section landing-split" aria-labelledby="teacher-title">
+        <section className="landing-band" aria-labelledby="student-title">
+          <div className="landing-band-inner">
+            <div>
+              <h2 id="student-title" className="landing-h2">Se estudia respondiendo, no leyendo respuestas</h2>
+              <p className="landing-copy">
+                Cuando un estudiante se equivoca, Aprendo no le muestra la respuesta: le pregunta qué lo llevó
+                a esa opción y lo guía con otra pregunta hasta que la encuentre. La respuesta llega después del
+                intento, no antes.
+              </p>
+              <p className="landing-copy">
+                Cada tema que domina es una lámina de su álbum. Las láminas cuentan dominio; los puntos y la
+                racha cuentan esfuerzo. Nada de eso cambia su nivel.
+              </p>
+            </div>
+            <figure className="ui-figure">
+              <div className="ui-phones">
+                <AlbumFragment />
+                <GuidedFragment />
+              </div>
+              <figcaption>Ejemplo de la aplicación del estudiante en un teléfono, con datos ficticios.</figcaption>
+            </figure>
+          </div>
+        </section>
+
+        <section className="landing-section landing-teacher" aria-labelledby="teacher-title">
           <div>
-            <h2 id="teacher-title" className="landing-h2">Lo que ve el docente</h2>
+            <h2 id="teacher-title" className="landing-h2">Lo que recibe el docente</h2>
+            <dl className="landing-terms">
+              <div>
+                <dt>Plan de la semana</dt>
+                <dd>
+                  Qué enseñar a todo el curso, qué grupos pequeños armar, con quién hablar uno a uno y qué
+                  preguntas falla más el curso. Asigna práctica al curso o a un grupo con un clic y ve quién la
+                  hizo.
+                </dd>
+              </div>
+              <div>
+                <dt>Prueba periódica del colegio</dt>
+                <dd>
+                  El colegio programa sus rondas: la misma forma para cada grado, sellada hasta que cierra, con
+                  resultados por curso y por área.
+                </dd>
+              </div>
+              <div>
+                <dt>Plan de mejora</dt>
+                <dd>
+                  Con los resultados de una ronda, el docente genera un plan con una acción por cada tema débil.
+                  En el ciclo siguiente ve cuántos siguen por debajo de Familiar, y la próxima ronda muestra el
+                  después.
+                </dd>
+              </div>
+            </dl>
+            <h3 className="landing-h3">Y lo que no puede hacer</h3>
             <p className="landing-copy">
-              Cada curso tiene su código. Los estudiantes se unen con él y el docente ve, sin hacer nada más,
-              qué enseñar esta semana a todo el curso, qué grupos pequeños armar, con quién hablar uno a uno,
-              las preguntas que más falla el grupo y su desempeño por competencia ICFES. Puede asignar práctica
-              al curso o a un grupo y ver quién la hizo.
+              Responder por un estudiante, calificarlo o ver sus respuestas en vivo. El docente asigna práctica;
+              solo el estudiante practica y presenta sus simulacros. Así el nivel que aparece en el panel es del
+              estudiante.
             </p>
           </div>
-          <div>
-            <h2 className="landing-h2">Y lo que no puede hacer</h2>
-            <p className="landing-copy">
-              Responder por un estudiante, calificarlo o ver sus respuestas en vivo. El docente asigna
-              práctica; solo el estudiante practica y presenta sus simulacros. Así el nivel que aparece en el
-              panel es del estudiante.
-            </p>
-          </div>
+          <CycleFragment />
         </section>
 
         <section className="landing-section landing-split" aria-labelledby="source-title">
           <div>
             <h2 id="source-title" className="landing-h2">De dónde salen las preguntas</h2>
             <p className="landing-copy">
-              De los cuadernillos que el ICFES ha publicado, sin modificarlas y con su fuente. Cada pregunta
-              pasa un control de su clave, su área y su tema antes de usarse, y los estudiantes pueden
-              reportar la que esté mal. Estamos
-              construyendo un banco propio de Aprendo con el mismo proceso de verificación.
+              Un colegio con licencia trabaja solo con el banco original de Aprendo: preguntas escritas por
+              Aprendo con inteligencia artificial, y cada una dice de dónde viene. Ninguna entra a una sesión
+              sin clave, área y tema, y los estudiantes pueden reportar la que esté mal. Aún no llevan la
+              firma de un docente de área.
+            </p>
+            <p className="landing-copy">
+              Quienes no están en un colegio con licencia también pueden practicar con cuadernillos que el ICFES
+              publicó, sin modificarlos y con su fuente. Esas preguntas no hacen parte de lo que un colegio paga.
             </p>
           </div>
           <div>
             <h2 className="landing-h2">Datos de menores de edad</h2>
             <p className="landing-copy">
-              Cada estudiante es dueño de su cuenta. El colegio ve su nivel mientras esté en un curso, y si
-              la cuenta se elimina se borra todo lo que el estudiante produjo, como pide la Ley 1581 de 2012.
-              Detalles en la <Link to="/privacidad">política de tratamiento de datos</Link>.
+              Cada estudiante es dueño de su cuenta. El colegio ve su nivel y su actividad mientras esté en un
+              curso. La liga está apagada hasta que el colegio la activa, y en ella solo aparecen apodo y avatar,
+              nunca el nombre, y nunca frente al docente.
+            </p>
+            <p className="landing-copy">
+              El estudiante puede descargar sus datos o eliminar su cuenta cuando quiera. No vendemos datos ni
+              los usamos para publicidad. Detalles en la{' '}
+              <Link to="/privacidad">política de tratamiento de datos</Link>.
             </p>
           </div>
         </section>
 
-        {contactHref != null ? (
-          <section className="landing-section" aria-labelledby="contact-title">
+        <section className="landing-contact" aria-labelledby="contact-title">
+          <div className="landing-contact-inner">
             <h2 id="contact-title" className="landing-h2">Llevar Aprendo a su colegio</h2>
             <p className="landing-copy">
-              Escríbanos con el nombre del colegio y cuántos estudiantes de grado 11 tienen. Le respondemos con
-              una propuesta para su colegio.
+              {CONTACT_EMAIL != null
+                ? 'Escríbanos con el nombre del colegio y cuántos estudiantes de grado 11 tienen. Le respondemos con una propuesta para su colegio.'
+                : 'Cree una cuenta y presente una nivelación como lo haría un estudiante.'}
             </p>
             <div className="landing-cta">
-              <a href={contactHref} className="btn-primary no-underline">
-                {CONTACT_EMAIL}
-              </a>
+              <ContactCta label={CONTACT_EMAIL ?? ''} />
             </div>
-          </section>
-        ) : null}
+          </div>
+        </section>
       </main>
 
-      <footer className="landing-footer">
-        <span>Aprendo · preparación para el Saber 11. No estamos afiliados al ICFES.</span>
-        <nav aria-label="Legal">
-          <Link to="/terminos">Términos</Link>
-          <Link to="/privacidad">Tratamiento de datos</Link>
-        </nav>
-      </footer>
+      <PublicFooter />
+    </div>
+  )
+}
+
+/** A rector can always act: with no inbox configured, the CTA opens a trial account. */
+function ContactCta({ label }: { label: string }) {
+  if (CONTACT_EMAIL == null) {
+    return (
+      <Link to="/login" search={{ modo: 'registro' }} className="btn-primary no-underline">
+        Crear una cuenta de prueba
+        <ArrowRight size={18} aria-hidden />
+      </Link>
+    )
+  }
+  return (
+    <a href={`mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent('Aprendo para mi colegio')}`} className="btn-primary no-underline">
+      {label}
+      <ArrowRight size={18} aria-hidden />
+    </a>
+  )
+}
+
+const LEVEL_NAMES = ['Nivel 1', 'Nivel 2', 'Nivel 3', 'Nivel 4']
+
+const EXAMPLE_CLASS = [
+  { subjectId: 'lectura_critica', levels: [3, 11, 13, 3], none: 2, average: 61 },
+  { subjectId: 'matematicas', levels: [9, 12, 7, 1], none: 3, average: 52 },
+  { subjectId: 'ciencias_naturales', levels: [5, 14, 9, 1], none: 3, average: 57 },
+  { subjectId: 'sociales_ciudadanas', levels: [4, 13, 10, 2], none: 3, average: 59 },
+  { subjectId: 'ingles', levels: [6, 12, 9, 2], none: 3, average: 55 },
+]
+
+/** The class report of the teacher panel (`teacher.$classGroupId.tsx`), same classes, example data. */
+function ClassReportFragment() {
+  return (
+    <figure className="ui-figure">
+      <div
+        data-ui
+        role="img"
+        aria-label="Ejemplo del informe de un curso: los estudiantes por nivel en cada área y el tema que se debe enseñar esta semana."
+        className="ruled-page ui-report"
+      >
+        <div className="ruled-page-margin">
+          <p className="ruled-page-date">Colegio de ejemplo</p>
+          <dl className="margin-facts">
+            <div>
+              <dt>Estudiantes</dt>
+              <dd>32</dd>
+            </div>
+            <div>
+              <dt>Necesitan atención</dt>
+              <dd>7</dd>
+            </div>
+          </dl>
+        </div>
+        <div className="ruled-page-body">
+          <div className="ruled-page-head">
+            <p className="page-title">11A</p>
+            <p className="page-lede">Grado 11</p>
+          </div>
+          <div className="ruled-section">
+            <p className="section-title">El curso por área</p>
+            <ul className="area-chart-rows">
+              {EXAMPLE_CLASS.map((row) => {
+                const theme = getSubjectTheme(row.subjectId)
+                return (
+                  <li key={row.subjectId} className="area-chart-row" style={{ '--subject-color': theme.color } as CSSProperties}>
+                    <span className="area-chart-label">
+                      <span className="subject-dot" />
+                      {theme.label}
+                    </span>
+                    <span className="level-stack">
+                      {row.levels.map((count, index) => (
+                        <span key={LEVEL_NAMES[index]} className={`level-stack-segment level-${index + 1}`} style={{ flexGrow: count }}>
+                          {count}
+                        </span>
+                      ))}
+                      <span className="level-stack-segment level-none" style={{ flexGrow: row.none }}>
+                        {row.none}
+                      </span>
+                    </span>
+                    <span className="area-chart-level">
+                      <strong>{row.average}</strong>
+                      <span className="area-chart-score">promedio</span>
+                    </span>
+                  </li>
+                )
+              })}
+            </ul>
+            <p className="area-chart-legend">
+              {LEVEL_NAMES.map((name, index) => (
+                <span key={name} className="inline-flex items-center gap-1.5">
+                  <span className={`level-swatch level-${index + 1}`} />
+                  {name}
+                </span>
+              ))}
+              <span className="inline-flex items-center gap-1.5">
+                <span className="level-swatch level-none" />
+                sin nivel aún
+              </span>
+            </p>
+          </div>
+          <div className="ruled-section">
+            <p className="section-title">Esta semana con todo el curso</p>
+            <div className="ruled-row">
+              <span className="ruled-row-main">
+                <span className="flex items-center gap-2 font-semibold">
+                  <span className="subject-dot" style={{ '--subject-color': getSubjectTheme('matematicas').color } as CSSProperties} />
+                  Razones, proporciones y porcentajes
+                </span>
+                <span className="ruled-row-note">
+                  18 de 29 (62%) están por debajo de Familiar. Clase corta de 15–20 min y una votación en parejas.
+                </span>
+                <span className="mt-2 flex flex-wrap gap-2">
+                  <span className="btn-secondary btn-sm">Asignar práctica al curso</span>
+                  <span className="btn-ghost btn-sm">Guía de clase</span>
+                </span>
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <figcaption>Ejemplo del panel docente, con un curso ficticio. Sin evidencia suficiente, un estudiante queda «sin nivel aún».</figcaption>
+    </figure>
+  )
+}
+
+const EXAMPLE_CYCLE = [
+  { topic: 'Razones, proporciones y porcentajes', tier: 'Todo el curso', before: { belowCount: 18, evidencedCount: 29 }, after: { belowCount: 9, evidencedCount: 29 } },
+  { topic: 'Hechos y detalles explícitos', tier: 'Grupo', before: { belowCount: 6, evidencedCount: 8 }, after: { belowCount: 3, evidencedCount: 8 } },
+  { topic: 'Ecuaciones e inecuaciones', tier: 'Grupo', before: { belowCount: 5, evidencedCount: 7 }, after: { belowCount: 5, evidencedCount: 7 } },
+]
+
+/** The before-and-after table of the teaching cycle (`ClassCycle.tsx`), example data. */
+function CycleFragment() {
+  return (
+    <figure className="ui-figure ui-cycle">
+      <div data-ui className="page-sheet">
+        <p className="section-title">Ciclo de enseñanza</p>
+        <p className="text-sm text-[var(--text-secondary)]">Terminó el 24 oct. Así cambió el curso:</p>
+        <div className="overflow-x-auto">
+          <table className="data-table">
+            <thead>
+              <tr>
+                <th>Tema</th>
+                <th>Para</th>
+                <th className="is-number">Al empezar</th>
+                <th className="is-number">Hoy</th>
+              </tr>
+            </thead>
+            <tbody>
+              {EXAMPLE_CYCLE.map((row) => (
+                <tr key={row.topic}>
+                  <td>{row.topic}</td>
+                  <td>{row.tier}</td>
+                  <td className="is-number">{belowShareLabel(row.before)}</td>
+                  <td className="is-number">{belowShareLabel(row.after)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <figcaption>Ejemplo con datos ficticios: cuántos estudiantes estaban por debajo de Familiar al empezar y hoy.</figcaption>
+    </figure>
+  )
+}
+
+/** The sticker glyphs of `.impeccable/mocks/decision/album.html`. */
+const GLYPHS: Record<string, ReactNode> = {
+  frac: <path fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" d="M5 12h14M12 5v.01M12 19v.01" />,
+  tri: <path fill="currentColor" d="M12 4 22 20H2z" />,
+  sq: <rect x="4" y="4" width="16" height="16" rx="2" fill="currentColor" />,
+  pi: <path fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" d="M4 8c2-2 4-2 8-2h8M9 6c0 5-1 10-3 13M16 6c-1 6-1 13 3 13" />,
+}
+
+const STICKERS = [
+  { n: 1, tone: 'c1', glyph: 'frac' },
+  { n: 2, tone: 'c3', glyph: 'tri' },
+  { n: 3, tone: 'c2', glyph: 'sq' },
+  { n: 4, tone: 'c4', glyph: 'pi' },
+  { n: 5, tone: 'c3', glyph: 'sq' },
+  { n: 6, tone: 'next', glyph: 'frac' },
+  { n: 7, tone: 'e', glyph: null },
+  { n: 8, tone: 'e', glyph: null },
+]
+
+function Glyph({ name }: { name: string }) {
+  return <svg viewBox="0 0 24 24">{GLYPHS[name]}</svg>
+}
+
+/** The student's Hoy, composed like the Álbum mock, for the one area with 8 topics. */
+function AlbumFragment() {
+  return (
+    <div data-ui role="img" aria-label="Ejemplo de la pantalla Hoy: álbum de Matemáticas con 5 de 8 láminas y un botón para la que falta." className="ui-phone">
+      <div className="ui-album-page">
+        <p className="ui-album-name">Matemáticas</p>
+        <p className="ui-album-count">5 de 8 láminas · racha de 6 días</p>
+        <div className="ui-album-grid">
+          {STICKERS.map((sticker) => (
+            <div key={sticker.n} className={`ui-sticker ${sticker.tone}`}>
+              {sticker.n}
+              {sticker.glyph != null ? <Glyph name={sticker.glyph} /> : null}
+            </div>
+          ))}
+        </div>
+        <div className="ui-album-go">
+          Te falta Geometría plana
+          <small>Consíguela · 5 preguntas · 5 min</small>
+        </div>
+      </div>
+      <div className="ui-album-task">
+        <b>Tiquete de lectura</b>
+        <span>De tu profe · vence mañana</span>
+      </div>
+      <div className="ui-album-tabs">
+        <span className="is-active"><House aria-hidden />Hoy</span>
+        <span><BookOpen aria-hidden />Aprende</span>
+        <span><Trophy aria-hidden />Retos</span>
+        <span><UserRound aria-hidden />Yo</span>
+      </div>
+    </div>
+  )
+}
+
+/** A wrong answer opens a question: "Todavía no", then why it was chosen. */
+function GuidedFragment() {
+  return (
+    <div
+      data-ui
+      role="img"
+      aria-label="Ejemplo de una pregunta respondida mal: la aplicación dice «Todavía no» y pregunta qué hizo elegir esa opción."
+      className="ui-phone"
+    >
+      <div className="ui-guide-bar">
+        <X aria-hidden />
+        <span className="ui-guide-beads">
+          <i className="done" />
+          <i className="done" />
+          <i className="current" />
+          <i />
+          <i />
+        </span>
+        <span className="ui-guide-slot">6</span>
+      </div>
+      <div className="ui-guide-sheet">
+        <p className="ui-guide-q">Una receta usa 3 tazas de harina por cada 2 de azúcar. Con 12 tazas de harina, ¿cuántas de azúcar necesitas?</p>
+        <div className="ui-guide-opt"><em>A</em>6</div>
+        <div className="ui-guide-opt"><em>B</em>8</div>
+        <div className="ui-guide-opt is-wrong"><em>C</em>11<X aria-hidden /></div>
+        <div className="ui-guide-opt"><em>D</em>18</div>
+      </div>
+      <div className="ui-guide-ask">
+        <p>Todavía no</p>
+        <div className="ui-guide-title">¿Qué te hizo elegir la C?</div>
+        <span className="ui-guide-chip">Le sumé 9 a las dos cantidades</span>
+        <span className="ui-guide-chip">Hice otra cuenta y me dio 11</span>
+        <span className="ui-guide-chip">La adiviné</span>
+      </div>
     </div>
   )
 }

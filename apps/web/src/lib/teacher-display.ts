@@ -45,3 +45,29 @@ export function belowShareLabel(count: { belowCount: number; evidencedCount: num
   if (count.evidencedCount === 0) return 'sin evidencia'
   return `${count.belowCount} de ${count.evidencedCount} (${Math.round((count.belowCount / count.evidencedCount) * 100)}%)`
 }
+
+function listWithAnd(items: string[]) {
+  if (items.length < 2) return items.join('')
+  return `${items.slice(0, -1).join(', ')} y ${items[items.length - 1]}`
+}
+
+/**
+ * The weekly note for the class's WhatsApp group (F69): the same words for
+ * every family, about the class and never about a child. Nothing is stored.
+ */
+export function familyWeeklyMessage(input: { className: string; topics: string[] }): string {
+  const focus = input.topics.length > 0
+    ? `Esta semana en clase reforzamos ${listWithAnd(input.topics)}.`
+    : 'Esta semana seguimos preparando las cinco áreas del Saber 11.'
+  return `Buen día, familias de ${input.className}. ${focus} Les pedimos su apoyo para que practiquen en Aprendo 20 minutos, tres días de esta semana, y les pregunten qué aprendieron. ¡Gracias por acompañarlos!`
+}
+
+/** Below this many guided paths a share would be noise. */
+const MIN_GUIDED_PATHS = 5
+
+/** How many guided paths ended with the answer shown (F56); null without enough of them. */
+export function guidedShareLabel(signal: { guidedCount: number; revealedCount: number }): string | null {
+  if (signal.guidedCount < MIN_GUIDED_PATHS) return null
+  const percent = Math.round((signal.revealedCount / signal.guidedCount) * 100)
+  return `${signal.revealedCount} de ${signal.guidedCount} caminos guiados (${percent}%) necesitaron que se les mostrara la respuesta`
+}

@@ -1,10 +1,11 @@
 import { useConvexMutation } from '@convex-dev/react-query'
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { Link, useNavigate } from '@tanstack/react-router'
-import { BookOpen, Play } from 'lucide-react'
+import { Play } from 'lucide-react'
 import { useState, type CSSProperties } from 'react'
 import { api } from '@aprendo/convex/api'
 import type { MasteryLevel } from '@aprendo/convex/mastery'
+import { SESSION_KIND_CONFIG, getConfiguredQuestionCount } from '@aprendo/convex/sessionKinds'
 import { learningPathQuery, pathSubjectsQuery, studentProgressQuery, todayDashboardQuery } from '../lib/student-queries.ts'
 import { getSubjectTheme } from '../lib/subject-theme.ts'
 import { focusSubjectId } from '../lib/progress-display.ts'
@@ -21,120 +22,134 @@ import { PageLoader } from './FullScreenLoader.tsx'
 import { MasteryBadge, MasteryLegend } from './MasteryBadge.tsx'
 
 const DEFAULT_SUBJECT_ID = 'lectura_critica'
+const TOPIC_QUESTIONS = getConfiguredQuestionCount(SESSION_KIND_CONFIG.topic)
 
 type PathNode = {
   subtopicId: string
   label: string
+  categoryId: string
   categoryLabel: string
   questionCount: number
   hasLesson: boolean
   level: MasteryLevel
 }
 
+/**
+ * Aprende: one full field of the area's colour, the one topic to do next, and
+ * below it every topic of the area as a numbered sticker slot (the temario
+ * lives here now). Everything that needs a sentence waits behind "Ver más".
+ */
 export function LearningPathPage({ studentId }: { studentId: string }) {
+  const navigate = useNavigate()
   const [pickedSubjectId, setSubjectId] = useState<string | null>(null)
   const progress = useQuery(studentProgressQuery(studentId))
-  // The plan's picks are the one compass (F33): Ruta opens on their area and marks them.
+  // The plan's picks are the one compass (F33): Aprende opens on their area and marks them.
   const today = useQuery(todayDashboardQuery(studentId))
   const nextSubtopics = today.data?.plan.nextSubtopics ?? []
   const subjectId = pickedSubjectId ?? focusSubjectId(nextSubtopics, progress.data?.subjectAggregates ?? []) ?? DEFAULT_SUBJECT_ID
   const subjects = useQuery(pathSubjectsQuery(studentId))
   const path = useQuery(learningPathQuery(studentId, subjectId))
 
+  const createSession = useConvexMutation(api.sessions.createSession)
+  const startTopic = useMutation({
+    mutationFn: (subtopicId: string) =>
+      createSession({ studentId: studentId as never, kind: 'topic', subjectId, subtopicId }),
+    onSuccess: (sessionId: string) => navigate({ to: '/practice/$sessionId', params: { sessionId } }),
+  })
+
   const theme = getSubjectTheme(subjectId)
   const nodes =
     path.data == null || progress.data == null
       ? null
       : withLevels(path.data.nodes, progress.data.subtopicMastery)
+  const states = nodes == null ? [] : resolvePathStates(nodes, nextSubtopics.map((item) => item.subtopicId))
   const mastery = nodes == null ? null : scopeMastery(nodes)
+  const nextTopic = nodes?.[states.indexOf('current')] ?? null
+  const placement = path.data?.level.hasEnoughEvidence === true ? path.data.level.placement : null
 
   return (
-    <div className="ruled-page fade-in" style={{ '--subject-color': theme.color } as CSSProperties}>
-      {/* The margin: the area this page is about and how far along it is. */}
-      <aside className="ruled-page-margin" aria-label="Tu área">
-        <p className="ruled-page-date inline-flex items-center gap-2">
-          <span aria-hidden className="subject-dot" style={{ '--subject-color': theme.color } as CSSProperties} />
-          {theme.label}
-        </p>
+    <div className="aprende fade-in">
+      <nav className="aprende-areas" aria-label="Área">
+        {(subjects.data ?? []).map((subject) => (
+          <button
+            key={subject.subjectId}
+            type="button"
+            className="aprende-area"
+            aria-pressed={subject.subjectId === subjectId}
+            style={{ '--field': getSubjectTheme(subject.subjectId).color } as CSSProperties}
+            onClick={() => setSubjectId(subject.subjectId)}
+          >
+            {subject.label}
+          </button>
+        ))}
+      </nav>
+
+      <section className="aprende-field" aria-labelledby="aprende-title" style={{ '--field': theme.color } as CSSProperties}>
+        <h1 id="aprende-title" className="aprende-name">{theme.label}</h1>
         {mastery != null ? (
-          <dl className="margin-facts">
-            <div>
-              <dt>Dominio del área</dt>
-              <dd>{mastery.percent}%</dd>
-            </div>
-            <div>
-              <dt>Competente o más</dt>
-              <dd>
-                {mastery.competenteOrAbove} de {mastery.subtopicCount}
-              </dd>
-            </div>
-          </dl>
+          <p className="aprende-count">
+            {mastery.competenteOrAbove} de {mastery.subtopicCount} láminas
+            {placement != null ? ` · ${placement.band.labelEs}` : ''}
+          </p>
         ) : null}
-        <Link to="/syllabus" className="margin-link">
-          Ver todo el temario
-        </Link>
-      </aside>
 
-      <div className="ruled-page-body">
-        <header className="ruled-page-head">
-          <h1 className="page-title">Ruta de aprendizaje</h1>
-          <p className="page-lede">Un tema a la vez, en orden, hasta tu siguiente nivel.</p>
-        </header>
+        {nextTopic != null ? (
+          <button
+            type="button"
+            className="btn-primary aprende-go"
+            disabled={startTopic.isPending}
+            onClick={() => startTopic.mutate(nextTopic.subtopicId)}
+          >
+            <span>{startTopic.isPending && startTopic.variables === nextTopic.subtopicId ? 'Preparando…' : `Practicar ${nextTopic.label}`}</span>
+            <small>{TOPIC_QUESTIONS} preguntas</small>
+          </button>
+        ) : null}
 
-        <div className="tab-scroll mb-2">
-          <nav className="tab-nav" aria-label="Área">
-            {(subjects.data ?? []).map((subject) => {
-              const isActive = subject.subjectId === subjectId
-              return (
-                <button
-                  key={subject.subjectId}
-                  type="button"
-                  onClick={() => setSubjectId(subject.subjectId)}
-                  aria-pressed={isActive}
-                  className={`tab-item shrink-0 whitespace-nowrap ${isActive ? 'is-active' : ''}`}
-                >
-                  <span
-                    aria-hidden
-                    className="subject-dot"
-                    style={{ '--subject-color': getSubjectTheme(subject.subjectId).color } as CSSProperties}
-                  />
-                  {subject.label}
-                </button>
-              )
-            })}
-          </nav>
-        </div>
+        {path.data != null ? (
+          <details className="aprende-more">
+            <summary>Ver más</summary>
+            <div className="aprende-more-body">
+              <LevelNote level={path.data.level} />
+              <MasteryLegend />
+            </div>
+          </details>
+        ) : null}
+      </section>
 
-        {path.data == null || nodes == null || mastery == null ? (
-          <PageLoader message="Cargando la ruta…" />
-        ) : (
-          <>
-            <LevelSection level={path.data.level} />
-            <section className="ruled-section" aria-labelledby="path-topics-title">
-              <div className="section-head">
-                <h2 id="path-topics-title" className="section-title">Temas, en orden</h2>
-                {nodes.length > 0 ? (
-                  <span className="section-meta tabular-nums">
-                    {mastery.points} / {mastery.maxPoints} pts
-                  </span>
-                ) : null}
-              </div>
-              {nodes.length === 0 ? (
-                <EmptyState title="Esta área aún no tiene temas">
-                  Todavía no hay preguntas cargadas para esta materia. Prueba con otra mientras tanto.
-                </EmptyState>
-              ) : (
-                <>
-                  <PathLines nodes={nodes} studentId={studentId} recommendedIds={nextSubtopics.map((item) => item.subtopicId)} />
-                  <div className="mt-5">
-                    <MasteryLegend />
-                  </div>
-                </>
-              )}
-            </section>
-          </>
-        )}
-      </div>
+      {startTopic.error ? (
+        <p role="alert" className="notice is-danger">
+          {readConvexError(startTopic.error, 'No se pudo iniciar la práctica.')}
+        </p>
+      ) : null}
+
+      {nodes == null ? (
+        <PageLoader message="Cargando tus temas…" />
+      ) : nodes.length === 0 ? (
+        <EmptyState title="Esta área aún no tiene temas">Prueba con otra mientras tanto.</EmptyState>
+      ) : (
+        <section className="aprende-topics" aria-label="Temas" style={{ '--field': theme.color } as CSSProperties}>
+          {byCategory(nodes).map((group) => (
+            <div key={group.categoryId}>
+              <h2 className="aprende-category">{group.categoryLabel}</h2>
+              <ol className="aprende-list">
+                {group.nodes.map((node) => {
+                  const index = nodes.indexOf(node)
+                  return (
+                    <TopicRow
+                      key={node.subtopicId}
+                      node={node}
+                      number={index + 1}
+                      state={states[index] ?? 'available'}
+                      disabled={startTopic.isPending}
+                      onPractice={() => startTopic.mutate(node.subtopicId)}
+                    />
+                  )
+                })}
+              </ol>
+            </div>
+          ))}
+        </section>
+      )}
     </div>
   )
 }
@@ -147,160 +162,80 @@ function withLevels(
   return nodes.map((node) => ({ ...node, level: levelFor(levels, node.subtopicId) }))
 }
 
+function byCategory(nodes: PathNode[]) {
+  const groups: { categoryId: string; categoryLabel: string; nodes: PathNode[] }[] = []
+  for (const node of nodes) {
+    const last = groups.at(-1)
+    if (last?.categoryId === node.categoryId) last.nodes.push(node)
+    else groups.push({ categoryId: node.categoryId, categoryLabel: node.categoryLabel, nodes: [node] })
+  }
+  return groups
+}
+
 type SubjectLevel = {
   hasEnoughEvidence: boolean
   attemptsNeeded: number
-  score: number | null
   placement: {
     band: { labelEs: string; descriptorEs: string }
-    index: number
-    bandCount: number
     nextBand: { labelEs: string } | null
     pointsToNextBand: number | null
   } | null
 }
 
-function LevelSection({ level }: { level: SubjectLevel }) {
+function LevelNote({ level }: { level: SubjectLevel }) {
   const placement = level.hasEnoughEvidence ? level.placement : null
+  if (placement == null) {
+    return <p>Te faltan {level.attemptsNeeded} preguntas en esta área para calcular tu nivel ICFES.</p>
+  }
   return (
-    <section className="ruled-section" aria-labelledby="path-level-title">
-      <h2 id="path-level-title" className="section-title">Tu nivel ICFES</h2>
-      {placement == null ? (
-        <>
-          <p className="empty-state-title m-0">Sin nivel aún</p>
-          <p className="mt-1 max-w-[60ch] text-sm text-[var(--text-secondary)]">
-            Te faltan {level.attemptsNeeded} preguntas en esta área para calcular tu nivel ICFES con
-            confianza. Haz la nivelación o practica un poco más.
-          </p>
-        </>
-      ) : (
-        <>
-          <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
-            <p className="figure m-0">
-              {placement.band.labelEs}
-            </p>
-            {placement.nextBand != null && placement.pointsToNextBand != null ? (
-              <p className="m-0 text-sm text-[var(--text-secondary)]">
-                Te faltan <strong className="text-[var(--text-primary)]">{placement.pointsToNextBand} puntos</strong>{' '}
-                para {placement.nextBand.labelEs}
-              </p>
-            ) : (
-              <p className="m-0 text-sm text-[var(--text-secondary)]">Estás en el nivel más alto de esta área</p>
-            )}
-          </div>
-          <div
-            className="mt-3 flex gap-px"
-            role="img"
-            aria-label={`Nivel ${placement.index} de ${placement.bandCount}`}
-          >
-            {Array.from({ length: placement.bandCount }, (_, position) => (
-              <span
-                key={position}
-                className="h-1.5 flex-1"
-                style={{ background: position < placement.index ? 'var(--subject-color, var(--text-primary))' : 'var(--bg-inset)' }}
-              />
-            ))}
-          </div>
-          <p className="mt-3 max-w-[60ch] text-sm text-[var(--text-secondary)]">{placement.band.descriptorEs}</p>
-        </>
-      )}
-    </section>
+    <p>
+      {placement.band.descriptorEs}
+      {placement.nextBand != null && placement.pointsToNextBand != null
+        ? ` Te faltan ${placement.pointsToNextBand} puntos para ${placement.nextBand.labelEs}.`
+        : ' Estás en el nivel más alto de esta área.'}
+    </p>
   )
 }
 
-/** The path as numbered lines: the line you are on is inked, the rest wait. */
-function PathLines({ nodes, studentId, recommendedIds }: { nodes: PathNode[]; studentId: string; recommendedIds: string[] }) {
-  const states = resolvePathStates(nodes, recommendedIds)
-  return (
-    <ol className="plan-lines">
-      {nodes.map((node, index) => (
-        <PathLine
-          key={node.subtopicId}
-          node={node}
-          number={index + 1}
-          state={states[index] ?? 'available'}
-          studentId={studentId}
-        />
-      ))}
-    </ol>
-  )
-}
-
-function PathLine({
+/** A numbered slot: a sticker once earned (competente up), shiny at dominado. */
+function TopicRow({
   node,
   number,
   state,
-  studentId,
+  disabled,
+  onPractice,
 }: {
   node: PathNode
   number: number
   state: PathState
-  studentId: string
+  disabled: boolean
+  onPractice: () => void
 }) {
-  const navigate = useNavigate()
-  const createSession = useMutation({
-    mutationFn: useConvexMutation(api.sessions.createSession),
-    onSuccess: (sessionId: string) => {
-      void navigate({ to: '/practice/$sessionId', params: { sessionId } })
-    },
-  })
-
-  const isCurrent = state === 'current'
-  const hasQuestions = node.questionCount > 0
-  const isMuted = state === 'empty'
-
   return (
-    <li className={`plan-line path-line${isCurrent ? ' is-first' : ''}`} aria-current={isCurrent ? 'step' : undefined}>
-      <span className="plan-line-number" aria-hidden>
+    <li
+      className={`aprende-topic is-${state}${node.level === 'dominado' ? ' is-shiny' : ''}`}
+      aria-current={state === 'current' ? 'step' : undefined}
+    >
+      <span className="aprende-slot" aria-hidden>
         {number}
       </span>
-      <div className="flex min-w-0 flex-col gap-1 py-3">
-        <span className="text-xs text-[var(--text-tertiary)]">{node.categoryLabel}</span>
-        <span className="flex flex-wrap items-center gap-x-2 gap-y-1">
-          <span className={`plan-line-title ${isMuted ? 'text-[var(--text-tertiary)]' : 'text-[var(--text-primary)]'}`}>
-            {node.label}
-          </span>
-          <MasteryBadge level={node.level} />
-        </span>
-        <span className="plan-line-reason">
-          {isCurrent && 'Recomendado ahora · '}
-          {hasQuestions ? `${node.questionCount} preguntas` : 'Sin preguntas aún'}
-        </span>
-
-        {createSession.error ? (
-          <p role="alert" className="notice is-danger">
-            {readConvexError(createSession.error, 'No se pudo iniciar la práctica.')}
-          </p>
-        ) : null}
-      </div>
-
-      <span className="path-line-actions">
-        <Link
-          to="/lesson/$subtopicId"
-          params={{ subtopicId: node.subtopicId }}
-          className="btn-ghost no-underline"
+      <Link to="/lesson/$subtopicId" params={{ subtopicId: node.subtopicId }} className="aprende-topic-main">
+        <span className="aprende-topic-label">{node.label}</span>
+        <MasteryBadge level={node.level} />
+      </Link>
+      {node.questionCount > 0 ? (
+        <button
+          type="button"
+          className="aprende-topic-go"
+          disabled={disabled}
+          aria-label={`Practicar ${node.label}`}
+          onClick={onPractice}
         >
-          <BookOpen size={13} aria-hidden />
-          {node.hasLesson ? 'Ver lección' : 'Aprender el tema'}
-        </Link>
-        {hasQuestions ? (
-          <button
-            type="button"
-            disabled={createSession.isPending}
-            onClick={() =>
-              createSession.mutate({
-                studentId: studentId as never,
-                kind: 'topic',
-                subtopicId: node.subtopicId,
-              })
-            }
-            className={`${isCurrent ? 'btn-primary' : 'btn-secondary'}`}
-          >
-            <Play size={13} aria-hidden />
-            {createSession.isPending ? 'Preparando…' : 'Practicar'}
-          </button>
-        ) : null}
-      </span>
+          <Play size={18} aria-hidden />
+        </button>
+      ) : (
+        <span className="aprende-topic-empty">Sin preguntas</span>
+      )}
     </li>
   )
 }

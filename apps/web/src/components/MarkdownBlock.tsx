@@ -2,6 +2,7 @@ import type { ComponentProps } from 'react'
 import { Streamdown, type ExtraProps } from 'streamdown'
 import { createMathPlugin } from '@streamdown/math'
 import 'katex/dist/katex.min.css'
+import { escapeMoney } from '../lib/escape-money.ts'
 
 const math = createMathPlugin({
   singleDollarTextMath: true,
@@ -28,7 +29,7 @@ const components = { p: Paragraph }
 export function MarkdownBlock({ markdown, skipHtml = false }: { markdown: string; skipHtml?: boolean }) {
   return (
     <Streamdown className="markdown-body" plugins={{ math }} components={components} skipHtml={skipHtml}>
-      {markdown}
+      {escapeMoney(markdown)}
     </Streamdown>
   )
 }

@@ -1,7 +1,7 @@
 /**
  * Apply the bank review to the deployment `bunx convex run` points at: dev, by default.
  *
- *   bun run packages/ingest/src/apply-bank-review.ts [content/revision-banco/2026-11-09.json]
+ *   bun run packages/ingest/src/apply-bank-review.ts [--prod] [content/revision-banco/2026-11-09.json]
  *
  * The decision file and its crops live under content/ (gitignored: ICFES text).
  * Crops are uploaded once and remembered in <file>.storage.json. Questions go
@@ -18,8 +18,10 @@ import { dirname, resolve } from 'node:path'
 
 const REPO = resolve(import.meta.dirname, '../../..')
 const CONVEX_DIR = resolve(REPO, 'packages/convex')
-const DECISIONS = resolve(REPO, process.argv[2] ?? 'content/revision-banco/2026-11-09.json')
-const STORAGE = `${DECISIONS}.storage.json`
+const PROD = process.argv.includes('--prod')
+const DECISIONS = resolve(REPO, process.argv.slice(2).find((arg) => arg !== '--prod') ?? 'content/revision-banco/2026-11-09.json')
+/** Storage ids belong to one deployment, so each keeps its own list. */
+const STORAGE = `${DECISIONS}.${PROD ? 'prod.' : ''}storage.json`
 /** One argv string is capped near 128 KB on Linux, which large passages can reach. */
 const MAX_PAYLOAD = 100_000
 
@@ -31,7 +33,7 @@ type Decision = {
 } & Record<string, unknown>
 
 function convexRun(fn: string, payload: unknown): unknown {
-  const out = execFileSync('bunx', ['convex', 'run', fn, JSON.stringify(payload)], {
+  const out = execFileSync('bunx', ['convex', 'run', ...(PROD ? ['--prod'] : []), fn, JSON.stringify(payload)], {
     cwd: CONVEX_DIR,
     encoding: 'utf8',
     maxBuffer: 60e6,

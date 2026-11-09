@@ -13,10 +13,11 @@ surface, written for the rector who decides whether the school buys.
 
 ## Users
 
-**The student: a Colombian 11th-grader preparing for the ICFES Saber 11.**
-Typically 16–17, on a phone, in short sessions between school and everything
-else. The exam gates university admission and scholarships, so the emotional
-baseline is anxiety, not curiosity. Phone first.
+**The student: a Colombian teenager preparing for the ICFES Saber 11.**
+Typically 15–17, on a phone, in short sessions between school and everything
+else. They live with games and feeds, and a screen of text loses them. The exam
+gates university admission and scholarships, so anxiety sits under everything:
+the app is lively and never shames. Phone first.
 
 **The teacher or coordinator.** On a school computer, following a class of
 30–40 students. Needs to know who needs support and in which competency, and
@@ -40,23 +41,32 @@ issue school licenses. A dense, functional surface.
 
 ## Personality
 
-**Institutional, exact, on the student's side.** A well-kept notebook, not a
-game and not a corporate dashboard.
+**Two registers, one honest product.** Student screens are young and credible:
+a sticker album you fill by mastering topics (Álbum, chosen 2026-11-08, see
+`plans/reconstruccion-estudiante-y-banco.md`). Teacher, school, staff and printed
+screens stay institutional and exact, because a rector buys those.
 
 - Speaks Spanish, with accents, addressing the student as *tú* and the school
   as *usted*.
 - Reports what the evidence supports and no more. When there isn't enough data,
   it says so instead of inventing a number.
-- Sober about effort and results: study days and mastery levels are academic
-  signals, never rewards.
+- Teaches by asking. A wrong answer opens a question, not the solution; the
+  answer comes after the student has tried.
+- Rewards effort and mastery separately: XP and leagues count effort, stickers
+  count mastery. Neither ever moves a learning metric.
+- Few words. One action per screen, a headline of at most 8 words, at most 25
+  words before the action.
 
 ## Anti-references
 
 - **The generic blue LMS with cards** (Canvas, Moodle).
 - **The corporate KPI dashboard.** No hero metrics, no KPI tiles.
-- **Anything childish.** No mascot, stickers, emojis, spiral bindings or
-  handwriting fonts. The notebook is an instrument, not a costume.
-- **Duolingo's guilt loop.** Nothing shames a student for a missed day.
+- **A printed test pasted on a screen.** No scanned stems when text will do.
+- **Childish teacher or school screens.** The album stays on the student side.
+- **Duolingo's guilt loop.** Nothing shames a student for a missed day; a broken
+  streak offers a fresh start, and there are no guilt notifications.
+- **Public results.** Leagues show effort, neighbours only, by nickname; a
+  student's results are never ranked in front of others.
 - **The infinite question bank.** Volume is not the value; direction is.
 
 ## Strategic design principles

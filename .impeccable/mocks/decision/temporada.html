@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8"><title>Temporada</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&family=Figtree:wght@500;600;700&display=swap">
+<style>
+*{box-sizing:border-box;margin:0}
+body{width:800px;height:844px;overflow:hidden;background:#0e1440;display:flex;gap:20px;font-family:Figtree,sans-serif;color:#0e1440}
+.phone{width:390px;height:844px;position:relative;overflow:hidden;background:#f2f5ff;display:flex;flex-direction:column}
+.field{background:#2536d9;color:#fff;padding:18px 20px 22px;flex:1;display:flex;flex-direction:column}
+.top{display:flex;justify-content:space-between}
+.stat{display:flex;align-items:center;gap:6px;font:800 19px/1 'Bricolage Grotesque';font-variant-numeric:tabular-nums}
+.stat svg{width:22px;height:22px}
+.avatar{align-self:center;margin:14px 0 12px;width:236px;height:252px}
+h1{font:800 46px/1 'Bricolage Grotesque';letter-spacing:-.02em;text-wrap:balance}
+.pass{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin:26px 0 18px}
+.day{text-align:center;font:700 13px/1 Figtree;color:#c3caff}
+.dot{height:38px;border-radius:12px;background:#1a27a8;margin-bottom:7px;display:grid;place-items:center}
+.dot svg{width:18px;height:18px}
+.on .dot{background:#c6f135;color:#0e1440}.now .dot{background:#fff;color:#2536d9;box-shadow:0 0 0 3px #c6f135}.on,.now{color:#fff}
+.go{display:block;margin-top:auto;width:100%;background:#c6f135;color:#0e1440;border:0;border-radius:20px;padding:15px;font:800 24px/1 'Bricolage Grotesque';box-shadow:0 6px 0 #8fb01c}
+.go small{display:block;font:600 14px/1 Figtree;margin-top:6px}
+.task{display:flex;align-items:center;gap:12px;padding:15px 20px;background:#fff}
+.task b{font-size:16px;display:block}.task span{font-size:14px;color:#4a5280}
+.ic{width:42px;height:42px;border-radius:13px;background:#ffe3e0;color:#c92a1e;display:grid;place-items:center;flex:none}
+.tabs{display:grid;grid-template-columns:repeat(4,1fr);background:#fff;padding:9px 6px 16px;border-top:1px solid #e1e6fa}
+.tabs a{text-align:center;font:700 12px/1.3 Figtree;color:#5b6490}.tabs svg{width:25px;height:25px;display:block;margin:0 auto 2px}.tabs .a{color:#2536d9}
+.bar{background:#2536d9;color:#fff;padding:16px 20px 15px;display:flex;align-items:center;gap:12px}
+.bar svg{width:24px;height:24px;flex:none}
+.beads{display:flex;gap:6px;flex:1}.beads i{flex:1;height:10px;border-radius:5px;background:#1a27a8}.beads .d{background:#c6f135}.beads .c{background:#fff}
+.sheet{padding:20px;flex:1;background:#fff}
+.q{font:600 21px/1.32 Figtree;margin-bottom:18px;text-wrap:pretty}
+.opt{display:flex;align-items:center;gap:14px;padding:12px 14px;border:2px solid #dfe4f7;border-radius:16px;margin-bottom:9px;font:700 19px/1 Figtree;box-shadow:0 3px 0 #dfe4f7}
+.opt em{font:800 16px/32px 'Bricolage Grotesque';width:32px;height:32px;text-align:center;border-radius:10px;background:#eef1fd;color:#2536d9}
+.opt.w{border-color:#d9352a;box-shadow:0 3px 0 #d9352a;color:#a81f15}.opt.w em{background:#d9352a;color:#fff}
+.opt.w svg{width:20px;height:20px;margin-left:auto}
+.ask{background:#2536d9;color:#fff;padding:20px 20px 26px;border-radius:26px 26px 0 0}
+.ask p{font:600 15px/1 Figtree;color:#c6f135;margin-bottom:7px}
+.ask h2{font:800 27px/1.05 'Bricolage Grotesque';margin-bottom:14px}
+.chip{display:block;background:#fff;color:#0e1440;border-radius:14px;padding:13px 15px;font:700 16px/1.1 Figtree;margin-top:8px;box-shadow:0 4px 0 #1a27a8}
+</style></head><body>
+<svg width="0" height="0" style="position:absolute"><defs>
+<symbol id="flame" viewBox="0 0 24 24"><path fill="#c6f135" d="M12 2c1 4 6 6 6 12a6 6 0 0 1-12 0c0-2 1-4 2.5-5 .2 2 1.2 3 2.2 3C11.7 9 10.8 5 12 2z"/></symbol>
+<symbol id="bolt" viewBox="0 0 24 24"><path fill="#c6f135" d="M13 2 4 14h6l-1 8 9-12h-6z"/></symbol>
+<symbol id="check" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" d="m5 13 4 4 10-11"/></symbol>
+<symbol id="x" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" d="M6 6l12 12M18 6 6 18"/></symbol>
+<symbol id="home" viewBox="0 0 24 24"><path fill="currentColor" d="M3 11 12 3l9 8v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></symbol>
+<symbol id="map" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" d="M5 20a2 2 0 1 0 0-.01M19 6a2 2 0 1 0 0-.01M7 19h8a3 3 0 0 0 0-6H9a3 3 0 0 1 0-6h8"/></symbol>
+<symbol id="cup" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" d="M7 4h10v6a5 5 0 0 1-10 0zM7 6H4v2a3 3 0 0 0 3 3M17 6h3v2a3 3 0 0 1-3 3M12 15v4M8 20h8"/></symbol>
+<symbol id="me" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM4 21c1-4 4-6 8-6s7 2 8 6"/></symbol>
+<symbol id="doc" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" d="M6 3h9l4 4v14H6zM9 12h7M9 16h7"/></symbol>
+</defs></svg>
+<section class="phone">
+ <div class="field">
+  <div class="top"><div class="stat"><svg><use href="#flame"/></svg>6 días</div><div class="stat"><svg><use href="#bolt"/></svg>340 XP</div></div>
+  <svg class="avatar" width="148" height="158" viewBox="0 0 148 158" role="img" aria-label="Tu avatar"><ellipse cx="74" cy="148" rx="58" ry="9" fill="#1a27a8"/><path fill="#ff5a4e" d="M28 150c2-34 20-50 46-50s44 16 46 50z"/><path fill="#ffc9a8" d="M60 86h28v24a14 14 0 0 1-28 0z"/><circle cx="74" cy="60" r="36" fill="#ffc9a8"/><path fill="#26120a" d="M36 62c-4-34 18-50 40-50s42 16 36 48c-6-10-14-20-22-22-14 8-38 8-54 24z"/><circle cx="60" cy="66" r="4.5" fill="#26120a"/><circle cx="90" cy="66" r="4.5" fill="#26120a"/><path d="M64 82c6 6 16 6 22 0" stroke="#26120a" stroke-width="3.5" fill="none" stroke-linecap="round"/></svg>
+  <h1>Hoy te toca Proporciones</h1>
+  <div class="pass" aria-label="Pase de la semana">
+   <div class="day on"><div class="dot"><svg><use href="#check"/></svg></div>L</div><div class="day on"><div class="dot"><svg><use href="#check"/></svg></div>M</div><div class="day on"><div class="dot"><svg><use href="#check"/></svg></div>M</div><div class="day on"><div class="dot"><svg><use href="#check"/></svg></div>J</div><div class="day on"><div class="dot"><svg><use href="#check"/></svg></div>V</div><div class="day now"><div class="dot"><svg><use href="#bolt"/></svg></div>S</div><div class="day"><div class="dot"><svg style="color:#c3caff"><use href="#cup"/></svg></div>D</div>
+  </div>
+  <button class="go">Empezar<small>5 preguntas · 5 min</small></button>
+ </div>
+ <div class="task"><div class="ic"><svg width="23" height="23"><use href="#doc"/></svg></div><div><b>Tiquete de lectura</b><span>De tu profe · vence mañana</span></div></div>
+ <nav class="tabs"><a class="a"><svg><use href="#home"/></svg>Hoy</a><a><svg><use href="#map"/></svg>Aprende</a><a><svg><use href="#cup"/></svg>Retos</a><a><svg><use href="#me"/></svg>Yo</a></nav>
+</section>
+<section class="phone">
+ <div class="bar"><svg><use href="#x"/></svg><div class="beads"><i class="d"></i><i class="d"></i><i class="c"></i><i></i><i></i></div></div>
+ <div class="sheet">
+  <p class="q">Una receta usa 3 tazas de harina por cada 2 de azúcar. Con 12 tazas de harina, ¿cuántas de azúcar necesitas?</p>
+  <div class="opt"><em>A</em>6</div><div class="opt"><em>B</em>8</div><div class="opt w"><em>C</em>11<svg><use href="#x"/></svg></div><div class="opt"><em>D</em>18</div>
+ </div>
+ <div class="ask"><p>Todavía no</p><h2>¿Qué te hizo elegir la C?</h2>
+  <a class="chip">Le sumé 9 a las dos cantidades</a><a class="chip">Hice otra cuenta y me dio 11</a><a class="chip">La adiviné</a></div>
+</section>
+</body></html>

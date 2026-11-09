@@ -1,0 +1,3262 @@
+[
+  {
+    "id": "lc-01",
+    "subjectId": "lectura_critica",
+    "categoryId": "lectura_critica.literal_comprehension",
+    "primarySubtopicId": "lectura_critica.literal_comprehension.word_phrase_meaning",
+    "competencia": "afirmacion_1_local",
+    "difficulty": "media",
+    "targetGrade": 11,
+    "context": "En la vereda El Hatillo, en Güepsa, don Aurelio todavía muele caña en un trapiche que heredó de su abuelo. Cuando la cooperativa le propuso cambiar el molino por uno eléctrico, él pidió un mes para pensarlo. Sacó cuentas en un cuaderno: la máquina nueva gastaría menos leña y dejaría libres a dos ayudantes, pero esos ayudantes eran sus sobrinos. «Esa máquina me ahorra plata y me cuesta familia», le dijo al gerente. Al final aceptó el molino con una condición: que los sobrinos aprendieran a repararlo y que la cooperativa les pagara por el mantenimiento de todos los trapiches de la vereda.",
+    "stem": "En el texto, la frase «Esa máquina me ahorra plata y me cuesta familia» quiere decir que",
+    "options": [
+      {
+        "label": "A",
+        "text": "el molino eléctrico es tan costoso que toda la familia tendría que aportar para pagarlo."
+      },
+      {
+        "label": "B",
+        "text": "los sobrinos de don Aurelio gastan más dinero del que la máquina nueva permitiría ahorrar."
+      },
+      {
+        "label": "C",
+        "text": "el molino eléctrico reduce gastos, pero les quitaría el trabajo a sus parientes."
+      },
+      {
+        "label": "D",
+        "text": "la cooperativa les cobra más a los campesinos que no trabajan junto con sus familias."
+      }
+    ],
+    "correctOption": "C",
+    "solution": "«Cuesta» está usado en sentido figurado: el precio no es dinero, sino el puesto de los sobrinos. Justo antes, don Aurelio calculó que la máquina gastaría menos leña y dejaría libres a dos ayudantes, que eran sus sobrinos.",
+    "guide": {
+      "hint": "¿Qué había anotado don Aurelio en su cuaderno justo antes de decir esa frase?",
+      "byOption": {
+        "A": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la A?",
+            "choices": [
+              {
+                "text": "Pensé que «cuesta» siempre habla de dinero"
+              },
+              {
+                "text": "Supuse que un molino eléctrico vale mucho"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Qué dice el texto sobre el precio de comprar el molino?",
+              "choices": [
+                {
+                  "text": "No menciona ese precio",
+                  "correct": true
+                },
+                {
+                  "text": "Que la familia debe pagarlo"
+                }
+              ]
+            },
+            {
+              "prompt": "Si alguien dice que un ascenso «le costó» sus amigos, ¿qué perdió?",
+              "choices": [
+                {
+                  "text": "Dinero para invitarlos"
+                },
+                {
+                  "text": "Amistades, no dinero",
+                  "correct": true
+                }
+              ]
+            }
+          ]
+        },
+        "B": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la B?",
+            "choices": [
+              {
+                "text": "Vi «plata» y «familia» y pensé en los gastos de los sobrinos"
+              },
+              {
+                "text": "Creí que los ayudantes salían muy caros"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "Según las cuentas del cuaderno, ¿qué haría la máquina con los gastos?",
+              "choices": [
+                {
+                  "text": "Los disminuiría",
+                  "correct": true
+                },
+                {
+                  "text": "Los aumentaría"
+                }
+              ]
+            },
+            {
+              "prompt": "¿El texto afirma en algún punto que los sobrinos gasten dinero?",
+              "choices": [
+                {
+                  "text": "Sí, en las cuentas del cuaderno"
+                },
+                {
+                  "text": "No, nunca lo afirma",
+                  "correct": true
+                }
+              ]
+            }
+          ]
+        },
+        "D": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la D?",
+            "choices": [
+              {
+                "text": "Como la cooperativa hizo la propuesta, pensé que hablaba de ella"
+              },
+              {
+                "text": "Entendí «familia» como un requisito para cobrar"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿De qué habla don Aurelio cuando dice «esa máquina»?",
+              "choices": [
+                {
+                  "text": "Del molino nuevo",
+                  "correct": true
+                },
+                {
+                  "text": "De la cooperativa"
+                }
+              ]
+            },
+            {
+              "prompt": "¿Menciona el texto alguna tarifa de la cooperativa según la familia?",
+              "choices": [
+                {
+                  "text": "Sí, al final del texto"
+                },
+                {
+                  "text": "No, no aparece ninguna tarifa",
+                  "correct": true
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "reveal": "La respuesta es la C. «Me cuesta familia» es una expresión figurada: el ahorro tendría como precio dejar sin ese trabajo a sus parientes."
+    }
+  },
+  {
+    "id": "lc-02",
+    "subjectId": "lectura_critica",
+    "categoryId": "lectura_critica.literal_comprehension",
+    "primarySubtopicId": "lectura_critica.literal_comprehension.explicit_details",
+    "competencia": "afirmacion_1_local",
+    "difficulty": "baja",
+    "targetGrade": 11,
+    "context": "En la vereda El Hatillo, en Güepsa, don Aurelio todavía muele caña en un trapiche que heredó de su abuelo. Cuando la cooperativa le propuso cambiar el molino por uno eléctrico, él pidió un mes para pensarlo. Sacó cuentas en un cuaderno: la máquina nueva gastaría menos leña y dejaría libres a dos ayudantes, pero esos ayudantes eran sus sobrinos. «Esa máquina me ahorra plata y me cuesta familia», le dijo al gerente. Al final aceptó el molino con una condición: que los sobrinos aprendieran a repararlo y que la cooperativa les pagara por el mantenimiento de todos los trapiches de la vereda.",
+    "stem": "Según el texto, ¿qué condición puso don Aurelio para aceptar el molino eléctrico?",
+    "options": [
+      {
+        "label": "A",
+        "text": "Que sus sobrinos se capacitaran para repararlo y recibieran pago por ese mantenimiento."
+      },
+      {
+        "label": "B",
+        "text": "Que la cooperativa le diera un mes para hacer las cuentas en su cuaderno."
+      },
+      {
+        "label": "C",
+        "text": "Que sus dos sobrinos siguieran moliendo caña en el trapiche que heredó de su abuelo."
+      },
+      {
+        "label": "D",
+        "text": "Que la cooperativa contratara a otros técnicos para reparar los trapiches de la vereda."
+      }
+    ],
+    "correctOption": "A",
+    "solution": "La última oración dice que aceptó con la condición de que los sobrinos aprendieran a reparar el molino y la cooperativa les pagara por el mantenimiento. El mes para pensarlo lo pidió antes de decidir, así que no es la condición final.",
+    "guide": {
+      "hint": "¿En qué oración del texto aparece la palabra «condición» y qué sigue después de ella?",
+      "byOption": {
+        "B": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la B?",
+            "choices": [
+              {
+                "text": "Recordé que pidió un mes para pensarlo"
+              },
+              {
+                "text": "Creí que pedir tiempo ya era poner una condición"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Qué ocurrió primero: pedir el mes o decidir sobre el molino?",
+              "choices": [
+                {
+                  "text": "Pedir el mes",
+                  "correct": true
+                },
+                {
+                  "text": "Decidir sobre el molino"
+                }
+              ]
+            },
+            {
+              "prompt": "Si pidió el mes antes de decidir, ¿puede ser la condición de su aceptación final?",
+              "choices": [
+                {
+                  "text": "Sí, porque también lo pidió él"
+                },
+                {
+                  "text": "No, porque ocurrió antes de decidir",
+                  "correct": true
+                }
+              ]
+            }
+          ]
+        },
+        "C": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la C?",
+            "choices": [
+              {
+                "text": "Pensé que quería conservar el trapiche antiguo"
+              },
+              {
+                "text": "Como el trapiche era de su abuelo, supuse que no lo cambiaría"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "Al final, ¿don Aurelio aceptó o rechazó el molino eléctrico?",
+              "choices": [
+                {
+                  "text": "Lo aceptó",
+                  "correct": true
+                },
+                {
+                  "text": "Lo rechazó"
+                }
+              ]
+            },
+            {
+              "prompt": "¿El texto dice que alguien siga moliendo en el trapiche viejo después del acuerdo?",
+              "choices": [
+                {
+                  "text": "Sí, lo harían los sobrinos"
+                },
+                {
+                  "text": "No, eso no aparece en el texto",
+                  "correct": true
+                }
+              ]
+            }
+          ]
+        },
+        "D": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la D?",
+            "choices": [
+              {
+                "text": "Leí «mantenimiento de todos los trapiches» y supuse que vendrían técnicos"
+              },
+              {
+                "text": "No me fijé en quiénes harían las reparaciones"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "Según la última oración, ¿quiénes se encargarían del mantenimiento de los trapiches?",
+              "choices": [
+                {
+                  "text": "Los parientes de don Aurelio",
+                  "correct": true
+                },
+                {
+                  "text": "Técnicos de la cooperativa"
+                }
+              ]
+            },
+            {
+              "prompt": "¿Menciona el texto técnicos externos contratados para esa labor?",
+              "choices": [
+                {
+                  "text": "Sí, en la última oración"
+                },
+                {
+                  "text": "No, no los menciona",
+                  "correct": true
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "reveal": "La respuesta es la A. Don Aurelio condicionó su aceptación a que los sobrinos aprendieran a reparar el molino y cobraran por ese mantenimiento; el mes de plazo lo pidió antes de decidir."
+    }
+  },
+  {
+    "id": "lc-03",
+    "subjectId": "lectura_critica",
+    "categoryId": "lectura_critica.literal_comprehension",
+    "primarySubtopicId": "lectura_critica.literal_comprehension.word_phrase_meaning",
+    "competencia": "afirmacion_1_local",
+    "difficulty": "baja",
+    "targetGrade": 11,
+    "context": "En Ayapel, Córdoba, los pescadores más viejos hablan de la ciénaga como de una vecina difícil: un día generosa, al otro esquiva. Hace diez años, cuando la pesca empezó a menguar, un grupo de ellos acordó no tender redes durante los meses de reproducción del bocachico. Los primeros años la veda fue un trago amargo: muchas familias tuvieron que vender el motor de la canoa o buscar jornales en las fincas. Hoy, cuando las redes vuelven a salir llenas, nadie celebra en voz alta; saben que la ciénaga no perdona los descuidos y que la abundancia de este año no asegura la del próximo.",
+    "stem": "En el texto, la expresión «un trago amargo» se refiere a",
+    "options": [
+      {
+        "label": "A",
+        "text": "el mal sabor que tomó el agua de la ciénaga durante los meses de veda."
+      },
+      {
+        "label": "B",
+        "text": "la bebida con la que los pescadores celebraban el final de cada temporada."
+      },
+      {
+        "label": "C",
+        "text": "la rabia de los pescadores contra quienes no respetaban el acuerdo de la veda."
+      },
+      {
+        "label": "D",
+        "text": "la etapa difícil que vivieron las familias cuando dejaron de pescar en esos meses."
+      }
+    ],
+    "correctOption": "D",
+    "solution": "Después de la expresión, el texto explica que muchas familias tuvieron que vender el motor de la canoa o buscar jornales. «Un trago amargo» es una manera figurada de nombrar una experiencia dura, no una bebida.",
+    "guide": {
+      "hint": "¿Qué cuenta el texto justo después de la expresión, tras los dos puntos?",
+      "byOption": {
+        "A": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la A?",
+            "choices": [
+              {
+                "text": "Como hablaban de la ciénaga, pensé en el sabor del agua"
+              },
+              {
+                "text": "Entendí «trago» de forma literal"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Qué dice el texto después de los dos puntos, justo tras esa expresión?",
+              "choices": [
+                {
+                  "text": "Que vendieron motores o buscaron jornales",
+                  "correct": true
+                },
+                {
+                  "text": "Que el agua se dañó"
+                }
+              ]
+            },
+            {
+              "prompt": "¿Menciona el texto en alguna parte el sabor del agua de la ciénaga?",
+              "choices": [
+                {
+                  "text": "Sí, durante la veda"
+                },
+                {
+                  "text": "No, nunca habla del sabor",
+                  "correct": true
+                }
+              ]
+            }
+          ]
+        },
+        "B": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la B?",
+            "choices": [
+              {
+                "text": "Asocié «trago» con una bebida de celebración"
+              },
+              {
+                "text": "Recordé las redes llenas y pensé en una fiesta"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "Según el texto, ¿cómo reaccionan hoy los pescadores cuando las redes salen llenas?",
+              "choices": [
+                {
+                  "text": "Nadie celebra en voz alta",
+                  "correct": true
+                },
+                {
+                  "text": "Hacen una gran fiesta"
+                }
+              ]
+            },
+            {
+              "prompt": "Si alguien dice «fue un trago amargo», ¿habla de algo agradable o doloroso?",
+              "choices": [
+                {
+                  "text": "De algo agradable"
+                },
+                {
+                  "text": "De algo doloroso",
+                  "correct": true
+                }
+              ]
+            }
+          ]
+        },
+        "C": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la C?",
+            "choices": [
+              {
+                "text": "Pensé que «amargo» hablaba de rabia"
+              },
+              {
+                "text": "Supuse que algunos pescadores incumplieron el acuerdo"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Qué dificultades concretas se cuentan de esos primeros años?",
+              "choices": [
+                {
+                  "text": "Ventas de motores y búsqueda de jornales",
+                  "correct": true
+                },
+                {
+                  "text": "Peleas entre pescadores vecinos"
+                }
+              ]
+            },
+            {
+              "prompt": "¿El texto menciona a alguien que haya violado la veda?",
+              "choices": [
+                {
+                  "text": "Sí, a varios pescadores"
+                },
+                {
+                  "text": "No, no menciona a nadie",
+                  "correct": true
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "reveal": "La respuesta es la D. La expresión resume la dureza de los primeros años de veda, cuando las familias se quedaron sin la pesca de esos meses."
+    }
+  },
+  {
+    "id": "lc-04",
+    "subjectId": "lectura_critica",
+    "categoryId": "lectura_critica.literal_comprehension",
+    "primarySubtopicId": "lectura_critica.literal_comprehension.explicit_details",
+    "competencia": "afirmacion_1_local",
+    "difficulty": "baja",
+    "targetGrade": 11,
+    "context": "En Ayapel, Córdoba, los pescadores más viejos hablan de la ciénaga como de una vecina difícil: un día generosa, al otro esquiva. Hace diez años, cuando la pesca empezó a menguar, un grupo de ellos acordó no tender redes durante los meses de reproducción del bocachico. Los primeros años la veda fue un trago amargo: muchas familias tuvieron que vender el motor de la canoa o buscar jornales en las fincas. Hoy, cuando las redes vuelven a salir llenas, nadie celebra en voz alta; saben que la ciénaga no perdona los descuidos y que la abundancia de este año no asegura la del próximo.",
+    "stem": "Según el texto, ¿qué tuvieron que hacer muchas familias durante los primeros años de la veda?",
+    "options": [
+      {
+        "label": "A",
+        "text": "Pescar en otras ciénagas cercanas hasta que terminara la época de reproducción."
+      },
+      {
+        "label": "B",
+        "text": "Desprenderse de su equipo de pesca o trabajar por jornal en fincas."
+      },
+      {
+        "label": "C",
+        "text": "Pedir ayuda económica a la alcaldía para poder reemplazar sus redes viejas."
+      },
+      {
+        "label": "D",
+        "text": "Comprar motores más potentes para salir a pescar lejos de la ciénaga."
+      }
+    ],
+    "correctOption": "B",
+    "solution": "El texto dice que muchas familias tuvieron que vender el motor de la canoa o buscar jornales en las fincas. Vender el motor es desprenderse de parte del equipo de pesca, y las demás opciones agregan hechos que el texto no menciona.",
+    "guide": {
+      "hint": "¿Qué oración del texto habla específicamente de esos primeros años?",
+      "byOption": {
+        "A": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la A?",
+            "choices": [
+              {
+                "text": "Supuse que buscarían pescado en otro lugar"
+              },
+              {
+                "text": "Me pareció lo más lógico para un pescador"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "Según el texto, ¿dónde buscaron trabajo algunas familias durante esos años?",
+              "choices": [
+                {
+                  "text": "En las fincas de la región",
+                  "correct": true
+                },
+                {
+                  "text": "En otras ciénagas"
+                }
+              ]
+            },
+            {
+              "prompt": "¿El texto nombra otras ciénagas donde hayan ido a pescar?",
+              "choices": [
+                {
+                  "text": "Sí, varias ciénagas cercanas"
+                },
+                {
+                  "text": "No, no nombra ninguna",
+                  "correct": true
+                }
+              ]
+            }
+          ]
+        },
+        "C": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la C?",
+            "choices": [
+              {
+                "text": "Pensé que en una crisis se acude a la alcaldía"
+              },
+              {
+                "text": "Creí haber leído que les dieron ayuda"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Quiénes acordaron no tender redes durante la reproducción del bocachico?",
+              "choices": [
+                {
+                  "text": "Un grupo de pescadores",
+                  "correct": true
+                },
+                {
+                  "text": "La alcaldía del municipio"
+                }
+              ]
+            },
+            {
+              "prompt": "¿Aparece la alcaldía o alguna ayuda oficial en el texto?",
+              "choices": [
+                {
+                  "text": "Sí, en los primeros años"
+                },
+                {
+                  "text": "No, en ninguna parte",
+                  "correct": true
+                }
+              ]
+            }
+          ]
+        },
+        "D": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la D?",
+            "choices": [
+              {
+                "text": "Vi la palabra «motor» y pensé que compraron uno"
+              },
+              {
+                "text": "Entendí que querían pescar más lejos"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "Según el texto, ¿qué pasó con el motor de la canoa?",
+              "choices": [
+                {
+                  "text": "Algunas familias lo vendieron",
+                  "correct": true
+                },
+                {
+                  "text": "Algunas familias lo compraron"
+                }
+              ]
+            },
+            {
+              "prompt": "Si vendieron el motor, ¿tenían cómo salir a pescar más lejos?",
+              "choices": [
+                {
+                  "text": "Sí, con más potencia"
+                },
+                {
+                  "text": "No, perdieron esa posibilidad",
+                  "correct": true
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "reveal": "La respuesta es la B. El texto dice que muchas familias vendieron el motor de la canoa o buscaron jornales en las fincas; las otras opciones agregan hechos que no aparecen."
+    }
+  },
+  {
+    "id": "lc-05",
+    "subjectId": "lectura_critica",
+    "categoryId": "lectura_critica.literal_comprehension",
+    "primarySubtopicId": "lectura_critica.literal_comprehension.word_phrase_meaning",
+    "competencia": "afirmacion_1_local",
+    "difficulty": "alta",
+    "targetGrade": 11,
+    "context": "Se suele decir que los supermercados acabarán con las plazas de mercado porque son más limpios y más baratos. Esa explicación, sin embargo, mira solo la caja registradora. En la plaza de Tunja, por ejemplo, doña Carmenza fía a sus clientes de toda la vida y le guarda a cada uno la papa que sabe que prefiere. Ese crédito no figura en ningún balance, pero sostiene barrios enteros en las semanas en que el sueldo no alcanza. Por eso, antes de firmar el acta de defunción de las plazas, convendría preguntarse qué otra cosa, además de alimentos, se vende y se compra en ellas.",
+    "stem": "En el texto, la expresión «Ese crédito» alude principalmente a",
+    "options": [
+      {
+        "label": "A",
+        "text": "la confianza personal que permite llevar hoy la comida y pagarla después."
+      },
+      {
+        "label": "B",
+        "text": "el préstamo formal que los bancos otorgan a las vendedoras de la plaza."
+      },
+      {
+        "label": "C",
+        "text": "el reconocimiento público que recibe doña Carmenza por su largo trabajo."
+      },
+      {
+        "label": "D",
+        "text": "la rebaja de precio que la vendedora les hace a sus clientes más antiguos."
+      }
+    ],
+    "correctOption": "A",
+    "solution": "«Ese» remite a lo que se acaba de contar: doña Carmenza fía a sus clientes de toda la vida. Fiar es entregar la mercancía y cobrarla más adelante, sobre la base de la confianza, por eso ayuda cuando el sueldo no alcanza.",
+    "guide": {
+      "hint": "¿Qué acción de doña Carmenza se cuenta justo antes de «Ese crédito»?",
+      "byOption": {
+        "B": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la B?",
+            "choices": [
+              {
+                "text": "Relacioné «crédito» con los bancos"
+              },
+              {
+                "text": "Vi «balance» y pensé en una entidad financiera"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Qué significa que doña Carmenza «fía» en su puesto?",
+              "choices": [
+                {
+                  "text": "Que entrega la mercancía y cobra luego",
+                  "correct": true
+                },
+                {
+                  "text": "Que pide un préstamo en el banco"
+                }
+              ]
+            },
+            {
+              "prompt": "¿Participa algún banco en el trato entre doña Carmenza y sus clientes?",
+              "choices": [
+                {
+                  "text": "Sí, el banco paga"
+                },
+                {
+                  "text": "No, es un trato directo",
+                  "correct": true
+                }
+              ]
+            }
+          ]
+        },
+        "C": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la C?",
+            "choices": [
+              {
+                "text": "Pensé en «dar crédito» como reconocer un mérito"
+              },
+              {
+                "text": "Creí que el texto elogiaba el trabajo de la vendedora"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "Según el texto, ¿cuándo resulta útil ese crédito para los barrios?",
+              "choices": [
+                {
+                  "text": "Cuando el sueldo no alcanza",
+                  "correct": true
+                },
+                {
+                  "text": "Cuando premian la labor de la vendedora"
+                }
+              ]
+            },
+            {
+              "prompt": "¿Un reconocimiento público resolvería la falta de comida en esas semanas?",
+              "choices": [
+                {
+                  "text": "Sí, porque da fama"
+                },
+                {
+                  "text": "No, porque no llena la despensa",
+                  "correct": true
+                }
+              ]
+            }
+          ]
+        },
+        "D": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la D?",
+            "choices": [
+              {
+                "text": "Pensé que fiar era cobrar menos"
+              },
+              {
+                "text": "Recordé el trato especial para los clientes de siempre"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Qué le guarda doña Carmenza al cliente, además de fiarle?",
+              "choices": [
+                {
+                  "text": "La papa que prefiere",
+                  "correct": true
+                },
+                {
+                  "text": "Un descuento especial"
+                }
+              ]
+            },
+            {
+              "prompt": "Si alguien fía, ¿el cliente termina pagando menos o solo paga más tarde?",
+              "choices": [
+                {
+                  "text": "Termina pagando menos"
+                },
+                {
+                  "text": "Solo paga más tarde",
+                  "correct": true
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "reveal": "La respuesta es la A. El crédito del que habla el autor es el fiado: una confianza entre personas que no aparece en ningún balance, pero que permite comer cuando falta el dinero."
+    }
+  },
+  {
+    "id": "lc-06",
+    "subjectId": "lectura_critica",
+    "categoryId": "lectura_critica.structure_cohesion_multimodal",
+    "primarySubtopicId": "lectura_critica.structure_cohesion_multimodal.text_structure_parts",
+    "competencia": "afirmacion_2_global",
+    "difficulty": "media",
+    "targetGrade": 11,
+    "context": "Se suele decir que los supermercados acabarán con las plazas de mercado porque son más limpios y más baratos. Esa explicación, sin embargo, mira solo la caja registradora. En la plaza de Tunja, por ejemplo, doña Carmenza fía a sus clientes de toda la vida y le guarda a cada uno la papa que sabe que prefiere. Ese crédito no figura en ningún balance, pero sostiene barrios enteros en las semanas en que el sueldo no alcanza. Por eso, antes de firmar el acta de defunción de las plazas, convendría preguntarse qué otra cosa, además de alimentos, se vende y se compra en ellas.",
+    "stem": "En la argumentación del autor, el caso de doña Carmenza cumple la función de",
+    "options": [
+      {
+        "label": "A",
+        "text": "demostrar que los supermercados venden productos de peor calidad que las plazas."
+      },
+      {
+        "label": "B",
+        "text": "narrar la biografía de una vendedora tradicional de la ciudad de Tunja."
+      },
+      {
+        "label": "C",
+        "text": "ilustrar un beneficio de las plazas que la explicación económica deja por fuera."
+      },
+      {
+        "label": "D",
+        "text": "presentar la opinión contraria a la que el autor defiende a lo largo del texto."
+      }
+    ],
+    "correctOption": "C",
+    "solution": "El autor critica que la explicación común «mira solo la caja registradora» y enseguida introduce el caso con «por ejemplo». El fiado de doña Carmenza muestra un valor de las plazas que esa explicación no contempla.",
+    "guide": {
+      "hint": "¿Qué idea general viene defendiendo el autor antes de mencionar a doña Carmenza?",
+      "byOption": {
+        "A": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la A?",
+            "choices": [
+              {
+                "text": "Entendí que el autor quería mostrar que las plazas son mejores en todo"
+              },
+              {
+                "text": "Pensé que comparaba la calidad de los productos"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "Al hablar de fiar y guardar la papa, ¿de qué clase de valor se ocupa?",
+              "choices": [
+                {
+                  "text": "De relaciones entre personas",
+                  "correct": true
+                },
+                {
+                  "text": "De calidad del producto"
+                }
+              ]
+            },
+            {
+              "prompt": "¿El texto compara la calidad de los alimentos de plazas y supermercados?",
+              "choices": [
+                {
+                  "text": "Sí, con el ejemplo de la papa"
+                },
+                {
+                  "text": "No, nunca compara calidad",
+                  "correct": true
+                }
+              ]
+            }
+          ]
+        },
+        "B": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la B?",
+            "choices": [
+              {
+                "text": "El pasaje cuenta cosas de una persona concreta"
+              },
+              {
+                "text": "Creí que el texto era sobre la vida de ella"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿El texto cuenta dónde nació o cómo empezó doña Carmenza?",
+              "choices": [
+                {
+                  "text": "No, solo unos detalles de su oficio",
+                  "correct": true
+                },
+                {
+                  "text": "Sí, cuenta toda su vida"
+                }
+              ]
+            },
+            {
+              "prompt": "Después del caso, ¿vuelve el autor a hablar de las plazas en general?",
+              "choices": [
+                {
+                  "text": "No, sigue con la vendedora"
+                },
+                {
+                  "text": "Sí, cierra hablando de las plazas",
+                  "correct": true
+                }
+              ]
+            }
+          ]
+        },
+        "D": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la D?",
+            "choices": [
+              {
+                "text": "Creí que era la voz de quienes defienden los supermercados"
+              },
+              {
+                "text": "Confundí el ejemplo con la objeción inicial"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Qué postura aparece primero y el autor cuestiona con «sin embargo»?",
+              "choices": [
+                {
+                  "text": "Que los supermercados acabarán con las plazas",
+                  "correct": true
+                },
+                {
+                  "text": "Que las plazas son valiosas"
+                }
+              ]
+            },
+            {
+              "prompt": "¿La historia de doña Carmenza apoya o ataca la postura del autor?",
+              "choices": [
+                {
+                  "text": "La ataca"
+                },
+                {
+                  "text": "La apoya",
+                  "correct": true
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "reveal": "La respuesta es la C. El caso funciona como ejemplo: muestra un beneficio social de las plazas que la mirada puramente económica no alcanza a ver."
+    }
+  },
+  {
+    "id": "lc-07",
+    "subjectId": "lectura_critica",
+    "categoryId": "lectura_critica.structure_cohesion_multimodal",
+    "primarySubtopicId": "lectura_critica.structure_cohesion_multimodal.text_structure_parts",
+    "competencia": "afirmacion_2_global",
+    "difficulty": "media",
+    "targetGrade": 11,
+    "context": "La biblioteca pública de Quibdó abrió en marzo un club de lectura en voz alta para adultos mayores. En tres meses, la asistencia pasó de seis a cuarenta personas, y varias de ellas, que nunca habían leído un libro completo, ya piden prestadas novelas para llevar a casa.\n\nLas cifras, con todo, esconden un problema. La sala donde se reúnen solo tiene doce sillas y el único bibliotecario que sabe dirigir las sesiones se jubila en diciembre. Si nadie toma su lugar, el club podría terminar convertido en un bonito recuerdo.",
+    "stem": "¿Qué relación hay entre el segundo párrafo y el primero?",
+    "options": [
+      {
+        "label": "A",
+        "text": "El segundo explica las causas del aumento de asistencia descrito en el primero."
+      },
+      {
+        "label": "B",
+        "text": "El segundo matiza el logro del primero señalando lo que amenaza su continuidad."
+      },
+      {
+        "label": "C",
+        "text": "El segundo repite con otras palabras las cifras de asistencia del primero."
+      },
+      {
+        "label": "D",
+        "text": "El segundo refuta el primero demostrando que las cifras de asistencia son falsas."
+      }
+    ],
+    "correctOption": "B",
+    "solution": "El primer párrafo presenta un logro y el segundo, con la expresión «con todo», advierte que hay un problema sin negar ese logro. La falta de sillas y la jubilación del bibliotecario ponen en riesgo que el club continúe.",
+    "guide": {
+      "hint": "¿Qué anuncia la primera oración del segundo párrafo sobre las cifras del primero?",
+      "byOption": {
+        "A": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la A?",
+            "choices": [
+              {
+                "text": "Pensé que las sillas y el bibliotecario explicaban el éxito"
+              },
+              {
+                "text": "Creí que los párrafos siempre van del hecho a la causa"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿El segundo párrafo dice por qué llegó más gente al club?",
+              "choices": [
+                {
+                  "text": "No, habla de dificultades",
+                  "correct": true
+                },
+                {
+                  "text": "Sí, gracias a las sillas"
+                }
+              ]
+            },
+            {
+              "prompt": "¿Doce sillas y un bibliotecario que se jubila favorecen el crecimiento del club?",
+              "choices": [
+                {
+                  "text": "Sí, lo impulsan"
+                },
+                {
+                  "text": "No, lo dificultan",
+                  "correct": true
+                }
+              ]
+            }
+          ]
+        },
+        "C": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la C?",
+            "choices": [
+              {
+                "text": "Vi que ambos párrafos hablan del club"
+              },
+              {
+                "text": "Me fijé en la palabra «cifras»"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Qué datos aparecen en el segundo párrafo y no en el primero?",
+              "choices": [
+                {
+                  "text": "Las sillas y la jubilación",
+                  "correct": true
+                },
+                {
+                  "text": "Los seis y los cuarenta asistentes"
+                }
+              ]
+            },
+            {
+              "prompt": "Si un párrafo agrega información nueva, ¿puede ser una simple repetición?",
+              "choices": [
+                {
+                  "text": "Sí, aunque agregue datos"
+                },
+                {
+                  "text": "No, aporta algo distinto",
+                  "correct": true
+                }
+              ]
+            }
+          ]
+        },
+        "D": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la D?",
+            "choices": [
+              {
+                "text": "«Esconden» me hizo pensar que las cifras mentían"
+              },
+              {
+                "text": "Entendí que había un engaño en los datos"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Qué esconden las cifras, según el segundo párrafo?",
+              "choices": [
+                {
+                  "text": "Una dificultad del club",
+                  "correct": true
+                },
+                {
+                  "text": "Un error de conteo"
+                }
+              ]
+            },
+            {
+              "prompt": "¿El segundo párrafo niega que hayan llegado cuarenta personas?",
+              "choices": [
+                {
+                  "text": "Sí, dice que fueron menos"
+                },
+                {
+                  "text": "No, nunca lo niega",
+                  "correct": true
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "reveal": "La respuesta es la B. El segundo párrafo no niega el éxito del club: lo relativiza mostrando dos amenazas concretas para su futuro."
+    }
+  },
+  {
+    "id": "lc-08",
+    "subjectId": "lectura_critica",
+    "categoryId": "lectura_critica.structure_cohesion_multimodal",
+    "primarySubtopicId": "lectura_critica.structure_cohesion_multimodal.text_structure_parts",
+    "competencia": "afirmacion_2_global",
+    "difficulty": "media",
+    "targetGrade": 11,
+    "context": "La bibliotecaria de un colegio de Pereira publicó esta tabla en la cartelera para abrir una conversación sobre las devoluciones de libros.\n\n**Préstamos de la biblioteca en septiembre**\n\n| Grado | Estudiantes | Libros prestados | Devueltos a tiempo |\n|---|---|---|---|\n| 9.° | 120 | 180 | 150 |\n| 10.° | 110 | 99 | 90 |\n| 11.° | 100 | 210 | 120 |\n\n*Nota: en septiembre, cada estudiante de 11.° podía tener hasta tres libros a la vez, por la preparación del examen de Estado; en los demás grados, solo uno a la vez.*",
+    "stem": "En la tabla, la nota final sirve para",
+    "options": [
+      {
+        "label": "A",
+        "text": "demostrar que los estudiantes de 11.° leen más que los de los otros grados."
+      },
+      {
+        "label": "B",
+        "text": "resumir los datos sobre devoluciones a tiempo que aparecen en la última columna."
+      },
+      {
+        "label": "C",
+        "text": "explicar la razón por la cual 11.° devuelve menos libros a tiempo que 9.°."
+      },
+      {
+        "label": "D",
+        "text": "aclarar una regla que ayuda a interpretar el número de préstamos de 11.°."
+      }
+    ],
+    "correctOption": "D",
+    "solution": "La nota informa que en septiembre 11.° tenía un límite de préstamo más alto que los demás grados. Ese dato, que no está en las columnas, ayuda a entender por qué 11.° registra tantos préstamos, pero no habla de lectura real ni de devoluciones.",
+    "guide": {
+      "hint": "¿Qué información nueva da la nota que no está en las columnas de la tabla?",
+      "byOption": {
+        "A": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la A?",
+            "choices": [
+              {
+                "text": "Vi que 11.° tiene la cifra más alta de préstamos"
+              },
+              {
+                "text": "Pensé que más préstamos significa más lectura"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Cuántos libros podía tener a la vez un estudiante de 11.° frente a otros grados?",
+              "choices": [
+                {
+                  "text": "Tres frente a uno",
+                  "correct": true
+                },
+                {
+                  "text": "Uno frente a tres"
+                }
+              ]
+            },
+            {
+              "prompt": "¿Prestar un libro demuestra que alguien lo leyó?",
+              "choices": [
+                {
+                  "text": "Sí, siempre lo demuestra"
+                },
+                {
+                  "text": "No, solo muestra que lo llevó",
+                  "correct": true
+                }
+              ]
+            }
+          ]
+        },
+        "B": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la B?",
+            "choices": [
+              {
+                "text": "Creí que la nota resumía la tabla"
+              },
+              {
+                "text": "Pensé que toda nota resume lo anterior"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Qué dato de la nota no está en ninguna columna?",
+              "choices": [
+                {
+                  "text": "El límite de libros por estudiante",
+                  "correct": true
+                },
+                {
+                  "text": "El número de libros devueltos"
+                }
+              ]
+            },
+            {
+              "prompt": "¿La nota menciona devoluciones o fechas de entrega?",
+              "choices": [
+                {
+                  "text": "Sí, en la segunda parte"
+                },
+                {
+                  "text": "No, no las menciona",
+                  "correct": true
+                }
+              ]
+            }
+          ]
+        },
+        "C": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la C?",
+            "choices": [
+              {
+                "text": "Relacioné llevar más libros con devolverlos tarde"
+              },
+              {
+                "text": "Vi que en 11.° hay 90 libros sin devolver a tiempo"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿La nota dice algo sobre plazos o retrasos de devolución?",
+              "choices": [
+                {
+                  "text": "No, solo habla del tope de libros",
+                  "correct": true
+                },
+                {
+                  "text": "Sí, explica los retrasos"
+                }
+              ]
+            },
+            {
+              "prompt": "Si la nota no trata de retrasos, ¿puede explicar su causa por sí sola?",
+              "choices": [
+                {
+                  "text": "Sí, porque se deduce siempre"
+                },
+                {
+                  "text": "No, tendríamos que suponerlo",
+                  "correct": true
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "reveal": "La respuesta es la D. La nota aporta una regla de préstamo que no aparece en las columnas y que sirve para leer con cuidado la cifra de 11.°."
+    }
+  },
+  {
+    "id": "lc-09",
+    "subjectId": "lectura_critica",
+    "categoryId": "lectura_critica.structure_cohesion_multimodal",
+    "primarySubtopicId": "lectura_critica.structure_cohesion_multimodal.logical_links_connectors",
+    "competencia": "afirmacion_2_global",
+    "difficulty": "baja",
+    "targetGrade": 11,
+    "context": "La huerta del colegio de Silvia, en el Cauca, comenzó como un castigo: quienes llegaban tarde debían deshierbar. Sin embargo, a los pocos meses había estudiantes que madrugaban para regar las matas. La profesora de biología aprovechó ese interés y propuso medir cuánto crecía el maíz con abono casero y cuánto sin él. Como los resultados fueron claros, los padres de familia pidieron semillas para sembrar en sus propias parcelas. Aunque la huerta ya no es un castigo, todavía hay quienes llegan tarde; ahora, eso sí, les toca explicar el porqué en la asamblea del curso.",
+    "stem": "En el texto, la expresión «Sin embargo» introduce",
+    "options": [
+      {
+        "label": "A",
+        "text": "un hecho inesperado frente a lo que se esperaría de un castigo."
+      },
+      {
+        "label": "B",
+        "text": "una consecuencia directa de obligar a los estudiantes a deshierbar."
+      },
+      {
+        "label": "C",
+        "text": "un ejemplo más de los castigos que se aplicaban en ese colegio."
+      },
+      {
+        "label": "D",
+        "text": "la causa por la que algunos estudiantes llegaban tarde a clase."
+      }
+    ],
+    "correctOption": "A",
+    "solution": "Antes del conector, la huerta se presenta como un castigo; después, hay estudiantes que madrugan por voluntad propia para cuidarla. «Sin embargo» marca ese contraste entre lo esperado y lo que ocurrió.",
+    "guide": {
+      "hint": "¿Qué idea se dice antes de «Sin embargo» y cuál se dice después de esa expresión?",
+      "byOption": {
+        "B": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la B?",
+            "choices": [
+              {
+                "text": "Pensé que lo de madrugar venía del castigo"
+              },
+              {
+                "text": "Creí que una idea llevaba directamente hacia la otra"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Qué conector usarías si madrugar fuera efecto directo del castigo?",
+              "choices": [
+                {
+                  "text": "Por eso",
+                  "correct": true
+                },
+                {
+                  "text": "Aunque"
+                }
+              ]
+            },
+            {
+              "prompt": "¿Se espera que alguien castigado quiera madrugar para esa misma tarea?",
+              "choices": [
+                {
+                  "text": "Sí, es lo normal"
+                },
+                {
+                  "text": "No, sería raro",
+                  "correct": true
+                }
+              ]
+            }
+          ]
+        },
+        "C": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la C?",
+            "choices": [
+              {
+                "text": "Vi que seguía hablando de la huerta y los estudiantes"
+              },
+              {
+                "text": "Pensé que regar era otro castigo"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "Según el texto, ¿quiénes debían deshierbar como castigo?",
+              "choices": [
+                {
+                  "text": "Quienes llegaban tarde",
+                  "correct": true
+                },
+                {
+                  "text": "Quienes madrugaban"
+                }
+              ]
+            },
+            {
+              "prompt": "¿Qué conector introduce normalmente un ejemplo?",
+              "choices": [
+                {
+                  "text": "Sin embargo"
+                },
+                {
+                  "text": "Por ejemplo",
+                  "correct": true
+                }
+              ]
+            }
+          ]
+        },
+        "D": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la D?",
+            "choices": [
+              {
+                "text": "Vi «llegaban tarde» al inicio y lo conecté"
+              },
+              {
+                "text": "Entendí que madrugar explicaba los retrasos"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Qué hacían los estudiantes después de «Sin embargo»: llegar tarde o madrugar?",
+              "choices": [
+                {
+                  "text": "Madrugar",
+                  "correct": true
+                },
+                {
+                  "text": "Llegar tarde"
+                }
+              ]
+            },
+            {
+              "prompt": "¿Un conector como «Sin embargo» presenta la causa de algo?",
+              "choices": [
+                {
+                  "text": "Sí, siempre da causas"
+                },
+                {
+                  "text": "No, introduce un contraste",
+                  "correct": true
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "reveal": "La respuesta es la A. «Sin embargo» opone dos ideas: lo que empezó como castigo terminó despertando el interés de los estudiantes."
+    }
+  },
+  {
+    "id": "lc-10",
+    "subjectId": "lectura_critica",
+    "categoryId": "lectura_critica.structure_cohesion_multimodal",
+    "primarySubtopicId": "lectura_critica.structure_cohesion_multimodal.logical_links_connectors",
+    "competencia": "afirmacion_2_global",
+    "difficulty": "media",
+    "targetGrade": 11,
+    "context": "La huerta del colegio de Silvia, en el Cauca, comenzó como un castigo: quienes llegaban tarde debían deshierbar. Sin embargo, a los pocos meses había estudiantes que madrugaban para regar las matas. La profesora de biología aprovechó ese interés y propuso medir cuánto crecía el maíz con abono casero y cuánto sin él. Como los resultados fueron claros, los padres de familia pidieron semillas para sembrar en sus propias parcelas. Aunque la huerta ya no es un castigo, todavía hay quienes llegan tarde; ahora, eso sí, les toca explicar el porqué en la asamblea del curso.",
+    "stem": "¿Cuál reescritura conserva la relación de ideas de la oración «Como los resultados fueron claros, los padres de familia pidieron semillas para sembrar en sus propias parcelas»?",
+    "options": [
+      {
+        "label": "A",
+        "text": "Los resultados fueron claros, aunque los padres de familia pidieron semillas para sus parcelas."
+      },
+      {
+        "label": "B",
+        "text": "Los padres de familia pidieron semillas para sus parcelas; por eso, los resultados fueron claros."
+      },
+      {
+        "label": "C",
+        "text": "Los resultados fueron claros; por eso, los padres de familia pidieron semillas para sus parcelas."
+      },
+      {
+        "label": "D",
+        "text": "Los resultados fueron claros mientras los padres de familia pedían semillas para sus parcelas."
+      }
+    ],
+    "correctOption": "C",
+    "solution": "Al comienzo de una oración, «como» presenta la causa: los resultados claros motivaron la petición de semillas. La reescritura debe mantener ese orden de causa y efecto, algo que hace «por eso» cuando va antes del efecto.",
+    "guide": {
+      "hint": "¿Qué ocurrió primero y qué ocurrió como respuesta a eso?",
+      "byOption": {
+        "A": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la A?",
+            "choices": [
+              {
+                "text": "Entendí «como» igual que «aunque»"
+              },
+              {
+                "text": "Creí que había un contraste entre resultados y semillas"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Qué hace la oración «Como llovió, no salimos»: da una razón o contradice?",
+              "choices": [
+                {
+                  "text": "Da una razón",
+                  "correct": true
+                },
+                {
+                  "text": "Contradice lo dicho"
+                }
+              ]
+            },
+            {
+              "prompt": "¿Pedir semillas contradice que los resultados fueran claros?",
+              "choices": [
+                {
+                  "text": "Sí, se oponen"
+                },
+                {
+                  "text": "No, es coherente con ellos",
+                  "correct": true
+                }
+              ]
+            }
+          ]
+        },
+        "B": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la B?",
+            "choices": [
+              {
+                "text": "Vi que la reescritura también usaba «por eso»"
+              },
+              {
+                "text": "Entendí que primero vinieron las semillas"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Qué debía existir antes de que los padres quisieran semillas?",
+              "choices": [
+                {
+                  "text": "Los datos del experimento",
+                  "correct": true
+                },
+                {
+                  "text": "Una cosecha de los padres"
+                }
+              ]
+            },
+            {
+              "prompt": "¿Puede pedir semillas volver claros unos resultados ya obtenidos?",
+              "choices": [
+                {
+                  "text": "Sí, los mejora"
+                },
+                {
+                  "text": "No, los resultados vinieron antes",
+                  "correct": true
+                }
+              ]
+            }
+          ]
+        },
+        "D": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la D?",
+            "choices": [
+              {
+                "text": "Entendí «como» con valor de tiempo"
+              },
+              {
+                "text": "Pensé que las dos cosas ocurrieron a la vez"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "En «Como era tarde, me fui», ¿qué aporta «como»?",
+              "choices": [
+                {
+                  "text": "La razón",
+                  "correct": true
+                },
+                {
+                  "text": "El momento"
+                }
+              ]
+            },
+            {
+              "prompt": "¿La oración original dice que las dos acciones ocurrieron simultáneamente?",
+              "choices": [
+                {
+                  "text": "Sí, ocurrieron juntas"
+                },
+                {
+                  "text": "No, una motiva la otra",
+                  "correct": true
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "reveal": "La respuesta es la C. «Como» introduce la causa y «por eso» introduce el efecto, de modo que ambas construcciones expresan la misma relación."
+    }
+  },
+  {
+    "id": "lc-11",
+    "subjectId": "lectura_critica",
+    "categoryId": "lectura_critica.structure_cohesion_multimodal",
+    "primarySubtopicId": "lectura_critica.structure_cohesion_multimodal.logical_links_connectors",
+    "competencia": "afirmacion_2_global",
+    "difficulty": "alta",
+    "targetGrade": 11,
+    "context": "Algunos concejales de Sogamoso proponen ampliar los cultivos de papa hacia la parte alta del páramo porque, dicen, el municipio necesita empleo. Es cierto que el desempleo rural es alto; ahora bien, el páramo regula el agua que consume toda la ciudad. Ampliar los cultivos daría trabajo durante algunas cosechas, pero podría dejar a miles de hogares con el servicio racionado. De ahí que la discusión no deba plantearse como empleo contra naturaleza, sino como empleo de hoy contra agua de mañana.",
+    "stem": "En el texto, la expresión «ahora bien» le permite al autor",
+    "options": [
+      {
+        "label": "A",
+        "text": "agregar un segundo dato que refuerza la necesidad de generar empleo rural."
+      },
+      {
+        "label": "B",
+        "text": "concluir que los cultivos de papa deben ampliarse de forma inmediata."
+      },
+      {
+        "label": "C",
+        "text": "rechazar como falsa la afirmación sobre el desempleo en el área rural."
+      },
+      {
+        "label": "D",
+        "text": "admitir un punto de los concejales y oponerle una consideración importante."
+      }
+    ],
+    "correctOption": "D",
+    "solution": "Con «Es cierto que» el autor acepta que el desempleo rural es alto. «Ahora bien» abre el contrapeso: el páramo regula el agua de la ciudad, razón que limita la propuesta de los concejales.",
+    "guide": {
+      "hint": "¿Qué dice el autor justo antes de «ahora bien» y qué dice justo después?",
+      "byOption": {
+        "A": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la A?",
+            "choices": [
+              {
+                "text": "Pensé que «ahora bien» suma ideas"
+              },
+              {
+                "text": "Creí que el páramo se mencionaba para apoyar a los concejales"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿El dato de que el páramo regula el agua favorece ampliar los cultivos?",
+              "choices": [
+                {
+                  "text": "No, es un motivo en contra",
+                  "correct": true
+                },
+                {
+                  "text": "Sí, es un motivo más"
+                }
+              ]
+            },
+            {
+              "prompt": "¿Qué conector se usa para sumar una idea del mismo sentido?",
+              "choices": [
+                {
+                  "text": "Ahora bien"
+                },
+                {
+                  "text": "Además",
+                  "correct": true
+                }
+              ]
+            }
+          ]
+        },
+        "B": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la B?",
+            "choices": [
+              {
+                "text": "Tomé la propuesta inicial de los concejales como conclusión"
+              },
+              {
+                "text": "Pensé que el autor estaba a favor por el tema del empleo"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Qué advierte el autor que podría pasar si se amplían los cultivos?",
+              "choices": [
+                {
+                  "text": "Servicio de agua racionado",
+                  "correct": true
+                },
+                {
+                  "text": "Empleo permanente"
+                }
+              ]
+            },
+            {
+              "prompt": "Si advierte ese riesgo, ¿apoya ampliar los cultivos de inmediato?",
+              "choices": [
+                {
+                  "text": "Sí, lo apoya"
+                },
+                {
+                  "text": "No, pide pensarlo mejor",
+                  "correct": true
+                }
+              ]
+            }
+          ]
+        },
+        "C": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la C?",
+            "choices": [
+              {
+                "text": "Creí que el autor negaba todo lo de los concejales"
+              },
+              {
+                "text": "Pensé que contradecir es decir que algo es falso"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Qué expresión usa el autor antes de mencionar el desempleo alto?",
+              "choices": [
+                {
+                  "text": "«Es cierto que»",
+                  "correct": true
+                },
+                {
+                  "text": "«Es falso que»"
+                }
+              ]
+            },
+            {
+              "prompt": "Al decir «Es cierto», ¿el autor niega el dato del desempleo?",
+              "choices": [
+                {
+                  "text": "Sí, lo niega"
+                },
+                {
+                  "text": "No, no lo niega",
+                  "correct": true
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "reveal": "La respuesta es la D. El autor primero concede que hay desempleo y luego, con «ahora bien», pone sobre la mesa el agua como razón para no ampliar los cultivos sin más."
+    }
+  },
+  {
+    "id": "lc-12",
+    "subjectId": "lectura_critica",
+    "categoryId": "lectura_critica.voices_perspective",
+    "primarySubtopicId": "lectura_critica.voices_perspective.voices_speakers",
+    "competencia": "afirmacion_2_global",
+    "difficulty": "media",
+    "targetGrade": 11,
+    "context": "La alcaldía de Montería anunció que desde enero retirará las ventas ambulantes del parque central. «El espacio público es de todos», afirmó la secretaria de Gobierno. A la vendedora de jugos Yolima Causil la frase le parece una burla: «Si es de todos, también es mío; llevo veinte años aquí y nadie me ofrece otro lugar». Un comerciante del sector, que pidió no ser nombrado, celebra la medida, pero admite en voz baja que sus clientes también le compran jugo a Yolima antes de entrar a su almacén. La Personería, por su parte, recordó que cualquier retiro debe ir acompañado de una alternativa de sustento.",
+    "stem": "Cuando Yolima dice «Si es de todos, también es mío», lo que busca es",
+    "options": [
+      {
+        "label": "A",
+        "text": "aceptar que debe compartir el parque con otros vendedores de la ciudad."
+      },
+      {
+        "label": "B",
+        "text": "usar las palabras de la funcionaria para defender su permanencia en el parque."
+      },
+      {
+        "label": "C",
+        "text": "reclamar que la alcaldía le entregue legalmente la propiedad de su puesto."
+      },
+      {
+        "label": "D",
+        "text": "mostrar que está de acuerdo con la medida anunciada por la alcaldía."
+      }
+    ],
+    "correctOption": "B",
+    "solution": "Yolima retoma la frase «es de todos» que dijo la secretaria y la voltea: si el parque es de todos, ella también tiene derecho a estar allí. Por eso el texto dice que la frase le parece una burla y añade que nadie le ofrece otro lugar.",
+    "guide": {
+      "hint": "¿Quién dijo antes que el espacio público «es de todos» y con qué propósito?",
+      "byOption": {
+        "A": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la A?",
+            "choices": [
+              {
+                "text": "Leí «de todos» como aceptar compartir"
+              },
+              {
+                "text": "Pensé que hablaba de repartir el espacio"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Cómo recibe Yolima la frase de la secretaria?",
+              "choices": [
+                {
+                  "text": "Como una burla",
+                  "correct": true
+                },
+                {
+                  "text": "Como un acuerdo"
+                }
+              ]
+            },
+            {
+              "prompt": "¿Alguien que se siente burlado está aceptando lo que le dijeron?",
+              "choices": [
+                {
+                  "text": "Sí, lo acepta"
+                },
+                {
+                  "text": "No, lo está cuestionando",
+                  "correct": true
+                }
+              ]
+            }
+          ]
+        },
+        "C": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la C?",
+            "choices": [
+              {
+                "text": "Entendí «mío» como dueña legal"
+              },
+              {
+                "text": "Pensé que por sus veinte años pedía una escritura"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Qué dice Yolima que nadie le ofrece?",
+              "choices": [
+                {
+                  "text": "Otro lugar",
+                  "correct": true
+                },
+                {
+                  "text": "Una escritura"
+                }
+              ]
+            },
+            {
+              "prompt": "¿Pedir un lugar donde trabajar es lo mismo que exigir propiedad legal?",
+              "choices": [
+                {
+                  "text": "Sí, es lo mismo"
+                },
+                {
+                  "text": "No, son cosas distintas",
+                  "correct": true
+                }
+              ]
+            }
+          ]
+        },
+        "D": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la D?",
+            "choices": [
+              {
+                "text": "Vi que repite la frase y creí que la apoyaba"
+              },
+              {
+                "text": "Pensé que «también» mostraba acuerdo"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Cómo califica el texto la reacción de Yolima ante la frase?",
+              "choices": [
+                {
+                  "text": "Le parece una burla",
+                  "correct": true
+                },
+                {
+                  "text": "Le parece justa"
+                }
+              ]
+            },
+            {
+              "prompt": "Si la medida la saca del parque, ¿está Yolima de acuerdo con ella?",
+              "choices": [
+                {
+                  "text": "Sí, la apoya"
+                },
+                {
+                  "text": "No, la rechaza",
+                  "correct": true
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "reveal": "La respuesta es la B. Yolima toma la frase oficial y la usa en su favor: si el parque es de todos, retirarla de allí contradice lo que dice la propia funcionaria."
+    }
+  },
+  {
+    "id": "lc-13",
+    "subjectId": "lectura_critica",
+    "categoryId": "lectura_critica.voices_perspective",
+    "primarySubtopicId": "lectura_critica.voices_perspective.voices_speakers",
+    "competencia": "afirmacion_2_global",
+    "difficulty": "alta",
+    "targetGrade": 11,
+    "context": "La alcaldía de Montería anunció que desde enero retirará las ventas ambulantes del parque central. «El espacio público es de todos», afirmó la secretaria de Gobierno. A la vendedora de jugos Yolima Causil la frase le parece una burla: «Si es de todos, también es mío; llevo veinte años aquí y nadie me ofrece otro lugar». Un comerciante del sector, que pidió no ser nombrado, celebra la medida, pero admite en voz baja que sus clientes también le compran jugo a Yolima antes de entrar a su almacén. La Personería, por su parte, recordó que cualquier retiro debe ir acompañado de una alternativa de sustento.",
+    "stem": "¿En qué se diferencia la posición de la Personería de la del comerciante frente al retiro de las ventas?",
+    "options": [
+      {
+        "label": "A",
+        "text": "La Personería rechaza el retiro; el comerciante lo critica solamente en privado."
+      },
+      {
+        "label": "B",
+        "text": "La Personería defiende a la alcaldía; el comerciante defiende a los vendedores."
+      },
+      {
+        "label": "C",
+        "text": "La Personería condiciona el retiro; el comerciante lo apoya con cierta reserva."
+      },
+      {
+        "label": "D",
+        "text": "La Personería informa la fecha del retiro; el comerciante propone otra alternativa."
+      }
+    ],
+    "correctOption": "C",
+    "solution": "La Personería no se opone al retiro, pero exige que vaya acompañado de una alternativa de sustento. El comerciante celebra la medida y, en voz baja, reconoce que la venta de jugos también atrae a sus clientes.",
+    "guide": {
+      "hint": "¿Qué verbo usa el texto para presentar lo que dice cada uno?",
+      "byOption": {
+        "A": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la A?",
+            "choices": [
+              {
+                "text": "Entendí el recordatorio de la Personería como un rechazo"
+              },
+              {
+                "text": "Vi «en voz baja» y pensé que el comerciante criticaba"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Qué exige la Personería que acompañe cualquier retiro?",
+              "choices": [
+                {
+                  "text": "Una alternativa de sustento",
+                  "correct": true
+                },
+                {
+                  "text": "Una prohibición total"
+                }
+              ]
+            },
+            {
+              "prompt": "¿Qué hace el comerciante con la medida?",
+              "choices": [
+                {
+                  "text": "La critica"
+                },
+                {
+                  "text": "La celebra",
+                  "correct": true
+                }
+              ]
+            }
+          ]
+        },
+        "B": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la B?",
+            "choices": [
+              {
+                "text": "Creí que toda entidad pública respalda a la alcaldía"
+              },
+              {
+                "text": "Vi que el comerciante mencionó a Yolima y pensé que la defendía"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿La Personería se limita a apoyar lo que anunció la alcaldía?",
+              "choices": [
+                {
+                  "text": "No, le recuerda un requisito",
+                  "correct": true
+                },
+                {
+                  "text": "Sí, la respalda"
+                }
+              ]
+            },
+            {
+              "prompt": "¿Qué hace primero el comerciante ante el retiro de las ventas?",
+              "choices": [
+                {
+                  "text": "Lo rechaza"
+                },
+                {
+                  "text": "Celebra la medida",
+                  "correct": true
+                }
+              ]
+            }
+          ]
+        },
+        "D": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la D?",
+            "choices": [
+              {
+                "text": "Recordé que en el texto aparece una fecha, enero"
+              },
+              {
+                "text": "Pensé que la alternativa la planteaba el comerciante"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Quién anunció que el retiro empezaría en enero?",
+              "choices": [
+                {
+                  "text": "La alcaldía",
+                  "correct": true
+                },
+                {
+                  "text": "La Personería"
+                }
+              ]
+            },
+            {
+              "prompt": "¿Quién menciona la necesidad de una alternativa de sustento?",
+              "choices": [
+                {
+                  "text": "El comerciante"
+                },
+                {
+                  "text": "La Personería",
+                  "correct": true
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "reveal": "La respuesta es la C. La Personería acepta el retiro solo si hay una alternativa de sustento, mientras que el comerciante lo celebra aunque reconozca que Yolima también le trae clientes."
+    }
+  },
+  {
+    "id": "lc-14",
+    "subjectId": "lectura_critica",
+    "categoryId": "lectura_critica.critical_evaluation",
+    "primarySubtopicId": "lectura_critica.critical_evaluation.validity_implications",
+    "competencia": "afirmacion_3_critica",
+    "difficulty": "media",
+    "targetGrade": 11,
+    "context": "El rector de un colegio de Pasto prohibió los celulares en clase durante el primer semestre. En junio, el promedio de matemáticas subió de 3,2 a 3,6, y el rector concluyó en la reunión de padres que la prohibición había funcionado. Una docente pidió revisar esa conclusión. Recordó que ese mismo semestre el colegio abrió tutorías de matemáticas los sábados y que la evaluación pasó de tres exámenes a cinco talleres con nota. «Algo mejoró; lo que aún no sabemos es por qué», dijo.",
+    "stem": "La objeción de la docente se basa en que",
+    "options": [
+      {
+        "label": "A",
+        "text": "hubo otros cambios en el semestre que también pudieron elevar el promedio."
+      },
+      {
+        "label": "B",
+        "text": "el aumento del promedio fue demasiado pequeño para tomarlo en cuenta."
+      },
+      {
+        "label": "C",
+        "text": "los celulares son una herramienta útil para aprender matemáticas en clase."
+      },
+      {
+        "label": "D",
+        "text": "las tutorías de los sábados tuvieron menos asistencia de la que se esperaba."
+      }
+    ],
+    "correctOption": "A",
+    "solution": "La docente no niega la mejora, pues dice «Algo mejoró». Señala que las tutorías y el nuevo sistema de evaluación ocurrieron al mismo tiempo que la prohibición, de modo que no se puede atribuir el aumento solo a esta.",
+    "guide": {
+      "hint": "¿Qué hechos recuerda la docente y para qué los menciona en la reunión?",
+      "byOption": {
+        "B": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la B?",
+            "choices": [
+              {
+                "text": "Pensé que 0,4 puntos es muy poco"
+              },
+              {
+                "text": "Creí que pedir revisar significaba restarle importancia"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Qué reconoce la docente cuando dice «Algo mejoró»?",
+              "choices": [
+                {
+                  "text": "Que el promedio sí subió",
+                  "correct": true
+                },
+                {
+                  "text": "Que nada cambió"
+                }
+              ]
+            },
+            {
+              "prompt": "¿La docente discute el tamaño del aumento o su explicación?",
+              "choices": [
+                {
+                  "text": "Su tamaño"
+                },
+                {
+                  "text": "Su explicación",
+                  "correct": true
+                }
+              ]
+            }
+          ]
+        },
+        "C": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la C?",
+            "choices": [
+              {
+                "text": "Supuse que una docente defendería el uso de celulares"
+              },
+              {
+                "text": "Pensé que criticar la prohibición era defender los celulares"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿De qué medidas del colegio habla la docente?",
+              "choices": [
+                {
+                  "text": "Tutorías y talleres con nota",
+                  "correct": true
+                },
+                {
+                  "text": "Uso de celulares en clase"
+                }
+              ]
+            },
+            {
+              "prompt": "¿Dice la docente algo sobre los celulares como herramienta?",
+              "choices": [
+                {
+                  "text": "Sí, los recomienda"
+                },
+                {
+                  "text": "No, no habla de eso",
+                  "correct": true
+                }
+              ]
+            }
+          ]
+        },
+        "D": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la D?",
+            "choices": [
+              {
+                "text": "Vi «tutorías» y pensé que el problema era la asistencia"
+              },
+              {
+                "text": "Creí que la docente criticaba las tutorías"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Para qué menciona la docente las tutorías?",
+              "choices": [
+                {
+                  "text": "Como medida que coincidió con la prohibición",
+                  "correct": true
+                },
+                {
+                  "text": "Como un fracaso del colegio"
+                }
+              ]
+            },
+            {
+              "prompt": "¿Da el texto algún dato sobre la asistencia de las tutorías?",
+              "choices": [
+                {
+                  "text": "Sí, dice que fue baja"
+                },
+                {
+                  "text": "No, no da ninguno",
+                  "correct": true
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "reveal": "La respuesta es la A. La docente cuestiona la causa, no la mejora: como hubo varias medidas simultáneas, la prohibición podría no ser la explicación."
+    }
+  },
+  {
+    "id": "lc-15",
+    "subjectId": "lectura_critica",
+    "categoryId": "lectura_critica.critical_evaluation",
+    "primarySubtopicId": "lectura_critica.critical_evaluation.validity_implications",
+    "competencia": "afirmacion_3_critica",
+    "difficulty": "alta",
+    "targetGrade": 11,
+    "context": "El rector de un colegio de Pasto prohibió los celulares en clase durante el primer semestre. En junio, el promedio de matemáticas subió de 3,2 a 3,6, y el rector concluyó en la reunión de padres que la prohibición había funcionado. Una docente pidió revisar esa conclusión. Recordó que ese mismo semestre el colegio abrió tutorías de matemáticas los sábados y que la evaluación pasó de tres exámenes a cinco talleres con nota. «Algo mejoró; lo que aún no sabemos es por qué», dijo.",
+    "stem": "¿Cuál de estos datos ayudaría más a comprobar si la conclusión del rector es válida?",
+    "options": [
+      {
+        "label": "A",
+        "text": "La opinión de los padres de familia sobre la prohibición de los celulares."
+      },
+      {
+        "label": "B",
+        "text": "El número de celulares que los docentes decomisaron durante el semestre."
+      },
+      {
+        "label": "C",
+        "text": "El promedio de matemáticas del colegio en el semestre anterior a la prohibición."
+      },
+      {
+        "label": "D",
+        "text": "El cambio de promedio en ese semestre de un colegio similar, con tutorías y talleres, que permita celulares."
+      }
+    ],
+    "correctOption": "D",
+    "solution": "Para saber si la prohibición causó la mejora hay que aislarla de las otras medidas. Un colegio similar con tutorías y talleres, pero con celulares permitidos, muestra qué pasa cuando solo cambia ese factor.",
+    "guide": {
+      "hint": "¿Qué tendría que separarse para saber cuál medida produjo el cambio?",
+      "byOption": {
+        "A": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la A?",
+            "choices": [
+              {
+                "text": "Pensé que la reunión de padres era lo importante"
+              },
+              {
+                "text": "Creí que si los padres aprueban, la medida funcionó"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Qué afirma el rector: que la medida gustó o que causó la mejora?",
+              "choices": [
+                {
+                  "text": "Que causó la mejora",
+                  "correct": true
+                },
+                {
+                  "text": "Que gustó a los padres"
+                }
+              ]
+            },
+            {
+              "prompt": "¿Una opinión favorable prueba que la medida subió las notas?",
+              "choices": [
+                {
+                  "text": "Sí, lo demuestra"
+                },
+                {
+                  "text": "No, no mide ese efecto",
+                  "correct": true
+                }
+              ]
+            }
+          ]
+        },
+        "B": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la B?",
+            "choices": [
+              {
+                "text": "Creí que más decomisos muestran que la norma se cumplió"
+              },
+              {
+                "text": "Pensé que contar celulares medía el efecto"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Qué mide el número de celulares decomisados?",
+              "choices": [
+                {
+                  "text": "El cumplimiento de la norma",
+                  "correct": true
+                },
+                {
+                  "text": "La causa de la mejora"
+                }
+              ]
+            },
+            {
+              "prompt": "¿Ese número permite descartar las tutorías como causa de la mejora?",
+              "choices": [
+                {
+                  "text": "Sí, las descarta"
+                },
+                {
+                  "text": "No, no las descarta",
+                  "correct": true
+                }
+              ]
+            }
+          ]
+        },
+        "C": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la C?",
+            "choices": [
+              {
+                "text": "Pensé en comparar antes y después"
+              },
+              {
+                "text": "No me di cuenta de que ese dato ya estaba"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Qué cifra del texto muestra el promedio antes de la prohibición?",
+              "choices": [
+                {
+                  "text": "3,2",
+                  "correct": true
+                },
+                {
+                  "text": "3,6"
+                }
+              ]
+            },
+            {
+              "prompt": "Comparar antes y después, ¿separa el efecto de los celulares del de las tutorías?",
+              "choices": [
+                {
+                  "text": "Sí, lo separa"
+                },
+                {
+                  "text": "No, ocurrieron juntos",
+                  "correct": true
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "reveal": "La respuesta es la D. Solo una comparación en la que las demás medidas sean iguales permite ver si los celulares marcan la diferencia."
+    }
+  },
+  {
+    "id": "lc-16",
+    "subjectId": "lectura_critica",
+    "categoryId": "lectura_critica.critical_evaluation",
+    "primarySubtopicId": "lectura_critica.critical_evaluation.validity_implications",
+    "competencia": "afirmacion_3_critica",
+    "difficulty": "media",
+    "targetGrade": 11,
+    "context": "Hace cinco años, la vereda Las Mercedes, en Santa Rosa de Cabal, se organizó para cuidar su acueducto comunitario. El reglamento dice que toda familia que se conecte debe aportar un jornal mensual para limpiar la bocatoma. Quien no pueda asistir puede pagar el valor de ese jornal. Este año, tres fincas vacacionales se conectaron y prefieren pagar. La junta acepta el dinero, pero varios socios antiguos se quejan: «La plata arregla tubos, pero cada vez somos menos los que conocemos la quebrada».",
+    "stem": "De la queja de los socios antiguos se puede inferir que, para ellos,",
+    "options": [
+      {
+        "label": "A",
+        "text": "las fincas vacacionales deberían ser desconectadas del acueducto comunitario."
+      },
+      {
+        "label": "B",
+        "text": "el jornal conserva un saber sobre la quebrada que el dinero no reemplaza."
+      },
+      {
+        "label": "C",
+        "text": "el valor del jornal es demasiado bajo para cubrir el arreglo de los tubos."
+      },
+      {
+        "label": "D",
+        "text": "el reglamento de la vereda prohíbe pagar dinero en lugar de asistir al jornal."
+      }
+    ],
+    "correctOption": "B",
+    "solution": "Los socios admiten que la plata sirve, pero lamentan que cada vez menos personas conozcan la quebrada. De ahí se infiere que el trabajo presencial en la bocatoma tiene un valor de conocimiento que el pago no sustituye.",
+    "guide": {
+      "hint": "¿Qué dicen los socios que sí logra la plata y qué dicen que se está perdiendo?",
+      "byOption": {
+        "A": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la A?",
+            "choices": [
+              {
+                "text": "Como se quejan de las fincas, pensé que las querían fuera"
+              },
+              {
+                "text": "Creí que una queja siempre pide expulsar a alguien"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿La junta rechaza o acepta el dinero de las fincas?",
+              "choices": [
+                {
+                  "text": "Lo acepta",
+                  "correct": true
+                },
+                {
+                  "text": "Lo rechaza"
+                }
+              ]
+            },
+            {
+              "prompt": "¿La frase de los socios pide desconectar a alguien?",
+              "choices": [
+                {
+                  "text": "Sí, lo exige"
+                },
+                {
+                  "text": "No, lamenta otra cosa",
+                  "correct": true
+                }
+              ]
+            }
+          ]
+        },
+        "C": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la C?",
+            "choices": [
+              {
+                "text": "Entendí «La plata arregla tubos» como si faltara dinero"
+              },
+              {
+                "text": "Pensé que el problema era el precio"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "En la queja, ¿la plata sirve o no sirve para los tubos?",
+              "choices": [
+                {
+                  "text": "Sirve, los arregla",
+                  "correct": true
+                },
+                {
+                  "text": "No sirve"
+                }
+              ]
+            },
+            {
+              "prompt": "¿Hablan los socios del valor en pesos del jornal?",
+              "choices": [
+                {
+                  "text": "Sí, dicen que es bajo"
+                },
+                {
+                  "text": "No, nunca lo mencionan",
+                  "correct": true
+                }
+              ]
+            }
+          ]
+        },
+        "D": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la D?",
+            "choices": [
+              {
+                "text": "Pensé que los socios alegan que pagar va contra la norma"
+              },
+              {
+                "text": "Olvidé esa parte del reglamento"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Qué puede hacer, según el reglamento, quien no asista al jornal?",
+              "choices": [
+                {
+                  "text": "Pagar su valor",
+                  "correct": true
+                },
+                {
+                  "text": "Perder la conexión"
+                }
+              ]
+            },
+            {
+              "prompt": "Entonces, ¿pagar en lugar de asistir va contra el reglamento?",
+              "choices": [
+                {
+                  "text": "Sí, está prohibido"
+                },
+                {
+                  "text": "No, está permitido",
+                  "correct": true
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "reveal": "La respuesta es la B. La queja reconoce la utilidad de la plata, pero advierte que quien no va a la quebrada deja de conocerla, y ese saber no se compra."
+    }
+  },
+  {
+    "id": "lc-17",
+    "subjectId": "lectura_critica",
+    "categoryId": "lectura_critica.critical_evaluation",
+    "primarySubtopicId": "lectura_critica.critical_evaluation.evaluative_content_bias",
+    "competencia": "afirmacion_3_critica",
+    "difficulty": "baja",
+    "targetGrade": 11,
+    "context": "Basta subir a cualquier bus de Cali para comprobarlo: los muchachos de hoy, pegados a sus pantallas como zombis, ya no leen nada. Mi generación devoraba novelas; la de ellos apenas digiere mensajes de diez palabras. Un sobrino mío, por ejemplo, no pudo decirme quién escribió *La vorágine*. Los maestros, rendidos, ya ni siquiera lo intentan. Así, dentro de poco tendremos un país incapaz de entender sus propias leyes, gobernado por quienes todavía se tomen la molestia de leerlas.",
+    "stem": "En el texto, la comparación de los jóvenes con «zombis» tiene el efecto de",
+    "options": [
+      {
+        "label": "A",
+        "text": "descalificarlos con una imagen negativa en lugar de dar datos sobre su lectura."
+      },
+      {
+        "label": "B",
+        "text": "describir de manera objetiva la postura física de los jóvenes en los buses."
+      },
+      {
+        "label": "C",
+        "text": "advertir sobre los problemas de salud que les causan las pantallas."
+      },
+      {
+        "label": "D",
+        "text": "reconocer que los jóvenes leen mucho, aunque lo hagan en formatos digitales."
+      }
+    ],
+    "correctOption": "A",
+    "solution": "Un zombi es una figura sin voluntad ni pensamiento, de modo que la comparación transmite desprecio. El autor la usa para juzgar a los jóvenes sin aportar cifras ni pruebas sobre cuánto leen.",
+    "guide": {
+      "hint": "¿Qué sensación produce en el lector la palabra «zombis» cuando se usa para hablar de personas?",
+      "byOption": {
+        "B": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la B?",
+            "choices": [
+              {
+                "text": "Pensé que solo describía lo que se ve en el bus"
+              },
+              {
+                "text": "Creí que una comparación siempre es neutra"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿La palabra «zombis» da datos medibles o expresa un juicio?",
+              "choices": [
+                {
+                  "text": "Expresa un juicio",
+                  "correct": true
+                },
+                {
+                  "text": "Da datos medibles"
+                }
+              ]
+            },
+            {
+              "prompt": "¿Una descripción objetiva usaría «zombis» para hablar del público de un bus?",
+              "choices": [
+                {
+                  "text": "Sí, es lo normal"
+                },
+                {
+                  "text": "No, usaría términos neutros",
+                  "correct": true
+                }
+              ]
+            }
+          ]
+        },
+        "C": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la C?",
+            "choices": [
+              {
+                "text": "Relacioné pantallas con daños de salud"
+              },
+              {
+                "text": "Pensé que «zombis» hablaba de cansancio"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿De qué se queja el autor: de salud o de lectura?",
+              "choices": [
+                {
+                  "text": "De lectura",
+                  "correct": true
+                },
+                {
+                  "text": "De salud"
+                }
+              ]
+            },
+            {
+              "prompt": "¿Aparece en el texto alguna enfermedad o efecto médico?",
+              "choices": [
+                {
+                  "text": "Sí, varios"
+                },
+                {
+                  "text": "No, ninguno",
+                  "correct": true
+                }
+              ]
+            }
+          ]
+        },
+        "D": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la D?",
+            "choices": [
+              {
+                "text": "Pensé que mirar pantallas era una manera de leer"
+              },
+              {
+                "text": "Supuse que el autor valoraba la lectura digital"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "Según el autor, ¿cuánto leen hoy los muchachos?",
+              "choices": [
+                {
+                  "text": "Nada",
+                  "correct": true
+                },
+                {
+                  "text": "Mucho"
+                }
+              ]
+            },
+            {
+              "prompt": "¿El autor reconoce algún mérito en los mensajes que leen los jóvenes?",
+              "choices": [
+                {
+                  "text": "Sí, los elogia"
+                },
+                {
+                  "text": "No, los menosprecia",
+                  "correct": true
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "reveal": "La respuesta es la A. «Zombis» no informa nada sobre los hábitos de lectura: es una imagen despectiva que busca desacreditar a los jóvenes."
+    }
+  },
+  {
+    "id": "lc-18",
+    "subjectId": "lectura_critica",
+    "categoryId": "lectura_critica.critical_evaluation",
+    "primarySubtopicId": "lectura_critica.critical_evaluation.evaluative_content_bias",
+    "competencia": "afirmacion_3_critica",
+    "difficulty": "alta",
+    "targetGrade": 11,
+    "context": "Basta subir a cualquier bus de Cali para comprobarlo: los muchachos de hoy, pegados a sus pantallas como zombis, ya no leen nada. Mi generación devoraba novelas; la de ellos apenas digiere mensajes de diez palabras. Un sobrino mío, por ejemplo, no pudo decirme quién escribió *La vorágine*. Los maestros, rendidos, ya ni siquiera lo intentan. Así, dentro de poco tendremos un país incapaz de entender sus propias leyes, gobernado por quienes todavía se tomen la molestia de leerlas.",
+    "stem": "¿Cuál es la principal debilidad del texto como argumento?",
+    "options": [
+      {
+        "label": "A",
+        "text": "Menciona una obra literaria colombiana que los jóvenes no tienen por qué conocer."
+      },
+      {
+        "label": "B",
+        "text": "Escribe desde la experiencia de una generación mayor que la de los jóvenes."
+      },
+      {
+        "label": "C",
+        "text": "Usa un tono emocional, lo cual hace que toda opinión del texto sea falsa."
+      },
+      {
+        "label": "D",
+        "text": "Generaliza sobre toda una generación a partir de impresiones y de un solo caso."
+      }
+    ],
+    "correctOption": "D",
+    "solution": "El autor concluye que los jóvenes «ya no leen nada» a partir de lo que ve en los buses y de lo que no supo responder un sobrino. Esas pruebas no bastan para hablar de toda una generación ni para anunciar el futuro del país.",
+    "guide": {
+      "hint": "¿Qué pruebas concretas presenta el autor para sostener su afirmación?",
+      "byOption": {
+        "A": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la A?",
+            "choices": [
+              {
+                "text": "Me pareció injusto exigir ese libro"
+              },
+              {
+                "text": "Pensé que la falla era la referencia a «La vorágine»"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Para qué usa el autor el caso del sobrino?",
+              "choices": [
+                {
+                  "text": "Para probar que los jóvenes no leen",
+                  "correct": true
+                },
+                {
+                  "text": "Para recomendar un libro"
+                }
+              ]
+            },
+            {
+              "prompt": "Si cambiara esa novela por otra, ¿se arreglaría el problema del razonamiento?",
+              "choices": [
+                {
+                  "text": "Sí, quedaría resuelto"
+                },
+                {
+                  "text": "No, la falla seguiría ahí",
+                  "correct": true
+                }
+              ]
+            }
+          ]
+        },
+        "B": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la B?",
+            "choices": [
+              {
+                "text": "Creí que un adulto no puede opinar sobre jóvenes"
+              },
+              {
+                "text": "Me molestó que hablara de «mi generación»"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Cómo se evalúa un argumento: por quién lo dice o por sus razones?",
+              "choices": [
+                {
+                  "text": "Por sus razones",
+                  "correct": true
+                },
+                {
+                  "text": "Por quién lo dice"
+                }
+              ]
+            },
+            {
+              "prompt": "¿Ser mayor impide, por sí solo, tener razón sobre un tema?",
+              "choices": [
+                {
+                  "text": "Sí, siempre lo impide"
+                },
+                {
+                  "text": "No, la edad no decide eso",
+                  "correct": true
+                }
+              ]
+            }
+          ]
+        },
+        "C": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la C?",
+            "choices": [
+              {
+                "text": "Vi el tono exagerado y concluí que todo era falso"
+              },
+              {
+                "text": "Pensé que emoción y verdad no pueden ir juntas"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Puede alguien decir algo verdadero con tono indignado?",
+              "choices": [
+                {
+                  "text": "Sí, es posible",
+                  "correct": true
+                },
+                {
+                  "text": "No, nunca"
+                }
+              ]
+            },
+            {
+              "prompt": "¿El tono emocional basta para declarar falsa una opinión?",
+              "choices": [
+                {
+                  "text": "Sí, basta con el tono"
+                },
+                {
+                  "text": "No, hay que revisar sus pruebas",
+                  "correct": true
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "reveal": "La respuesta es la D. La lectura de un bus y un sobrino no autorizan una afirmación sobre todos los jóvenes: ese salto es la falla central del argumento."
+    }
+  },
+  {
+    "id": "lc-19",
+    "subjectId": "lectura_critica",
+    "categoryId": "lectura_critica.context_intertextuality",
+    "primarySubtopicId": "lectura_critica.context_intertextuality.contextualization",
+    "competencia": "afirmacion_3_critica",
+    "difficulty": "media",
+    "targetGrade": 11,
+    "context": "Carta ficticia de un campesino boyacense, escrita en 1955.\n\nApreciado señor párroco: le escribo desde la vereda para contarle que ya somos once los que nos reunimos cada noche junto al radio, después del ordeño. El auxiliar nos copia en el tablero lo que dicen desde Sutatenza, y mi mujer, que a los cuarenta años no conocía una letra, firmó el otro día con su nombre el recibo de la leche. Ya no tendré que pedirle al tendero que me lea las cartas de mi hijo. Le ruego nos consiga cartillas, porque una sola no alcanza para tantos.",
+    "stem": "Esta carta se comprende mejor si se sabe que, a mediados del siglo XX, en buena parte del campo colombiano,",
+    "options": [
+      {
+        "label": "A",
+        "text": "las familias campesinas habían dejado la radio para informarse por televisión."
+      },
+      {
+        "label": "B",
+        "text": "muchos adultos no sabían leer y la radio se usó para llevarles educación básica."
+      },
+      {
+        "label": "C",
+        "text": "la ley obligaba a todos los campesinos adultos a asistir a la escuela parroquial."
+      },
+      {
+        "label": "D",
+        "text": "los párrocos les prohibían a los campesinos aprender a leer y a escribir."
+      }
+    ],
+    "correctOption": "B",
+    "solution": "La carta muestra adultos que aprenden letras reunidos alrededor de un radio, con un auxiliar y cartillas. Eso se comprende por las escuelas radiofónicas que, desde Sutatenza, llevaron alfabetización al campo donde muchos adultos no sabían leer.",
+    "guide": {
+      "hint": "¿Qué puede hacer ahora la mujer del campesino que antes no podía y cómo lo aprendió?",
+      "byOption": {
+        "A": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la A?",
+            "choices": [
+              {
+                "text": "Pensé que la televisión ya había llegado a todas partes"
+              },
+              {
+                "text": "Creí que la radio era un medio ya abandonado"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Qué aparato reúne a los vecinos cada noche en la carta?",
+              "choices": [
+                {
+                  "text": "Un radio",
+                  "correct": true
+                },
+                {
+                  "text": "Un televisor"
+                }
+              ]
+            },
+            {
+              "prompt": "Si se reúnen cada noche junto al radio, ¿lo han abandonado?",
+              "choices": [
+                {
+                  "text": "Sí, ya no lo usan"
+                },
+                {
+                  "text": "No, lo usan",
+                  "correct": true
+                }
+              ]
+            }
+          ]
+        },
+        "C": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la C?",
+            "choices": [
+              {
+                "text": "Creí que las reuniones eran obligatorias"
+              },
+              {
+                "text": "Vi que le escribe al párroco y pensé en una orden"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Qué le pide el campesino al párroco?",
+              "choices": [
+                {
+                  "text": "Cartillas",
+                  "correct": true
+                },
+                {
+                  "text": "Un permiso para faltar"
+                }
+              ]
+            },
+            {
+              "prompt": "¿Hay en la carta alguna señal de obligación legal para asistir?",
+              "choices": [
+                {
+                  "text": "Sí, la ley aparece"
+                },
+                {
+                  "text": "No, participan por voluntad propia",
+                  "correct": true
+                }
+              ]
+            }
+          ]
+        },
+        "D": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la D?",
+            "choices": [
+              {
+                "text": "Pensé que la Iglesia estaba en contra de la educación"
+              },
+              {
+                "text": "Creí que el campesino le escribía con temor"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Para qué escribe el campesino al párroco?",
+              "choices": [
+                {
+                  "text": "Para pedirle cartillas",
+                  "correct": true
+                },
+                {
+                  "text": "Para pedirle perdón"
+                }
+              ]
+            },
+            {
+              "prompt": "¿Le pedirías cartillas a quien te prohíbe aprender?",
+              "choices": [
+                {
+                  "text": "Sí, sería normal"
+                },
+                {
+                  "text": "No, no tendría sentido",
+                  "correct": true
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "reveal": "La respuesta es la B. La carta cobra sentido en el marco de las escuelas radiofónicas, que enseñaron a leer a adultos campesinos a mediados del siglo XX."
+    }
+  },
+  {
+    "id": "lc-20",
+    "subjectId": "lectura_critica",
+    "categoryId": "lectura_critica.context_intertextuality",
+    "primarySubtopicId": "lectura_critica.context_intertextuality.contextualization",
+    "competencia": "afirmacion_3_critica",
+    "difficulty": "alta",
+    "targetGrade": 11,
+    "context": "SE AVISA a la comunidad de la vereda Puerto Nuevo, en el Medio Atrato, que la brigada de salud llegará el jueves y no el martes, porque el río sigue muy bajo y la lancha no puede pasar con la nevera de las vacunas. Quienes tengan cita deben traer el carné y estar en la escuela antes de las ocho. Se solicita a los dueños de canoas grandes que presten apoyo el miércoles para traer las cajas desde el puerto de abajo. No se recibirán excusas de último momento: la próxima visita será dentro de tres meses. Junta de Acción Comunal.",
+    "stem": "Por la información del aviso, ¿qué se puede suponer sobre la situación de la vereda?",
+    "options": [
+      {
+        "label": "A",
+        "text": "Tiene un hospital propio, pero le faltan médicos especialistas durante el verano."
+      },
+      {
+        "label": "B",
+        "text": "Sus habitantes rechazan las vacunas y la junta debe presionarlos para que asistan."
+      },
+      {
+        "label": "C",
+        "text": "Depende del río para recibir atención en salud, que llega pocas veces al año."
+      },
+      {
+        "label": "D",
+        "text": "Organiza la brigada por su cuenta y compra las vacunas con dinero comunitario."
+      }
+    ],
+    "correctOption": "C",
+    "solution": "El aviso cambia la fecha porque el río bajo impide el paso de la lancha, y pide canoas para traer las cajas. Además, la próxima visita será en tres meses, lo que indica que la atención en salud llega por agua y con poca frecuencia.",
+    "guide": {
+      "hint": "¿Qué detalles concretos del aviso describen la vida en esa vereda?",
+      "byOption": {
+        "A": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la A?",
+            "choices": [
+              {
+                "text": "Vi «cita» y «brigada de salud» y pensé en un hospital"
+              },
+              {
+                "text": "Creí que el problema era la falta de especialistas"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿En qué lugar deben presentarse quienes tienen cita?",
+              "choices": [
+                {
+                  "text": "En la escuela",
+                  "correct": true
+                },
+                {
+                  "text": "En el hospital"
+                }
+              ]
+            },
+            {
+              "prompt": "Si la vereda tuviera hospital propio, ¿necesitaría esperar una brigada de afuera?",
+              "choices": [
+                {
+                  "text": "Sí, igualmente"
+                },
+                {
+                  "text": "No, tendría atención allí",
+                  "correct": true
+                }
+              ]
+            }
+          ]
+        },
+        "B": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la B?",
+            "choices": [
+              {
+                "text": "Leí «no se recibirán excusas» y pensé que la gente no quería ir"
+              },
+              {
+                "text": "Creí que el tono duro era una presión"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Qué razón da el aviso para no aceptar excusas?",
+              "choices": [
+                {
+                  "text": "Que la próxima visita tarda tres meses",
+                  "correct": true
+                },
+                {
+                  "text": "Que la gente odia las vacunas"
+                }
+              ]
+            },
+            {
+              "prompt": "¿Menciona el aviso a alguien que se niegue a vacunarse?",
+              "choices": [
+                {
+                  "text": "Sí, a varios"
+                },
+                {
+                  "text": "No, a nadie",
+                  "correct": true
+                }
+              ]
+            }
+          ]
+        },
+        "D": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la D?",
+            "choices": [
+              {
+                "text": "Como la junta firma el aviso, pensé que organizaba todo"
+              },
+              {
+                "text": "Vi que pedía canoas y creí que la comunidad lo pagaba todo"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Qué les pide la junta a los dueños de canoas grandes?",
+              "choices": [
+                {
+                  "text": "Apoyo para traer las cajas",
+                  "correct": true
+                },
+                {
+                  "text": "Dinero para vacunas"
+                }
+              ]
+            },
+            {
+              "prompt": "¿Menciona el aviso que la comunidad compre las vacunas?",
+              "choices": [
+                {
+                  "text": "Sí, con aportes"
+                },
+                {
+                  "text": "No, no lo menciona",
+                  "correct": true
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "reveal": "La respuesta es la C. La lancha, el río bajo y los tres meses de espera muestran que la salud llega a la vereda por agua y solo de vez en cuando."
+    }
+  }
+]

@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8"><title>Álbum</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Figtree:wght@500;600;700;800&display=swap">
+<style>
+*{box-sizing:border-box;margin:0}
+body{width:800px;height:844px;overflow:hidden;background:#10231c;display:flex;gap:20px;font-family:Figtree,sans-serif;color:#10231c}
+.phone{width:390px;height:844px;position:relative;overflow:hidden;background:#fff;display:flex;flex-direction:column}
+.page{background:#097d52;color:#fff;padding:20px 20px 18px;flex:1;display:flex;flex-direction:column}
+h1{font:400 50px/1 Anton;letter-spacing:.005em}
+.count{font:700 16px/1 Figtree;margin:8px 0 16px;color:#fff;font-variant-numeric:tabular-nums}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;flex:1}
+.s{border-radius:10px;background:#fff;color:#10231c;display:flex;flex-direction:column;justify-content:space-between;padding:7px 8px;font:400 22px/1 Anton}
+.s svg{width:34px;height:34px;align-self:flex-end}
+.c1{background:#ffd23f}.c2{background:#ff8a5c}.c3{background:#8fe3ff}.c4{background:#fff}
+.e{background:#097049;color:#c6f0de;outline:2px solid #2fa77a;outline-offset:-2px}
+.next{background:#fff;color:#10231c;outline:4px solid #ffd23f;box-shadow:0 10px 18px rgba(0,0,0,.28);transform:rotate(-4deg) scale(1.08);z-index:1}
+.next svg{color:#e8402f}
+.go{margin-top:18px;background:#ffd23f;color:#10231c;border:0;border-radius:14px;padding:14px;font:400 29px/1 Anton;box-shadow:0 5px 0 #c79a12}
+.go small{display:block;font:700 14px/1 Figtree;margin-top:5px}
+.task{display:flex;align-items:center;gap:12px;padding:14px 20px}
+.task b{font-size:16px;display:block}.task span{font-size:14px;color:#4b5f57}
+.tabs{display:grid;grid-template-columns:repeat(4,1fr);padding:9px 6px 16px;border-top:1px solid #dfe7e3}
+.tabs a{text-align:center;font:700 12px/1.3 Figtree;color:#52665d}.tabs svg{width:25px;height:25px;display:block;margin:0 auto 2px}.tabs .a{color:#0b8a5b}
+.bar{background:#097d52;color:#fff;padding:14px 20px;display:flex;align-items:center;gap:12px}
+.bar>svg{width:24px;height:24px;flex:none}
+.beads{display:flex;gap:6px;flex:1}.beads i{flex:1;height:10px;border-radius:3px;background:#097049}.beads .d{background:#ffd23f}.beads .c{background:#fff}
+.slot{width:38px;height:46px;border-radius:7px;box-shadow:inset 0 0 0 2px #7cd0ad;font:400 21px/46px Anton;text-align:center;color:#fff;flex:none}
+.sheet{padding:20px;flex:1}
+.q{font:600 21px/1.32 Figtree;margin-bottom:18px;text-wrap:pretty}
+.opt{display:flex;align-items:center;gap:14px;padding:12px 14px;border-radius:12px;background:#eef4f1;margin-bottom:9px;font:700 19px/1 Figtree}
+.opt em{font:400 21px/32px Anton;font-style:normal;width:32px;height:32px;text-align:center;border-radius:7px;background:#fff;color:#0b8a5b}
+.opt.w{background:#ffe6e2;color:#a31d10;box-shadow:inset 0 0 0 2px #e8402f}.opt.w em{background:#e8402f;color:#fff}
+.opt.w svg{width:20px;height:20px;margin-left:auto}
+.ask{background:#10231c;color:#fff;padding:20px 20px 26px}
+.ask p{font:700 15px/1 Figtree;color:#ffd23f;margin-bottom:7px}
+.ask h2{font:400 32px/1.05 Anton;margin-bottom:12px;letter-spacing:.005em}
+.chip{display:block;background:#fff;color:#10231c;border-radius:11px;padding:13px 15px;font:700 16px/1.1 Figtree;margin-top:8px}
+</style></head><body>
+<svg width="0" height="0" style="position:absolute"><defs>
+<symbol id="frac" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" d="M5 12h14M12 5v.01M12 19v.01"/></symbol>
+<symbol id="tri" viewBox="0 0 24 24"><path fill="currentColor" d="M12 4 22 20H2z"/></symbol>
+<symbol id="sq" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2" fill="currentColor"/></symbol>
+<symbol id="pi" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" d="M4 8c2-2 4-2 8-2h8M9 6c0 5-1 10-3 13M16 6c-1 6-1 13 3 13"/></symbol>
+<symbol id="x" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" d="M6 6l12 12M18 6 6 18"/></symbol>
+<symbol id="home" viewBox="0 0 24 24"><path fill="currentColor" d="M3 11 12 3l9 8v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></symbol>
+<symbol id="book" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" d="M12 6c-2-2-5-2-8-2v15c3 0 6 0 8 2 2-2 5-2 8-2V4c-3 0-6 0-8 2zM12 6v15"/></symbol>
+<symbol id="cup" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" d="M7 4h10v6a5 5 0 0 1-10 0zM12 15v4M8 20h8"/></symbol>
+<symbol id="me" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM4 21c1-4 4-6 8-6s7 2 8 6"/></symbol>
+</defs></svg>
+<section class="phone">
+ <div class="page">
+  <h1>Matemáticas</h1><p class="count">12 de 20 láminas · racha de 6 días</p>
+  <div class="grid">
+   <div class="s c1">1<svg><use href="#frac"/></svg></div><div class="s c3">2<svg><use href="#tri"/></svg></div><div class="s c2">3<svg><use href="#sq"/></svg></div><div class="s c4">4<svg><use href="#pi"/></svg></div>
+   <div class="s c3">5<svg><use href="#sq"/></svg></div><div class="s c1">6<svg><use href="#pi"/></svg></div><div class="s c4">7<svg><use href="#tri"/></svg></div><div class="s c2">8<svg><use href="#frac"/></svg></div>
+   <div class="s c1">9<svg><use href="#tri"/></svg></div><div class="s c2">10<svg><use href="#pi"/></svg></div><div class="s c3">11<svg><use href="#frac"/></svg></div><div class="s c4">12<svg><use href="#sq"/></svg></div>
+   <div class="s next">13<svg><use href="#frac"/></svg></div><div class="s e">14</div><div class="s e">15</div><div class="s e">16</div>
+   <div class="s e">17</div><div class="s e">18</div><div class="s e">19</div><div class="s e">20</div>
+  </div>
+  <button class="go">Te falta Proporciones<small>Consíguela · 5 preguntas · 5 min</small></button>
+ </div>
+ <div class="task"><div><b>Tiquete de lectura</b><span>De tu profe · vence mañana</span></div></div>
+ <nav class="tabs"><a class="a"><svg><use href="#home"/></svg>Hoy</a><a><svg><use href="#book"/></svg>Aprende</a><a><svg><use href="#cup"/></svg>Retos</a><a><svg><use href="#me"/></svg>Yo</a></nav>
+</section>
+<section class="phone">
+ <div class="bar"><svg><use href="#x"/></svg><div class="beads"><i class="d"></i><i class="d"></i><i class="c"></i><i></i><i></i></div><div class="slot">13</div></div>
+ <div class="sheet">
+  <p class="q">Una receta usa 3 tazas de harina por cada 2 de azúcar. Con 12 tazas de harina, ¿cuántas de azúcar necesitas?</p>
+  <div class="opt"><em>A</em>6</div><div class="opt"><em>B</em>8</div><div class="opt w"><em>C</em>11<svg><use href="#x"/></svg></div><div class="opt"><em>D</em>18</div>
+ </div>
+ <div class="ask"><p>Todavía no</p><h2>¿Qué te hizo elegir la C?</h2>
+  <a class="chip">Le sumé 9 a las dos cantidades</a><a class="chip">Hice otra cuenta y me dio 11</a><a class="chip">La adiviné</a></div>
+</section>
+</body></html>

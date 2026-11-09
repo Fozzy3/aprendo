@@ -1,0 +1,2803 @@
+[
+  {
+    "id": "ing-01",
+    "subjectId": "ingles",
+    "categoryId": "ingles.lexis",
+    "primarySubtopicId": "ingles.lexis.vocab_definitions",
+    "competencia": "linguistica",
+    "difficulty": "media",
+    "targetGrade": 11,
+    "stem": "Julián's family is very big. He has 12 cousins, 6 aunts and 5 uncles. Which word describes all these people?",
+    "options": [
+      {
+        "label": "A",
+        "text": "parents"
+      },
+      {
+        "label": "B",
+        "text": "relatives"
+      },
+      {
+        "label": "C",
+        "text": "familiars"
+      }
+    ],
+    "correctOption": "B",
+    "solution": "«Relatives» significa parientes: las personas de tu familia en general, como tíos, tías y primos. «Parents» solo nombra a la mamá y al papá, y «familiars» no tiene ese sentido en inglés.",
+    "guide": {
+      "hint": "¿Qué tienen en común las personas que menciona la oración?",
+      "byOption": {
+        "A": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la A?",
+            "choices": [
+              {
+                "text": "Se parece a «parientes» en español"
+              },
+              {
+                "text": "Pensé que sirve para toda la familia"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Llamaría Julián «mother» a una de sus tías?",
+              "choices": [
+                {
+                  "text": "Sí, es lo mismo"
+                },
+                {
+                  "text": "No, su tía no es su mamá",
+                  "correct": true
+                }
+              ]
+            },
+            {
+              "prompt": "¿Qué personas nombra exactamente la palabra «parents»?",
+              "choices": [
+                {
+                  "text": "Solo la mamá y el papá",
+                  "correct": true
+                },
+                {
+                  "text": "Todos los miembros de la familia"
+                }
+              ]
+            },
+            {
+              "prompt": "Si «parents» solo nombra a mamá y papá, ¿puede incluir tíos y primos?",
+              "choices": [
+                {
+                  "text": "Sí, los incluye"
+                },
+                {
+                  "text": "No, ellos quedan por fuera",
+                  "correct": true
+                }
+              ]
+            }
+          ]
+        },
+        "C": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la C?",
+            "choices": [
+              {
+                "text": "Se parece a «familiares» en español"
+              },
+              {
+                "text": "Creí que viene de «family»"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Qué significa «familiar» en la oración «This song is familiar»?",
+              "choices": [
+                {
+                  "text": "Que la canción te suena conocida",
+                  "correct": true
+                },
+                {
+                  "text": "Que la canción es de tu familia"
+                }
+              ]
+            },
+            {
+              "prompt": "Si «familiar» significa conocido, ¿sirve «familiars» para nombrar a tíos y primos?",
+              "choices": [
+                {
+                  "text": "Sí, es la palabra correcta"
+                },
+                {
+                  "text": "No, no tiene ese significado",
+                  "correct": true
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "reveal": "La palabra buscada era «relatives», que sirve para hablar de parientes. Cuidado: «parents» no significa parientes, solo padres. Y «familiar» significa conocido."
+    }
+  },
+  {
+    "id": "ing-02",
+    "subjectId": "ingles",
+    "categoryId": "ingles.lexis",
+    "primarySubtopicId": "ingles.lexis.vocab_definitions",
+    "competencia": "linguistica",
+    "difficulty": "baja",
+    "targetGrade": 11,
+    "stem": "Today is Wednesday. Yesterday was ____.",
+    "options": [
+      {
+        "label": "A",
+        "text": "Thursday"
+      },
+      {
+        "label": "B",
+        "text": "Monday"
+      },
+      {
+        "label": "C",
+        "text": "Tuesday"
+      }
+    ],
+    "correctOption": "C",
+    "solution": "«Yesterday» significa ayer, así que debes ir un día hacia atrás desde el miércoles. El día anterior a «Wednesday» es «Tuesday», es decir, el martes.",
+    "guide": {
+      "hint": "¿Hacia qué lado del calendario te lleva la palabra «yesterday»?",
+      "byOption": {
+        "A": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la A?",
+            "choices": [
+              {
+                "text": "Pensé que «yesterday» significaba mañana"
+              },
+              {
+                "text": "Confundí los nombres de dos días parecidos"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Qué significa la palabra «yesterday»?",
+              "choices": [
+                {
+                  "text": "Mañana"
+                },
+                {
+                  "text": "Ayer",
+                  "correct": true
+                }
+              ]
+            },
+            {
+              "prompt": "¿«Thursday» viene antes o después de «Wednesday»?",
+              "choices": [
+                {
+                  "text": "Después",
+                  "correct": true
+                },
+                {
+                  "text": "Antes"
+                }
+              ]
+            },
+            {
+              "prompt": "Si «Thursday» viene después de hoy, ¿pudo haber sido ayer?",
+              "choices": [
+                {
+                  "text": "Sí, fue ayer"
+                },
+                {
+                  "text": "No, ese día aún no llega",
+                  "correct": true
+                }
+              ]
+            }
+          ]
+        },
+        "B": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la B?",
+            "choices": [
+              {
+                "text": "Retrocedí dos días desde el miércoles"
+              },
+              {
+                "text": "El lunes es el día que mejor me sé"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Cuántos días hacia atrás significa «yesterday»?",
+              "choices": [
+                {
+                  "text": "Uno",
+                  "correct": true
+                },
+                {
+                  "text": "Dos"
+                }
+              ]
+            },
+            {
+              "prompt": "Si un solo día atrás es ayer, ¿puede «Monday» ser ayer cuando hoy es miércoles?",
+              "choices": [
+                {
+                  "text": "No, queda dos días atrás",
+                  "correct": true
+                },
+                {
+                  "text": "Sí, es ayer"
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "reveal": "Ayer respecto al miércoles es el martes: «Tuesday». Los nombres «Tuesday» y «Thursday» se confunden mucho; recuerda que «Tue» es martes y «Thu» es jueves."
+    }
+  },
+  {
+    "id": "ing-03",
+    "subjectId": "ingles",
+    "categoryId": "ingles.lexis",
+    "primarySubtopicId": "ingles.lexis.vocab_definitions",
+    "competencia": "linguistica",
+    "difficulty": "alta",
+    "targetGrade": 11,
+    "stem": "Complete the sentence: Everybody thinks Nicolás is from Cali, but ____ he was born in Pasto.",
+    "options": [
+      {
+        "label": "A",
+        "text": "currently"
+      },
+      {
+        "label": "B",
+        "text": "eventually"
+      },
+      {
+        "label": "C",
+        "text": "actually"
+      }
+    ],
+    "correctOption": "C",
+    "solution": "«Actually» significa en realidad y sirve para corregir una idea equivocada, como la que todos tienen sobre Nicolás. No significa actualmente, que en inglés sería «currently», y «eventually» quiere decir al final.",
+    "guide": {
+      "hint": "¿Qué relación hay entre lo que la gente cree y el lugar donde nació Nicolás?",
+      "byOption": {
+        "A": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la A?",
+            "choices": [
+              {
+                "text": "Me sonó a «actualmente»"
+              },
+              {
+                "text": "Creí que la oración hablaba del presente"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Cuándo ocurrió el nacimiento de Nicolás?",
+              "choices": [
+                {
+                  "text": "Está ocurriendo ahora"
+                },
+                {
+                  "text": "En el pasado",
+                  "correct": true
+                }
+              ]
+            },
+            {
+              "prompt": "¿Qué idea trae la palabra «currently»?",
+              "choices": [
+                {
+                  "text": "En este momento",
+                  "correct": true
+                },
+                {
+                  "text": "Lo contrario de lo que se cree"
+                }
+              ]
+            },
+            {
+              "prompt": "¿Puede «currently» acompañar algo que pasó una sola vez, como nacer?",
+              "choices": [
+                {
+                  "text": "No, habla de algo actual",
+                  "correct": true
+                },
+                {
+                  "text": "Sí, encaja bien"
+                }
+              ]
+            }
+          ]
+        },
+        "B": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la B?",
+            "choices": [
+              {
+                "text": "Me sonó a «eventualmente» en español"
+              },
+              {
+                "text": "Creí que significaba tal vez"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Haber nacido en Pasto es algo seguro o algo posible?",
+              "choices": [
+                {
+                  "text": "Algo posible"
+                },
+                {
+                  "text": "Algo seguro",
+                  "correct": true
+                }
+              ]
+            },
+            {
+              "prompt": "¿Qué significa «eventually» en inglés?",
+              "choices": [
+                {
+                  "text": "Tal vez, de vez en cuando"
+                },
+                {
+                  "text": "Al final, después de un tiempo",
+                  "correct": true
+                }
+              ]
+            },
+            {
+              "prompt": "¿Encaja «al final de un proceso» con un hecho como haber nacido en Pasto?",
+              "choices": [
+                {
+                  "text": "No, nacer no es el final de un proceso",
+                  "correct": true
+                },
+                {
+                  "text": "Sí, encaja"
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "reveal": "«Actually» significa en realidad; se usa para aclarar o corregir. «Currently» es actualmente y «eventually» es al final: los tres se confunden por su parecido con el español."
+    }
+  },
+  {
+    "id": "ing-04",
+    "subjectId": "ingles",
+    "categoryId": "ingles.lexis",
+    "primarySubtopicId": "ingles.lexis.vocab_definitions",
+    "competencia": "linguistica",
+    "difficulty": "alta",
+    "targetGrade": 11,
+    "stem": "After six years at university, Verónica received her ____ in medicine at the graduation ceremony.",
+    "options": [
+      {
+        "label": "A",
+        "text": "degree"
+      },
+      {
+        "label": "B",
+        "text": "race"
+      },
+      {
+        "label": "C",
+        "text": "career"
+      }
+    ],
+    "correctOption": "A",
+    "solution": "En una ceremonia de graduación se recibe el título, que en inglés es «degree». «Career» es la vida laboral de una persona y «race» es una competencia de velocidad.",
+    "guide": {
+      "hint": "¿Qué se entrega en una ceremonia de graduación?",
+      "byOption": {
+        "B": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la B?",
+            "choices": [
+              {
+                "text": "En español digo «carrera»"
+              },
+              {
+                "text": "Busqué la traducción literal de «carrera»"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿«Race» nombra estudios universitarios o una competencia deportiva?",
+              "choices": [
+                {
+                  "text": "Estudios universitarios"
+                },
+                {
+                  "text": "Una competencia deportiva",
+                  "correct": true
+                }
+              ]
+            },
+            {
+              "prompt": "¿Se entrega una competencia de velocidad en una ceremonia de graduación?",
+              "choices": [
+                {
+                  "text": "No, no tiene sentido",
+                  "correct": true
+                },
+                {
+                  "text": "Sí, se entrega"
+                }
+              ]
+            }
+          ]
+        },
+        "C": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la C?",
+            "choices": [
+              {
+                "text": "Suena igual que «carrera»"
+              },
+              {
+                "text": "Creí que era lo que se estudia en la universidad"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Qué nombra «career» en la frase «His career in medicine lasted 40 years»?",
+              "choices": [
+                {
+                  "text": "Sus estudios"
+                },
+                {
+                  "text": "Su vida laboral",
+                  "correct": true
+                }
+              ]
+            },
+            {
+              "prompt": "Si «career» es la vida laboral, ¿se recibe en una ceremonia de graduación?",
+              "choices": [
+                {
+                  "text": "No, la vida laboral no se entrega",
+                  "correct": true
+                },
+                {
+                  "text": "Sí, se recibe"
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "reveal": "«Degree» es el título universitario; «career», la vida laboral; «race», una competencia. En español, «carrera» cubre las tres ideas, pero en inglés son palabras distintas."
+    }
+  },
+  {
+    "id": "ing-05",
+    "subjectId": "ingles",
+    "categoryId": "ingles.grammar_language_use",
+    "primarySubtopicId": "ingles.grammar_language_use.verb_tenses_forms",
+    "competencia": "linguistica",
+    "difficulty": "baja",
+    "targetGrade": 11,
+    "stem": "My sister ____ in Bogotá with her husband.",
+    "options": [
+      {
+        "label": "A",
+        "text": "lives"
+      },
+      {
+        "label": "B",
+        "text": "live"
+      },
+      {
+        "label": "C",
+        "text": "is live"
+      }
+    ],
+    "correctOption": "A",
+    "solution": "El sujeto «my sister» equivale a «she», así que en presente simple el verbo lleva -s: «lives». «Live» es la forma para «I», «you», «we» y «they», y «is live» junta dos verbos sin necesidad.",
+    "guide": {
+      "hint": "¿Quién hace la acción y cómo se escribe el verbo con ese sujeto?",
+      "byOption": {
+        "B": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la B?",
+            "choices": [
+              {
+                "text": "Pensé que el verbo nunca cambia"
+              },
+              {
+                "text": "Usé la misma forma que con «I»"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Qué sujeto tiene la oración?",
+              "choices": [
+                {
+                  "text": "My sister (ella)",
+                  "correct": true
+                },
+                {
+                  "text": "I (yo)"
+                }
+              ]
+            },
+            {
+              "prompt": "En presente simple, ¿qué le pasa al verbo «play» con «she»?",
+              "choices": [
+                {
+                  "text": "Queda igual"
+                },
+                {
+                  "text": "Lleva -s al final",
+                  "correct": true
+                }
+              ]
+            },
+            {
+              "prompt": "Con «my sister» como sujeto, ¿puede el verbo quedar sin esa -s?",
+              "choices": [
+                {
+                  "text": "No, necesita la -s",
+                  "correct": true
+                },
+                {
+                  "text": "Sí, queda igual"
+                }
+              ]
+            }
+          ]
+        },
+        "C": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la C?",
+            "choices": [
+              {
+                "text": "Creí que toda oración necesita «is»"
+              },
+              {
+                "text": "Pensé en «está viviendo»"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Cuál es el verbo en la oración «she eats rice»?",
+              "choices": [
+                {
+                  "text": "eats",
+                  "correct": true
+                },
+                {
+                  "text": "is"
+                }
+              ]
+            },
+            {
+              "prompt": "Si ya hay un verbo principal como «live», ¿hace falta «is» delante?",
+              "choices": [
+                {
+                  "text": "Sí, siempre"
+                },
+                {
+                  "text": "No, sobra",
+                  "correct": true
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "reveal": "Con «my sister», equivalente a «she», el verbo lleva -s en presente simple. Por eso se dice «lives»; «is live» mezcla dos verbos."
+    }
+  },
+  {
+    "id": "ing-06",
+    "subjectId": "ingles",
+    "categoryId": "ingles.grammar_language_use",
+    "primarySubtopicId": "ingles.grammar_language_use.verb_tenses_forms",
+    "competencia": "linguistica",
+    "difficulty": "media",
+    "targetGrade": 11,
+    "stem": "Did you ____ Carla at the party last Saturday?",
+    "options": [
+      {
+        "label": "A",
+        "text": "saw"
+      },
+      {
+        "label": "B",
+        "text": "see"
+      },
+      {
+        "label": "C",
+        "text": "seen"
+      }
+    ],
+    "correctOption": "B",
+    "solution": "Después del auxiliar «did», el verbo va en forma base: «see». El auxiliar ya indica el pasado, por eso no se usa «saw», y «seen» es participio y necesita «have» o «has».",
+    "guide": {
+      "hint": "¿Qué palabra de la pregunta muestra el tiempo verbal y qué forma del verbo viene después?",
+      "byOption": {
+        "A": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la A?",
+            "choices": [
+              {
+                "text": "La pregunta habla del pasado, así que usé el pasado"
+              },
+              {
+                "text": "«Saw» es el pasado que conozco"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "En la pregunta «Did you go», ¿cuál palabra marca el pasado?",
+              "choices": [
+                {
+                  "text": "go"
+                },
+                {
+                  "text": "Did",
+                  "correct": true
+                }
+              ]
+            },
+            {
+              "prompt": "Si «did» ya marca el pasado, ¿cómo va el verbo que sigue?",
+              "choices": [
+                {
+                  "text": "En su forma base",
+                  "correct": true
+                },
+                {
+                  "text": "También en pasado"
+                }
+              ]
+            },
+            {
+              "prompt": "¿Puede ir «saw» justo después de «did»?",
+              "choices": [
+                {
+                  "text": "Sí, es correcto"
+                },
+                {
+                  "text": "No, repetiría el pasado",
+                  "correct": true
+                }
+              ]
+            }
+          ]
+        },
+        "C": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la C?",
+            "choices": [
+              {
+                "text": "Pensé en «he visto» y usé esa forma"
+              },
+              {
+                "text": "La confundí con la forma para hablar del pasado"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Qué auxiliar va antes de participios como «gone» o «eaten»?",
+              "choices": [
+                {
+                  "text": "Have o has",
+                  "correct": true
+                },
+                {
+                  "text": "Did"
+                }
+              ]
+            },
+            {
+              "prompt": "En esta pregunta, ¿cuál es el auxiliar?",
+              "choices": [
+                {
+                  "text": "Have"
+                },
+                {
+                  "text": "Did",
+                  "correct": true
+                }
+              ]
+            },
+            {
+              "prompt": "Si el auxiliar es «did», ¿puede seguirle un participio?",
+              "choices": [
+                {
+                  "text": "No, le sigue la forma base",
+                  "correct": true
+                },
+                {
+                  "text": "Sí, claro"
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "reveal": "Regla rápida: did + verbo en forma base. El pasado no se marca dos veces en la misma pregunta."
+    }
+  },
+  {
+    "id": "ing-07",
+    "subjectId": "ingles",
+    "categoryId": "ingles.grammar_language_use",
+    "primarySubtopicId": "ingles.grammar_language_use.verb_tenses_forms",
+    "competencia": "linguistica",
+    "difficulty": "alta",
+    "targetGrade": 11,
+    "stem": "Complete the sentence: I ____ in Medellín since 2019.",
+    "options": [
+      {
+        "label": "A",
+        "text": "live"
+      },
+      {
+        "label": "B",
+        "text": "lived"
+      },
+      {
+        "label": "C",
+        "text": "have lived"
+      },
+      {
+        "label": "D",
+        "text": "am living"
+      }
+    ],
+    "correctOption": "C",
+    "solution": "«Since 2019» marca el inicio de algo que sigue hasta hoy, y eso exige presente perfecto: «have lived». «Live» y «am living» no conectan el pasado con el presente, y «lived» indicaría que ya terminó.",
+    "guide": {
+      "hint": "¿Qué indica la palabra «since» sobre el momento en que empezó la acción y si todavía sigue?",
+      "byOption": {
+        "A": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la A?",
+            "choices": [
+              {
+                "text": "En español digo «vivo aquí desde 2019»"
+              },
+              {
+                "text": "Pensé que el presente sirve porque sigue pasando"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Cuándo empezó la acción de vivir en Medellín?",
+              "choices": [
+                {
+                  "text": "En 2019",
+                  "correct": true
+                },
+                {
+                  "text": "Hoy"
+                }
+              ]
+            },
+            {
+              "prompt": "¿Qué tiempo une un inicio en el pasado con el ahora?",
+              "choices": [
+                {
+                  "text": "El presente simple"
+                },
+                {
+                  "text": "El presente perfecto",
+                  "correct": true
+                }
+              ]
+            },
+            {
+              "prompt": "Con «since 2019», ¿puede usarse el presente simple «live»?",
+              "choices": [
+                {
+                  "text": "No, hace falta el presente perfecto",
+                  "correct": true
+                },
+                {
+                  "text": "Sí, igual que en español"
+                }
+              ]
+            }
+          ]
+        },
+        "B": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la B?",
+            "choices": [
+              {
+                "text": "Como 2019 ya pasó, usé el pasado"
+              },
+              {
+                "text": "Vi la fecha y pensé en pasado simple"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "Si dices «since 2019», ¿la acción terminó o sigue hasta hoy?",
+              "choices": [
+                {
+                  "text": "Terminó en 2019"
+                },
+                {
+                  "text": "Sigue hasta hoy",
+                  "correct": true
+                }
+              ]
+            },
+            {
+              "prompt": "¿Puede el pasado simple «lived» describir algo que sigue hasta hoy?",
+              "choices": [
+                {
+                  "text": "No, el pasado simple habla de algo terminado",
+                  "correct": true
+                },
+                {
+                  "text": "Sí, sirve igual"
+                }
+              ]
+            }
+          ]
+        },
+        "D": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la D?",
+            "choices": [
+              {
+                "text": "Pensé que la forma con -ing muestra que sigue pasando"
+              },
+              {
+                "text": "Traduje «estoy viviendo»"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Qué palabra de la oración marca el punto de inicio de la acción?",
+              "choices": [
+                {
+                  "text": "since",
+                  "correct": true
+                },
+                {
+                  "text": "in"
+                }
+              ]
+            },
+            {
+              "prompt": "¿Puede usarse el presente continuo con «since» para hablar de un inicio en el pasado?",
+              "choices": [
+                {
+                  "text": "Sí, sirve"
+                },
+                {
+                  "text": "No, con «since» se necesita un tiempo perfecto",
+                  "correct": true
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "reveal": "En español decimos «vivo aquí desde 2019», pero en inglés se necesita el presente perfecto. Recuerda: «since» o «for» con una acción que sigue piden have + participio."
+    }
+  },
+  {
+    "id": "ing-08",
+    "subjectId": "ingles",
+    "categoryId": "ingles.grammar_language_use",
+    "primarySubtopicId": "ingles.grammar_language_use.verb_tenses_forms",
+    "competencia": "linguistica",
+    "difficulty": "media",
+    "targetGrade": 11,
+    "stem": "We will call you when the bus ____.",
+    "options": [
+      {
+        "label": "A",
+        "text": "will arrive"
+      },
+      {
+        "label": "B",
+        "text": "arrives"
+      },
+      {
+        "label": "C",
+        "text": "arrive"
+      }
+    ],
+    "correctOption": "B",
+    "solution": "Después de «when», aunque se hable del futuro, se usa presente simple. El sujeto «the bus» equivale a «it», por eso la forma es «arrives».",
+    "guide": {
+      "hint": "¿Qué pasa en inglés con el verbo que va después de «when» si hablas del futuro?",
+      "byOption": {
+        "A": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la A?",
+            "choices": [
+              {
+                "text": "El bus llega en el futuro, así que usé «will»"
+              },
+              {
+                "text": "Repetí el «will» de la primera parte"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "En «I will eat when I get home», ¿qué verbo lleva «will»?",
+              "choices": [
+                {
+                  "text": "eat",
+                  "correct": true
+                },
+                {
+                  "text": "get"
+                }
+              ]
+            },
+            {
+              "prompt": "Después de «when» hablando de futuro, ¿qué tiempo se usa?",
+              "choices": [
+                {
+                  "text": "Futuro con will"
+                },
+                {
+                  "text": "Presente simple",
+                  "correct": true
+                }
+              ]
+            },
+            {
+              "prompt": "Entonces, ¿puede ir «will arrive» después de «when» en esta oración?",
+              "choices": [
+                {
+                  "text": "No, ahí va presente simple",
+                  "correct": true
+                },
+                {
+                  "text": "Sí, es futuro"
+                }
+              ]
+            }
+          ]
+        },
+        "C": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la C?",
+            "choices": [
+              {
+                "text": "Pensé que después de «when» va el verbo sin cambios"
+              },
+              {
+                "text": "No miré quién hace la acción"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Qué sujeto tiene el verbo de la segunda parte?",
+              "choices": [
+                {
+                  "text": "We"
+                },
+                {
+                  "text": "The bus",
+                  "correct": true
+                }
+              ]
+            },
+            {
+              "prompt": "¿Qué lleva el verbo en presente simple si el sujeto es «it»?",
+              "choices": [
+                {
+                  "text": "Una -s al final",
+                  "correct": true
+                },
+                {
+                  "text": "Nada"
+                }
+              ]
+            },
+            {
+              "prompt": "Si «the bus» equivale a «it», ¿puede quedar «arrive» sin -s?",
+              "choices": [
+                {
+                  "text": "Sí, queda igual"
+                },
+                {
+                  "text": "No, necesita la -s",
+                  "correct": true
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "reveal": "En español decimos «cuando llegue», pero en inglés se usa presente simple: «when the bus arrives». Recuerda la -s porque el sujeto es tercera persona."
+    }
+  },
+  {
+    "id": "ing-09",
+    "subjectId": "ingles",
+    "categoryId": "ingles.pragmatics_functions",
+    "primarySubtopicId": "ingles.pragmatics_functions.notices_instructions_signage",
+    "competencia": "pragmatica",
+    "difficulty": "baja",
+    "targetGrade": 11,
+    "context": "Sign on a school door:\n\nNO FOOD OR DRINKS IN THE COMPUTER ROOM",
+    "stem": "What does this sign mean?",
+    "options": [
+      {
+        "label": "A",
+        "text": "There is no food for sale here."
+      },
+      {
+        "label": "B",
+        "text": "You cannot eat or drink in this room."
+      },
+      {
+        "label": "C",
+        "text": "You can eat here, but you cannot drink."
+      }
+    ],
+    "correctOption": "B",
+    "solution": "«No food or drinks» prohíbe tanto la comida como las bebidas en esa sala. Se trata de una regla: el letrero no informa sobre ventas de comida.",
+    "guide": {
+      "hint": "¿A quién le habla el letrero y qué quiere que esa persona sepa?",
+      "byOption": {
+        "A": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la A?",
+            "choices": [
+              {
+                "text": "Leí «no food» como «no hay comida»"
+              },
+              {
+                "text": "Pensé que hablaba de una cafetería"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Qué lugar menciona el letrero?",
+              "choices": [
+                {
+                  "text": "Una tienda"
+                },
+                {
+                  "text": "La sala de computadores",
+                  "correct": true
+                }
+              ]
+            },
+            {
+              "prompt": "¿Un letrero en una sala de computadores vende comida o da una regla?",
+              "choices": [
+                {
+                  "text": "Da una regla",
+                  "correct": true
+                },
+                {
+                  "text": "Vende comida"
+                }
+              ]
+            },
+            {
+              "prompt": "¿Dice el letrero algo sobre vender comida?",
+              "choices": [
+                {
+                  "text": "Sí, avisa que no hay"
+                },
+                {
+                  "text": "No, nada sobre ventas",
+                  "correct": true
+                }
+              ]
+            }
+          ]
+        },
+        "C": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la C?",
+            "choices": [
+              {
+                "text": "Pensé que el «no» solo aplicaba a «drinks»"
+              },
+              {
+                "text": "Leí «food» y no me fijé en la palabra «or»"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Qué palabra une «food» y «drinks» en el letrero?",
+              "choices": [
+                {
+                  "text": "or",
+                  "correct": true
+                },
+                {
+                  "text": "but"
+                }
+              ]
+            },
+            {
+              "prompt": "Cuando «no» va antes de «food or drinks», ¿cuántas cosas se prohíben?",
+              "choices": [
+                {
+                  "text": "Solo las bebidas"
+                },
+                {
+                  "text": "Las dos",
+                  "correct": true
+                }
+              ]
+            },
+            {
+              "prompt": "Si la comida también está prohibida, ¿se puede comer en esa sala?",
+              "choices": [
+                {
+                  "text": "No, tampoco se puede",
+                  "correct": true
+                },
+                {
+                  "text": "Sí, solo beber no"
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "reveal": "«No» más un sustantivo en un aviso suele significar prohibido. Por eso «no food or drinks» quiere decir que no se puede comer ni beber ahí."
+    }
+  },
+  {
+    "id": "ing-10",
+    "subjectId": "ingles",
+    "categoryId": "ingles.pragmatics_functions",
+    "primarySubtopicId": "ingles.pragmatics_functions.notices_instructions_signage",
+    "competencia": "pragmatica",
+    "difficulty": "media",
+    "targetGrade": 11,
+    "context": "SCIENCE FAIR ON FRIDAY\n\nGrade 11 students do not have to wear the school uniform on Friday. Students in other grades must wear it.",
+    "stem": "What does the notice say about grade 11 students?",
+    "options": [
+      {
+        "label": "A",
+        "text": "They can come without the uniform on Friday."
+      },
+      {
+        "label": "B",
+        "text": "They are not allowed to wear the uniform on Friday."
+      },
+      {
+        "label": "C",
+        "text": "They must wear the uniform on Friday."
+      }
+    ],
+    "correctOption": "A",
+    "solution": "«Do not have to» significa que algo no es obligatorio, aunque se puede hacer. Por eso los de grado 11 pueden ir sin uniforme; la obligación de llevarlo («must») es solo para los demás grados.",
+    "guide": {
+      "hint": "¿Qué parte del aviso habla de los estudiantes de grado 11, y qué les pide?",
+      "byOption": {
+        "B": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la B?",
+            "choices": [
+              {
+                "text": "Leí «do not have to» como «no pueden»"
+              },
+              {
+                "text": "Creí que era una prohibición"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Qué significa «You do not have to pay», por ejemplo en un museo gratis?",
+              "choices": [
+                {
+                  "text": "Que está prohibido"
+                },
+                {
+                  "text": "Que no es obligatorio",
+                  "correct": true
+                }
+              ]
+            },
+            {
+              "prompt": "Si «do not have to» indica que no es obligatorio, ¿prohíbe ponerse el uniforme?",
+              "choices": [
+                {
+                  "text": "No, cada uno decide",
+                  "correct": true
+                },
+                {
+                  "text": "Sí, lo prohíbe"
+                }
+              ]
+            }
+          ]
+        },
+        "C": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la C?",
+            "choices": [
+              {
+                "text": "Vi la palabra «must» y pensé que era para todos"
+              },
+              {
+                "text": "Leí solo la segunda oración del aviso"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Para quién es la segunda oración del aviso?",
+              "choices": [
+                {
+                  "text": "Para grado 11"
+                },
+                {
+                  "text": "Para los otros grados",
+                  "correct": true
+                }
+              ]
+            },
+            {
+              "prompt": "¿Qué dice la primera oración sobre grado 11?",
+              "choices": [
+                {
+                  "text": "Que no están obligados",
+                  "correct": true
+                },
+                {
+                  "text": "Que deben llevarlo"
+                }
+              ]
+            },
+            {
+              "prompt": "¿Aplica «must wear it» para grado 11?",
+              "choices": [
+                {
+                  "text": "Sí, para todos"
+                },
+                {
+                  "text": "No, aplica para otros grados",
+                  "correct": true
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "reveal": "«Don't have to» significa no tener obligación, mientras que «must not» significa prohibido. Confundirlos cambia por completo el sentido de un aviso."
+    }
+  },
+  {
+    "id": "ing-11",
+    "subjectId": "ingles",
+    "categoryId": "ingles.pragmatics_functions",
+    "primarySubtopicId": "ingles.pragmatics_functions.notices_instructions_signage",
+    "competencia": "pragmatica",
+    "difficulty": "media",
+    "targetGrade": 11,
+    "context": "LIBRARY RULES\n\nYou can borrow books for two weeks.\nA fine of $500 is charged for each late day.",
+    "stem": "What happens if you return a book three days late?",
+    "options": [
+      {
+        "label": "A",
+        "text": "Nothing happens, because it is fine."
+      },
+      {
+        "label": "B",
+        "text": "The library gives you $500 for each day."
+      },
+      {
+        "label": "C",
+        "text": "You pay some money for each extra day."
+      }
+    ],
+    "correctOption": "C",
+    "solution": "En este aviso, «fine» significa multa y «is charged» indica que se cobra. Si devuelves un libro tarde, pagas $500 por cada día de retraso.",
+    "guide": {
+      "hint": "¿Qué palabra del aviso habla de lo que pasa si devuelves tarde un libro y qué significa ahí?",
+      "byOption": {
+        "A": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la A?",
+            "choices": [
+              {
+                "text": "Creí que «fine» significa bien"
+              },
+              {
+                "text": "Pensé que no había ningún problema"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Qué significa «fine» en la frase «I'm fine, thanks»?",
+              "choices": [
+                {
+                  "text": "Bien",
+                  "correct": true
+                },
+                {
+                  "text": "Multa"
+                }
+              ]
+            },
+            {
+              "prompt": "En un aviso de biblioteca con un precio al lado, ¿qué significa «fine»?",
+              "choices": [
+                {
+                  "text": "Bien"
+                },
+                {
+                  "text": "Multa",
+                  "correct": true
+                }
+              ]
+            },
+            {
+              "prompt": "Si «fine» aquí es una multa, ¿devolver tarde no tiene consecuencias?",
+              "choices": [
+                {
+                  "text": "Sí tiene, hay que responder por el retraso",
+                  "correct": true
+                },
+                {
+                  "text": "No tiene ninguna"
+                }
+              ]
+            }
+          ]
+        },
+        "B": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la B?",
+            "choices": [
+              {
+                "text": "Vi «$500» y pensé que me lo daban"
+              },
+              {
+                "text": "Creí que «charged» era recibir"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Qué significa «charge» en la frase «The shop charges $5 for a bag»?",
+              "choices": [
+                {
+                  "text": "Regalar"
+                },
+                {
+                  "text": "Cobrar",
+                  "correct": true
+                }
+              ]
+            },
+            {
+              "prompt": "Si la biblioteca cobra por cada día tarde, ¿te da dinero a ti?",
+              "choices": [
+                {
+                  "text": "No, la biblioteca lo recibe",
+                  "correct": true
+                },
+                {
+                  "text": "Sí, te lo entrega"
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "reveal": "«Fine» tiene dos significados: bien y multa. En un aviso con dinero y reglas, casi siempre es multa."
+    }
+  },
+  {
+    "id": "ing-12",
+    "subjectId": "ingles",
+    "categoryId": "ingles.pragmatics_functions",
+    "primarySubtopicId": "ingles.pragmatics_functions.notices_instructions_signage",
+    "competencia": "sociolinguistica",
+    "difficulty": "media",
+    "targetGrade": 11,
+    "stem": "A hospital wants to put a sign in a corridor asking visitors not to make noise. Which sign is the most appropriate?",
+    "options": [
+      {
+        "label": "A",
+        "text": "Shut up, everybody."
+      },
+      {
+        "label": "B",
+        "text": "Please don't to make noise."
+      },
+      {
+        "label": "C",
+        "text": "You must to be quiet here."
+      },
+      {
+        "label": "D",
+        "text": "Quiet, please. Patients are resting."
+      }
+    ],
+    "correctOption": "D",
+    "solution": "«Quiet, please. Patients are resting.» es cortés y está bien escrito. «Shut up» es grosero, y «don't to» y «must to» son errores gramaticales porque después de esos verbos no va «to».",
+    "guide": {
+      "hint": "¿Qué tan formal debe sonar un letrero para visitantes de un hospital y qué oración está bien escrita?",
+      "byOption": {
+        "A": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la A?",
+            "choices": [
+              {
+                "text": "Traduje «cállense» directamente"
+              },
+              {
+                "text": "Pensé que era la forma normal de pedir silencio"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Cómo se sentiría un visitante si le dicen «cállese» en un hospital?",
+              "choices": [
+                {
+                  "text": "Le parecería grosero",
+                  "correct": true
+                },
+                {
+                  "text": "Le parecería amable"
+                }
+              ]
+            },
+            {
+              "prompt": "¿Qué registro se espera en un letrero público de un hospital?",
+              "choices": [
+                {
+                  "text": "Brusco"
+                },
+                {
+                  "text": "Cortés",
+                  "correct": true
+                }
+              ]
+            },
+            {
+              "prompt": "¿Es «shut up» una expresión cortés?",
+              "choices": [
+                {
+                  "text": "No, es grosera",
+                  "correct": true
+                },
+                {
+                  "text": "Sí, es amable"
+                }
+              ]
+            }
+          ]
+        },
+        "B": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la B?",
+            "choices": [
+              {
+                "text": "Traduje «no hacer» palabra por palabra"
+              },
+              {
+                "text": "Creí que después de «don't» va «to»"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "En «Please don't run», ¿qué va después de «don't»?",
+              "choices": [
+                {
+                  "text": "«to» y luego el verbo"
+                },
+                {
+                  "text": "El verbo solo",
+                  "correct": true
+                }
+              ]
+            },
+            {
+              "prompt": "¿Es correcto poner «to» entre «don't» y «make»?",
+              "choices": [
+                {
+                  "text": "No, sobra",
+                  "correct": true
+                },
+                {
+                  "text": "Sí, hace falta"
+                }
+              ]
+            }
+          ]
+        },
+        "C": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la C?",
+            "choices": [
+              {
+                "text": "En español digo «deben estar» y agregué «to»"
+              },
+              {
+                "text": "Creí que «must» siempre va con «to»"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "En «You must wait here», ¿hay «to» entre «must» y el verbo?",
+              "choices": [
+                {
+                  "text": "Sí, una"
+                },
+                {
+                  "text": "No, ninguna",
+                  "correct": true
+                }
+              ]
+            },
+            {
+              "prompt": "¿Es correcto escribir «must to be»?",
+              "choices": [
+                {
+                  "text": "No, sobra «to»",
+                  "correct": true
+                },
+                {
+                  "text": "Sí, es correcto"
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "reveal": "En avisos públicos se usa un tono cortés: «Quiet, please» funciona bien. Recuerda además que «must» y «don't» van seguidos del verbo sin «to»."
+    }
+  },
+  {
+    "id": "ing-13",
+    "subjectId": "ingles",
+    "categoryId": "ingles.reading_literal",
+    "primarySubtopicId": "ingles.reading_literal.explicit_info_paraphrase",
+    "competencia": "linguistica",
+    "difficulty": "baja",
+    "targetGrade": 11,
+    "context": "My name is Valeria. I live in Ibagué with my grandparents. My parents work in Cali, so I visit them in July and December.",
+    "stem": "Who does Valeria live with?",
+    "options": [
+      {
+        "label": "A",
+        "text": "With her grandmother and grandfather."
+      },
+      {
+        "label": "B",
+        "text": "With her mother and father."
+      },
+      {
+        "label": "C",
+        "text": "With her relatives in Cali."
+      }
+    ],
+    "correctOption": "A",
+    "solution": "El texto dice «I live in Ibagué with my grandparents», y esa palabra significa abuelos. Sus padres están en Cali, y ella solo los visita en julio y diciembre.",
+    "guide": {
+      "hint": "¿Qué palabra del texto dice con quién vive Valeria, y dónde?",
+      "byOption": {
+        "B": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la B?",
+            "choices": [
+              {
+                "text": "Leí «parents» y no vi la palabra completa"
+              },
+              {
+                "text": "Pensé que «grandparents» era otra forma de decir padres"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Dónde trabajan los «parents» de Valeria?",
+              "choices": [
+                {
+                  "text": "En Cali",
+                  "correct": true
+                },
+                {
+                  "text": "En Ibagué"
+                }
+              ]
+            },
+            {
+              "prompt": "¿En qué ciudad vive Valeria?",
+              "choices": [
+                {
+                  "text": "En Cali"
+                },
+                {
+                  "text": "En Ibagué",
+                  "correct": true
+                }
+              ]
+            },
+            {
+              "prompt": "Si sus padres están en Cali, ¿vive Valeria con ellos en Ibagué?",
+              "choices": [
+                {
+                  "text": "No, ellos están en otra ciudad",
+                  "correct": true
+                },
+                {
+                  "text": "Sí, viven juntos"
+                }
+              ]
+            }
+          ]
+        },
+        "C": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la C?",
+            "choices": [
+              {
+                "text": "Vi «Cali» y pensé que ella vive allá"
+              },
+              {
+                "text": "Entendí que viaja porque vive con su familia en Cali"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Qué verbo usa Valeria para hablar de Cali?",
+              "choices": [
+                {
+                  "text": "visit",
+                  "correct": true
+                },
+                {
+                  "text": "live"
+                }
+              ]
+            },
+            {
+              "prompt": "Si solo visita Cali en julio y diciembre, ¿vive allá?",
+              "choices": [
+                {
+                  "text": "Sí, vive allá"
+                },
+                {
+                  "text": "No, vive en otra ciudad",
+                  "correct": true
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "reveal": "«Grandparents» son los abuelos, no los padres. El prefijo «grand-» aparece también en «grandmother» y «grandfather»."
+    }
+  },
+  {
+    "id": "ing-14",
+    "subjectId": "ingles",
+    "categoryId": "ingles.reading_literal",
+    "primarySubtopicId": "ingles.reading_literal.explicit_info_paraphrase",
+    "competencia": "linguistica",
+    "difficulty": "media",
+    "targetGrade": 11,
+    "context": "Our town's Saturday market used to be in the main square. Since March, it has been at the sports centre because the square is being repaired.",
+    "stem": "Where is the market now?",
+    "options": [
+      {
+        "label": "A",
+        "text": "In the main square."
+      },
+      {
+        "label": "B",
+        "text": "At the sports centre."
+      },
+      {
+        "label": "C",
+        "text": "In a shop for repairs."
+      }
+    ],
+    "correctOption": "B",
+    "solution": "El texto dice que desde marzo el mercado está en el centro deportivo, mientras la plaza está en reparación. «Used to be» indica que antes estaba en la plaza, pero ya no.",
+    "guide": {
+      "hint": "¿Qué expresión del texto marca lo que ya no ocurre y cuál lo que ocurre ahora?",
+      "byOption": {
+        "A": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la A?",
+            "choices": [
+              {
+                "text": "Leí «used to be» y pensé que sigue ahí"
+              },
+              {
+                "text": "Vi «main square» al comienzo y no seguí leyendo"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "En «I used to play tennis», ¿sigue jugando la persona?",
+              "choices": [
+                {
+                  "text": "Sí, sigue jugando"
+                },
+                {
+                  "text": "No, ya no juega",
+                  "correct": true
+                }
+              ]
+            },
+            {
+              "prompt": "¿Qué palabra del texto indica desde cuándo cambió el lugar?",
+              "choices": [
+                {
+                  "text": "Since",
+                  "correct": true
+                },
+                {
+                  "text": "Saturday"
+                }
+              ]
+            },
+            {
+              "prompt": "Si el mercado «used to be» en la plaza, ¿sigue hoy en esa plaza?",
+              "choices": [
+                {
+                  "text": "Sí, sigue ahí"
+                },
+                {
+                  "text": "No, cambió de lugar",
+                  "correct": true
+                }
+              ]
+            }
+          ]
+        },
+        "C": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la C?",
+            "choices": [
+              {
+                "text": "Vi «repaired» y pensé en un taller"
+              },
+              {
+                "text": "Entendí que el mercado está en un sitio que repara cosas"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Qué es lo que se está reparando, según el texto?",
+              "choices": [
+                {
+                  "text": "La plaza",
+                  "correct": true
+                },
+                {
+                  "text": "Una tienda"
+                }
+              ]
+            },
+            {
+              "prompt": "¿Menciona el texto alguna tienda de reparaciones?",
+              "choices": [
+                {
+                  "text": "Sí, una"
+                },
+                {
+                  "text": "No, ninguna",
+                  "correct": true
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "reveal": "«Used to» señala algo que era cierto antes y ya no. Para saber la situación actual, mira la parte que empieza con «Since March»."
+    }
+  },
+  {
+    "id": "ing-15",
+    "subjectId": "ingles",
+    "categoryId": "ingles.reading_literal",
+    "primarySubtopicId": "ingles.reading_literal.explicit_info_paraphrase",
+    "competencia": "pragmatica",
+    "difficulty": "alta",
+    "targetGrade": 11,
+    "context": "Daniela, 17, wanted less plastic at her school. She asked the cafeteria owner to stop selling bottled water. At first he refused, saying he would lose money. Then she suggested selling reusable bottles and refilling them for a small price. He agreed to try it for one month. By the end of the month, sales had not fallen, and the rubbish bins were half empty.",
+    "stem": "What was the result of the one-month trial?",
+    "options": [
+      {
+        "label": "A",
+        "text": "The owner sold less than before."
+      },
+      {
+        "label": "B",
+        "text": "The rubbish bins were completely empty."
+      },
+      {
+        "label": "C",
+        "text": "The cafeteria's sales did not go down."
+      },
+      {
+        "label": "D",
+        "text": "The owner went back to selling bottled water."
+      }
+    ],
+    "correctOption": "C",
+    "solution": "El texto dice «sales had not fallen»: las ventas no bajaron. Las canecas quedaron medio vacías, no del todo, y nada indica que el dueño volviera a lo de antes.",
+    "guide": {
+      "hint": "¿Qué oración del texto dice lo que pasó al terminar el mes?",
+      "byOption": {
+        "A": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la A?",
+            "choices": [
+              {
+                "text": "Leí «fallen» y no vi el «not»"
+              },
+              {
+                "text": "Creí que la idea le haría perder dinero"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Qué temía el dueño al comienzo?",
+              "choices": [
+                {
+                  "text": "Perder dinero",
+                  "correct": true
+                },
+                {
+                  "text": "Ganar más"
+                }
+              ]
+            },
+            {
+              "prompt": "¿Qué significa la frase «sales had fallen»?",
+              "choices": [
+                {
+                  "text": "Que las ventas subieron"
+                },
+                {
+                  "text": "Que las ventas bajaron",
+                  "correct": true
+                }
+              ]
+            },
+            {
+              "prompt": "El texto dice «had not fallen»: ¿bajaron las ventas al final del mes?",
+              "choices": [
+                {
+                  "text": "No, se mantuvieron o subieron",
+                  "correct": true
+                },
+                {
+                  "text": "Sí, bajaron"
+                }
+              ]
+            }
+          ]
+        },
+        "B": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la B?",
+            "choices": [
+              {
+                "text": "Leí «bins» y «empty» sin fijarme en «half»"
+              },
+              {
+                "text": "Pensé que ya no había basura"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Qué palabra acompaña a «empty» en el texto?",
+              "choices": [
+                {
+                  "text": "completely"
+                },
+                {
+                  "text": "half",
+                  "correct": true
+                }
+              ]
+            },
+            {
+              "prompt": "Si «half» significa mitad, ¿estaban completamente vacías las canecas?",
+              "choices": [
+                {
+                  "text": "No, solo medio vacías",
+                  "correct": true
+                },
+                {
+                  "text": "Sí, totalmente"
+                }
+              ]
+            }
+          ]
+        },
+        "D": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la D?",
+            "choices": [
+              {
+                "text": "Recordé que el dueño se negó al comienzo"
+              },
+              {
+                "text": "Pensé que la prueba falló y volvió a lo de antes"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿El dueño se negó antes o después de la prueba?",
+              "choices": [
+                {
+                  "text": "Después"
+                },
+                {
+                  "text": "Antes de la prueba",
+                  "correct": true
+                }
+              ]
+            },
+            {
+              "prompt": "¿Dice el texto que volvió a vender agua embotellada al terminar el mes?",
+              "choices": [
+                {
+                  "text": "No, no lo menciona",
+                  "correct": true
+                },
+                {
+                  "text": "Sí, lo dice"
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "reveal": "Fíjate en las palabras pequeñas, como «not» y «half», porque cambian el significado. «Had not fallen» quiere decir que las ventas no bajaron."
+    }
+  },
+  {
+    "id": "ing-16",
+    "subjectId": "ingles",
+    "categoryId": "ingles.reading_literal",
+    "primarySubtopicId": "ingles.reading_literal.explicit_info_paraphrase",
+    "competencia": "pragmatica",
+    "difficulty": "alta",
+    "targetGrade": 11,
+    "context": "ENGLISH CAMP 2027\n\nApplications are open until 30 June.\n\nStudents under 15 need permission from a parent.\n\nThe camp is free, but transport is not included.",
+    "stem": "Which sentence is true about the camp?",
+    "options": [
+      {
+        "label": "A",
+        "text": "Students have to pay for their own transport."
+      },
+      {
+        "label": "B",
+        "text": "The camp includes free transport."
+      },
+      {
+        "label": "C",
+        "text": "All students need permission from a parent."
+      },
+      {
+        "label": "D",
+        "text": "Applications close at the beginning of June."
+      }
+    ],
+    "correctOption": "A",
+    "solution": "El aviso dice que el campamento es gratis, pero «transport is not included»: cada estudiante debe pagar su transporte. Las otras opciones fallan porque solo los menores de 15 necesitan permiso y las inscripciones cierran el 30 de junio.",
+    "guide": {
+      "hint": "¿Qué dice cada línea del aviso y cuál coincide con lo que afirma cada opción?",
+      "byOption": {
+        "B": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la B?",
+            "choices": [
+              {
+                "text": "Leí «free» y pensé que todo es gratis"
+              },
+              {
+                "text": "No noté la palabra «not» en la última línea"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Qué parte de la última línea es gratis?",
+              "choices": [
+                {
+                  "text": "El transporte"
+                },
+                {
+                  "text": "El campamento",
+                  "correct": true
+                }
+              ]
+            },
+            {
+              "prompt": "Si «transport is not included», ¿viene incluido en el campamento?",
+              "choices": [
+                {
+                  "text": "No, queda por fuera",
+                  "correct": true
+                },
+                {
+                  "text": "Sí, viene incluido"
+                }
+              ]
+            }
+          ]
+        },
+        "C": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la C?",
+            "choices": [
+              {
+                "text": "Creí que la regla era para todos"
+              },
+              {
+                "text": "Leí «under» y no entendí qué significaba"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Qué significa «under 15» cuando se habla de edad?",
+              "choices": [
+                {
+                  "text": "Más de 15 años"
+                },
+                {
+                  "text": "Menos de 15 años",
+                  "correct": true
+                }
+              ]
+            },
+            {
+              "prompt": "¿Necesita permiso un estudiante de 16 años según el aviso?",
+              "choices": [
+                {
+                  "text": "No, solo los menores de 15",
+                  "correct": true
+                },
+                {
+                  "text": "Sí, todos"
+                }
+              ]
+            }
+          ]
+        },
+        "D": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la D?",
+            "choices": [
+              {
+                "text": "Leí «June» y supuse el comienzo del mes"
+              },
+              {
+                "text": "Confundí el 30 de junio con el primero"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Qué palabra indica el último día para inscribirse?",
+              "choices": [
+                {
+                  "text": "open"
+                },
+                {
+                  "text": "until",
+                  "correct": true
+                }
+              ]
+            },
+            {
+              "prompt": "Si «until 30 June» marca el último día, ¿se cierra el proceso el primero de junio?",
+              "choices": [
+                {
+                  "text": "No, sigue abierto hasta el 30",
+                  "correct": true
+                },
+                {
+                  "text": "Sí, ese día cierra"
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "reveal": "En avisos, lee cada línea y busca palabras como «but», «not» y «until». Cambian por completo lo que se permite o se paga."
+    }
+  },
+  {
+    "id": "ing-17",
+    "subjectId": "ingles",
+    "categoryId": "ingles.reading_inferential",
+    "primarySubtopicId": "ingles.reading_inferential.inferences_conclusions",
+    "competencia": "pragmatica",
+    "difficulty": "media",
+    "targetGrade": 11,
+    "context": "Tomás looked at his watch. Then he looked at the empty bus stop. \"Oh no, not again!\" he said, and he started walking very fast toward the school.",
+    "stem": "What can we understand from the text?",
+    "options": [
+      {
+        "label": "A",
+        "text": "He lost his watch at the bus stop."
+      },
+      {
+        "label": "B",
+        "text": "He decided not to go to school."
+      },
+      {
+        "label": "C",
+        "text": "He arrived too late for the bus."
+      }
+    ],
+    "correctOption": "C",
+    "solution": "El paradero está vacío y Tomás, tras mirar la hora, dice «Oh no, not again!»: eso muestra que el bus ya pasó. Por eso camina rápido hacia el colegio.",
+    "guide": {
+      "hint": "¿Qué pistas del texto muestran cómo se siente Tomás y qué acaba de descubrir?",
+      "byOption": {
+        "A": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la A?",
+            "choices": [
+              {
+                "text": "Leí «looked at his watch» y pensé que lo buscaba"
+              },
+              {
+                "text": "Asocié «Oh no» con haber perdido algo"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Qué hace alguien que mira su reloj?",
+              "choices": [
+                {
+                  "text": "Revisa la hora",
+                  "correct": true
+                },
+                {
+                  "text": "Lo busca"
+                }
+              ]
+            },
+            {
+              "prompt": "Si Tomás mira su reloj, ¿lo perdió?",
+              "choices": [
+                {
+                  "text": "Sí, lo perdió"
+                },
+                {
+                  "text": "No, lo tiene puesto",
+                  "correct": true
+                }
+              ]
+            }
+          ]
+        },
+        "B": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la B?",
+            "choices": [
+              {
+                "text": "Creí que «Oh no» significaba que no iría"
+              },
+              {
+                "text": "Pensé que se devolvió para su casa"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Hacia dónde camina Tomás al final?",
+              "choices": [
+                {
+                  "text": "Hacia la casa"
+                },
+                {
+                  "text": "Hacia el colegio",
+                  "correct": true
+                }
+              ]
+            },
+            {
+              "prompt": "Si camina rápido hacia el colegio, ¿decidió no ir?",
+              "choices": [
+                {
+                  "text": "No, sí va a ir",
+                  "correct": true
+                },
+                {
+                  "text": "Sí, decidió quedarse"
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "reveal": "Inferir es unir pistas que no están escritas directamente. Aquí, el reloj, el paradero vacío y su reacción apuntan a que el bus ya se había ido."
+    }
+  },
+  {
+    "id": "ing-18",
+    "subjectId": "ingles",
+    "categoryId": "ingles.reading_inferential",
+    "primarySubtopicId": "ingles.reading_inferential.inferences_conclusions",
+    "competencia": "pragmatica",
+    "difficulty": "baja",
+    "targetGrade": 11,
+    "context": "Message from Lucía to her mother:\n\nMom, I can't go to the cinema with you tonight. I have a lot of maths homework, and my exam is tomorrow morning.",
+    "stem": "What will Lucía probably do tonight?",
+    "options": [
+      {
+        "label": "A",
+        "text": "Study at home."
+      },
+      {
+        "label": "B",
+        "text": "Go to the cinema."
+      },
+      {
+        "label": "C",
+        "text": "Take a maths exam."
+      }
+    ],
+    "correctOption": "A",
+    "solution": "Lucía no puede ir al cine porque tiene mucha tarea y su examen es mañana. Lo más probable es que esta noche se quede estudiando en casa.",
+    "guide": {
+      "hint": "¿Qué dice Lucía que tiene que hacer y para cuándo?",
+      "byOption": {
+        "B": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la B?",
+            "choices": [
+              {
+                "text": "Leí «cinema» y no noté «can't»"
+              },
+              {
+                "text": "Creí que «can't» significaba que sí puede"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Qué significa «can't» en la frase «I can't swim»?",
+              "choices": [
+                {
+                  "text": "Sí puedo"
+                },
+                {
+                  "text": "No puedo",
+                  "correct": true
+                }
+              ]
+            },
+            {
+              "prompt": "Si Lucía escribe «I can't go to the cinema», ¿irá esta noche?",
+              "choices": [
+                {
+                  "text": "No, dice que no puede",
+                  "correct": true
+                },
+                {
+                  "text": "Sí, irá"
+                }
+              ]
+            }
+          ]
+        },
+        "C": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la C?",
+            "choices": [
+              {
+                "text": "Leí «exam» y pensé que era esta noche"
+              },
+              {
+                "text": "Confundí «tonight» con «tomorrow»"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Cuándo es el examen de Lucía, según el mensaje?",
+              "choices": [
+                {
+                  "text": "Esta noche"
+                },
+                {
+                  "text": "Mañana por la mañana",
+                  "correct": true
+                }
+              ]
+            },
+            {
+              "prompt": "Si el examen es mañana, ¿lo presentará esta noche?",
+              "choices": [
+                {
+                  "text": "No, todavía no",
+                  "correct": true
+                },
+                {
+                  "text": "Sí, esta noche"
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "reveal": "Para inferir lo que hará alguien, une las razones que da: mucha tarea y un examen al día siguiente. Recuerda que «tonight» es esta noche y «tomorrow» es mañana."
+    }
+  },
+  {
+    "id": "ing-19",
+    "subjectId": "ingles",
+    "categoryId": "ingles.reading_inferential",
+    "primarySubtopicId": "ingles.reading_inferential.inferences_conclusions",
+    "competencia": "sociolinguistica",
+    "difficulty": "alta",
+    "targetGrade": 11,
+    "context": "Dear Mr Rojas,\n\nI would be grateful if you could send me the results of the debate competition. I am sorry to trouble you during the holidays.\n\nYours sincerely,\nCamila Díaz",
+    "stem": "Who is Camila most probably writing to?",
+    "options": [
+      {
+        "label": "A",
+        "text": "Her best friend."
+      },
+      {
+        "label": "B",
+        "text": "A teacher or other adult she must treat formally."
+      },
+      {
+        "label": "C",
+        "text": "Someone in her own family."
+      }
+    ],
+    "correctOption": "B",
+    "solution": "El saludo «Dear Mr Rojas», la frase «I would be grateful» y la despedida «Yours sincerely» son propios de un mensaje formal. Por eso lo más probable es que Camila le escriba a un adulto como un profesor.",
+    "guide": {
+      "hint": "¿Qué expresiones del mensaje muestran qué tan cercana o distante es la relación?",
+      "byOption": {
+        "A": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la A?",
+            "choices": [
+              {
+                "text": "«Dear» me sonó a «querido» y pensé en un amigo"
+              },
+              {
+                "text": "Creí que pedir un favor es cosa de amigos"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Escribirías «Mr Rojas» para saludar a tu mejor amigo?",
+              "choices": [
+                {
+                  "text": "No, usaría su nombre",
+                  "correct": true
+                },
+                {
+                  "text": "Sí, siempre"
+                }
+              ]
+            },
+            {
+              "prompt": "¿Qué tipo de saludo es «Dear» seguido de «Mr» y apellido?",
+              "choices": [
+                {
+                  "text": "Uno cariñoso"
+                },
+                {
+                  "text": "Uno formal",
+                  "correct": true
+                }
+              ]
+            },
+            {
+              "prompt": "Con «Yours sincerely» al final, ¿parece un mensaje para un mejor amigo?",
+              "choices": [
+                {
+                  "text": "No, es muy formal",
+                  "correct": true
+                },
+                {
+                  "text": "Sí, es cercano"
+                }
+              ]
+            }
+          ]
+        },
+        "C": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la C?",
+            "choices": [
+              {
+                "text": "Pensé que «Rojas» es de su familia"
+              },
+              {
+                "text": "Creí que «Dear» solo se usa con familiares"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Cuál es el apellido de Camila en la firma?",
+              "choices": [
+                {
+                  "text": "Rojas"
+                },
+                {
+                  "text": "Díaz",
+                  "correct": true
+                }
+              ]
+            },
+            {
+              "prompt": "Si alguien de su familia recibiera el mensaje, ¿usaría ella «Yours sincerely» y «I would be grateful»?",
+              "choices": [
+                {
+                  "text": "Sí, es normal"
+                },
+                {
+                  "text": "No, suena muy formal",
+                  "correct": true
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "reveal": "En inglés, «Dear» encabeza también las cartas formales; con «Mr» y el apellido no expresa cariño. El registro del mensaje dice mucho sobre la relación entre quienes escriben."
+    }
+  },
+  {
+    "id": "ing-20",
+    "subjectId": "ingles",
+    "categoryId": "ingles.reading_inferential",
+    "primarySubtopicId": "ingles.reading_inferential.inferences_conclusions",
+    "competencia": "pragmatica",
+    "difficulty": "alta",
+    "targetGrade": 11,
+    "context": "Restaurant review\n\nThe food at Sabores was tasty, I suppose, but I waited 50 minutes for a soup and the waiter forgot my juice. At those prices, I'd rather eat at home.",
+    "stem": "What can we conclude about the writer's opinion?",
+    "options": [
+      {
+        "label": "A",
+        "text": "The writer will probably go back soon."
+      },
+      {
+        "label": "B",
+        "text": "The food was the worst part of the visit."
+      },
+      {
+        "label": "C",
+        "text": "The writer did not receive any food."
+      },
+      {
+        "label": "D",
+        "text": "The service and the prices disappointed the writer."
+      }
+    ],
+    "correctOption": "D",
+    "solution": "El autor admite que la comida estaba bien, pero se queja de 50 minutos de espera, del jugo olvidado y de los precios. Por eso dice que preferiría comer en casa: la experiencia lo decepcionó.",
+    "guide": {
+      "hint": "¿Qué partes del texto muestran lo que le gustó y lo que no le gustó al autor?",
+      "byOption": {
+        "A": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la A?",
+            "choices": [
+              {
+                "text": "Leí «tasty» y pensé que le encantó"
+              },
+              {
+                "text": "Entendí «rather» como que volvería"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "En el texto, ¿qué expresa la frase «rather eat at home»?",
+              "choices": [
+                {
+                  "text": "Preferiría comer en casa",
+                  "correct": true
+                },
+                {
+                  "text": "Quiere comer en ese restaurante"
+                }
+              ]
+            },
+            {
+              "prompt": "Si prefiere comer en casa, ¿piensa volver pronto a Sabores?",
+              "choices": [
+                {
+                  "text": "Sí, volverá"
+                },
+                {
+                  "text": "No, no parece querer volver",
+                  "correct": true
+                }
+              ]
+            }
+          ]
+        },
+        "B": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la B?",
+            "choices": [
+              {
+                "text": "Vi «I suppose» y pensé que la comida fue mala"
+              },
+              {
+                "text": "Pensé que las quejas eran sobre el sabor"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Qué dice el autor de la comida?",
+              "choices": [
+                {
+                  "text": "Que sabía mal"
+                },
+                {
+                  "text": "Que estaba rica",
+                  "correct": true
+                }
+              ]
+            },
+            {
+              "prompt": "¿De qué se queja el autor, en general?",
+              "choices": [
+                {
+                  "text": "De la espera, el olvido y el costo",
+                  "correct": true
+                },
+                {
+                  "text": "Del sabor"
+                }
+              ]
+            },
+            {
+              "prompt": "Si la comida fue «tasty», ¿fue lo peor de la visita?",
+              "choices": [
+                {
+                  "text": "Sí, fue lo peor"
+                },
+                {
+                  "text": "No, lo peor fue otra cosa",
+                  "correct": true
+                }
+              ]
+            }
+          ]
+        },
+        "C": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la C?",
+            "choices": [
+              {
+                "text": "Leí «forgot» y creí que olvidaron todo"
+              },
+              {
+                "text": "Entendí que nunca le trajeron nada"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Qué olvidó el mesero, según el texto?",
+              "choices": [
+                {
+                  "text": "La sopa"
+                },
+                {
+                  "text": "El jugo",
+                  "correct": true
+                }
+              ]
+            },
+            {
+              "prompt": "Si el autor dice que la comida estaba rica, ¿llegó a probarla?",
+              "choices": [
+                {
+                  "text": "Sí, la probó",
+                  "correct": true
+                },
+                {
+                  "text": "No, nunca llegó"
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "reveal": "Las opiniones en inglés suelen estar en frases cortas como «I'd rather», que significa preferiría. Aquí la comida no era el problema, sino el servicio y el precio."
+    }
+  }
+]

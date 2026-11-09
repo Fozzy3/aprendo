@@ -1,0 +1,830 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-11-09T04:27:32.083864+00:00",
+  "title": "Design System: Aprendo",
+  "extensions": {
+    "colorMeta": {
+      "album-pitch": {
+        "role": "primary",
+        "displayName": "Álbum Pitch",
+        "canonical": "#097d52",
+        "tonalRamp": [
+          "#001600",
+          "#00340f",
+          "#00532c",
+          "#00744a",
+          "#34976a",
+          "#5bbb8c",
+          "#81e0b0",
+          "#a7ffd4"
+        ]
+      },
+      "album-pitch-deep": {
+        "role": "primary",
+        "displayName": "Álbum Pitch Deep",
+        "canonical": "#076a45",
+        "tonalRamp": [
+          "#001500",
+          "#003212",
+          "#00522f",
+          "#18734d",
+          "#42956d",
+          "#67b98f",
+          "#8bdeb3",
+          "#b0ffd7"
+        ]
+      },
+      "album-green-ink": {
+        "role": "primary",
+        "displayName": "Álbum Green Ink",
+        "canonical": "#08704a",
+        "tonalRamp": [
+          "#001500",
+          "#003312",
+          "#00522e",
+          "#0f734d",
+          "#3e966d",
+          "#63ba8f",
+          "#88dfb3",
+          "#adffd7"
+        ]
+      },
+      "album-sticker": {
+        "role": "primary",
+        "displayName": "Álbum Sticker",
+        "canonical": "#ffd23f",
+        "tonalRamp": [
+          "#1e0100",
+          "#3c1d00",
+          "#5c3c00",
+          "#7d5c00",
+          "#9f7e00",
+          "#c4a133",
+          "#e9c65c",
+          "#ffeb83"
+        ]
+      },
+      "album-sticker-hover": {
+        "role": "primary",
+        "displayName": "Álbum Sticker Hover",
+        "canonical": "#ffdb66",
+        "tonalRamp": [
+          "#1e0200",
+          "#3b1e00",
+          "#5b3c00",
+          "#7c5d00",
+          "#9e7f00",
+          "#c2a233",
+          "#e7c65c",
+          "#ffec83"
+        ]
+      },
+      "album-sticker-edge": {
+        "role": "primary",
+        "displayName": "Álbum Sticker Edge",
+        "canonical": "#c79a12",
+        "tonalRamp": [
+          "#200000",
+          "#3f1a00",
+          "#5f3900",
+          "#815a00",
+          "#a47c00",
+          "#c89f33",
+          "#eec35c",
+          "#ffe983"
+        ]
+      },
+      "album-tone-sky": {
+        "role": "tertiary",
+        "displayName": "Álbum Tone Sky",
+        "canonical": "#8fe3ff",
+        "tonalRamp": [
+          "#000f25",
+          "#002d43",
+          "#004c63",
+          "#016c85",
+          "#388ea8",
+          "#5eb2cd",
+          "#83d7f3",
+          "#a9fdff"
+        ]
+      },
+      "album-tone-coral": {
+        "role": "tertiary",
+        "displayName": "Álbum Tone Coral",
+        "canonical": "#ff8a5c",
+        "tonalRamp": [
+          "#2f0000",
+          "#520000",
+          "#771f00",
+          "#9c421b",
+          "#c2643f",
+          "#e98762",
+          "#ffac85",
+          "#ffd1a9"
+        ]
+      },
+      "album-next-mark": {
+        "role": "tertiary",
+        "displayName": "Álbum Next Mark",
+        "canonical": "#d7361f",
+        "tonalRamp": [
+          "#300000",
+          "#540000",
+          "#781b0d",
+          "#9d3f2f",
+          "#c46150",
+          "#eb8471",
+          "#ffa894",
+          "#ffcdb8"
+        ]
+      },
+      "album-ink": {
+        "role": "neutral",
+        "displayName": "Álbum Ink",
+        "canonical": "#10231c",
+        "tonalRamp": [
+          "#010f09",
+          "#162a22",
+          "#33473f",
+          "#52675e",
+          "#72887f",
+          "#94aba2",
+          "#b8d0c6",
+          "#ddf5eb"
+        ]
+      },
+      "album-text-secondary": {
+        "role": "neutral",
+        "displayName": "Álbum Text Secondary",
+        "canonical": "#3c5148",
+        "tonalRamp": [
+          "#000f08",
+          "#162a22",
+          "#33473f",
+          "#51675e",
+          "#72887e",
+          "#94aba1",
+          "#b8d0c5",
+          "#dcf5ea"
+        ]
+      },
+      "album-text-tertiary": {
+        "role": "neutral",
+        "displayName": "Álbum Text Tertiary",
+        "canonical": "#52665d",
+        "tonalRamp": [
+          "#010f08",
+          "#172922",
+          "#34473f",
+          "#53675e",
+          "#73887e",
+          "#95aba1",
+          "#b9cfc5",
+          "#def5ea"
+        ]
+      },
+      "album-graphite": {
+        "role": "neutral",
+        "displayName": "Álbum Graphite",
+        "canonical": "#4b5f57",
+        "tonalRamp": [
+          "#010f09",
+          "#172923",
+          "#34473f",
+          "#52675e",
+          "#73887f",
+          "#95aba2",
+          "#b9cfc6",
+          "#def5eb"
+        ]
+      },
+      "album-paper": {
+        "role": "neutral",
+        "displayName": "Álbum Paper",
+        "canonical": "#ffffff",
+        "tonalRamp": [
+          "#0b0b0b",
+          "#252525",
+          "#424242",
+          "#616161",
+          "#828282",
+          "#a5a5a5",
+          "#c9c9c9",
+          "#eeeeee"
+        ]
+      },
+      "album-desk": {
+        "role": "neutral",
+        "displayName": "Álbum Desk",
+        "canonical": "#eef5f1",
+        "tonalRamp": [
+          "#080c0a",
+          "#212624",
+          "#3e4440",
+          "#5d635f",
+          "#7e8480",
+          "#a0a7a3",
+          "#c4cbc7",
+          "#e9f0ec"
+        ]
+      },
+      "album-inset": {
+        "role": "neutral",
+        "displayName": "Álbum Inset",
+        "canonical": "#eaf2ee",
+        "tonalRamp": [
+          "#070d0a",
+          "#212724",
+          "#3d4441",
+          "#5c6360",
+          "#7d8481",
+          "#a0a7a3",
+          "#c3cbc7",
+          "#e9f1ed"
+        ]
+      },
+      "album-rule": {
+        "role": "neutral",
+        "displayName": "Álbum Rule",
+        "canonical": "#d6e5dd",
+        "tonalRamp": [
+          "#040e09",
+          "#1d2822",
+          "#39453f",
+          "#58655e",
+          "#78867f",
+          "#9ba9a1",
+          "#bfcdc5",
+          "#e4f3eb"
+        ]
+      },
+      "album-red": {
+        "role": "neutral",
+        "displayName": "Álbum Red",
+        "canonical": "#c8321f",
+        "tonalRamp": [
+          "#300000",
+          "#540000",
+          "#781b0f",
+          "#9e3e30",
+          "#c46151",
+          "#eb8472",
+          "#ffa895",
+          "#ffcdb9"
+        ]
+      },
+      "album-red-text": {
+        "role": "neutral",
+        "displayName": "Álbum Red Text",
+        "canonical": "#a31d10",
+        "tonalRamp": [
+          "#300000",
+          "#540000",
+          "#781a10",
+          "#9e3e31",
+          "#c46152",
+          "#eb8473",
+          "#ffa896",
+          "#ffcdba"
+        ]
+      },
+      "album-red-soft": {
+        "role": "neutral",
+        "displayName": "Álbum Red Soft",
+        "canonical": "#ffe6e2",
+        "tonalRamp": [
+          "#150705",
+          "#31201d",
+          "#503d3a",
+          "#705c58",
+          "#937c79",
+          "#b69f9b",
+          "#dbc3bf",
+          "#ffe8e4"
+        ]
+      },
+      "album-area-lectura": {
+        "role": "secondary",
+        "displayName": "Álbum Area Lectura",
+        "canonical": "#c2342a",
+        "tonalRamp": [
+          "#300000",
+          "#540000",
+          "#781a14",
+          "#9e3e34",
+          "#c46054",
+          "#eb8376",
+          "#ffa798",
+          "#ffcdbd"
+        ]
+      },
+      "album-area-matematicas": {
+        "role": "secondary",
+        "displayName": "Álbum Area Matematicas",
+        "canonical": "#097d52",
+        "tonalRamp": [
+          "#001600",
+          "#00340f",
+          "#00532c",
+          "#00744a",
+          "#34976a",
+          "#5bbb8c",
+          "#81e0b0",
+          "#a7ffd4"
+        ]
+      },
+      "album-area-ciencias": {
+        "role": "secondary",
+        "displayName": "Álbum Area Ciencias",
+        "canonical": "#0a6fb0",
+        "tonalRamp": [
+          "#00003d",
+          "#00235f",
+          "#004481",
+          "#0066a6",
+          "#3188cb",
+          "#58acf1",
+          "#7dd1ff",
+          "#a2f7ff"
+        ]
+      },
+      "album-area-sociales": {
+        "role": "secondary",
+        "displayName": "Álbum Area Sociales",
+        "canonical": "#b4540a",
+        "tonalRamp": [
+          "#2e0000",
+          "#510000",
+          "#752300",
+          "#994503",
+          "#bf6833",
+          "#e68b57",
+          "#ffaf7a",
+          "#ffd49f"
+        ]
+      },
+      "album-area-ingles": {
+        "role": "secondary",
+        "displayName": "Álbum Area Ingles",
+        "canonical": "#b3257a",
+        "tonalRamp": [
+          "#2a0013",
+          "#4d002e",
+          "#701a4c",
+          "#953d6c",
+          "#ba5f8e",
+          "#e181b1",
+          "#ffa5d6",
+          "#ffcafc"
+        ]
+      },
+      "album-dark-paper": {
+        "role": "neutral",
+        "displayName": "Álbum Dark Paper",
+        "canonical": "#12201a",
+        "tonalRamp": [
+          "#030e09",
+          "#1a2922",
+          "#37463f",
+          "#56665e",
+          "#76877f",
+          "#98aaa2",
+          "#bccec6",
+          "#e1f4eb"
+        ]
+      },
+      "album-dark-card": {
+        "role": "neutral",
+        "displayName": "Álbum Dark Card",
+        "canonical": "#17281f",
+        "tonalRamp": [
+          "#020f07",
+          "#182920",
+          "#35473d",
+          "#54665c",
+          "#74887d",
+          "#96ab9f",
+          "#bacfc3",
+          "#dff5e8"
+        ]
+      },
+      "album-dark-desk": {
+        "role": "neutral",
+        "displayName": "Álbum Dark Desk",
+        "canonical": "#0b1511",
+        "tonalRamp": [
+          "#050d0a",
+          "#1d2823",
+          "#3a4540",
+          "#58645f",
+          "#798680",
+          "#9ba9a3",
+          "#bfcdc7",
+          "#e4f2ec"
+        ]
+      },
+      "album-dark-ink": {
+        "role": "neutral",
+        "displayName": "Álbum Dark Ink",
+        "canonical": "#e9f3ee",
+        "tonalRamp": [
+          "#070d0a",
+          "#202723",
+          "#3c4440",
+          "#5b645f",
+          "#7c8580",
+          "#9ea8a3",
+          "#c2ccc7",
+          "#e7f1ec"
+        ]
+      },
+      "album-dark-cover": {
+        "role": "neutral",
+        "displayName": "Álbum Dark Cover",
+        "canonical": "#0a5f40",
+        "tonalRamp": [
+          "#001501",
+          "#003116",
+          "#005032",
+          "#257151",
+          "#4a9371",
+          "#6eb793",
+          "#92dcb7",
+          "#b7ffdc"
+        ]
+      },
+      "album-dark-brand": {
+        "role": "neutral",
+        "displayName": "Álbum Dark Brand",
+        "canonical": "#62d2a2",
+        "tonalRamp": [
+          "#001700",
+          "#003511",
+          "#00552e",
+          "#00764c",
+          "#19996c",
+          "#4bbd8e",
+          "#73e3b2",
+          "#9affd7"
+        ]
+      },
+      "album-dark-red": {
+        "role": "neutral",
+        "displayName": "Álbum Dark Red",
+        "canonical": "#f0796a",
+        "tonalRamp": [
+          "#300000",
+          "#540000",
+          "#781a14",
+          "#9e3e34",
+          "#c46054",
+          "#eb8375",
+          "#ffa798",
+          "#ffcdbc"
+        ]
+      },
+      "notebook-paper": {
+        "role": "neutral",
+        "displayName": "Cuaderno Paper",
+        "canonical": "#fbfcfe",
+        "tonalRamp": [
+          "#0b0b0c",
+          "#242526",
+          "#414243",
+          "#606163",
+          "#818284",
+          "#a4a5a7",
+          "#c8c9cb",
+          "#edeef0"
+        ]
+      },
+      "notebook-rule": {
+        "role": "neutral",
+        "displayName": "Cuaderno Rule",
+        "canonical": "#c9d8ea",
+        "tonalRamp": [
+          "#030c17",
+          "#1b2633",
+          "#374352",
+          "#566372",
+          "#768494",
+          "#98a7b8",
+          "#bccbdd",
+          "#e1f0ff"
+        ]
+      },
+      "notebook-ink": {
+        "role": "neutral",
+        "displayName": "Cuaderno Ink",
+        "canonical": "#16233f",
+        "tonalRamp": [
+          "#020922",
+          "#172440",
+          "#334260",
+          "#516182",
+          "#7182a5",
+          "#93a5c9",
+          "#b7caef",
+          "#dcefff"
+        ]
+      },
+      "notebook-margin": {
+        "role": "neutral",
+        "displayName": "Cuaderno Margin",
+        "canonical": "#c3352b",
+        "tonalRamp": [
+          "#300000",
+          "#540000",
+          "#781a14",
+          "#9e3e34",
+          "#c46054",
+          "#eb8376",
+          "#ffa798",
+          "#ffcdbd"
+        ]
+      },
+      "notebook-green-ink": {
+        "role": "neutral",
+        "displayName": "Cuaderno Green Ink",
+        "canonical": "#2e6b45",
+        "tonalRamp": [
+          "#001400",
+          "#00300e",
+          "#0c4f2b",
+          "#337049",
+          "#55926a",
+          "#78b68c",
+          "#9cdbaf",
+          "#c0ffd4"
+        ]
+      },
+      "notebook-graphite": {
+        "role": "neutral",
+        "displayName": "Cuaderno Graphite",
+        "canonical": "#4a5263",
+        "tonalRamp": [
+          "#060b18",
+          "#1e2534",
+          "#3a4252",
+          "#596173",
+          "#7a8295",
+          "#9ca5b8",
+          "#c0c9dd",
+          "#e5efff"
+        ]
+      },
+      "notebook-pen": {
+        "role": "primary",
+        "displayName": "Cuaderno Pen",
+        "canonical": "#1d4f91",
+        "tonalRamp": [
+          "#00003c",
+          "#001f5e",
+          "#0c4081",
+          "#2f61a5",
+          "#5083ca",
+          "#72a7f0",
+          "#95ccff",
+          "#baf2ff"
+        ]
+      },
+      "notebook-desk": {
+        "role": "neutral",
+        "displayName": "Cuaderno Desk",
+        "canonical": "#e6edf6",
+        "tonalRamp": [
+          "#070b11",
+          "#20262c",
+          "#3d434a",
+          "#5c6269",
+          "#7d838b",
+          "#9fa6ae",
+          "#c3cad3",
+          "#e8eff8"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "album-hero": {
+        "displayName": "Álbum Hero",
+        "purpose": "Area name on a field."
+      },
+      "album-numeral": {
+        "displayName": "Álbum Numeral",
+        "purpose": "XP on the reward screen."
+      },
+      "album-headline": {
+        "displayName": "Álbum Headline",
+        "purpose": "The guided question."
+      },
+      "album-button": {
+        "displayName": "Álbum Button",
+        "purpose": "Name of the primary action."
+      },
+      "album-sticker-number": {
+        "displayName": "Álbum Sticker Number",
+        "purpose": "Slot numbers."
+      },
+      "album-question": {
+        "displayName": "Álbum Question",
+        "purpose": "Short question stem."
+      },
+      "album-title": {
+        "displayName": "Álbum Title",
+        "purpose": "Small headings and task names."
+      },
+      "album-label": {
+        "displayName": "Álbum Label",
+        "purpose": "Tab labels."
+      },
+      "notebook-display": {
+        "displayName": "Cuaderno Display",
+        "purpose": "Headings and figures on notebook screens."
+      },
+      "notebook-body": {
+        "displayName": "Cuaderno Body",
+        "purpose": "Everything else on notebook screens."
+      }
+    },
+    "shadows": [
+      {
+        "name": "album-press-edge",
+        "value": "0 4px 0 #c79a12",
+        "purpose": "Lower edge of a primary button; 0 5px 0 on hero buttons."
+      },
+      {
+        "name": "album-next-lift",
+        "value": "0 10px 18px rgba(0,0,0,0.28)",
+        "purpose": "The next sticker only."
+      },
+      {
+        "name": "album-float-md",
+        "value": "0 4px 14px rgba(16,35,28,0.12)",
+        "purpose": "Menus."
+      },
+      {
+        "name": "album-float-lg",
+        "value": "0 12px 32px rgba(16,35,28,0.18)",
+        "purpose": "Dialogs and sheets."
+      },
+      {
+        "name": "notebook-float-md",
+        "value": "0 4px 14px rgba(22,35,63,0.1)",
+        "purpose": "Notebook menus."
+      },
+      {
+        "name": "notebook-float-lg",
+        "value": "0 12px 32px rgba(22,35,63,0.14)",
+        "purpose": "Notebook dialogs and sheets."
+      }
+    ],
+    "motion": [
+      {
+        "name": "album-ease-out-strong",
+        "value": "cubic-bezier(0.23, 1, 0.32, 1)",
+        "purpose": "Presses, at 100ms."
+      },
+      {
+        "name": "album-colour",
+        "value": "140ms ease",
+        "purpose": "Colour and border changes."
+      },
+      {
+        "name": "album-landing",
+        "value": "spring, duration 0.7s, bounce 0.3, delay 0.8s",
+        "purpose": "The sticker landing on a fresh reward."
+      },
+      {
+        "name": "album-wrong",
+        "value": "260ms shake",
+        "purpose": "A wrong answer."
+      },
+      {
+        "name": "album-correct",
+        "value": "240ms pop",
+        "purpose": "The correct letter."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "album-desktop",
+        "value": "781px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Álbum Primary Button",
+      "kind": "button",
+      "refersTo": "album-button-primary",
+      "description": "The one yellow action on a student screen.",
+      "html": "<button class=\"ds-primary\">Empezar</button>",
+      "css": ".ds-primary{font-family:Figtree,sans-serif;min-height:3rem;padding:.625rem 1.5rem;font-size:1rem;font-weight:800;background:#ffd23f;color:#10231c;border:0;border-radius:12px;box-shadow:0 4px 0 #c79a12;cursor:pointer;transition:transform 100ms cubic-bezier(.23,1,.32,1),box-shadow 100ms cubic-bezier(.23,1,.32,1),background-color 140ms ease}.ds-primary:hover{background:#ffdb66}.ds-primary:focus-visible{outline:2px solid #097d52;outline-offset:3px}.ds-primary:active{transform:translateY(3px);box-shadow:0 1px 0 #c79a12;background:#ffdb66}"
+    },
+    {
+      "name": "Álbum Hero Button",
+      "kind": "button",
+      "refersTo": "album-button-hero",
+      "description": "Names the missing sticker and its cost on Hoy.",
+      "html": "<button class=\"ds-hero\"><span>Te falta Proporciones</span><small>Consíguela · 5 preguntas · 5 min</small></button>",
+      "css": ".ds-hero{display:flex;flex-direction:column;align-items:center;gap:5px;width:100%;padding:14px;border:0;border-radius:14px;background:#ffd23f;color:#10231c;box-shadow:0 5px 0 #c79a12;cursor:pointer;transition:transform 100ms cubic-bezier(.23,1,.32,1),box-shadow 100ms cubic-bezier(.23,1,.32,1)}.ds-hero span{font-family:Anton,\"Arial Narrow\",sans-serif;font-weight:400;font-size:29px;line-height:1.05}.ds-hero small{font-family:Figtree,sans-serif;font-size:14px;font-weight:700}.ds-hero:hover{background:#ffdb66}.ds-hero:focus-visible{outline:2px solid #097d52;outline-offset:3px}.ds-hero:active{transform:translateY(3px);box-shadow:0 1px 0 #c79a12}"
+    },
+    {
+      "name": "Álbum Secondary Button",
+      "kind": "button",
+      "refersTo": "album-button-secondary",
+      "description": "Any action that is not the one primary.",
+      "html": "<button class=\"ds-secondary\">Ver más</button>",
+      "css": ".ds-secondary{font-family:Figtree,sans-serif;min-height:3rem;padding:.625rem 1.5rem;font-size:1rem;font-weight:800;background:#fff;color:#10231c;border:2px solid rgba(16,35,28,.24);border-radius:12px;cursor:pointer;transition:background-color 140ms ease}.ds-secondary:hover{background:#f4f9f6}.ds-secondary:focus-visible{outline:2px solid #097d52;outline-offset:2px}.ds-secondary:active{background:#f4f9f6}"
+    },
+    {
+      "name": "Sticker Slots",
+      "kind": "custom",
+      "refersTo": "album-sticker-next",
+      "description": "Earned, next and empty slots on an area field.",
+      "html": "<div class=\"ds-page\"><div class=\"ds-s ds-earned\">12</div><div class=\"ds-s ds-next\">13</div><div class=\"ds-s ds-empty\">14</div></div>",
+      "css": ".ds-page{display:grid;grid-template-columns:repeat(3,76px);gap:9px;padding:20px;background:#097d52}.ds-s{height:96px;padding:7px 8px;border-radius:10px;font-family:Anton,\"Arial Narrow\",sans-serif;font-weight:400;font-size:22px;line-height:1;color:#10231c;font-variant-numeric:tabular-nums;transition:transform 100ms cubic-bezier(.23,1,.32,1)}.ds-earned{background:#ffd23f}.ds-next{background:#fff;outline:4px solid #ffd23f;box-shadow:0 10px 18px rgba(0,0,0,.28);transform:rotate(-4deg) scale(1.08)}.ds-empty{background:#086e48;color:#d7ebe2;outline:2px solid #53a486;outline-offset:-2px}.ds-earned:hover,.ds-empty:hover{transform:scale(.96)}"
+    },
+    {
+      "name": "Answer Option",
+      "kind": "card",
+      "refersTo": "album-solve-option",
+      "description": "A resting answer in solve, letter tile and text.",
+      "html": "<button class=\"ds-opt\"><em>A</em>Tres cuartos</button>",
+      "css": ".ds-opt{display:flex;align-items:center;gap:14px;width:320px;min-height:56px;padding:12px 14px;border:0;border-radius:12px;background:#eef5f1;color:#10231c;font-family:Figtree,sans-serif;font-size:1.0625rem;font-weight:700;text-align:left;cursor:pointer;transition:transform 100ms cubic-bezier(.23,1,.32,1)}.ds-opt em{display:grid;place-items:center;width:32px;height:32px;border-radius:7px;background:#fff;color:#08704a;font-family:Anton,\"Arial Narrow\",sans-serif;font-weight:400;font-style:normal;font-size:21px}.ds-opt:hover{box-shadow:inset 0 0 0 2px #097d52}.ds-opt:focus-visible{outline:2px solid #097d52;outline-offset:2px}.ds-opt:active{transform:translateY(2px)}"
+    },
+    {
+      "name": "Guided Chip",
+      "kind": "chip",
+      "refersTo": "album-ask-chip",
+      "description": "A tap answer in the guided question panel.",
+      "html": "<div class=\"ds-ask\"><button class=\"ds-chip\">Sumé los denominadores</button></div>",
+      "css": ".ds-ask{padding:20px;background:#10231c}.ds-chip{width:320px;min-height:44px;padding:13px 15px;border:0;border-radius:11px;background:#fff;color:#10231c;font-family:Figtree,sans-serif;font-size:1rem;font-weight:700;text-align:left;cursor:pointer;transition:transform 100ms cubic-bezier(.23,1,.32,1),background-color 140ms ease}.ds-chip:hover{background:#ffdb66}.ds-chip:focus-visible{outline:2px solid #ffd23f;outline-offset:2px}.ds-chip:active{transform:scale(.97);background:#ffd23f}"
+    },
+    {
+      "name": "Cuaderno Primary Button",
+      "kind": "button",
+      "refersTo": "notebook-button-primary",
+      "description": "The notebook system primary, for teacher, school and staff.",
+      "html": "<button class=\"ds-nb\">Guardar</button>",
+      "css": ".ds-nb{font-family:\"Public Sans\",sans-serif;min-height:2.5rem;padding:.5rem 1.25rem;font-size:.9rem;background:#1d4f91;color:#fbfcfe;border:1px solid #1d4f91;border-radius:3px;cursor:pointer;transition:background-color 140ms ease}.ds-nb:hover{background:#163f75;border-color:#163f75}.ds-nb:focus-visible{outline:2px solid #1d4f91;outline-offset:2px}"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Sticker You Were Missing",
+    "overview": "Every topic mastered is a numbered slot filled on an area's page. Progress is a page filling up, not a percentage and not a winding lesson path. The screen is a full field of the area's colour, white sheets for work, near-black green ink, and one yellow button that goes and gets the next sticker.\n\nDensity is low and the phone comes first: one thing to do, large names and numbers, thumb-sized targets. The register is young and credible, for students of 15 and 16 in short sessions and mixed light.\n\n**Review status.** This section records what the code ships. The student surface has not yet been reviewed rendered against live data, so empty, long-label and full-album states are unconfirmed on screen, and values here may move after that review. The 33 subtopic sticker pictures are simple provisional SVG glyphs.",
+    "keyCharacteristics": [
+      "Full fields of per-area colour with white type.",
+      "Numbered slots, on a four-column page on the phone and six on desktop.",
+      "Yellow means the thing to go and get.",
+      "Anton for names and numbers, Figtree for everything read.",
+      "A physical press on the primary button, and one authored landing."
+    ],
+    "rules": [
+      {
+        "name": "The Field Rule",
+        "body": "An area owns the whole field in its colour, and every word on a field is white. A new area colour must hold 4.5:1 against white.",
+        "section": "colors"
+      },
+      {
+        "name": "The Earned Colour Rule",
+        "body": "A filled sticker means earned, and nothing else fills a slot. An empty slot shows only its number, on a darker shade of the field.",
+        "section": "colors"
+      },
+      {
+        "name": "The Names and Numbers Rule",
+        "body": "Anton sets names, numbers and the words on the main button, always at 400. Anything read as a sentence is Figtree.",
+        "section": "typography"
+      },
+      {
+        "name": "The Press Edge Rule",
+        "body": "The solid edge belongs to the primary action, in a darker shade of that button's own colour. It is a key you push, chosen with the world, never a decorative offset.",
+        "section": "elevation"
+      },
+      {
+        "name": "The Next One Rule",
+        "body": "Only the next sticker lifts and tilts (-4deg). The student's own portrait may tilt (-3deg). Nothing else leans.",
+        "section": "elevation"
+      },
+      {
+        "name": "The One Landing Rule",
+        "body": "The sticker dropping into its slot (spring, 0.7s, after 0.8s) is the only celebration, and it plays once on a fresh close. Under reduced motion it fades, and the XP count-up shows its number at once.",
+        "section": "components"
+      }
+    ],
+    "dos": [
+      "Do set every student screen through the Álbum tokens, and add new student routes to `lib/student-look.ts`.",
+      "Do give each screen one yellow primary action.",
+      "Do use 100ms strong ease-out for presses and 140ms for colour, and remove transforms under reduced motion.",
+      "Do write the next step as a name (\"Te falta Proporciones\") with its cost in questions and minutes."
+    ],
+    "donts": [
+      "Don't bring the Álbum to teacher, school, staff, public or printed screens.",
+      "Don't bring the notebook's ruling or red margin to student screens; the sheet background is removed on purpose.",
+      "Don't draw student progress as percentage dashboards or a winding path; it is slots on a page.",
+      "Don't copy the kicker lines above a heading or the neutral press edges on secondary controls, tiles and non-solve options. They ship today and are not part of this system.",
+      "Don't hardcode the yellow, its edge or the ink where a token exists."
+    ]
+  }
+}

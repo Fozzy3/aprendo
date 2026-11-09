@@ -1,0 +1,3542 @@
+[
+  {
+    "id": "mat-01",
+    "subjectId": "matematicas",
+    "categoryId": "matematicas.number_proportionality",
+    "primarySubtopicId": "matematicas.number_proportionality.ratios_proportions_percent",
+    "competencia": "formulacion_ejecucion",
+    "difficulty": "baja",
+    "targetGrade": 11,
+    "stem": "Una tienda de Pereira vende unos tenis en 180.000 pesos y esta semana ofrece 15 % de descuento sobre ese precio. ¿Cuánto paga una persona por los tenis esta semana?",
+    "options": [
+      {
+        "label": "A",
+        "text": "27.000 pesos"
+      },
+      {
+        "label": "B",
+        "text": "165.000 pesos"
+      },
+      {
+        "label": "C",
+        "text": "153.000 pesos"
+      },
+      {
+        "label": "D",
+        "text": "207.000 pesos"
+      }
+    ],
+    "correctOption": "C",
+    "solution": "El descuento es $0{,}15 \\times 180000 = 27000$ pesos. Al restarlo del precio original quedan $180000 - 27000 = 153000$ pesos, que es lo que se paga.",
+    "guide": {
+      "hint": "¿Qué parte de los 180.000 pesos corresponde al porcentaje que anuncia la tienda?",
+      "byOption": {
+        "A": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la A?",
+            "choices": [
+              {
+                "text": "Calculé el 15 % de 180.000 y ahí paré"
+              },
+              {
+                "text": "Pensé que el descuento era lo que se paga"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "Si los tenis costaran 100.000 pesos con 15 % de descuento, ¿cuánto dejarías de pagar?",
+              "choices": [
+                {
+                  "text": "15.000 pesos",
+                  "correct": true
+                },
+                {
+                  "text": "85.000 pesos"
+                }
+              ]
+            },
+            {
+              "prompt": "En esa compra, ¿el 15 % es lo que pagas o lo que te ahorras?",
+              "choices": [
+                {
+                  "text": "Lo que te ahorras",
+                  "correct": true
+                },
+                {
+                  "text": "Lo que pagas"
+                }
+              ]
+            },
+            {
+              "prompt": "Entonces, ¿27.000 pesos es lo que se entrega en la caja?",
+              "choices": [
+                {
+                  "text": "No, es lo que se descuenta",
+                  "correct": true
+                },
+                {
+                  "text": "Sí, es el precio final"
+                }
+              ]
+            }
+          ]
+        },
+        "B": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la B?",
+            "choices": [
+              {
+                "text": "Le resté 15.000 porque el descuento dice 15"
+              },
+              {
+                "text": "Confundí 15 % con 15 mil pesos"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Cuánto es el 10 % de 180.000 pesos?",
+              "choices": [
+                {
+                  "text": "18.000 pesos",
+                  "correct": true
+                },
+                {
+                  "text": "10.000 pesos"
+                }
+              ]
+            },
+            {
+              "prompt": "Si el 10 % ya son 18.000 pesos, ¿el 15 % puede ser solo 15.000 pesos?",
+              "choices": [
+                {
+                  "text": "No, debe ser más de 18.000",
+                  "correct": true
+                },
+                {
+                  "text": "Sí, porque 15 % son 15.000"
+                }
+              ]
+            }
+          ]
+        },
+        "D": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la D?",
+            "choices": [
+              {
+                "text": "Sumé el 15 % al precio"
+              },
+              {
+                "text": "Pensé que el porcentaje aumentaba el precio"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "Cuando una tienda hace un descuento, ¿pagas más o menos que el precio original?",
+              "choices": [
+                {
+                  "text": "Menos",
+                  "correct": true
+                },
+                {
+                  "text": "Más"
+                }
+              ]
+            },
+            {
+              "prompt": "¿Puede un precio con descuento ser mayor que 180.000 pesos?",
+              "choices": [
+                {
+                  "text": "No, debe ser menor",
+                  "correct": true
+                },
+                {
+                  "text": "Sí, si el porcentaje es alto"
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "reveal": "El 15 % de 180.000 pesos son 27.000 pesos de descuento, así que se pagan 153.000 pesos. La clave es distinguir lo que se descuenta de lo que realmente se paga."
+    }
+  },
+  {
+    "id": "mat-02",
+    "subjectId": "matematicas",
+    "categoryId": "matematicas.number_proportionality",
+    "primarySubtopicId": "matematicas.number_proportionality.ratios_proportions_percent",
+    "competencia": "formulacion_ejecucion",
+    "difficulty": "media",
+    "targetGrade": 11,
+    "stem": "En una finca de Chinchiná, 4 recolectores tardan 15 días en recoger el café de un lote, todos trabajando al mismo ritmo. ¿Cuántos días tardarían 6 recolectores en recoger ese mismo lote?",
+    "options": [
+      {
+        "label": "A",
+        "text": "13 días"
+      },
+      {
+        "label": "B",
+        "text": "22,5 días"
+      },
+      {
+        "label": "C",
+        "text": "2,5 días"
+      },
+      {
+        "label": "D",
+        "text": "10 días"
+      }
+    ],
+    "correctOption": "D",
+    "solution": "El lote requiere $4 \\times 15 = 60$ jornadas de trabajo en total. Repartidas entre 6 recolectores son $60 \\div 6 = 10$ días.",
+    "guide": {
+      "hint": "¿Cuántas jornadas de trabajo requiere el lote, sin importar cuántas personas lo recojan?",
+      "byOption": {
+        "A": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la A?",
+            "choices": [
+              {
+                "text": "Resté 2 días porque llegan 2 recolectores más"
+              },
+              {
+                "text": "Pensé que cada recolector extra ahorra un día"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Cuántas jornadas de trabajo suman 4 recolectores durante 15 días?",
+              "choices": [
+                {
+                  "text": "60 jornadas",
+                  "correct": true
+                },
+                {
+                  "text": "19 jornadas"
+                }
+              ]
+            },
+            {
+              "prompt": "¿Cuántas jornadas suman 6 recolectores durante 13 días?",
+              "choices": [
+                {
+                  "text": "78 jornadas",
+                  "correct": true
+                },
+                {
+                  "text": "60 jornadas"
+                }
+              ]
+            },
+            {
+              "prompt": "Si el lote requiere 60 jornadas, ¿13 días con 6 personas es el tiempo exacto?",
+              "choices": [
+                {
+                  "text": "No, sobrarían jornadas",
+                  "correct": true
+                },
+                {
+                  "text": "Sí, coincide"
+                }
+              ]
+            }
+          ]
+        },
+        "B": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la B?",
+            "choices": [
+              {
+                "text": "Multipliqué 15 por 6 y dividí entre 4"
+              },
+              {
+                "text": "Pensé que más recolectores significa más días"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "Si llegan más personas al mismo lote, ¿el trabajo termina antes o después?",
+              "choices": [
+                {
+                  "text": "Antes",
+                  "correct": true
+                },
+                {
+                  "text": "Después"
+                }
+              ]
+            },
+            {
+              "prompt": "¿Pueden 6 recolectores tardar más que los 15 días que tardaban 4?",
+              "choices": [
+                {
+                  "text": "No, deben tardar menos",
+                  "correct": true
+                },
+                {
+                  "text": "Sí, porque son más personas"
+                }
+              ]
+            }
+          ]
+        },
+        "C": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la C?",
+            "choices": [
+              {
+                "text": "Dividí 15 entre 6"
+              },
+              {
+                "text": "Olvidé que los 15 días eran de 4 personas"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Cuántos días tardaría un solo recolector en recoger todo el lote?",
+              "choices": [
+                {
+                  "text": "60 días",
+                  "correct": true
+                },
+                {
+                  "text": "15 días"
+                }
+              ]
+            },
+            {
+              "prompt": "Si 15 días era el tiempo de 4 personas, ¿dividir 15 entre 6 usa bien ese dato?",
+              "choices": [
+                {
+                  "text": "No, falta tener en cuenta a las 4 personas",
+                  "correct": true
+                },
+                {
+                  "text": "Sí, basta con el 6"
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "reveal": "El trabajo total son 60 jornadas, y al repartirlas entre 6 recolectores salen 10 días. Es una proporción inversa: si aumentan las personas, disminuye el tiempo."
+    }
+  },
+  {
+    "id": "mat-03",
+    "subjectId": "matematicas",
+    "categoryId": "matematicas.number_proportionality",
+    "primarySubtopicId": "matematicas.number_proportionality.ratios_proportions_percent",
+    "competencia": "argumentacion",
+    "difficulty": "alta",
+    "targetGrade": 11,
+    "stem": "En un almacén de Bucaramanga, una chaqueta costaba 250.000 pesos. En diciembre su precio subió 20 % y en enero se rebajó 20 % sobre el precio de diciembre. Laura afirma que la chaqueta volvió a costar lo mismo que al principio. ¿Cuál afirmación es correcta?",
+    "options": [
+      {
+        "label": "A",
+        "text": "Laura tiene razón: subir y bajar el mismo porcentaje se cancela, y el precio queda en 250.000 pesos."
+      },
+      {
+        "label": "B",
+        "text": "Laura se equivoca: la rebaja se calcula sobre un valor mayor, y el precio queda en 240.000 pesos."
+      },
+      {
+        "label": "C",
+        "text": "Laura se equivoca: el precio sube 4 % en total y queda en 260.000 pesos."
+      },
+      {
+        "label": "D",
+        "text": "Laura se equivoca: solo cuenta la rebaja y el precio queda en 200.000 pesos."
+      }
+    ],
+    "correctOption": "B",
+    "solution": "En diciembre el precio pasa a $250000 \\times 1{,}2 = 300000$ pesos. En enero se rebaja el 20 % de 300.000, es decir 60.000 pesos, y queda en 240.000 pesos, menos que al principio.",
+    "guide": {
+      "hint": "¿Sobre qué valor se calcula cada uno de los dos porcentajes?",
+      "byOption": {
+        "A": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la A?",
+            "choices": [
+              {
+                "text": "Sumé +20 y −20 y dio cero"
+              },
+              {
+                "text": "Creí que el mismo porcentaje siempre se cancela"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "Después del aumento de diciembre, ¿cuánto cuesta la chaqueta?",
+              "choices": [
+                {
+                  "text": "300.000 pesos",
+                  "correct": true
+                },
+                {
+                  "text": "270.000 pesos"
+                }
+              ]
+            },
+            {
+              "prompt": "¿El 20 % de 300.000 pesos es igual al 20 % de 250.000 pesos?",
+              "choices": [
+                {
+                  "text": "No, es mayor",
+                  "correct": true
+                },
+                {
+                  "text": "Sí, es igual"
+                }
+              ]
+            },
+            {
+              "prompt": "Si la rebaja es mayor que el aumento, ¿vuelve el precio a 250.000 pesos?",
+              "choices": [
+                {
+                  "text": "No, queda por debajo",
+                  "correct": true
+                },
+                {
+                  "text": "Sí, vuelve exacto"
+                }
+              ]
+            }
+          ]
+        },
+        "C": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la C?",
+            "choices": [
+              {
+                "text": "Multipliqué 20 % por 20 % y lo sumé"
+              },
+              {
+                "text": "Pensé que el efecto neto es un aumento"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Por qué número multiplicas un precio para subirlo 20 %?",
+              "choices": [
+                {
+                  "text": "Por 1,2",
+                  "correct": true
+                },
+                {
+                  "text": "Por 0,2"
+                }
+              ]
+            },
+            {
+              "prompt": "¿Por qué número multiplicas un precio para rebajarlo 20 %?",
+              "choices": [
+                {
+                  "text": "Por 0,8",
+                  "correct": true
+                },
+                {
+                  "text": "Por 1,2"
+                }
+              ]
+            },
+            {
+              "prompt": "¿El producto 1,2 × 0,8 es mayor que 1?",
+              "choices": [
+                {
+                  "text": "No, es menor que 1",
+                  "correct": true
+                },
+                {
+                  "text": "Sí, es mayor que 1"
+                }
+              ]
+            }
+          ]
+        },
+        "D": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la D?",
+            "choices": [
+              {
+                "text": "Apliqué la rebaja al precio inicial"
+              },
+              {
+                "text": "Olvidé el aumento de diciembre"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Sobre qué precio se aplica la rebaja de enero?",
+              "choices": [
+                {
+                  "text": "Sobre el que ya tiene el aumento",
+                  "correct": true
+                },
+                {
+                  "text": "Sobre el inicial de 250.000 pesos"
+                }
+              ]
+            },
+            {
+              "prompt": "Si la rebaja parte de 300.000 pesos, ¿puede el precio quedar en 200.000 pesos?",
+              "choices": [
+                {
+                  "text": "No, sería rebajar más del 20 %",
+                  "correct": true
+                },
+                {
+                  "text": "Sí, equivale al 20 %"
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "reveal": "El 20 % de enero se calcula sobre 300.000 pesos, no sobre 250.000, y por eso resta más de lo que sumó el aumento. El precio final es 240.000 pesos, de modo que Laura se equivoca."
+    }
+  },
+  {
+    "id": "mat-04",
+    "subjectId": "matematicas",
+    "categoryId": "matematicas.algebra_equations",
+    "primarySubtopicId": "matematicas.algebra_equations.equations_inequalities",
+    "competencia": "formulacion_ejecucion",
+    "difficulty": "baja",
+    "targetGrade": 11,
+    "stem": "En un parqueadero de Cali se cobra una tarifa fija de 3.000 pesos por entrar, más 1.500 pesos por cada hora. Mateo pagó 13.500 pesos en total. ¿Cuántas horas estuvo su moto en el parqueadero?",
+    "options": [
+      {
+        "label": "A",
+        "text": "7 horas"
+      },
+      {
+        "label": "B",
+        "text": "3 horas"
+      },
+      {
+        "label": "C",
+        "text": "9 horas"
+      },
+      {
+        "label": "D",
+        "text": "11 horas"
+      }
+    ],
+    "correctOption": "A",
+    "solution": "Si $h$ son las horas, entonces $3000 + 1500h = 13500$. Al restar la tarifa fija queda $1500h = 10500$, de donde $h = 7$.",
+    "guide": {
+      "hint": "¿Qué parte de lo que pagó Mateo depende de las horas y qué parte no?",
+      "byOption": {
+        "B": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la B?",
+            "choices": [
+              {
+                "text": "Sumé 3.000 y 1.500 y dividí el total"
+              },
+              {
+                "text": "Creí que la tarifa fija se cobra cada hora"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿La tarifa fija de 3.000 pesos se paga una vez o cada hora?",
+              "choices": [
+                {
+                  "text": "Una sola vez",
+                  "correct": true
+                },
+                {
+                  "text": "Cada hora"
+                }
+              ]
+            },
+            {
+              "prompt": "Si Mateo hubiera parqueado 3 horas, ¿habría pagado 13.500 pesos?",
+              "choices": [
+                {
+                  "text": "No, habría pagado mucho menos",
+                  "correct": true
+                },
+                {
+                  "text": "Sí, exactamente eso"
+                }
+              ]
+            }
+          ]
+        },
+        "C": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la C?",
+            "choices": [
+              {
+                "text": "Dividí 13.500 entre 1.500"
+              },
+              {
+                "text": "Olvidé la tarifa fija"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "Antes de contar las horas, ¿qué parte del pago ya está ocupada?",
+              "choices": [
+                {
+                  "text": "Los 3.000 pesos de la tarifa fija",
+                  "correct": true
+                },
+                {
+                  "text": "Ninguna parte"
+                }
+              ]
+            },
+            {
+              "prompt": "Con 9 horas y la tarifa fija, ¿el total sería 13.500 pesos?",
+              "choices": [
+                {
+                  "text": "No, sería 16.500 pesos",
+                  "correct": true
+                },
+                {
+                  "text": "Sí, exactamente"
+                }
+              ]
+            }
+          ]
+        },
+        "D": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la D?",
+            "choices": [
+              {
+                "text": "Sumé la tarifa fija al total"
+              },
+              {
+                "text": "Moví el 3.000 con el signo equivocado"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "Para quitar 3.000 de un lado de la ecuación, ¿qué haces en el otro lado?",
+              "choices": [
+                {
+                  "text": "Resto 3.000",
+                  "correct": true
+                },
+                {
+                  "text": "Sumo 3.000"
+                }
+              ]
+            },
+            {
+              "prompt": "Con 11 horas y la tarifa fija, ¿cuánto sería el total?",
+              "choices": [
+                {
+                  "text": "19.500 pesos",
+                  "correct": true
+                },
+                {
+                  "text": "13.500 pesos"
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "reveal": "Al quitar los 3.000 pesos fijos quedan 10.500 pesos que dependen de las horas, y $10500 \\div 1500 = 7$. La moto estuvo 7 horas en el parqueadero."
+    }
+  },
+  {
+    "id": "mat-05",
+    "subjectId": "matematicas",
+    "categoryId": "matematicas.algebra_equations",
+    "primarySubtopicId": "matematicas.algebra_equations.equations_inequalities",
+    "competencia": "formulacion_ejecucion",
+    "difficulty": "media",
+    "targetGrade": 11,
+    "stem": "En una cafetería de Manizales, un pedido de 2 tintos y 1 almojábana cuesta 6.000 pesos, y un pedido de 1 tinto y 2 almojábanas cuesta 7.500 pesos. ¿Cuánto cuesta un pedido de 1 tinto y 1 almojábana?",
+    "options": [
+      {
+        "label": "A",
+        "text": "13.500 pesos"
+      },
+      {
+        "label": "B",
+        "text": "6.750 pesos"
+      },
+      {
+        "label": "C",
+        "text": "4.500 pesos"
+      },
+      {
+        "label": "D",
+        "text": "3.000 pesos"
+      }
+    ],
+    "correctOption": "C",
+    "solution": "Al sumar los dos pedidos se obtienen 3 tintos y 3 almojábanas por 13.500 pesos. Dividiendo entre 3, un tinto con una almojábana cuestan 4.500 pesos.",
+    "guide": {
+      "hint": "¿Qué pasa con las cantidades de cada producto si juntas los dos pedidos?",
+      "byOption": {
+        "A": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la A?",
+            "choices": [
+              {
+                "text": "Sumé las dos cuentas y ahí paré"
+              },
+              {
+                "text": "Creí que la suma ya era el precio de un par"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Cuántos tintos hay en total al juntar los dos pedidos?",
+              "choices": [
+                {
+                  "text": "3 tintos",
+                  "correct": true
+                },
+                {
+                  "text": "2 tintos"
+                }
+              ]
+            },
+            {
+              "prompt": "Si 13.500 pesos pagan 3 tintos y 3 almojábanas, ¿es el precio de un solo par?",
+              "choices": [
+                {
+                  "text": "No, es el de tres pares",
+                  "correct": true
+                },
+                {
+                  "text": "Sí, es el de un par"
+                }
+              ]
+            }
+          ]
+        },
+        "B": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la B?",
+            "choices": [
+              {
+                "text": "Dividí la suma entre 2"
+              },
+              {
+                "text": "Pensé que dos pedidos eran dos pares"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "Al juntar los dos pedidos, ¿cuántas almojábanas hay?",
+              "choices": [
+                {
+                  "text": "3 almojábanas",
+                  "correct": true
+                },
+                {
+                  "text": "2 almojábanas"
+                }
+              ]
+            },
+            {
+              "prompt": "Si hay 3 pares en 13.500 pesos, ¿dividir entre 2 da el precio de un par?",
+              "choices": [
+                {
+                  "text": "No, hay que repartir entre 3",
+                  "correct": true
+                },
+                {
+                  "text": "Sí, dividir entre 2 basta"
+                }
+              ]
+            }
+          ]
+        },
+        "D": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la D?",
+            "choices": [
+              {
+                "text": "Hallé el precio de la almojábana y ahí paré"
+              },
+              {
+                "text": "Leí que preguntaban por un solo producto"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Qué pide la pregunta: un producto o un par de productos?",
+              "choices": [
+                {
+                  "text": "Un par de productos",
+                  "correct": true
+                },
+                {
+                  "text": "Un solo producto"
+                }
+              ]
+            },
+            {
+              "prompt": "Si una almojábana vale 3.000 pesos, ¿un tinto con almojábana puede costar lo mismo?",
+              "choices": [
+                {
+                  "text": "No, también se paga el tinto",
+                  "correct": true
+                },
+                {
+                  "text": "Sí, el tinto no cuenta"
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "reveal": "Juntar los pedidos da 3 tintos y 3 almojábanas por 13.500 pesos, así que cada par cuesta 4.500 pesos. También se puede resolver hallando que el tinto vale 1.500 pesos y la almojábana 3.000 pesos."
+    }
+  },
+  {
+    "id": "mat-06",
+    "subjectId": "matematicas",
+    "categoryId": "matematicas.algebra_equations",
+    "primarySubtopicId": "matematicas.algebra_equations.equations_inequalities",
+    "competencia": "formulacion_ejecucion",
+    "difficulty": "alta",
+    "targetGrade": 11,
+    "stem": "Una operadora ofrece en Pasto dos planes de datos mensuales. El Plan Básico cobra 22.000 pesos fijos más 800 pesos por cada GB consumido. El Plan Plus cobra 40.000 pesos fijos más 200 pesos por cada GB consumido. ¿Cuál condición describe todos los consumos de datos para los que el Plan Plus resulta más barato que el Plan Básico?",
+    "options": [
+      {
+        "label": "A",
+        "text": "Menos de 30 GB"
+      },
+      {
+        "label": "B",
+        "text": "Más de 30 GB"
+      },
+      {
+        "label": "C",
+        "text": "Más de 18 GB"
+      },
+      {
+        "label": "D",
+        "text": "Más de 90 GB"
+      }
+    ],
+    "correctOption": "B",
+    "solution": "El Plan Plus es más barato cuando $40000 + 200g < 22000 + 800g$. Al despejar queda $18000 < 600g$, es decir, $g > 30$.",
+    "guide": {
+      "hint": "¿Cómo expresas con una desigualdad que un plan cueste menos que el otro?",
+      "byOption": {
+        "A": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la A?",
+            "choices": [
+              {
+                "text": "Invertí el sentido de la desigualdad"
+              },
+              {
+                "text": "Pensé que el plan de mayor cargo fijo conviene si usas poco"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "Con 0 GB consumidos, ¿cuál plan sale más barato?",
+              "choices": [
+                {
+                  "text": "El Básico, con 22.000 pesos",
+                  "correct": true
+                },
+                {
+                  "text": "El Plus, con 40.000 pesos"
+                }
+              ]
+            },
+            {
+              "prompt": "Con muy pocos gigas, ¿el Plan Plus es la opción más barata?",
+              "choices": [
+                {
+                  "text": "No, con pocos gigas gana el Básico",
+                  "correct": true
+                },
+                {
+                  "text": "Sí, siempre es el más barato"
+                }
+              ]
+            }
+          ]
+        },
+        "C": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la C?",
+            "choices": [
+              {
+                "text": "Sumé los dos costos por GB"
+              },
+              {
+                "text": "Dividí 18.000 entre 1.000"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "Por cada GB adicional, ¿cuánto se acorta la diferencia entre los dos planes?",
+              "choices": [
+                {
+                  "text": "600 pesos",
+                  "correct": true
+                },
+                {
+                  "text": "1.000 pesos"
+                }
+              ]
+            },
+            {
+              "prompt": "Con 20 GB, ¿cuánto cuesta el Plan Básico?",
+              "choices": [
+                {
+                  "text": "38.000 pesos",
+                  "correct": true
+                },
+                {
+                  "text": "44.000 pesos"
+                }
+              ]
+            },
+            {
+              "prompt": "Con 20 GB, ¿ya es más barato el Plan Plus, que cuesta 44.000 pesos?",
+              "choices": [
+                {
+                  "text": "No, sigue siendo más caro",
+                  "correct": true
+                },
+                {
+                  "text": "Sí, ya es más barato"
+                }
+              ]
+            }
+          ]
+        },
+        "D": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la D?",
+            "choices": [
+              {
+                "text": "Dividí 18.000 entre 200"
+              },
+              {
+                "text": "Usé solo el precio por GB del Plan Plus"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "Por cada GB adicional, ¿qué le pasa a la diferencia entre los planes?",
+              "choices": [
+                {
+                  "text": "Se reduce en 600 pesos",
+                  "correct": true
+                },
+                {
+                  "text": "Se reduce en 200 pesos"
+                }
+              ]
+            },
+            {
+              "prompt": "Con 60 GB, ¿el Plan Plus ya cuesta menos que el Básico?",
+              "choices": [
+                {
+                  "text": "Sí, 52.000 frente a 70.000 pesos",
+                  "correct": true
+                },
+                {
+                  "text": "No, el Básico sigue ganando"
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "reveal": "La diferencia inicial de 18.000 pesos se acorta 600 pesos por cada GB, y se agota en 30 GB. Con más de 30 GB, el Plan Plus es el más barato."
+    }
+  },
+  {
+    "id": "mat-07",
+    "subjectId": "matematicas",
+    "categoryId": "matematicas.functions_variation",
+    "primarySubtopicId": "matematicas.functions_variation.functions_graphs",
+    "competencia": "interpretacion_representacion",
+    "difficulty": "baja",
+    "targetGrade": 11,
+    "stem": "En Barranquilla, el costo en pesos de una carrera de taxi de $d$ kilómetros se calcula con $C(d) = 4500 + 1200d$, donde 4.500 pesos es el banderazo. ¿Cuánto cuesta una carrera de 6 kilómetros?",
+    "options": [
+      {
+        "label": "A",
+        "text": "7.200 pesos"
+      },
+      {
+        "label": "B",
+        "text": "34.200 pesos"
+      },
+      {
+        "label": "C",
+        "text": "5.700 pesos"
+      },
+      {
+        "label": "D",
+        "text": "11.700 pesos"
+      }
+    ],
+    "correctOption": "D",
+    "solution": "Al reemplazar $d = 6$ se obtiene $C(6) = 4500 + 1200 \\times 6 = 4500 + 7200$. La carrera cuesta 11.700 pesos.",
+    "guide": {
+      "hint": "¿Qué parte de la fórmula cambia con la distancia y qué parte no?",
+      "byOption": {
+        "A": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la A?",
+            "choices": [
+              {
+                "text": "Multipliqué 1.200 por 6 y ya"
+              },
+              {
+                "text": "Olvidé sumar el banderazo"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "Si la carrera fuera de 0 kilómetros, ¿cuánto marcaría la fórmula?",
+              "choices": [
+                {
+                  "text": "4.500 pesos",
+                  "correct": true
+                },
+                {
+                  "text": "0 pesos"
+                }
+              ]
+            },
+            {
+              "prompt": "Si los 4.500 pesos se cobran siempre, ¿7.200 pesos incluye ese cobro?",
+              "choices": [
+                {
+                  "text": "No, falta el banderazo",
+                  "correct": true
+                },
+                {
+                  "text": "Sí, ya está incluido"
+                }
+              ]
+            }
+          ]
+        },
+        "B": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la B?",
+            "choices": [
+              {
+                "text": "Multipliqué toda la fórmula por 6"
+              },
+              {
+                "text": "Creí que el banderazo se cobra por kilómetro"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "En 4500 + 1200d, ¿a qué número multiplica la d?",
+              "choices": [
+                {
+                  "text": "Solo a 1200",
+                  "correct": true
+                },
+                {
+                  "text": "A 4500 y a 1200"
+                }
+              ]
+            },
+            {
+              "prompt": "Si 34.200 pesos fuera lo correcto, ¿cuántas veces se cobraría el banderazo?",
+              "choices": [
+                {
+                  "text": "Seis veces, lo que no es la regla",
+                  "correct": true
+                },
+                {
+                  "text": "Una vez, como dice la regla"
+                }
+              ]
+            }
+          ]
+        },
+        "C": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la C?",
+            "choices": [
+              {
+                "text": "Sumé 4.500 y 1.200 sin la distancia"
+              },
+              {
+                "text": "No usé los 6 kilómetros"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Qué debe reemplazar a la letra d en la fórmula?",
+              "choices": [
+                {
+                  "text": "Los 6 kilómetros",
+                  "correct": true
+                },
+                {
+                  "text": "El número 1"
+                }
+              ]
+            },
+            {
+              "prompt": "¿A qué distancia corresponde un costo de 5.700 pesos?",
+              "choices": [
+                {
+                  "text": "1 kilómetro",
+                  "correct": true
+                },
+                {
+                  "text": "6 kilómetros"
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "reveal": "El banderazo se cobra una sola vez y solo los 1.200 pesos se multiplican por los kilómetros. Por eso la carrera de 6 kilómetros cuesta 11.700 pesos."
+    }
+  },
+  {
+    "id": "mat-08",
+    "subjectId": "matematicas",
+    "categoryId": "matematicas.functions_variation",
+    "primarySubtopicId": "matematicas.functions_variation.functions_graphs",
+    "competencia": "interpretacion_representacion",
+    "difficulty": "media",
+    "targetGrade": 11,
+    "stem": "En un vivero de Fusagasugá se registró la altura de una plántula durante cuatro semanas:\n\n| Semana $s$ | Altura $h$ (cm) |\n|---|---|\n| 1 | 5 |\n| 2 | 8 |\n| 3 | 11 |\n| 4 | 14 |\n\n¿Cuál función describe los datos de la tabla?",
+    "options": [
+      {
+        "label": "A",
+        "text": "$h(s) = 3s + 2$"
+      },
+      {
+        "label": "B",
+        "text": "$h(s) = s + 4$"
+      },
+      {
+        "label": "C",
+        "text": "$h(s) = 5s$"
+      },
+      {
+        "label": "D",
+        "text": "$h(s) = 3s + 5$"
+      }
+    ],
+    "correctOption": "A",
+    "solution": "La altura aumenta 3 cm cada semana, así que la función tiene la forma $h(s) = 3s + b$. Como $h(1) = 5$, se obtiene $b = 2$ y la función es $h(s) = 3s + 2$.",
+    "guide": {
+      "hint": "¿Qué debe cumplir una fórmula para coincidir con todas las filas de la tabla?",
+      "byOption": {
+        "B": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la B?",
+            "choices": [
+              {
+                "text": "Solo revisé la primera fila"
+              },
+              {
+                "text": "Vi que 1 más 4 da 5"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Cuánto crece la altura entre la semana 1 y la semana 2?",
+              "choices": [
+                {
+                  "text": "3 cm",
+                  "correct": true
+                },
+                {
+                  "text": "1 cm"
+                }
+              ]
+            },
+            {
+              "prompt": "En h(s) = s + 4, ¿cuánto sube h cada semana?",
+              "choices": [
+                {
+                  "text": "1 cm",
+                  "correct": true
+                },
+                {
+                  "text": "3 cm"
+                }
+              ]
+            },
+            {
+              "prompt": "¿Esa fórmula da 8 cm en la semana 2?",
+              "choices": [
+                {
+                  "text": "No, da 6 cm",
+                  "correct": true
+                },
+                {
+                  "text": "Sí, da 8 cm"
+                }
+              ]
+            }
+          ]
+        },
+        "C": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la C?",
+            "choices": [
+              {
+                "text": "Multipliqué por 5 porque arranca en 5"
+              },
+              {
+                "text": "Pensé que la altura era proporcional a la semana"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "Si la altura fuera proporcional, ¿cuánto mediría en la semana 2?",
+              "choices": [
+                {
+                  "text": "10 cm",
+                  "correct": true
+                },
+                {
+                  "text": "8 cm"
+                }
+              ]
+            },
+            {
+              "prompt": "¿La tabla registra ese valor en la semana 2?",
+              "choices": [
+                {
+                  "text": "No, registra 8 cm",
+                  "correct": true
+                },
+                {
+                  "text": "Sí, registra 10 cm"
+                }
+              ]
+            }
+          ]
+        },
+        "D": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la D?",
+            "choices": [
+              {
+                "text": "Tomé el 5 de la semana 1 como valor inicial"
+              },
+              {
+                "text": "Hallé el aumento pero usé mal el término independiente"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Cuánto vale s en la fila donde la altura es 5 cm?",
+              "choices": [
+                {
+                  "text": "1",
+                  "correct": true
+                },
+                {
+                  "text": "0"
+                }
+              ]
+            },
+            {
+              "prompt": "Con h(s) = 3s + 5, ¿cuánto daría la semana 1?",
+              "choices": [
+                {
+                  "text": "8 cm",
+                  "correct": true
+                },
+                {
+                  "text": "5 cm"
+                }
+              ]
+            },
+            {
+              "prompt": "¿Coincide ese resultado con los 5 cm de la tabla?",
+              "choices": [
+                {
+                  "text": "No, se pasa por 3 cm",
+                  "correct": true
+                },
+                {
+                  "text": "Sí, coincide"
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "reveal": "La altura sube 3 cm por semana y, al probar la semana 1, el término independiente debe ser 2. La función $h(s) = 3s + 2$ coincide con las cuatro filas."
+    }
+  },
+  {
+    "id": "mat-09",
+    "subjectId": "matematicas",
+    "categoryId": "matematicas.functions_variation",
+    "primarySubtopicId": "matematicas.functions_variation.functions_graphs",
+    "competencia": "formulacion_ejecucion",
+    "difficulty": "alta",
+    "targetGrade": 11,
+    "stem": "En un partido en el estadio Atanasio Girardot de Medellín, un portero saca el balón y su altura, en metros, a los $t$ segundos está dada por $h(t) = -5t^2 + 20t + 1$. ¿Cuál es la altura máxima que alcanza el balón?",
+    "options": [
+      {
+        "label": "A",
+        "text": "1 m"
+      },
+      {
+        "label": "B",
+        "text": "21 m"
+      },
+      {
+        "label": "C",
+        "text": "31 m"
+      },
+      {
+        "label": "D",
+        "text": "61 m"
+      }
+    ],
+    "correctOption": "B",
+    "solution": "El máximo ocurre en $t = \\frac{-20}{2(-5)} = 2$ segundos. Allí, $h(2) = -5(4) + 20(2) + 1 = 21$, de modo que la altura máxima es 21 m.",
+    "guide": {
+      "hint": "¿En qué instante deja de subir el balón?",
+      "byOption": {
+        "A": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la A?",
+            "choices": [
+              {
+                "text": "Usé t = −b/a y me dio 4 segundos"
+              },
+              {
+                "text": "Tomé el último número de la fórmula"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Qué altura tiene el balón en el instante t = 0?",
+              "choices": [
+                {
+                  "text": "1 m",
+                  "correct": true
+                },
+                {
+                  "text": "20 m"
+                }
+              ]
+            },
+            {
+              "prompt": "¿Cuál expresión da el tiempo del vértice?",
+              "choices": [
+                {
+                  "text": "t = −b/(2a)",
+                  "correct": true
+                },
+                {
+                  "text": "t = −b/a"
+                }
+              ]
+            },
+            {
+              "prompt": "Si el balón sale desde 1 m y luego sube, ¿puede ser 1 m el máximo?",
+              "choices": [
+                {
+                  "text": "No, sube más que eso",
+                  "correct": true
+                },
+                {
+                  "text": "Sí, es su altura máxima"
+                }
+              ]
+            }
+          ]
+        },
+        "C": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la C?",
+            "choices": [
+              {
+                "text": "Multipliqué −5 por 2 sin elevar al cuadrado"
+              },
+              {
+                "text": "Olvidé el exponente de t"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Cuánto vale t² cuando t = 2?",
+              "choices": [
+                {
+                  "text": "4",
+                  "correct": true
+                },
+                {
+                  "text": "2"
+                }
+              ]
+            },
+            {
+              "prompt": "¿Cuánto da el término −5t² con t = 2?",
+              "choices": [
+                {
+                  "text": "−20",
+                  "correct": true
+                },
+                {
+                  "text": "−10"
+                }
+              ]
+            },
+            {
+              "prompt": "Si ese término da −20 y no −10, ¿puede el resultado ser 31 m?",
+              "choices": [
+                {
+                  "text": "No, el resultado es menor",
+                  "correct": true
+                },
+                {
+                  "text": "Sí, no cambia"
+                }
+              ]
+            }
+          ]
+        },
+        "D": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la D?",
+            "choices": [
+              {
+                "text": "Tomé −5t² como positivo"
+              },
+              {
+                "text": "Me confundí con el signo del primer término"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿t² es positivo o negativo cuando t = 2?",
+              "choices": [
+                {
+                  "text": "Positivo",
+                  "correct": true
+                },
+                {
+                  "text": "Negativo"
+                }
+              ]
+            },
+            {
+              "prompt": "Entonces, ¿qué signo da −5 por ese valor?",
+              "choices": [
+                {
+                  "text": "Negativo",
+                  "correct": true
+                },
+                {
+                  "text": "Positivo"
+                }
+              ]
+            },
+            {
+              "prompt": "Si ese término resta, ¿puede la altura superar 41 m?",
+              "choices": [
+                {
+                  "text": "No, debe ser menor que 41 m",
+                  "correct": true
+                },
+                {
+                  "text": "Sí, llega a 61 m"
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "reveal": "El vértice de la parábola está en $t = 2$ segundos, y al evaluar allí la función se obtienen 21 m. El balón parte de 1 m, sube hasta esa altura y luego empieza a bajar."
+    }
+  },
+  {
+    "id": "mat-10",
+    "subjectId": "matematicas",
+    "categoryId": "matematicas.geometry_measurement",
+    "primarySubtopicId": "matematicas.geometry_measurement.plane_geometry",
+    "competencia": "formulacion_ejecucion",
+    "difficulty": "baja",
+    "targetGrade": 11,
+    "stem": "En Girardot, un poste vertical de la red eléctrica mide 8 m de altura. Un cable tensor va desde la punta del poste hasta un punto del suelo que está a 6 m de la base. ¿Cuánto mide el cable?",
+    "options": [
+      {
+        "label": "A",
+        "text": "14 m"
+      },
+      {
+        "label": "B",
+        "text": "2 m"
+      },
+      {
+        "label": "C",
+        "text": "10 m"
+      },
+      {
+        "label": "D",
+        "text": "$\\sqrt{28}$ m"
+      }
+    ],
+    "correctOption": "C",
+    "solution": "El poste, el suelo y el cable forman un triángulo rectángulo cuya hipotenusa es el cable. Por el teorema de Pitágoras, la longitud es $\\sqrt{8^2 + 6^2} = \\sqrt{100} = 10$ m.",
+    "guide": {
+      "hint": "¿Qué relación cumplen los tres lados de un triángulo que tiene un ángulo recto?",
+      "byOption": {
+        "A": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la A?",
+            "choices": [
+              {
+                "text": "Sumé 8 y 6"
+              },
+              {
+                "text": "Creí que el cable es la suma de los otros dos lados"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Qué figura forman el poste, el suelo y el cable?",
+              "choices": [
+                {
+                  "text": "Un triángulo rectángulo",
+                  "correct": true
+                },
+                {
+                  "text": "Un rectángulo"
+                }
+              ]
+            },
+            {
+              "prompt": "En un triángulo, ¿un lado puede medir lo mismo que la suma de los otros dos?",
+              "choices": [
+                {
+                  "text": "No, debe ser menor",
+                  "correct": true
+                },
+                {
+                  "text": "Sí, puede ser igual"
+                }
+              ]
+            }
+          ]
+        },
+        "B": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la B?",
+            "choices": [
+              {
+                "text": "Resté 8 menos 6"
+              },
+              {
+                "text": "Pensé que la diferencia daba el cable"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿El cable es un cateto o la hipotenusa?",
+              "choices": [
+                {
+                  "text": "La hipotenusa",
+                  "correct": true
+                },
+                {
+                  "text": "Un cateto"
+                }
+              ]
+            },
+            {
+              "prompt": "¿La hipotenusa puede ser más corta que un cateto?",
+              "choices": [
+                {
+                  "text": "No, es el lado mayor",
+                  "correct": true
+                },
+                {
+                  "text": "Sí, puede serlo"
+                }
+              ]
+            }
+          ]
+        },
+        "D": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la D?",
+            "choices": [
+              {
+                "text": "Resté los cuadrados de 8 y 6"
+              },
+              {
+                "text": "Creí que en Pitágoras siempre se resta"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "En h² = a² + b², ¿qué lado queda solo?",
+              "choices": [
+                {
+                  "text": "La hipotenusa",
+                  "correct": true
+                },
+                {
+                  "text": "Un cateto"
+                }
+              ]
+            },
+            {
+              "prompt": "¿√28 es mayor que los 8 m del poste?",
+              "choices": [
+                {
+                  "text": "No, es menor",
+                  "correct": true
+                },
+                {
+                  "text": "Sí, es mayor"
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "reveal": "El cable es la hipotenusa, y sus catetos miden 8 m y 6 m, de modo que su longitud es 10 m. La hipotenusa siempre debe ser el lado más largo del triángulo rectángulo."
+    }
+  },
+  {
+    "id": "mat-11",
+    "subjectId": "matematicas",
+    "categoryId": "matematicas.geometry_measurement",
+    "primarySubtopicId": "matematicas.geometry_measurement.plane_geometry",
+    "competencia": "formulacion_ejecucion",
+    "difficulty": "media",
+    "targetGrade": 11,
+    "stem": "En la plaza de Villa de Leyva, a cierta hora de la tarde, una persona de 1,60 m de estatura proyecta una sombra de 2,40 m. A esa misma hora, un árbol proyecta una sombra de 9 m. ¿Cuánto mide el árbol?",
+    "options": [
+      {
+        "label": "A",
+        "text": "13,5 m"
+      },
+      {
+        "label": "B",
+        "text": "8,2 m"
+      },
+      {
+        "label": "C",
+        "text": "14,4 m"
+      },
+      {
+        "label": "D",
+        "text": "6 m"
+      }
+    ],
+    "correctOption": "D",
+    "solution": "A la misma hora los triángulos formados son semejantes, por lo que $\\frac{\\text{altura}}{9} = \\frac{1{,}60}{2{,}40}$. Al despejar, la altura del árbol es 6 m.",
+    "guide": {
+      "hint": "¿Qué relación se mantiene entre altura y sombra a una misma hora?",
+      "byOption": {
+        "A": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la A?",
+            "choices": [
+              {
+                "text": "Multipliqué 9 por 2,40 y dividí entre 1,60"
+              },
+              {
+                "text": "Puse la proporción al revés"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿La sombra de la persona es más larga o más corta que su estatura?",
+              "choices": [
+                {
+                  "text": "Más larga",
+                  "correct": true
+                },
+                {
+                  "text": "Más corta"
+                }
+              ]
+            },
+            {
+              "prompt": "Si a esa hora la sombra supera al objeto, ¿puede el árbol medir más de 9 m?",
+              "choices": [
+                {
+                  "text": "No, debe medir menos de 9 m",
+                  "correct": true
+                },
+                {
+                  "text": "Sí, puede medir más"
+                }
+              ]
+            }
+          ]
+        },
+        "B": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la B?",
+            "choices": [
+              {
+                "text": "Usé la diferencia de sombras como diferencia de alturas"
+              },
+              {
+                "text": "Pensé que las medidas crecen sumando"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Cuántas veces cabe la sombra de la persona en la del árbol?",
+              "choices": [
+                {
+                  "text": "3,75 veces",
+                  "correct": true
+                },
+                {
+                  "text": "2,40 veces"
+                }
+              ]
+            },
+            {
+              "prompt": "Si la sombra creció 3,75 veces, ¿cómo debe cambiar la altura?",
+              "choices": [
+                {
+                  "text": "Crecer también 3,75 veces",
+                  "correct": true
+                },
+                {
+                  "text": "Aumentar en la misma cantidad de metros"
+                }
+              ]
+            },
+            {
+              "prompt": "¿8,2 m es 3,75 veces la estatura de 1,60 m?",
+              "choices": [
+                {
+                  "text": "No, no guarda esa razón",
+                  "correct": true
+                },
+                {
+                  "text": "Sí, guarda esa razón"
+                }
+              ]
+            }
+          ]
+        },
+        "C": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la C?",
+            "choices": [
+              {
+                "text": "Multipliqué 1,60 por 9"
+              },
+              {
+                "text": "No dividí entre la sombra de la persona"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Qué debe ser igual en los dos triángulos de sombra?",
+              "choices": [
+                {
+                  "text": "La razón entre altura y sombra",
+                  "correct": true
+                },
+                {
+                  "text": "La suma de altura y sombra"
+                }
+              ]
+            },
+            {
+              "prompt": "¿Cuál es la razón entre altura y sombra de la persona?",
+              "choices": [
+                {
+                  "text": "1,60 ÷ 2,40",
+                  "correct": true
+                },
+                {
+                  "text": "2,40 ÷ 1,60"
+                }
+              ]
+            },
+            {
+              "prompt": "Si el árbol midiera 14,4 m, ¿su sombra sería de 9 m con esa razón?",
+              "choices": [
+                {
+                  "text": "No, su sombra sería mucho mayor",
+                  "correct": true
+                },
+                {
+                  "text": "Sí, daría 9 m"
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "reveal": "La razón entre altura y sombra es la misma para la persona y para el árbol, porque los rayos del sol llegan con igual inclinación. Con esa razón, el árbol de 9 m de sombra mide 6 m."
+    }
+  },
+  {
+    "id": "mat-12",
+    "subjectId": "matematicas",
+    "categoryId": "matematicas.geometry_measurement",
+    "primarySubtopicId": "matematicas.geometry_measurement.perimeter_area_volume",
+    "competencia": "formulacion_ejecucion",
+    "difficulty": "baja",
+    "targetGrade": 11,
+    "stem": "Una familia de Neiva quiere cercar todo el borde de un lote rectangular que mide 24 m de largo y 15 m de ancho. ¿Cuántos metros de malla necesita?",
+    "options": [
+      {
+        "label": "A",
+        "text": "78 m"
+      },
+      {
+        "label": "B",
+        "text": "360 m"
+      },
+      {
+        "label": "C",
+        "text": "39 m"
+      },
+      {
+        "label": "D",
+        "text": "63 m"
+      }
+    ],
+    "correctOption": "A",
+    "solution": "La malla rodea el lote, así que se necesita su perímetro. Este es $2(24 + 15) = 78$ m.",
+    "guide": {
+      "hint": "¿Qué medida del lote necesitas hallar para saber cuánta malla comprar?",
+      "byOption": {
+        "B": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la B?",
+            "choices": [
+              {
+                "text": "Multipliqué el largo por el ancho"
+              },
+              {
+                "text": "Confundí perímetro y área"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "La malla va alrededor del lote; ¿se mide en metros o en metros cuadrados?",
+              "choices": [
+                {
+                  "text": "En metros",
+                  "correct": true
+                },
+                {
+                  "text": "En metros cuadrados"
+                }
+              ]
+            },
+            {
+              "prompt": "¿Qué parte del lote mide el producto 24 × 15?",
+              "choices": [
+                {
+                  "text": "La superficie interior",
+                  "correct": true
+                },
+                {
+                  "text": "El borde"
+                }
+              ]
+            }
+          ]
+        },
+        "C": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la C?",
+            "choices": [
+              {
+                "text": "Sumé 24 y 15 solamente"
+              },
+              {
+                "text": "Olvidé que hay dos largos y dos anchos"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Cuántos lados del lote debe cubrir la malla?",
+              "choices": [
+                {
+                  "text": "4 lados",
+                  "correct": true
+                },
+                {
+                  "text": "2 lados"
+                }
+              ]
+            },
+            {
+              "prompt": "Si 39 m cubren un largo y un ancho, ¿cuántos lados quedan sin malla?",
+              "choices": [
+                {
+                  "text": "2 lados",
+                  "correct": true
+                },
+                {
+                  "text": "Ninguno"
+                }
+              ]
+            }
+          ]
+        },
+        "D": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la D?",
+            "choices": [
+              {
+                "text": "Conté 24 dos veces y 15 una vez"
+              },
+              {
+                "text": "Dejé un lado sin contar"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Cuántos lados del lote miden 15 m?",
+              "choices": [
+                {
+                  "text": "2 lados",
+                  "correct": true
+                },
+                {
+                  "text": "1 lado"
+                }
+              ]
+            },
+            {
+              "prompt": "Si 63 m incluyen solo un lado de 15 m, ¿queda cerrado el lote?",
+              "choices": [
+                {
+                  "text": "No, falta un lado",
+                  "correct": true
+                },
+                {
+                  "text": "Sí, queda cerrado"
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "reveal": "Para rodear el lote se suman los cuatro lados: dos de 24 m y dos de 15 m. En total se necesitan 78 m de malla."
+    }
+  },
+  {
+    "id": "mat-13",
+    "subjectId": "matematicas",
+    "categoryId": "matematicas.geometry_measurement",
+    "primarySubtopicId": "matematicas.geometry_measurement.perimeter_area_volume",
+    "competencia": "formulacion_ejecucion",
+    "difficulty": "media",
+    "targetGrade": 11,
+    "stem": "En Riohacha, una familia instaló un tanque cilíndrico para guardar agua. El tanque tiene 3 m de diámetro y 2 m de altura. Usando $\\pi \\approx 3{,}14$, ¿cuántos litros de agua caben en el tanque?",
+    "options": [
+      {
+        "label": "A",
+        "text": "9.420 litros"
+      },
+      {
+        "label": "B",
+        "text": "56.520 litros"
+      },
+      {
+        "label": "C",
+        "text": "14.130 litros"
+      },
+      {
+        "label": "D",
+        "text": "1.413 litros"
+      }
+    ],
+    "correctOption": "C",
+    "solution": "El radio es 1,5 m, así que el volumen es $3{,}14 \\times 1{,}5^2 \\times 2 = 14{,}13$ m³. Como 1 m³ equivale a 1.000 litros, caben 14.130 litros.",
+    "guide": {
+      "hint": "¿Qué medidas necesitas para hallar el volumen de un cilindro y en qué unidad queda?",
+      "byOption": {
+        "A": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la A?",
+            "choices": [
+              {
+                "text": "Multipliqué el radio sin elevarlo al cuadrado"
+              },
+              {
+                "text": "Usé πrh como fórmula"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Cuál expresión da el área del círculo de la base?",
+              "choices": [
+                {
+                  "text": "πr²",
+                  "correct": true
+                },
+                {
+                  "text": "πr"
+                }
+              ]
+            },
+            {
+              "prompt": "¿Cuánto vale 1,5²?",
+              "choices": [
+                {
+                  "text": "2,25",
+                  "correct": true
+                },
+                {
+                  "text": "3"
+                }
+              ]
+            },
+            {
+              "prompt": "Si r² es 2,25 y no 1,5, ¿puede el volumen ser 9,42 m³?",
+              "choices": [
+                {
+                  "text": "No, tiene que ser mayor",
+                  "correct": true
+                },
+                {
+                  "text": "Sí, no cambia"
+                }
+              ]
+            }
+          ]
+        },
+        "B": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la B?",
+            "choices": [
+              {
+                "text": "Usé 3 m como radio"
+              },
+              {
+                "text": "Confundí radio y diámetro"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Qué relación hay entre el diámetro y el radio?",
+              "choices": [
+                {
+                  "text": "El radio es la mitad",
+                  "correct": true
+                },
+                {
+                  "text": "El radio es el doble"
+                }
+              ]
+            },
+            {
+              "prompt": "Con 3 m de diámetro, ¿cuánto mide el radio?",
+              "choices": [
+                {
+                  "text": "1,5 m",
+                  "correct": true
+                },
+                {
+                  "text": "3 m"
+                }
+              ]
+            },
+            {
+              "prompt": "Si el radio es 1,5 m, ¿es correcto que r² = 9?",
+              "choices": [
+                {
+                  "text": "No, 9 sale de usar el diámetro",
+                  "correct": true
+                },
+                {
+                  "text": "Sí, es 9"
+                }
+              ]
+            }
+          ]
+        },
+        "D": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la D?",
+            "choices": [
+              {
+                "text": "Multipliqué por 100 para pasar a litros"
+              },
+              {
+                "text": "Confundí la equivalencia del metro cúbico"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Cuántos litros tiene un metro cúbico?",
+              "choices": [
+                {
+                  "text": "1.000 litros",
+                  "correct": true
+                },
+                {
+                  "text": "100 litros"
+                }
+              ]
+            },
+            {
+              "prompt": "¿Cuántos litros caben en un tanque de 2 m³?",
+              "choices": [
+                {
+                  "text": "2.000 litros",
+                  "correct": true
+                },
+                {
+                  "text": "200 litros"
+                }
+              ]
+            },
+            {
+              "prompt": "El tanque tiene más de 10 m³; ¿alcanzan 1.413 litros para llenarlo?",
+              "choices": [
+                {
+                  "text": "No, faltarían muchos litros",
+                  "correct": true
+                },
+                {
+                  "text": "Sí, alcanzan"
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "reveal": "Con radio de 1,5 m, el volumen del cilindro es 14,13 m³. Al multiplicar por 1.000 se obtienen 14.130 litros de capacidad."
+    }
+  },
+  {
+    "id": "mat-14",
+    "subjectId": "matematicas",
+    "categoryId": "matematicas.geometry_measurement",
+    "primarySubtopicId": "matematicas.geometry_measurement.perimeter_area_volume",
+    "competencia": "argumentacion",
+    "difficulty": "alta",
+    "targetGrade": 11,
+    "stem": "En Santa Marta, un patio cuadrado de 6 m de lado se va a ampliar a 12 m de lado. Cubrirlo con baldosa cuesta 45.000 pesos por metro cuadrado. Diana afirma que, como el lado se duplicó, cubrir el patio nuevo costará el doble de lo que costaba cubrir el original. ¿Cuál afirmación es correcta?",
+    "options": [
+      {
+        "label": "A",
+        "text": "Diana tiene razón: el costo pasa a 3.240.000 pesos, porque se duplica el lado."
+      },
+      {
+        "label": "B",
+        "text": "Diana se equivoca: el costo pasa a 6.480.000 pesos, porque el área crece más que el lado."
+      },
+      {
+        "label": "C",
+        "text": "Diana se equivoca: el costo pasa a 2.160.000 pesos, porque depende del borde del patio."
+      },
+      {
+        "label": "D",
+        "text": "Diana se equivoca: el costo pasa a 12.960.000 pesos, porque el costo crece ocho veces."
+      }
+    ],
+    "correctOption": "B",
+    "solution": "El área pasa de $6^2 = 36$ m² a $12^2 = 144$ m², es decir, se multiplica por 4. Por eso el costo es $144 \\times 45000 = 6480000$ pesos, y no el doble de 1.620.000 pesos.",
+    "guide": {
+      "hint": "¿Cómo cambia la superficie de un cuadrado cuando cambia su lado?",
+      "byOption": {
+        "A": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la A?",
+            "choices": [
+              {
+                "text": "Si el lado es el doble, todo es el doble"
+              },
+              {
+                "text": "Multipliqué el costo inicial por 2"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Cuánto mide el área del patio original?",
+              "choices": [
+                {
+                  "text": "36 m²",
+                  "correct": true
+                },
+                {
+                  "text": "24 m²"
+                }
+              ]
+            },
+            {
+              "prompt": "¿Cuánto mide el área del patio de 12 m de lado?",
+              "choices": [
+                {
+                  "text": "144 m²",
+                  "correct": true
+                },
+                {
+                  "text": "72 m²"
+                }
+              ]
+            },
+            {
+              "prompt": "¿144 m² es el doble de 36 m²?",
+              "choices": [
+                {
+                  "text": "No, es más del doble",
+                  "correct": true
+                },
+                {
+                  "text": "Sí, es el doble"
+                }
+              ]
+            }
+          ]
+        },
+        "C": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la C?",
+            "choices": [
+              {
+                "text": "Calculé el borde del patio"
+              },
+              {
+                "text": "Multipliqué 48 m por 45.000 pesos"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿La baldosa cubre el borde o la superficie del patio?",
+              "choices": [
+                {
+                  "text": "La superficie",
+                  "correct": true
+                },
+                {
+                  "text": "El borde"
+                }
+              ]
+            },
+            {
+              "prompt": "¿Qué mide 48 m en el patio ampliado?",
+              "choices": [
+                {
+                  "text": "El perímetro",
+                  "correct": true
+                },
+                {
+                  "text": "El área"
+                }
+              ]
+            }
+          ]
+        },
+        "D": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la D?",
+            "choices": [
+              {
+                "text": "Elevé al cubo el factor 2"
+              },
+              {
+                "text": "Pensé que el patio tiene tres dimensiones"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Cuántas dimensiones tiene un patio plano?",
+              "choices": [
+                {
+                  "text": "Dos",
+                  "correct": true
+                },
+                {
+                  "text": "Tres"
+                }
+              ]
+            },
+            {
+              "prompt": "Al duplicar todas las medidas, ¿qué magnitud crece ocho veces?",
+              "choices": [
+                {
+                  "text": "El volumen",
+                  "correct": true
+                },
+                {
+                  "text": "El área"
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "reveal": "Al duplicar el lado de un cuadrado, su área se multiplica por 4, no por 2. El costo pasa de 1.620.000 pesos a 6.480.000 pesos, por lo que Diana se equivoca."
+    }
+  },
+  {
+    "id": "mat-15",
+    "subjectId": "matematicas",
+    "categoryId": "matematicas.data_statistics_chance",
+    "primarySubtopicId": "matematicas.data_statistics_chance.tables_graphs_interpretation",
+    "competencia": "interpretacion_representacion",
+    "difficulty": "baja",
+    "targetGrade": 11,
+    "stem": "La tabla muestra las arepas vendidas en un puesto de Envigado durante una semana:\n\n| Día | Arepas vendidas |\n|---|---|\n| Lunes | 120 |\n| Martes | 95 |\n| Miércoles | 140 |\n| Jueves | 85 |\n| Viernes | 180 |\n\n¿Cuál fue el promedio diario de arepas vendidas?",
+    "options": [
+      {
+        "label": "A",
+        "text": "124 arepas"
+      },
+      {
+        "label": "B",
+        "text": "620 arepas"
+      },
+      {
+        "label": "C",
+        "text": "140 arepas"
+      },
+      {
+        "label": "D",
+        "text": "132,5 arepas"
+      }
+    ],
+    "correctOption": "A",
+    "solution": "Se suman las ventas de los cinco días, que dan 620 arepas. Al dividir entre 5 se obtiene un promedio de 124 arepas por día.",
+    "guide": {
+      "hint": "¿Qué significa «promedio diario» en esta situación?",
+      "byOption": {
+        "B": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la B?",
+            "choices": [
+              {
+                "text": "Sumé todo y no dividí"
+              },
+              {
+                "text": "Confundí el total con el promedio"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Qué mide el promedio diario de ventas?",
+              "choices": [
+                {
+                  "text": "Lo que toca a cada día si se reparte igual",
+                  "correct": true
+                },
+                {
+                  "text": "Lo vendido en toda la semana"
+                }
+              ]
+            },
+            {
+              "prompt": "¿Puede el promedio ser mayor que las ventas del mejor día?",
+              "choices": [
+                {
+                  "text": "No, queda entre el mínimo y el máximo",
+                  "correct": true
+                },
+                {
+                  "text": "Sí, si se suman los días"
+                }
+              ]
+            }
+          ]
+        },
+        "C": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la C?",
+            "choices": [
+              {
+                "text": "Tomé el dato del medio de la tabla"
+              },
+              {
+                "text": "Confundí el promedio con la mediana"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿La tabla está ordenada de menor a mayor?",
+              "choices": [
+                {
+                  "text": "No, está ordenada por días",
+                  "correct": true
+                },
+                {
+                  "text": "Sí, de menor a mayor"
+                }
+              ]
+            },
+            {
+              "prompt": "¿El promedio usa un solo dato o todos los datos?",
+              "choices": [
+                {
+                  "text": "Todos los datos",
+                  "correct": true
+                },
+                {
+                  "text": "Un solo dato"
+                }
+              ]
+            }
+          ]
+        },
+        "D": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la D?",
+            "choices": [
+              {
+                "text": "Promedié solo el mayor y el menor"
+              },
+              {
+                "text": "Usé únicamente 85 y 180"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Cuántos días debe tener en cuenta el promedio?",
+              "choices": [
+                {
+                  "text": "Los cinco días",
+                  "correct": true
+                },
+                {
+                  "text": "Solo dos días"
+                }
+              ]
+            },
+            {
+              "prompt": "Si 132,5 sale de solo dos días, ¿cuenta lo vendido el martes?",
+              "choices": [
+                {
+                  "text": "No, ignora ese día",
+                  "correct": true
+                },
+                {
+                  "text": "Sí, lo cuenta"
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "reveal": "El promedio reparte en partes iguales el total de la semana: 620 arepas entre 5 días. Eso da 124 arepas por día."
+    }
+  },
+  {
+    "id": "mat-16",
+    "subjectId": "matematicas",
+    "categoryId": "matematicas.data_statistics_chance",
+    "primarySubtopicId": "matematicas.data_statistics_chance.tables_graphs_interpretation",
+    "competencia": "argumentacion",
+    "difficulty": "media",
+    "targetGrade": 11,
+    "stem": "La tabla muestra los resultados de una prueba de matemáticas en tres colegios de Cúcuta:\n\n| Colegio | Estudiantes | Aprobaron |\n|---|---|---|\n| San José | 200 | 150 |\n| La Esperanza | 80 | 68 |\n| Nuevo Horizonte | 120 | 96 |\n\n¿Cuál afirmación describe correctamente los datos?",
+    "options": [
+      {
+        "label": "A",
+        "text": "San José tuvo el mejor resultado porque aprobó el mayor número de estudiantes: 150."
+      },
+      {
+        "label": "B",
+        "text": "Nuevo Horizonte tuvo la mayor proporción de aprobados, con 96 %."
+      },
+      {
+        "label": "C",
+        "text": "San José tuvo la mayor proporción de aprobados, con 37,5 %."
+      },
+      {
+        "label": "D",
+        "text": "La Esperanza tuvo la mayor proporción de aprobados, con 85 %."
+      }
+    ],
+    "correctOption": "D",
+    "solution": "Las proporciones son $\\frac{150}{200} = 75$ %, $\\frac{68}{80} = 85$ % y $\\frac{96}{120} = 80$ %. La mayor corresponde a La Esperanza, aunque tenga menos aprobados en número.",
+    "guide": {
+      "hint": "¿Qué información necesitas para saber qué tan bien le fue a cada colegio?",
+      "byOption": {
+        "A": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la A?",
+            "choices": [
+              {
+                "text": "Elegí el número más grande"
+              },
+              {
+                "text": "Comparé aprobados sin mirar el total de cada colegio"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Qué colegio tiene más estudiantes en total?",
+              "choices": [
+                {
+                  "text": "San José",
+                  "correct": true
+                },
+                {
+                  "text": "La Esperanza"
+                }
+              ]
+            },
+            {
+              "prompt": "¿Qué porcentaje de los estudiantes de San José aprobó?",
+              "choices": [
+                {
+                  "text": "75 %",
+                  "correct": true
+                },
+                {
+                  "text": "150 %"
+                }
+              ]
+            },
+            {
+              "prompt": "Si solo aprobó el 75 %, ¿150 aprobados garantizan el mejor resultado?",
+              "choices": [
+                {
+                  "text": "No, otro colegio puede tener mayor porcentaje",
+                  "correct": true
+                },
+                {
+                  "text": "Sí, lo garantizan"
+                }
+              ]
+            }
+          ]
+        },
+        "B": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la B?",
+            "choices": [
+              {
+                "text": "Leí 96 como si fuera un porcentaje"
+              },
+              {
+                "text": "Tomé el dato directo de la columna de aprobados"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Qué indica el 96 en la tabla?",
+              "choices": [
+                {
+                  "text": "Cuántos estudiantes aprobaron",
+                  "correct": true
+                },
+                {
+                  "text": "El porcentaje de aprobados"
+                }
+              ]
+            },
+            {
+              "prompt": "¿Cuánto da 96 dividido entre 120, expresado en porcentaje?",
+              "choices": [
+                {
+                  "text": "80 %",
+                  "correct": true
+                },
+                {
+                  "text": "96 %"
+                }
+              ]
+            }
+          ]
+        },
+        "C": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la C?",
+            "choices": [
+              {
+                "text": "Dividí entre los 400 de todos los colegios"
+              },
+              {
+                "text": "Usé el total de la tabla"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Entre cuántos estudiantes se calcula la proporción de San José?",
+              "choices": [
+                {
+                  "text": "Sus 200 estudiantes",
+                  "correct": true
+                },
+                {
+                  "text": "Los 400 de todos los colegios"
+                }
+              ]
+            },
+            {
+              "prompt": "¿Cuánto da 150 sobre 200, expresado en porcentaje?",
+              "choices": [
+                {
+                  "text": "75 %",
+                  "correct": true
+                },
+                {
+                  "text": "37,5 %"
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "reveal": "Para comparar colegios de distinto tamaño se usa la proporción de aprobados, no el número absoluto. San José tiene 75 %, Nuevo Horizonte 80 % y La Esperanza 85 %, que es la mayor."
+    }
+  },
+  {
+    "id": "mat-17",
+    "subjectId": "matematicas",
+    "categoryId": "matematicas.data_statistics_chance",
+    "primarySubtopicId": "matematicas.data_statistics_chance.probability_counting",
+    "competencia": "formulacion_ejecucion",
+    "difficulty": "alta",
+    "targetGrade": 11,
+    "stem": "En un curso de un colegio de Popayán hay 12 mujeres y 8 hombres. Se eligen al azar dos representantes, uno después del otro y sin repetir persona. ¿Cuál es la probabilidad de que las dos personas elegidas sean mujeres?",
+    "options": [
+      {
+        "label": "A",
+        "text": "$\\frac{9}{25}$"
+      },
+      {
+        "label": "B",
+        "text": "$\\frac{3}{5}$"
+      },
+      {
+        "label": "C",
+        "text": "$\\frac{33}{95}$"
+      },
+      {
+        "label": "D",
+        "text": "$\\frac{11}{19}$"
+      }
+    ],
+    "correctOption": "C",
+    "solution": "La primera elección da $\\frac{12}{20}$ y, si fue mujer, la segunda da $\\frac{11}{19}$. Al multiplicar se obtiene $\\frac{132}{380} = \\frac{33}{95}$.",
+    "guide": {
+      "hint": "¿Cómo se combina lo que ocurre en la primera elección con lo que ocurre en la segunda?",
+      "byOption": {
+        "A": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la A?",
+            "choices": [
+              {
+                "text": "Elevé 12/20 al cuadrado"
+              },
+              {
+                "text": "Pensé que la segunda elección no cambia"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "Después de elegir a una mujer, ¿cuántas personas quedan para escoger?",
+              "choices": [
+                {
+                  "text": "19 personas",
+                  "correct": true
+                },
+                {
+                  "text": "20 personas"
+                }
+              ]
+            },
+            {
+              "prompt": "¿Cuántas mujeres quedan para la segunda elección?",
+              "choices": [
+                {
+                  "text": "11 mujeres",
+                  "correct": true
+                },
+                {
+                  "text": "12 mujeres"
+                }
+              ]
+            },
+            {
+              "prompt": "Si cambian esos números, ¿sirve repetir 12/20 en la segunda elección?",
+              "choices": [
+                {
+                  "text": "No, la fracción cambia",
+                  "correct": true
+                },
+                {
+                  "text": "Sí, es igual"
+                }
+              ]
+            }
+          ]
+        },
+        "B": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la B?",
+            "choices": [
+              {
+                "text": "Solo calculé la primera elección"
+              },
+              {
+                "text": "No tuve en cuenta a la segunda persona"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Cuántas personas se deben elegir en total?",
+              "choices": [
+                {
+                  "text": "2 personas",
+                  "correct": true
+                },
+                {
+                  "text": "1 persona"
+                }
+              ]
+            },
+            {
+              "prompt": "¿Elegir dos mujeres es más o menos probable que elegir una?",
+              "choices": [
+                {
+                  "text": "Menos probable",
+                  "correct": true
+                },
+                {
+                  "text": "Igual de probable"
+                }
+              ]
+            }
+          ]
+        },
+        "D": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la D?",
+            "choices": [
+              {
+                "text": "Usé solo lo que queda en la segunda elección"
+              },
+              {
+                "text": "Olvidé la primera elección"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Qué probabilidad representa la fracción 11/19?",
+              "choices": [
+                {
+                  "text": "Segunda mujer, si la primera ya fue mujer",
+                  "correct": true
+                },
+                {
+                  "text": "Elegir dos mujeres desde el inicio"
+                }
+              ]
+            },
+            {
+              "prompt": "Para que ocurran dos eventos seguidos, ¿qué se hace con sus probabilidades?",
+              "choices": [
+                {
+                  "text": "Se multiplican",
+                  "correct": true
+                },
+                {
+                  "text": "Se toma solo la última"
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "reveal": "Se multiplican las probabilidades de las dos elecciones, teniendo en cuenta que la segunda ya no incluye a la primera persona. El resultado es $\\frac{33}{95}$."
+    }
+  },
+  {
+    "id": "mat-18",
+    "subjectId": "matematicas",
+    "categoryId": "matematicas.data_statistics_chance",
+    "primarySubtopicId": "matematicas.data_statistics_chance.probability_counting",
+    "competencia": "formulacion_ejecucion",
+    "difficulty": "baja",
+    "targetGrade": 11,
+    "stem": "Una heladería de Cartagena arma cada helado con un sabor (4 opciones), una salsa (3 opciones) y un tipo de cono (2 opciones). ¿Cuántos helados distintos se pueden armar?",
+    "options": [
+      {
+        "label": "A",
+        "text": "9 helados"
+      },
+      {
+        "label": "B",
+        "text": "24 helados"
+      },
+      {
+        "label": "C",
+        "text": "12 helados"
+      },
+      {
+        "label": "D",
+        "text": "84 helados"
+      }
+    ],
+    "correctOption": "B",
+    "solution": "Cada helado se arma con tres decisiones independientes. Por el principio multiplicativo hay $4 \\times 3 \\times 2 = 24$ helados distintos.",
+    "guide": {
+      "hint": "¿Cuántas decisiones toma cada cliente y cuántas opciones tiene en cada una?",
+      "byOption": {
+        "A": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la A?",
+            "choices": [
+              {
+                "text": "Sumé 4, 3 y 2"
+              },
+              {
+                "text": "Pensé que cada opción se cuenta una vez"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "Con un solo sabor, ¿cuántas opciones tienes con las 3 salsas?",
+              "choices": [
+                {
+                  "text": "3 opciones",
+                  "correct": true
+                },
+                {
+                  "text": "1 opción"
+                }
+              ]
+            },
+            {
+              "prompt": "Con 4 sabores y 3 salsas cada uno, ¿cuántas parejas hay?",
+              "choices": [
+                {
+                  "text": "12 parejas",
+                  "correct": true
+                },
+                {
+                  "text": "7 parejas"
+                }
+              ]
+            },
+            {
+              "prompt": "Si ya hay 12 parejas sin contar el cono, ¿pueden ser solo 9 helados?",
+              "choices": [
+                {
+                  "text": "No, son más",
+                  "correct": true
+                },
+                {
+                  "text": "Sí, son 9"
+                }
+              ]
+            }
+          ]
+        },
+        "C": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la C?",
+            "choices": [
+              {
+                "text": "Multipliqué sabores por salsas"
+              },
+              {
+                "text": "Olvidé el tipo de cono"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Cuántas decisiones debe tomar cada cliente?",
+              "choices": [
+                {
+                  "text": "3 decisiones",
+                  "correct": true
+                },
+                {
+                  "text": "2 decisiones"
+                }
+              ]
+            },
+            {
+              "prompt": "Si cada pareja de sabor y salsa admite 2 conos, ¿se mantiene en 12 el total?",
+              "choices": [
+                {
+                  "text": "No, el total aumenta",
+                  "correct": true
+                },
+                {
+                  "text": "Sí, se mantiene"
+                }
+              ]
+            }
+          ]
+        },
+        "D": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la D?",
+            "choices": [
+              {
+                "text": "Usé combinaciones de 9 en 3"
+              },
+              {
+                "text": "Junté todas las opciones en un solo grupo"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Puede un cliente escoger dos sabores y ningún cono?",
+              "choices": [
+                {
+                  "text": "No, escoge uno de cada grupo",
+                  "correct": true
+                },
+                {
+                  "text": "Sí, los que quiera"
+                }
+              ]
+            },
+            {
+              "prompt": "¿Escoger 3 entre 9 opciones obliga a tomar uno de cada grupo?",
+              "choices": [
+                {
+                  "text": "No, permite repetir grupo",
+                  "correct": true
+                },
+                {
+                  "text": "Sí, lo obliga"
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "reveal": "Se usa el principio multiplicativo: cada sabor se combina con cada salsa y cada cono. Eso da 24 helados distintos."
+    }
+  },
+  {
+    "id": "mat-19",
+    "subjectId": "matematicas",
+    "categoryId": "matematicas.modeling_verification",
+    "primarySubtopicId": "matematicas.modeling_verification.modeling_word_problems",
+    "competencia": "interpretacion_representacion",
+    "difficulty": "media",
+    "targetGrade": 11,
+    "stem": "El acueducto de un municipio cercano a Ibagué cobra cada mes un cargo fijo de 9.800 pesos, 2.400 pesos por cada uno de los primeros 20 m³ consumidos y 3.600 pesos por cada m³ adicional. ¿Cuál expresión da el costo $C$ en pesos para un consumo de $m$ metros cúbicos, con $m > 20$?",
+    "options": [
+      {
+        "label": "A",
+        "text": "$C = 9800 + 3600m$"
+      },
+      {
+        "label": "B",
+        "text": "$C = 9800 + 2400m + 3600(m - 20)$"
+      },
+      {
+        "label": "C",
+        "text": "$C = 9800 + 2400 \\cdot 20 + 3600m$"
+      },
+      {
+        "label": "D",
+        "text": "$C = 9800 + 2400 \\cdot 20 + 3600(m - 20)$"
+      }
+    ],
+    "correctOption": "D",
+    "solution": "Los primeros 20 m³ cuestan $2400 \\cdot 20$ pesos, y los $m - 20$ restantes cuestan 3.600 pesos cada uno. Sumando el cargo fijo se obtiene $C = 9800 + 2400 \\cdot 20 + 3600(m - 20)$.",
+    "guide": {
+      "hint": "¿Cuántos metros cúbicos se cobran con cada tarifa cuando el consumo supera los 20?",
+      "byOption": {
+        "A": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la A?",
+            "choices": [
+              {
+                "text": "Cobré todos los metros a la tarifa alta"
+              },
+              {
+                "text": "Olvidé los primeros 20 m³"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "Con 25 m³, ¿cuántos metros cúbicos se cobran a 2.400 pesos?",
+              "choices": [
+                {
+                  "text": "20",
+                  "correct": true
+                },
+                {
+                  "text": "25"
+                }
+              ]
+            },
+            {
+              "prompt": "Con 25 m³, ¿cuántos se cobran a 3.600 pesos?",
+              "choices": [
+                {
+                  "text": "5",
+                  "correct": true
+                },
+                {
+                  "text": "25"
+                }
+              ]
+            },
+            {
+              "prompt": "Si solo 5 se cobran a 3.600 pesos, ¿debe 3.600 multiplicar toda la m?",
+              "choices": [
+                {
+                  "text": "No, solo el excedente",
+                  "correct": true
+                },
+                {
+                  "text": "Sí, toda la m"
+                }
+              ]
+            }
+          ]
+        },
+        "B": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la B?",
+            "choices": [
+              {
+                "text": "Cobré 2.400 pesos por todos los metros"
+              },
+              {
+                "text": "Apliqué las dos tarifas a los metros adicionales"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "Un metro cúbico por encima de 20, ¿cuántas tarifas paga?",
+              "choices": [
+                {
+                  "text": "Solo una",
+                  "correct": true
+                },
+                {
+                  "text": "Las dos"
+                }
+              ]
+            },
+            {
+              "prompt": "En esa expresión, ¿cuánto se cobra por el metro número 25?",
+              "choices": [
+                {
+                  "text": "6.000 pesos",
+                  "correct": true
+                },
+                {
+                  "text": "3.600 pesos"
+                }
+              ]
+            },
+            {
+              "prompt": "¿Cobrar 6.000 pesos por ese metro respeta la regla del acueducto?",
+              "choices": [
+                {
+                  "text": "No, debe pagar solo 3.600 pesos",
+                  "correct": true
+                },
+                {
+                  "text": "Sí, la respeta"
+                }
+              ]
+            }
+          ]
+        },
+        "C": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la C?",
+            "choices": [
+              {
+                "text": "Multipliqué 3.600 por todos los metros"
+              },
+              {
+                "text": "Olvidé restar los 20 m³ ya cobrados"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "Si m = 20, ¿cuánto debería cobrarse a la tarifa alta?",
+              "choices": [
+                {
+                  "text": "Nada",
+                  "correct": true
+                },
+                {
+                  "text": "72.000 pesos"
+                }
+              ]
+            },
+            {
+              "prompt": "¿Qué da el término 3600m cuando m = 20?",
+              "choices": [
+                {
+                  "text": "72.000 pesos",
+                  "correct": true
+                },
+                {
+                  "text": "0 pesos"
+                }
+              ]
+            },
+            {
+              "prompt": "¿Cobrar 72.000 pesos extra al llegar justo a 20 m³ respeta la regla?",
+              "choices": [
+                {
+                  "text": "No, aún no hay metros adicionales",
+                  "correct": true
+                },
+                {
+                  "text": "Sí, la respeta"
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "reveal": "El consumo se divide en dos tramos: 20 m³ a 2.400 pesos y los $m - 20$ restantes a 3.600 pesos, además del cargo fijo. Por eso la expresión correcta es $C = 9800 + 2400 \\cdot 20 + 3600(m - 20)$."
+    }
+  },
+  {
+    "id": "mat-20",
+    "subjectId": "matematicas",
+    "categoryId": "matematicas.modeling_verification",
+    "primarySubtopicId": "matematicas.modeling_verification.modeling_word_problems",
+    "competencia": "argumentacion",
+    "difficulty": "alta",
+    "targetGrade": 11,
+    "stem": "En Villavicencio, Sofía vende jugos naturales. Cada mes paga 420.000 pesos de arriendo. Cada jugo le cuesta 1.800 pesos en ingredientes y lo vende a 4.800 pesos. ¿Cuál es el mínimo de jugos que debe vender al mes para no perder dinero, y por qué?",
+    "options": [
+      {
+        "label": "A",
+        "text": "140 jugos, porque el arriendo se paga con lo que sobra de cada venta."
+      },
+      {
+        "label": "B",
+        "text": "88 jugos, porque cada jugo se vende a 4.800 pesos."
+      },
+      {
+        "label": "C",
+        "text": "234 jugos, porque cada jugo cuesta 1.800 pesos."
+      },
+      {
+        "label": "D",
+        "text": "64 jugos, porque cada jugo mueve 6.600 pesos entre precio y costo."
+      }
+    ],
+    "correctOption": "A",
+    "solution": "Cada jugo deja $4800 - 1800 = 3000$ pesos para el arriendo. Se necesitan $420000 \\div 3000 = 140$ jugos para cubrirlo.",
+    "guide": {
+      "hint": "¿Qué parte del dinero de cada jugo puede destinarse a los gastos fijos?",
+      "byOption": {
+        "B": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la B?",
+            "choices": [
+              {
+                "text": "Dividí 420.000 entre 4.800"
+              },
+              {
+                "text": "Usé solo el precio de venta"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "Por cada jugo vendido, ¿todo el dinero queda para el arriendo?",
+              "choices": [
+                {
+                  "text": "No, hay que reponer ingredientes",
+                  "correct": true
+                },
+                {
+                  "text": "Sí, todo queda"
+                }
+              ]
+            },
+            {
+              "prompt": "¿Cuánto queda de cada jugo después de pagar los ingredientes?",
+              "choices": [
+                {
+                  "text": "3.000 pesos",
+                  "correct": true
+                },
+                {
+                  "text": "4.800 pesos"
+                }
+              ]
+            },
+            {
+              "prompt": "Con 88 jugos y 3.000 pesos por jugo, ¿se cubren los 420.000 pesos?",
+              "choices": [
+                {
+                  "text": "No, solo se reúnen 264.000 pesos",
+                  "correct": true
+                },
+                {
+                  "text": "Sí, alcanza"
+                }
+              ]
+            }
+          ]
+        },
+        "C": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la C?",
+            "choices": [
+              {
+                "text": "Dividí 420.000 entre 1.800"
+              },
+              {
+                "text": "Pensé que el costo es lo que paga el arriendo"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿De dónde sale el dinero para el arriendo?",
+              "choices": [
+                {
+                  "text": "De lo que sobra tras pagar ingredientes",
+                  "correct": true
+                },
+                {
+                  "text": "Del costo de cada jugo"
+                }
+              ]
+            },
+            {
+              "prompt": "¿Cuánto aporta cada jugo para el arriendo?",
+              "choices": [
+                {
+                  "text": "3.000 pesos",
+                  "correct": true
+                },
+                {
+                  "text": "1.800 pesos"
+                }
+              ]
+            },
+            {
+              "prompt": "Si 234 jugos aportan 702.000 pesos, ¿esa es la cantidad mínima?",
+              "choices": [
+                {
+                  "text": "No, con menos jugos alcanza",
+                  "correct": true
+                },
+                {
+                  "text": "Sí, es la mínima"
+                }
+              ]
+            }
+          ]
+        },
+        "D": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la D?",
+            "choices": [
+              {
+                "text": "Sumé 4.800 y 1.800"
+              },
+              {
+                "text": "Pensé que ambos montos ayudan al arriendo"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿El costo de 1.800 pesos entra o sale del negocio?",
+              "choices": [
+                {
+                  "text": "Sale",
+                  "correct": true
+                },
+                {
+                  "text": "Entra"
+                }
+              ]
+            },
+            {
+              "prompt": "Si el costo sale, ¿se suma o se resta del precio?",
+              "choices": [
+                {
+                  "text": "Se resta",
+                  "correct": true
+                },
+                {
+                  "text": "Se suma"
+                }
+              ]
+            },
+            {
+              "prompt": "Con 64 jugos a 3.000 pesos cada uno, ¿se cubre el arriendo?",
+              "choices": [
+                {
+                  "text": "No, ni la mitad",
+                  "correct": true
+                },
+                {
+                  "text": "Sí, se cubre"
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "reveal": "Solo lo que sobra después de pagar los ingredientes sirve para cubrir el arriendo: 3.000 pesos por jugo. Por eso se necesitan 140 jugos al mes para no perder dinero."
+    }
+  }
+]

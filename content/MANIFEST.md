@@ -47,8 +47,9 @@ en `docs/levels.v1.json`: Pre A1 / A1 / A2 / B1, sin `B+`.
 
 `16-feb-…-lectura-critica-2026`, `24-feb-…-ciencias-naturales-2026`,
 `09-marzo_…-matematicas-2026`, `22-diciembre-…-ciencias-naturales-2025`,
-`16-octubre-…-ingles-2024`. Exámenes completos, **sin clave de respuestas** —
-estos sí necesitan inferencia del modelo.
+`16-octubre-…-ingles-2024`. Exámenes completos, **con tabla de respuestas
+correctas impresa al final** (la de Inglés, una por cada uno de sus dos
+exámenes). No necesitan inferencia del modelo.
 
 ---
 
@@ -87,6 +88,20 @@ Se conservan como referencia histórica. `cuadernillo-saber11-2016.pdf` y
 
 ---
 
+## Ampliación del 2026-11-09
+
+Decisiones y recortes en `content/revision-banco/2026-11-09-ampliacion-2*` (no están en git). **El registro de fuentes y las huellas para no repetir preguntas están en `content/fuentes/README.md`.**
+
+| Fuente | Años | Origen de la clave |
+|---|---|---|
+| Cuadernillos Saber 11 | 2014, 2019 | Tabla impresa |
+| Evaluar para Avanzar, grado 11 | 2021 a 2023 | Guía docente del ICFES; sin guía utilizable, dos soluciones a ciegas |
+| Exámenes aplicados, prefijo `icfes-reservado-` | 2024, 2025 | Dos soluciones a ciegas (`answerModelId: two-solvers-v1`) |
+
+Los `icfes-reservado-` son copias de cuadernillos marcados como de uso exclusivo del ICFES. El dueño decidió subirlos a producción el 2026-11-09, sabiendo que la revisión legal sigue pendiente. Sus escaneos originales llevaban datos del examinado y no se conservan.
+
+---
+
 ## Estado del pipeline frente a este material
 
 **Resuelto:** el enriquecimiento aceptaba solo etiquetas `A-D`. Los cuadernillos
@@ -94,7 +109,12 @@ de Inglés usan ítems de 3 opciones (`A-C`) y de emparejamiento donde cinco
 enunciados comparten ocho opciones (`A-H`). El enum ahora va de `A` a `H`
 (`packages/ingest/src/question-enrichment-core.ts`).
 
-**Pendiente:** nada en el pipeline lee las claves de respuestas. Hoy todo pasa
-por inferencia de Gemini, incluso cuando el PDF trae la respuesta impresa tres
-páginas más abajo. Aprovecharlas requiere un paso de extracción de clave que
-sobrescriba `answerCorrectOption` y marque esas preguntas como verificadas.
+**Resuelto:** las claves impresas ya se leen sin modelo en
+`packages/ingest/src/icfes-booklet.ts`: `parseAnswerKey` (tabla final),
+`parseExamAnswerKeys` (una tabla por examen en Inglés) e `inlineAnswer` (respuesta
+impresa junto a la pregunta en las `explicadas` y en las guías).
+`load-icfes-booklets.ts` carga con esa clave los ocho cuadernillos de Lectura,
+Matemáticas, Sociales y Ciencias.
+
+**Pendiente:** el cargador todavía no incluye Inglés, las `explicadas` ni las
+guías.

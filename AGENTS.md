@@ -69,15 +69,17 @@ Current routes:
 
 - `/` landing, `/login`, `/app` (post-login router to the student's default route)
 - `/diagnostic` placement (nivelación) by area
-- `/today`, `/path`, `/syllabus`, `/lesson/$subtopicId`, `/progress`, `/history`
-- `/practice` hub, `/practice/$sessionId` solve, `/practice/$sessionId/review` review and results
-- `/join` join a class with its code, `/cuenta` account and deletion
-- `/teacher`, `/teacher/$classGroupId`, `/teacher/student/$studentId` teacher panel (week plan, groups, assignments, cycles; never grades or acts for a student), `/teacher/guia/$subtopicId` printable class guide
-- `/school` school admin: name and crest, classes and codes, teachers, students, seats
-- `/admin` Aprendo staff: PDF ingest, question browser, question reports, school licences
+- Student tabs: `/today` (Hoy), `/path` (Aprende; `/syllabus` redirects here), `/practice` (Retos), `/progress` (Yo; `/history` redirects here); `/lesson/$subtopicId`
+- `/practice/$sessionId` solve with the Socratic guided path, `/practice/$sessionId/review` reward and review, `/duelo/$id` live class duel
+- `/join` join a class with its code, `/cuenta` account, data export and deletion
+- `/teacher`, `/teacher/$classGroupId` (tabs: week, results, plan), `/teacher/student/$studentId` teacher panel (never grades or acts for a student), `/teacher/guia/$subtopicId` printable class guide, `/teacher/duelo/$id` duel on the projector
+- `/school` school admin tabs: courses, people, periodic tests, institution
+- `/admin` Aprendo staff: bank, question audit (reviewers see only this), reports, school licences
 - `/reset-password`, `/terminos`, `/privacidad`
 
-Visual system: `DESIGN.md` (Cuaderno cuadriculado). The institutional redesign and the school (B2B) model are tracked in `plans/rediseno-institucional.md`; the planned ENEM (Brazil) version, not started, in `plans/enem-brasil.md`; the career-goal methodology (study weighted by the student's career family), built as V1, in `plans/meta-carrera.md`; the voice tutor (speech to speech), phase 0 built (browser speech), in `plans/tutor-voz.md`; the pedagogical audit in `plans/analisis-pedagogico.md` and its phased roadmap (F30–F37) in `plans/ruta-mejora-pedagogica.md`; tenants and roles are specified in `specs/DATA_MODEL_SPEC.md` §7.
+Current roadmap, approved 2026-11-08: `plans/reconstruccion-estudiante-y-banco.md` (F50–F77: full front-end rebuild, gamification, Socratic study, question bank audit and original bank).
+
+Visual system: `DESIGN.md` has two worlds: Álbum for student screens (`apps/web/src/student.css`, scoped by `html[data-look='student']`) and Cuaderno cuadriculado for teacher, school, staff, public and print. Audit and original bank: `packages/convex/src/audit.ts`, `auditChecks.ts`, `auditDecision.ts`, `seedBank.ts`, seed content in `docs/seed-bank/`. The institutional redesign and the school (B2B) model are tracked in `plans/rediseno-institucional.md`; the planned ENEM (Brazil) version, not started, in `plans/enem-brasil.md`; the career-goal methodology (study weighted by the student's career family), built as V1, in `plans/meta-carrera.md`; the voice tutor (speech to speech), phase 0 built (browser speech), in `plans/tutor-voz.md`; the pedagogical audit in `plans/analisis-pedagogico.md` and its phased roadmap (F30–F37) in `plans/ruta-mejora-pedagogica.md`; tenants and roles are specified in `specs/DATA_MODEL_SPEC.md` §7.
 
 #### `packages/convex`
 

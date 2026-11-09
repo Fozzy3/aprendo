@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8"><title>Estándar</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&display=swap">
+<style>
+*{box-sizing:border-box;margin:0}
+body{width:800px;height:844px;overflow:hidden;background:#e5e5e5;display:flex;gap:20px;font-family:Nunito,sans-serif;color:#3c3c3c}
+.phone{width:390px;height:844px;overflow:hidden;background:#fff;display:flex;flex-direction:column}
+.top{display:flex;justify-content:space-between;padding:16px 20px;font:900 18px/1 Nunito;color:#a85a00;border-bottom:2px solid #e5e5e5}.top span:last-child{color:#0a6f9f}
+.unit{margin:14px 16px;background:#58cc02;color:#0f2e00;border-radius:16px;padding:15px 18px}.unit h1{font:900 24px/1.1 Nunito}.unit p{font:800 15px/1.2 Nunito;margin-top:3px}
+.path{flex:1;position:relative}
+.n{position:absolute;width:72px;height:66px;border-radius:50%;background:#58cc02;box-shadow:0 7px 0 #46a302;display:grid;place-items:center;color:#fff}
+.n svg{width:34px;height:34px}.n.off{background:#e5e5e5;box-shadow:0 7px 0 #cecece;color:#afafaf}
+.n.cur{outline:7px solid #d7f5b5;outline-offset:3px}
+.tag{position:absolute;left:224px;top:128px;background:#fff;border:2px solid #e5e5e5;border-radius:12px;padding:9px 12px;font:900 15px/1.15 Nunito;color:#2f7000}
+.go{margin:0 16px 12px;background:#58cc02;color:#0f2e00;border:0;border-radius:16px;padding:15px;font:900 20px/1 Nunito;box-shadow:0 5px 0 #46a302}
+.tabs{display:grid;grid-template-columns:repeat(4,1fr);padding:10px 6px 16px;border-top:2px solid #e5e5e5}
+.tabs a{text-align:center;font:800 13px/1.3 Nunito;color:#666}.tabs svg{width:25px;height:25px;display:block;margin:0 auto 2px}.tabs .a{color:#0a6f9f}
+.bar{padding:18px 20px;display:flex;align-items:center;gap:12px;color:#afafaf}.bar svg{width:24px;height:24px;flex:none}
+.track{height:15px;background:#e5e5e5;flex:1;border-radius:8px}.track i{display:block;height:15px;width:52%;background:#58cc02;border-radius:8px}
+.sheet{padding:6px 20px;flex:1}
+.q{font:800 22px/1.3 Nunito;margin-bottom:18px;text-wrap:pretty}
+.opt{display:flex;align-items:center;gap:14px;padding:12px 14px;border:2px solid #e5e5e5;border-radius:14px;margin-bottom:9px;font:800 20px/1 Nunito;box-shadow:0 3px 0 #e5e5e5}
+.opt em{font:900 16px/30px Nunito;font-style:normal;width:30px;height:30px;text-align:center;border:2px solid #e5e5e5;border-radius:8px;color:#666}
+.opt.w{background:#ffdfe0;border-color:#ea2b2b;box-shadow:0 3px 0 #ea2b2b;color:#c21f1f}.opt.w em{border-color:#ea2b2b;color:#ea2b2b}
+.ask{background:#ffdfe0;color:#c21f1f;padding:18px 20px 24px}
+.ask p{font:900 16px/1 Nunito;margin-bottom:6px}.ask h2{font:900 24px/1.1 Nunito;margin-bottom:10px}
+.chip{display:block;background:#fff;color:#3c3c3c;border-radius:13px;padding:12px 15px;font:800 16px/1.1 Nunito;margin-top:8px;box-shadow:0 3px 0 #f4b3b5}
+</style></head><body>
+<svg width="0" height="0" style="position:absolute"><defs>
+<symbol id="star" viewBox="0 0 24 24"><path fill="currentColor" d="m12 3 2.8 5.8 6.2.9-4.5 4.4 1.1 6.3L12 17.4l-5.6 3 1.1-6.3L3 9.7l6.2-.9z"/></symbol>
+<symbol id="lock" viewBox="0 0 24 24"><path fill="currentColor" d="M7 11V8a5 5 0 0 1 10 0v3h1v10H6V11zm2 0h6V8a3 3 0 0 0-6 0z"/></symbol>
+<symbol id="x" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" d="M6 6l12 12M18 6 6 18"/></symbol>
+<symbol id="home" viewBox="0 0 24 24"><path fill="currentColor" d="M3 11 12 3l9 8v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></symbol>
+<symbol id="book" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" d="M12 6c-2-2-5-2-8-2v15c3 0 6 0 8 2 2-2 5-2 8-2V4c-3 0-6 0-8 2zM12 6v15"/></symbol>
+<symbol id="cup" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" d="M7 4h10v6a5 5 0 0 1-10 0zM12 15v4M8 20h8"/></symbol>
+<symbol id="me" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM4 21c1-4 4-6 8-6s7 2 8 6"/></symbol>
+</defs></svg>
+<section class="phone">
+ <div class="top"><span>6 días</span><span>340 XP</span></div>
+ <div class="unit"><h1>Matemáticas</h1><p>Unidad 3: razones</p></div>
+ <div class="path">
+  <div class="n" style="left:120px;top:14px"><svg><use href="#star"/></svg></div>
+  <div class="n cur" style="left:158px;top:116px"><svg><use href="#star"/></svg></div>
+  <div class="tag">Proporciones<br>5 min</div>
+  <div class="n off" style="left:112px;top:224px"><svg><use href="#lock"/></svg></div>
+  <div class="n off" style="left:158px;top:326px"><svg><use href="#lock"/></svg></div>
+ </div>
+ <button class="go">Empezar</button>
+ <nav class="tabs"><a class="a"><svg><use href="#home"/></svg>Hoy</a><a><svg><use href="#book"/></svg>Aprende</a><a><svg><use href="#cup"/></svg>Retos</a><a><svg><use href="#me"/></svg>Yo</a></nav>
+</section>
+<section class="phone">
+ <div class="bar"><svg><use href="#x"/></svg><div class="track"><i></i></div></div>
+ <div class="sheet">
+  <p class="q">Una receta usa 3 tazas de harina por cada 2 de azúcar. Con 12 tazas de harina, ¿cuántas de azúcar necesitas?</p>
+  <div class="opt"><em>A</em>6</div><div class="opt"><em>B</em>8</div><div class="opt w"><em>C</em>11</div><div class="opt"><em>D</em>18</div>
+ </div>
+ <div class="ask"><p>Todavía no</p><h2>¿Qué te hizo elegir la C?</h2>
+  <a class="chip">Le sumé 9 a las dos cantidades</a><a class="chip">Hice otra cuenta y me dio 11</a><a class="chip">La adiviné</a></div>
+</section>
+</body></html>

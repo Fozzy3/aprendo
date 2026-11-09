@@ -1,0 +1,2699 @@
+{
+  "version": "v1",
+  "total": 2000,
+  "officialQuestionCounts": {
+    "ingles": 55,
+    "lectura_critica": 41,
+    "matematicas": 50,
+    "ciencias_naturales": 58,
+    "sociales_ciudadanas": 50
+  },
+  "authoringOrder": [
+    "ingles",
+    "lectura_critica",
+    "matematicas",
+    "ciencias_naturales",
+    "sociales_ciudadanas"
+  ],
+  "difficultyMix": {
+    "baja": 0.3,
+    "media": 0.5,
+    "alta": 0.2
+  },
+  "note": "Número de ítems originales a escribir por celda, ponderado por los cupos oficiales del examen (41/50/58/50/55). Inglés va primero: la ruta de cuadernillos no tiene ninguno. Grados 6-10 quedan para después (F70).",
+  "cells": [
+    {
+      "subjectId": "ingles",
+      "categoryId": "ingles.lexis",
+      "subtopicId": "ingles.lexis.vocab_definitions",
+      "competencia": "linguistica",
+      "difficulty": "baja",
+      "targetGrade": 11,
+      "count": 9
+    },
+    {
+      "subjectId": "ingles",
+      "categoryId": "ingles.lexis",
+      "subtopicId": "ingles.lexis.vocab_definitions",
+      "competencia": "linguistica",
+      "difficulty": "media",
+      "targetGrade": 11,
+      "count": 14
+    },
+    {
+      "subjectId": "ingles",
+      "categoryId": "ingles.lexis",
+      "subtopicId": "ingles.lexis.vocab_definitions",
+      "competencia": "linguistica",
+      "difficulty": "alta",
+      "targetGrade": 11,
+      "count": 6
+    },
+    {
+      "subjectId": "ingles",
+      "categoryId": "ingles.lexis",
+      "subtopicId": "ingles.lexis.vocab_definitions",
+      "competencia": "pragmatica",
+      "difficulty": "baja",
+      "targetGrade": 11,
+      "count": 9
+    },
+    {
+      "subjectId": "ingles",
+      "categoryId": "ingles.lexis",
+      "subtopicId": "ingles.lexis.vocab_definitions",
+      "competencia": "pragmatica",
+      "difficulty": "media",
+      "targetGrade": 11,
+      "count": 14
+    },
+    {
+      "subjectId": "ingles",
+      "categoryId": "ingles.lexis",
+      "subtopicId": "ingles.lexis.vocab_definitions",
+      "competencia": "pragmatica",
+      "difficulty": "alta",
+      "targetGrade": 11,
+      "count": 6
+    },
+    {
+      "subjectId": "ingles",
+      "categoryId": "ingles.lexis",
+      "subtopicId": "ingles.lexis.vocab_definitions",
+      "competencia": "sociolinguistica",
+      "difficulty": "baja",
+      "targetGrade": 11,
+      "count": 9
+    },
+    {
+      "subjectId": "ingles",
+      "categoryId": "ingles.lexis",
+      "subtopicId": "ingles.lexis.vocab_definitions",
+      "competencia": "sociolinguistica",
+      "difficulty": "media",
+      "targetGrade": 11,
+      "count": 14
+    },
+    {
+      "subjectId": "ingles",
+      "categoryId": "ingles.lexis",
+      "subtopicId": "ingles.lexis.vocab_definitions",
+      "competencia": "sociolinguistica",
+      "difficulty": "alta",
+      "targetGrade": 11,
+      "count": 6
+    },
+    {
+      "subjectId": "ingles",
+      "categoryId": "ingles.grammar_language_use",
+      "subtopicId": "ingles.grammar_language_use.verb_tenses_forms",
+      "competencia": "linguistica",
+      "difficulty": "baja",
+      "targetGrade": 11,
+      "count": 9
+    },
+    {
+      "subjectId": "ingles",
+      "categoryId": "ingles.grammar_language_use",
+      "subtopicId": "ingles.grammar_language_use.verb_tenses_forms",
+      "competencia": "linguistica",
+      "difficulty": "media",
+      "targetGrade": 11,
+      "count": 14
+    },
+    {
+      "subjectId": "ingles",
+      "categoryId": "ingles.grammar_language_use",
+      "subtopicId": "ingles.grammar_language_use.verb_tenses_forms",
+      "competencia": "linguistica",
+      "difficulty": "alta",
+      "targetGrade": 11,
+      "count": 6
+    },
+    {
+      "subjectId": "ingles",
+      "categoryId": "ingles.grammar_language_use",
+      "subtopicId": "ingles.grammar_language_use.verb_tenses_forms",
+      "competencia": "pragmatica",
+      "difficulty": "baja",
+      "targetGrade": 11,
+      "count": 9
+    },
+    {
+      "subjectId": "ingles",
+      "categoryId": "ingles.grammar_language_use",
+      "subtopicId": "ingles.grammar_language_use.verb_tenses_forms",
+      "competencia": "pragmatica",
+      "difficulty": "media",
+      "targetGrade": 11,
+      "count": 14
+    },
+    {
+      "subjectId": "ingles",
+      "categoryId": "ingles.grammar_language_use",
+      "subtopicId": "ingles.grammar_language_use.verb_tenses_forms",
+      "competencia": "pragmatica",
+      "difficulty": "alta",
+      "targetGrade": 11,
+      "count": 6
+    },
+    {
+      "subjectId": "ingles",
+      "categoryId": "ingles.grammar_language_use",
+      "subtopicId": "ingles.grammar_language_use.verb_tenses_forms",
+      "competencia": "sociolinguistica",
+      "difficulty": "baja",
+      "targetGrade": 11,
+      "count": 9
+    },
+    {
+      "subjectId": "ingles",
+      "categoryId": "ingles.grammar_language_use",
+      "subtopicId": "ingles.grammar_language_use.verb_tenses_forms",
+      "competencia": "sociolinguistica",
+      "difficulty": "media",
+      "targetGrade": 11,
+      "count": 14
+    },
+    {
+      "subjectId": "ingles",
+      "categoryId": "ingles.grammar_language_use",
+      "subtopicId": "ingles.grammar_language_use.verb_tenses_forms",
+      "competencia": "sociolinguistica",
+      "difficulty": "alta",
+      "targetGrade": 11,
+      "count": 6
+    },
+    {
+      "subjectId": "ingles",
+      "categoryId": "ingles.pragmatics_functions",
+      "subtopicId": "ingles.pragmatics_functions.notices_instructions_signage",
+      "competencia": "linguistica",
+      "difficulty": "baja",
+      "targetGrade": 11,
+      "count": 9
+    },
+    {
+      "subjectId": "ingles",
+      "categoryId": "ingles.pragmatics_functions",
+      "subtopicId": "ingles.pragmatics_functions.notices_instructions_signage",
+      "competencia": "linguistica",
+      "difficulty": "media",
+      "targetGrade": 11,
+      "count": 14
+    },
+    {
+      "subjectId": "ingles",
+      "categoryId": "ingles.pragmatics_functions",
+      "subtopicId": "ingles.pragmatics_functions.notices_instructions_signage",
+      "competencia": "linguistica",
+      "difficulty": "alta",
+      "targetGrade": 11,
+      "count": 6
+    },
+    {
+      "subjectId": "ingles",
+      "categoryId": "ingles.pragmatics_functions",
+      "subtopicId": "ingles.pragmatics_functions.notices_instructions_signage",
+      "competencia": "pragmatica",
+      "difficulty": "baja",
+      "targetGrade": 11,
+      "count": 9
+    },
+    {
+      "subjectId": "ingles",
+      "categoryId": "ingles.pragmatics_functions",
+      "subtopicId": "ingles.pragmatics_functions.notices_instructions_signage",
+      "competencia": "pragmatica",
+      "difficulty": "media",
+      "targetGrade": 11,
+      "count": 14
+    },
+    {
+      "subjectId": "ingles",
+      "categoryId": "ingles.pragmatics_functions",
+      "subtopicId": "ingles.pragmatics_functions.notices_instructions_signage",
+      "competencia": "pragmatica",
+      "difficulty": "alta",
+      "targetGrade": 11,
+      "count": 6
+    },
+    {
+      "subjectId": "ingles",
+      "categoryId": "ingles.pragmatics_functions",
+      "subtopicId": "ingles.pragmatics_functions.notices_instructions_signage",
+      "competencia": "sociolinguistica",
+      "difficulty": "baja",
+      "targetGrade": 11,
+      "count": 9
+    },
+    {
+      "subjectId": "ingles",
+      "categoryId": "ingles.pragmatics_functions",
+      "subtopicId": "ingles.pragmatics_functions.notices_instructions_signage",
+      "competencia": "sociolinguistica",
+      "difficulty": "media",
+      "targetGrade": 11,
+      "count": 14
+    },
+    {
+      "subjectId": "ingles",
+      "categoryId": "ingles.pragmatics_functions",
+      "subtopicId": "ingles.pragmatics_functions.notices_instructions_signage",
+      "competencia": "sociolinguistica",
+      "difficulty": "alta",
+      "targetGrade": 11,
+      "count": 6
+    },
+    {
+      "subjectId": "ingles",
+      "categoryId": "ingles.reading_literal",
+      "subtopicId": "ingles.reading_literal.explicit_info_paraphrase",
+      "competencia": "linguistica",
+      "difficulty": "baja",
+      "targetGrade": 11,
+      "count": 9
+    },
+    {
+      "subjectId": "ingles",
+      "categoryId": "ingles.reading_literal",
+      "subtopicId": "ingles.reading_literal.explicit_info_paraphrase",
+      "competencia": "linguistica",
+      "difficulty": "media",
+      "targetGrade": 11,
+      "count": 14
+    },
+    {
+      "subjectId": "ingles",
+      "categoryId": "ingles.reading_literal",
+      "subtopicId": "ingles.reading_literal.explicit_info_paraphrase",
+      "competencia": "linguistica",
+      "difficulty": "alta",
+      "targetGrade": 11,
+      "count": 6
+    },
+    {
+      "subjectId": "ingles",
+      "categoryId": "ingles.reading_literal",
+      "subtopicId": "ingles.reading_literal.explicit_info_paraphrase",
+      "competencia": "pragmatica",
+      "difficulty": "baja",
+      "targetGrade": 11,
+      "count": 9
+    },
+    {
+      "subjectId": "ingles",
+      "categoryId": "ingles.reading_literal",
+      "subtopicId": "ingles.reading_literal.explicit_info_paraphrase",
+      "competencia": "pragmatica",
+      "difficulty": "media",
+      "targetGrade": 11,
+      "count": 14
+    },
+    {
+      "subjectId": "ingles",
+      "categoryId": "ingles.reading_literal",
+      "subtopicId": "ingles.reading_literal.explicit_info_paraphrase",
+      "competencia": "pragmatica",
+      "difficulty": "alta",
+      "targetGrade": 11,
+      "count": 6
+    },
+    {
+      "subjectId": "ingles",
+      "categoryId": "ingles.reading_literal",
+      "subtopicId": "ingles.reading_literal.explicit_info_paraphrase",
+      "competencia": "sociolinguistica",
+      "difficulty": "baja",
+      "targetGrade": 11,
+      "count": 8
+    },
+    {
+      "subjectId": "ingles",
+      "categoryId": "ingles.reading_literal",
+      "subtopicId": "ingles.reading_literal.explicit_info_paraphrase",
+      "competencia": "sociolinguistica",
+      "difficulty": "media",
+      "targetGrade": 11,
+      "count": 14
+    },
+    {
+      "subjectId": "ingles",
+      "categoryId": "ingles.reading_literal",
+      "subtopicId": "ingles.reading_literal.explicit_info_paraphrase",
+      "competencia": "sociolinguistica",
+      "difficulty": "alta",
+      "targetGrade": 11,
+      "count": 6
+    },
+    {
+      "subjectId": "ingles",
+      "categoryId": "ingles.reading_inferential",
+      "subtopicId": "ingles.reading_inferential.inferences_conclusions",
+      "competencia": "linguistica",
+      "difficulty": "baja",
+      "targetGrade": 11,
+      "count": 9
+    },
+    {
+      "subjectId": "ingles",
+      "categoryId": "ingles.reading_inferential",
+      "subtopicId": "ingles.reading_inferential.inferences_conclusions",
+      "competencia": "linguistica",
+      "difficulty": "media",
+      "targetGrade": 11,
+      "count": 14
+    },
+    {
+      "subjectId": "ingles",
+      "categoryId": "ingles.reading_inferential",
+      "subtopicId": "ingles.reading_inferential.inferences_conclusions",
+      "competencia": "linguistica",
+      "difficulty": "alta",
+      "targetGrade": 11,
+      "count": 6
+    },
+    {
+      "subjectId": "ingles",
+      "categoryId": "ingles.reading_inferential",
+      "subtopicId": "ingles.reading_inferential.inferences_conclusions",
+      "competencia": "pragmatica",
+      "difficulty": "baja",
+      "targetGrade": 11,
+      "count": 9
+    },
+    {
+      "subjectId": "ingles",
+      "categoryId": "ingles.reading_inferential",
+      "subtopicId": "ingles.reading_inferential.inferences_conclusions",
+      "competencia": "pragmatica",
+      "difficulty": "media",
+      "targetGrade": 11,
+      "count": 14
+    },
+    {
+      "subjectId": "ingles",
+      "categoryId": "ingles.reading_inferential",
+      "subtopicId": "ingles.reading_inferential.inferences_conclusions",
+      "competencia": "pragmatica",
+      "difficulty": "alta",
+      "targetGrade": 11,
+      "count": 6
+    },
+    {
+      "subjectId": "ingles",
+      "categoryId": "ingles.reading_inferential",
+      "subtopicId": "ingles.reading_inferential.inferences_conclusions",
+      "competencia": "sociolinguistica",
+      "difficulty": "baja",
+      "targetGrade": 11,
+      "count": 8
+    },
+    {
+      "subjectId": "ingles",
+      "categoryId": "ingles.reading_inferential",
+      "subtopicId": "ingles.reading_inferential.inferences_conclusions",
+      "competencia": "sociolinguistica",
+      "difficulty": "media",
+      "targetGrade": 11,
+      "count": 14
+    },
+    {
+      "subjectId": "ingles",
+      "categoryId": "ingles.reading_inferential",
+      "subtopicId": "ingles.reading_inferential.inferences_conclusions",
+      "competencia": "sociolinguistica",
+      "difficulty": "alta",
+      "targetGrade": 11,
+      "count": 6
+    },
+    {
+      "subjectId": "lectura_critica",
+      "categoryId": "lectura_critica.literal_comprehension",
+      "subtopicId": "lectura_critica.literal_comprehension.word_phrase_meaning",
+      "competencia": "afirmacion_1_local",
+      "difficulty": "baja",
+      "targetGrade": 11,
+      "count": 4
+    },
+    {
+      "subjectId": "lectura_critica",
+      "categoryId": "lectura_critica.literal_comprehension",
+      "subtopicId": "lectura_critica.literal_comprehension.word_phrase_meaning",
+      "competencia": "afirmacion_1_local",
+      "difficulty": "media",
+      "targetGrade": 11,
+      "count": 7
+    },
+    {
+      "subjectId": "lectura_critica",
+      "categoryId": "lectura_critica.literal_comprehension",
+      "subtopicId": "lectura_critica.literal_comprehension.word_phrase_meaning",
+      "competencia": "afirmacion_1_local",
+      "difficulty": "alta",
+      "targetGrade": 11,
+      "count": 3
+    },
+    {
+      "subjectId": "lectura_critica",
+      "categoryId": "lectura_critica.literal_comprehension",
+      "subtopicId": "lectura_critica.literal_comprehension.word_phrase_meaning",
+      "competencia": "afirmacion_2_global",
+      "difficulty": "baja",
+      "targetGrade": 11,
+      "count": 4
+    },
+    {
+      "subjectId": "lectura_critica",
+      "categoryId": "lectura_critica.literal_comprehension",
+      "subtopicId": "lectura_critica.literal_comprehension.word_phrase_meaning",
+      "competencia": "afirmacion_2_global",
+      "difficulty": "media",
+      "targetGrade": 11,
+      "count": 7
+    },
+    {
+      "subjectId": "lectura_critica",
+      "categoryId": "lectura_critica.literal_comprehension",
+      "subtopicId": "lectura_critica.literal_comprehension.word_phrase_meaning",
+      "competencia": "afirmacion_2_global",
+      "difficulty": "alta",
+      "targetGrade": 11,
+      "count": 3
+    },
+    {
+      "subjectId": "lectura_critica",
+      "categoryId": "lectura_critica.literal_comprehension",
+      "subtopicId": "lectura_critica.literal_comprehension.word_phrase_meaning",
+      "competencia": "afirmacion_3_critica",
+      "difficulty": "baja",
+      "targetGrade": 11,
+      "count": 4
+    },
+    {
+      "subjectId": "lectura_critica",
+      "categoryId": "lectura_critica.literal_comprehension",
+      "subtopicId": "lectura_critica.literal_comprehension.word_phrase_meaning",
+      "competencia": "afirmacion_3_critica",
+      "difficulty": "media",
+      "targetGrade": 11,
+      "count": 6
+    },
+    {
+      "subjectId": "lectura_critica",
+      "categoryId": "lectura_critica.literal_comprehension",
+      "subtopicId": "lectura_critica.literal_comprehension.word_phrase_meaning",
+      "competencia": "afirmacion_3_critica",
+      "difficulty": "alta",
+      "targetGrade": 11,
+      "count": 3
+    },
+    {
+      "subjectId": "lectura_critica",
+      "categoryId": "lectura_critica.literal_comprehension",
+      "subtopicId": "lectura_critica.literal_comprehension.explicit_details",
+      "competencia": "afirmacion_1_local",
+      "difficulty": "baja",
+      "targetGrade": 11,
+      "count": 4
+    },
+    {
+      "subjectId": "lectura_critica",
+      "categoryId": "lectura_critica.literal_comprehension",
+      "subtopicId": "lectura_critica.literal_comprehension.explicit_details",
+      "competencia": "afirmacion_1_local",
+      "difficulty": "media",
+      "targetGrade": 11,
+      "count": 7
+    },
+    {
+      "subjectId": "lectura_critica",
+      "categoryId": "lectura_critica.literal_comprehension",
+      "subtopicId": "lectura_critica.literal_comprehension.explicit_details",
+      "competencia": "afirmacion_1_local",
+      "difficulty": "alta",
+      "targetGrade": 11,
+      "count": 3
+    },
+    {
+      "subjectId": "lectura_critica",
+      "categoryId": "lectura_critica.literal_comprehension",
+      "subtopicId": "lectura_critica.literal_comprehension.explicit_details",
+      "competencia": "afirmacion_2_global",
+      "difficulty": "baja",
+      "targetGrade": 11,
+      "count": 4
+    },
+    {
+      "subjectId": "lectura_critica",
+      "categoryId": "lectura_critica.literal_comprehension",
+      "subtopicId": "lectura_critica.literal_comprehension.explicit_details",
+      "competencia": "afirmacion_2_global",
+      "difficulty": "media",
+      "targetGrade": 11,
+      "count": 7
+    },
+    {
+      "subjectId": "lectura_critica",
+      "categoryId": "lectura_critica.literal_comprehension",
+      "subtopicId": "lectura_critica.literal_comprehension.explicit_details",
+      "competencia": "afirmacion_2_global",
+      "difficulty": "alta",
+      "targetGrade": 11,
+      "count": 3
+    },
+    {
+      "subjectId": "lectura_critica",
+      "categoryId": "lectura_critica.literal_comprehension",
+      "subtopicId": "lectura_critica.literal_comprehension.explicit_details",
+      "competencia": "afirmacion_3_critica",
+      "difficulty": "baja",
+      "targetGrade": 11,
+      "count": 4
+    },
+    {
+      "subjectId": "lectura_critica",
+      "categoryId": "lectura_critica.literal_comprehension",
+      "subtopicId": "lectura_critica.literal_comprehension.explicit_details",
+      "competencia": "afirmacion_3_critica",
+      "difficulty": "media",
+      "targetGrade": 11,
+      "count": 6
+    },
+    {
+      "subjectId": "lectura_critica",
+      "categoryId": "lectura_critica.literal_comprehension",
+      "subtopicId": "lectura_critica.literal_comprehension.explicit_details",
+      "competencia": "afirmacion_3_critica",
+      "difficulty": "alta",
+      "targetGrade": 11,
+      "count": 3
+    },
+    {
+      "subjectId": "lectura_critica",
+      "categoryId": "lectura_critica.structure_cohesion_multimodal",
+      "subtopicId": "lectura_critica.structure_cohesion_multimodal.text_structure_parts",
+      "competencia": "afirmacion_1_local",
+      "difficulty": "baja",
+      "targetGrade": 11,
+      "count": 4
+    },
+    {
+      "subjectId": "lectura_critica",
+      "categoryId": "lectura_critica.structure_cohesion_multimodal",
+      "subtopicId": "lectura_critica.structure_cohesion_multimodal.text_structure_parts",
+      "competencia": "afirmacion_1_local",
+      "difficulty": "media",
+      "targetGrade": 11,
+      "count": 7
+    },
+    {
+      "subjectId": "lectura_critica",
+      "categoryId": "lectura_critica.structure_cohesion_multimodal",
+      "subtopicId": "lectura_critica.structure_cohesion_multimodal.text_structure_parts",
+      "competencia": "afirmacion_1_local",
+      "difficulty": "alta",
+      "targetGrade": 11,
+      "count": 3
+    },
+    {
+      "subjectId": "lectura_critica",
+      "categoryId": "lectura_critica.structure_cohesion_multimodal",
+      "subtopicId": "lectura_critica.structure_cohesion_multimodal.text_structure_parts",
+      "competencia": "afirmacion_2_global",
+      "difficulty": "baja",
+      "targetGrade": 11,
+      "count": 4
+    },
+    {
+      "subjectId": "lectura_critica",
+      "categoryId": "lectura_critica.structure_cohesion_multimodal",
+      "subtopicId": "lectura_critica.structure_cohesion_multimodal.text_structure_parts",
+      "competencia": "afirmacion_2_global",
+      "difficulty": "media",
+      "targetGrade": 11,
+      "count": 7
+    },
+    {
+      "subjectId": "lectura_critica",
+      "categoryId": "lectura_critica.structure_cohesion_multimodal",
+      "subtopicId": "lectura_critica.structure_cohesion_multimodal.text_structure_parts",
+      "competencia": "afirmacion_2_global",
+      "difficulty": "alta",
+      "targetGrade": 11,
+      "count": 3
+    },
+    {
+      "subjectId": "lectura_critica",
+      "categoryId": "lectura_critica.structure_cohesion_multimodal",
+      "subtopicId": "lectura_critica.structure_cohesion_multimodal.text_structure_parts",
+      "competencia": "afirmacion_3_critica",
+      "difficulty": "baja",
+      "targetGrade": 11,
+      "count": 4
+    },
+    {
+      "subjectId": "lectura_critica",
+      "categoryId": "lectura_critica.structure_cohesion_multimodal",
+      "subtopicId": "lectura_critica.structure_cohesion_multimodal.text_structure_parts",
+      "competencia": "afirmacion_3_critica",
+      "difficulty": "media",
+      "targetGrade": 11,
+      "count": 6
+    },
+    {
+      "subjectId": "lectura_critica",
+      "categoryId": "lectura_critica.structure_cohesion_multimodal",
+      "subtopicId": "lectura_critica.structure_cohesion_multimodal.text_structure_parts",
+      "competencia": "afirmacion_3_critica",
+      "difficulty": "alta",
+      "targetGrade": 11,
+      "count": 3
+    },
+    {
+      "subjectId": "lectura_critica",
+      "categoryId": "lectura_critica.structure_cohesion_multimodal",
+      "subtopicId": "lectura_critica.structure_cohesion_multimodal.logical_links_connectors",
+      "competencia": "afirmacion_1_local",
+      "difficulty": "baja",
+      "targetGrade": 11,
+      "count": 4
+    },
+    {
+      "subjectId": "lectura_critica",
+      "categoryId": "lectura_critica.structure_cohesion_multimodal",
+      "subtopicId": "lectura_critica.structure_cohesion_multimodal.logical_links_connectors",
+      "competencia": "afirmacion_1_local",
+      "difficulty": "media",
+      "targetGrade": 11,
+      "count": 7
+    },
+    {
+      "subjectId": "lectura_critica",
+      "categoryId": "lectura_critica.structure_cohesion_multimodal",
+      "subtopicId": "lectura_critica.structure_cohesion_multimodal.logical_links_connectors",
+      "competencia": "afirmacion_1_local",
+      "difficulty": "alta",
+      "targetGrade": 11,
+      "count": 3
+    },
+    {
+      "subjectId": "lectura_critica",
+      "categoryId": "lectura_critica.structure_cohesion_multimodal",
+      "subtopicId": "lectura_critica.structure_cohesion_multimodal.logical_links_connectors",
+      "competencia": "afirmacion_2_global",
+      "difficulty": "baja",
+      "targetGrade": 11,
+      "count": 4
+    },
+    {
+      "subjectId": "lectura_critica",
+      "categoryId": "lectura_critica.structure_cohesion_multimodal",
+      "subtopicId": "lectura_critica.structure_cohesion_multimodal.logical_links_connectors",
+      "competencia": "afirmacion_2_global",
+      "difficulty": "media",
+      "targetGrade": 11,
+      "count": 6
+    },
+    {
+      "subjectId": "lectura_critica",
+      "categoryId": "lectura_critica.structure_cohesion_multimodal",
+      "subtopicId": "lectura_critica.structure_cohesion_multimodal.logical_links_connectors",
+      "competencia": "afirmacion_2_global",
+      "difficulty": "alta",
+      "targetGrade": 11,
+      "count": 3
+    },
+    {
+      "subjectId": "lectura_critica",
+      "categoryId": "lectura_critica.structure_cohesion_multimodal",
+      "subtopicId": "lectura_critica.structure_cohesion_multimodal.logical_links_connectors",
+      "competencia": "afirmacion_3_critica",
+      "difficulty": "baja",
+      "targetGrade": 11,
+      "count": 4
+    },
+    {
+      "subjectId": "lectura_critica",
+      "categoryId": "lectura_critica.structure_cohesion_multimodal",
+      "subtopicId": "lectura_critica.structure_cohesion_multimodal.logical_links_connectors",
+      "competencia": "afirmacion_3_critica",
+      "difficulty": "media",
+      "targetGrade": 11,
+      "count": 6
+    },
+    {
+      "subjectId": "lectura_critica",
+      "categoryId": "lectura_critica.structure_cohesion_multimodal",
+      "subtopicId": "lectura_critica.structure_cohesion_multimodal.logical_links_connectors",
+      "competencia": "afirmacion_3_critica",
+      "difficulty": "alta",
+      "targetGrade": 11,
+      "count": 3
+    },
+    {
+      "subjectId": "lectura_critica",
+      "categoryId": "lectura_critica.voices_perspective",
+      "subtopicId": "lectura_critica.voices_perspective.voices_speakers",
+      "competencia": "afirmacion_1_local",
+      "difficulty": "baja",
+      "targetGrade": 11,
+      "count": 4
+    },
+    {
+      "subjectId": "lectura_critica",
+      "categoryId": "lectura_critica.voices_perspective",
+      "subtopicId": "lectura_critica.voices_perspective.voices_speakers",
+      "competencia": "afirmacion_1_local",
+      "difficulty": "media",
+      "targetGrade": 11,
+      "count": 7
+    },
+    {
+      "subjectId": "lectura_critica",
+      "categoryId": "lectura_critica.voices_perspective",
+      "subtopicId": "lectura_critica.voices_perspective.voices_speakers",
+      "competencia": "afirmacion_1_local",
+      "difficulty": "alta",
+      "targetGrade": 11,
+      "count": 3
+    },
+    {
+      "subjectId": "lectura_critica",
+      "categoryId": "lectura_critica.voices_perspective",
+      "subtopicId": "lectura_critica.voices_perspective.voices_speakers",
+      "competencia": "afirmacion_2_global",
+      "difficulty": "baja",
+      "targetGrade": 11,
+      "count": 4
+    },
+    {
+      "subjectId": "lectura_critica",
+      "categoryId": "lectura_critica.voices_perspective",
+      "subtopicId": "lectura_critica.voices_perspective.voices_speakers",
+      "competencia": "afirmacion_2_global",
+      "difficulty": "media",
+      "targetGrade": 11,
+      "count": 6
+    },
+    {
+      "subjectId": "lectura_critica",
+      "categoryId": "lectura_critica.voices_perspective",
+      "subtopicId": "lectura_critica.voices_perspective.voices_speakers",
+      "competencia": "afirmacion_2_global",
+      "difficulty": "alta",
+      "targetGrade": 11,
+      "count": 3
+    },
+    {
+      "subjectId": "lectura_critica",
+      "categoryId": "lectura_critica.voices_perspective",
+      "subtopicId": "lectura_critica.voices_perspective.voices_speakers",
+      "competencia": "afirmacion_3_critica",
+      "difficulty": "baja",
+      "targetGrade": 11,
+      "count": 4
+    },
+    {
+      "subjectId": "lectura_critica",
+      "categoryId": "lectura_critica.voices_perspective",
+      "subtopicId": "lectura_critica.voices_perspective.voices_speakers",
+      "competencia": "afirmacion_3_critica",
+      "difficulty": "media",
+      "targetGrade": 11,
+      "count": 6
+    },
+    {
+      "subjectId": "lectura_critica",
+      "categoryId": "lectura_critica.voices_perspective",
+      "subtopicId": "lectura_critica.voices_perspective.voices_speakers",
+      "competencia": "afirmacion_3_critica",
+      "difficulty": "alta",
+      "targetGrade": 11,
+      "count": 3
+    },
+    {
+      "subjectId": "lectura_critica",
+      "categoryId": "lectura_critica.critical_evaluation",
+      "subtopicId": "lectura_critica.critical_evaluation.validity_implications",
+      "competencia": "afirmacion_1_local",
+      "difficulty": "baja",
+      "targetGrade": 11,
+      "count": 4
+    },
+    {
+      "subjectId": "lectura_critica",
+      "categoryId": "lectura_critica.critical_evaluation",
+      "subtopicId": "lectura_critica.critical_evaluation.validity_implications",
+      "competencia": "afirmacion_1_local",
+      "difficulty": "media",
+      "targetGrade": 11,
+      "count": 7
+    },
+    {
+      "subjectId": "lectura_critica",
+      "categoryId": "lectura_critica.critical_evaluation",
+      "subtopicId": "lectura_critica.critical_evaluation.validity_implications",
+      "competencia": "afirmacion_1_local",
+      "difficulty": "alta",
+      "targetGrade": 11,
+      "count": 3
+    },
+    {
+      "subjectId": "lectura_critica",
+      "categoryId": "lectura_critica.critical_evaluation",
+      "subtopicId": "lectura_critica.critical_evaluation.validity_implications",
+      "competencia": "afirmacion_2_global",
+      "difficulty": "baja",
+      "targetGrade": 11,
+      "count": 4
+    },
+    {
+      "subjectId": "lectura_critica",
+      "categoryId": "lectura_critica.critical_evaluation",
+      "subtopicId": "lectura_critica.critical_evaluation.validity_implications",
+      "competencia": "afirmacion_2_global",
+      "difficulty": "media",
+      "targetGrade": 11,
+      "count": 6
+    },
+    {
+      "subjectId": "lectura_critica",
+      "categoryId": "lectura_critica.critical_evaluation",
+      "subtopicId": "lectura_critica.critical_evaluation.validity_implications",
+      "competencia": "afirmacion_2_global",
+      "difficulty": "alta",
+      "targetGrade": 11,
+      "count": 3
+    },
+    {
+      "subjectId": "lectura_critica",
+      "categoryId": "lectura_critica.critical_evaluation",
+      "subtopicId": "lectura_critica.critical_evaluation.validity_implications",
+      "competencia": "afirmacion_3_critica",
+      "difficulty": "baja",
+      "targetGrade": 11,
+      "count": 4
+    },
+    {
+      "subjectId": "lectura_critica",
+      "categoryId": "lectura_critica.critical_evaluation",
+      "subtopicId": "lectura_critica.critical_evaluation.validity_implications",
+      "competencia": "afirmacion_3_critica",
+      "difficulty": "media",
+      "targetGrade": 11,
+      "count": 6
+    },
+    {
+      "subjectId": "lectura_critica",
+      "categoryId": "lectura_critica.critical_evaluation",
+      "subtopicId": "lectura_critica.critical_evaluation.validity_implications",
+      "competencia": "afirmacion_3_critica",
+      "difficulty": "alta",
+      "targetGrade": 11,
+      "count": 3
+    },
+    {
+      "subjectId": "lectura_critica",
+      "categoryId": "lectura_critica.critical_evaluation",
+      "subtopicId": "lectura_critica.critical_evaluation.evaluative_content_bias",
+      "competencia": "afirmacion_1_local",
+      "difficulty": "baja",
+      "targetGrade": 11,
+      "count": 4
+    },
+    {
+      "subjectId": "lectura_critica",
+      "categoryId": "lectura_critica.critical_evaluation",
+      "subtopicId": "lectura_critica.critical_evaluation.evaluative_content_bias",
+      "competencia": "afirmacion_1_local",
+      "difficulty": "media",
+      "targetGrade": 11,
+      "count": 7
+    },
+    {
+      "subjectId": "lectura_critica",
+      "categoryId": "lectura_critica.critical_evaluation",
+      "subtopicId": "lectura_critica.critical_evaluation.evaluative_content_bias",
+      "competencia": "afirmacion_1_local",
+      "difficulty": "alta",
+      "targetGrade": 11,
+      "count": 3
+    },
+    {
+      "subjectId": "lectura_critica",
+      "categoryId": "lectura_critica.critical_evaluation",
+      "subtopicId": "lectura_critica.critical_evaluation.evaluative_content_bias",
+      "competencia": "afirmacion_2_global",
+      "difficulty": "baja",
+      "targetGrade": 11,
+      "count": 4
+    },
+    {
+      "subjectId": "lectura_critica",
+      "categoryId": "lectura_critica.critical_evaluation",
+      "subtopicId": "lectura_critica.critical_evaluation.evaluative_content_bias",
+      "competencia": "afirmacion_2_global",
+      "difficulty": "media",
+      "targetGrade": 11,
+      "count": 6
+    },
+    {
+      "subjectId": "lectura_critica",
+      "categoryId": "lectura_critica.critical_evaluation",
+      "subtopicId": "lectura_critica.critical_evaluation.evaluative_content_bias",
+      "competencia": "afirmacion_2_global",
+      "difficulty": "alta",
+      "targetGrade": 11,
+      "count": 3
+    },
+    {
+      "subjectId": "lectura_critica",
+      "categoryId": "lectura_critica.critical_evaluation",
+      "subtopicId": "lectura_critica.critical_evaluation.evaluative_content_bias",
+      "competencia": "afirmacion_3_critica",
+      "difficulty": "baja",
+      "targetGrade": 11,
+      "count": 4
+    },
+    {
+      "subjectId": "lectura_critica",
+      "categoryId": "lectura_critica.critical_evaluation",
+      "subtopicId": "lectura_critica.critical_evaluation.evaluative_content_bias",
+      "competencia": "afirmacion_3_critica",
+      "difficulty": "media",
+      "targetGrade": 11,
+      "count": 6
+    },
+    {
+      "subjectId": "lectura_critica",
+      "categoryId": "lectura_critica.critical_evaluation",
+      "subtopicId": "lectura_critica.critical_evaluation.evaluative_content_bias",
+      "competencia": "afirmacion_3_critica",
+      "difficulty": "alta",
+      "targetGrade": 11,
+      "count": 3
+    },
+    {
+      "subjectId": "lectura_critica",
+      "categoryId": "lectura_critica.context_intertextuality",
+      "subtopicId": "lectura_critica.context_intertextuality.contextualization",
+      "competencia": "afirmacion_1_local",
+      "difficulty": "baja",
+      "targetGrade": 11,
+      "count": 4
+    },
+    {
+      "subjectId": "lectura_critica",
+      "categoryId": "lectura_critica.context_intertextuality",
+      "subtopicId": "lectura_critica.context_intertextuality.contextualization",
+      "competencia": "afirmacion_1_local",
+      "difficulty": "media",
+      "targetGrade": 11,
+      "count": 7
+    },
+    {
+      "subjectId": "lectura_critica",
+      "categoryId": "lectura_critica.context_intertextuality",
+      "subtopicId": "lectura_critica.context_intertextuality.contextualization",
+      "competencia": "afirmacion_1_local",
+      "difficulty": "alta",
+      "targetGrade": 11,
+      "count": 3
+    },
+    {
+      "subjectId": "lectura_critica",
+      "categoryId": "lectura_critica.context_intertextuality",
+      "subtopicId": "lectura_critica.context_intertextuality.contextualization",
+      "competencia": "afirmacion_2_global",
+      "difficulty": "baja",
+      "targetGrade": 11,
+      "count": 4
+    },
+    {
+      "subjectId": "lectura_critica",
+      "categoryId": "lectura_critica.context_intertextuality",
+      "subtopicId": "lectura_critica.context_intertextuality.contextualization",
+      "competencia": "afirmacion_2_global",
+      "difficulty": "media",
+      "targetGrade": 11,
+      "count": 6
+    },
+    {
+      "subjectId": "lectura_critica",
+      "categoryId": "lectura_critica.context_intertextuality",
+      "subtopicId": "lectura_critica.context_intertextuality.contextualization",
+      "competencia": "afirmacion_2_global",
+      "difficulty": "alta",
+      "targetGrade": 11,
+      "count": 3
+    },
+    {
+      "subjectId": "lectura_critica",
+      "categoryId": "lectura_critica.context_intertextuality",
+      "subtopicId": "lectura_critica.context_intertextuality.contextualization",
+      "competencia": "afirmacion_3_critica",
+      "difficulty": "baja",
+      "targetGrade": 11,
+      "count": 4
+    },
+    {
+      "subjectId": "lectura_critica",
+      "categoryId": "lectura_critica.context_intertextuality",
+      "subtopicId": "lectura_critica.context_intertextuality.contextualization",
+      "competencia": "afirmacion_3_critica",
+      "difficulty": "media",
+      "targetGrade": 11,
+      "count": 6
+    },
+    {
+      "subjectId": "lectura_critica",
+      "categoryId": "lectura_critica.context_intertextuality",
+      "subtopicId": "lectura_critica.context_intertextuality.contextualization",
+      "competencia": "afirmacion_3_critica",
+      "difficulty": "alta",
+      "targetGrade": 11,
+      "count": 3
+    },
+    {
+      "subjectId": "matematicas",
+      "categoryId": "matematicas.number_proportionality",
+      "subtopicId": "matematicas.number_proportionality.ratios_proportions_percent",
+      "competencia": "interpretacion_representacion",
+      "difficulty": "baja",
+      "targetGrade": 11,
+      "count": 5
+    },
+    {
+      "subjectId": "matematicas",
+      "categoryId": "matematicas.number_proportionality",
+      "subtopicId": "matematicas.number_proportionality.ratios_proportions_percent",
+      "competencia": "interpretacion_representacion",
+      "difficulty": "media",
+      "targetGrade": 11,
+      "count": 9
+    },
+    {
+      "subjectId": "matematicas",
+      "categoryId": "matematicas.number_proportionality",
+      "subtopicId": "matematicas.number_proportionality.ratios_proportions_percent",
+      "competencia": "interpretacion_representacion",
+      "difficulty": "alta",
+      "targetGrade": 11,
+      "count": 3
+    },
+    {
+      "subjectId": "matematicas",
+      "categoryId": "matematicas.number_proportionality",
+      "subtopicId": "matematicas.number_proportionality.ratios_proportions_percent",
+      "competencia": "formulacion_ejecucion",
+      "difficulty": "baja",
+      "targetGrade": 11,
+      "count": 5
+    },
+    {
+      "subjectId": "matematicas",
+      "categoryId": "matematicas.number_proportionality",
+      "subtopicId": "matematicas.number_proportionality.ratios_proportions_percent",
+      "competencia": "formulacion_ejecucion",
+      "difficulty": "media",
+      "targetGrade": 11,
+      "count": 9
+    },
+    {
+      "subjectId": "matematicas",
+      "categoryId": "matematicas.number_proportionality",
+      "subtopicId": "matematicas.number_proportionality.ratios_proportions_percent",
+      "competencia": "formulacion_ejecucion",
+      "difficulty": "alta",
+      "targetGrade": 11,
+      "count": 3
+    },
+    {
+      "subjectId": "matematicas",
+      "categoryId": "matematicas.number_proportionality",
+      "subtopicId": "matematicas.number_proportionality.ratios_proportions_percent",
+      "competencia": "argumentacion",
+      "difficulty": "baja",
+      "targetGrade": 11,
+      "count": 5
+    },
+    {
+      "subjectId": "matematicas",
+      "categoryId": "matematicas.number_proportionality",
+      "subtopicId": "matematicas.number_proportionality.ratios_proportions_percent",
+      "competencia": "argumentacion",
+      "difficulty": "media",
+      "targetGrade": 11,
+      "count": 8
+    },
+    {
+      "subjectId": "matematicas",
+      "categoryId": "matematicas.number_proportionality",
+      "subtopicId": "matematicas.number_proportionality.ratios_proportions_percent",
+      "competencia": "argumentacion",
+      "difficulty": "alta",
+      "targetGrade": 11,
+      "count": 3
+    },
+    {
+      "subjectId": "matematicas",
+      "categoryId": "matematicas.algebra_equations",
+      "subtopicId": "matematicas.algebra_equations.equations_inequalities",
+      "competencia": "interpretacion_representacion",
+      "difficulty": "baja",
+      "targetGrade": 11,
+      "count": 5
+    },
+    {
+      "subjectId": "matematicas",
+      "categoryId": "matematicas.algebra_equations",
+      "subtopicId": "matematicas.algebra_equations.equations_inequalities",
+      "competencia": "interpretacion_representacion",
+      "difficulty": "media",
+      "targetGrade": 11,
+      "count": 9
+    },
+    {
+      "subjectId": "matematicas",
+      "categoryId": "matematicas.algebra_equations",
+      "subtopicId": "matematicas.algebra_equations.equations_inequalities",
+      "competencia": "interpretacion_representacion",
+      "difficulty": "alta",
+      "targetGrade": 11,
+      "count": 3
+    },
+    {
+      "subjectId": "matematicas",
+      "categoryId": "matematicas.algebra_equations",
+      "subtopicId": "matematicas.algebra_equations.equations_inequalities",
+      "competencia": "formulacion_ejecucion",
+      "difficulty": "baja",
+      "targetGrade": 11,
+      "count": 5
+    },
+    {
+      "subjectId": "matematicas",
+      "categoryId": "matematicas.algebra_equations",
+      "subtopicId": "matematicas.algebra_equations.equations_inequalities",
+      "competencia": "formulacion_ejecucion",
+      "difficulty": "media",
+      "targetGrade": 11,
+      "count": 9
+    },
+    {
+      "subjectId": "matematicas",
+      "categoryId": "matematicas.algebra_equations",
+      "subtopicId": "matematicas.algebra_equations.equations_inequalities",
+      "competencia": "formulacion_ejecucion",
+      "difficulty": "alta",
+      "targetGrade": 11,
+      "count": 3
+    },
+    {
+      "subjectId": "matematicas",
+      "categoryId": "matematicas.algebra_equations",
+      "subtopicId": "matematicas.algebra_equations.equations_inequalities",
+      "competencia": "argumentacion",
+      "difficulty": "baja",
+      "targetGrade": 11,
+      "count": 5
+    },
+    {
+      "subjectId": "matematicas",
+      "categoryId": "matematicas.algebra_equations",
+      "subtopicId": "matematicas.algebra_equations.equations_inequalities",
+      "competencia": "argumentacion",
+      "difficulty": "media",
+      "targetGrade": 11,
+      "count": 8
+    },
+    {
+      "subjectId": "matematicas",
+      "categoryId": "matematicas.algebra_equations",
+      "subtopicId": "matematicas.algebra_equations.equations_inequalities",
+      "competencia": "argumentacion",
+      "difficulty": "alta",
+      "targetGrade": 11,
+      "count": 3
+    },
+    {
+      "subjectId": "matematicas",
+      "categoryId": "matematicas.functions_variation",
+      "subtopicId": "matematicas.functions_variation.functions_graphs",
+      "competencia": "interpretacion_representacion",
+      "difficulty": "baja",
+      "targetGrade": 11,
+      "count": 5
+    },
+    {
+      "subjectId": "matematicas",
+      "categoryId": "matematicas.functions_variation",
+      "subtopicId": "matematicas.functions_variation.functions_graphs",
+      "competencia": "interpretacion_representacion",
+      "difficulty": "media",
+      "targetGrade": 11,
+      "count": 9
+    },
+    {
+      "subjectId": "matematicas",
+      "categoryId": "matematicas.functions_variation",
+      "subtopicId": "matematicas.functions_variation.functions_graphs",
+      "competencia": "interpretacion_representacion",
+      "difficulty": "alta",
+      "targetGrade": 11,
+      "count": 3
+    },
+    {
+      "subjectId": "matematicas",
+      "categoryId": "matematicas.functions_variation",
+      "subtopicId": "matematicas.functions_variation.functions_graphs",
+      "competencia": "formulacion_ejecucion",
+      "difficulty": "baja",
+      "targetGrade": 11,
+      "count": 5
+    },
+    {
+      "subjectId": "matematicas",
+      "categoryId": "matematicas.functions_variation",
+      "subtopicId": "matematicas.functions_variation.functions_graphs",
+      "competencia": "formulacion_ejecucion",
+      "difficulty": "media",
+      "targetGrade": 11,
+      "count": 8
+    },
+    {
+      "subjectId": "matematicas",
+      "categoryId": "matematicas.functions_variation",
+      "subtopicId": "matematicas.functions_variation.functions_graphs",
+      "competencia": "formulacion_ejecucion",
+      "difficulty": "alta",
+      "targetGrade": 11,
+      "count": 3
+    },
+    {
+      "subjectId": "matematicas",
+      "categoryId": "matematicas.functions_variation",
+      "subtopicId": "matematicas.functions_variation.functions_graphs",
+      "competencia": "argumentacion",
+      "difficulty": "baja",
+      "targetGrade": 11,
+      "count": 5
+    },
+    {
+      "subjectId": "matematicas",
+      "categoryId": "matematicas.functions_variation",
+      "subtopicId": "matematicas.functions_variation.functions_graphs",
+      "competencia": "argumentacion",
+      "difficulty": "media",
+      "targetGrade": 11,
+      "count": 8
+    },
+    {
+      "subjectId": "matematicas",
+      "categoryId": "matematicas.functions_variation",
+      "subtopicId": "matematicas.functions_variation.functions_graphs",
+      "competencia": "argumentacion",
+      "difficulty": "alta",
+      "targetGrade": 11,
+      "count": 3
+    },
+    {
+      "subjectId": "matematicas",
+      "categoryId": "matematicas.geometry_measurement",
+      "subtopicId": "matematicas.geometry_measurement.plane_geometry",
+      "competencia": "interpretacion_representacion",
+      "difficulty": "baja",
+      "targetGrade": 11,
+      "count": 5
+    },
+    {
+      "subjectId": "matematicas",
+      "categoryId": "matematicas.geometry_measurement",
+      "subtopicId": "matematicas.geometry_measurement.plane_geometry",
+      "competencia": "interpretacion_representacion",
+      "difficulty": "media",
+      "targetGrade": 11,
+      "count": 9
+    },
+    {
+      "subjectId": "matematicas",
+      "categoryId": "matematicas.geometry_measurement",
+      "subtopicId": "matematicas.geometry_measurement.plane_geometry",
+      "competencia": "interpretacion_representacion",
+      "difficulty": "alta",
+      "targetGrade": 11,
+      "count": 3
+    },
+    {
+      "subjectId": "matematicas",
+      "categoryId": "matematicas.geometry_measurement",
+      "subtopicId": "matematicas.geometry_measurement.plane_geometry",
+      "competencia": "formulacion_ejecucion",
+      "difficulty": "baja",
+      "targetGrade": 11,
+      "count": 5
+    },
+    {
+      "subjectId": "matematicas",
+      "categoryId": "matematicas.geometry_measurement",
+      "subtopicId": "matematicas.geometry_measurement.plane_geometry",
+      "competencia": "formulacion_ejecucion",
+      "difficulty": "media",
+      "targetGrade": 11,
+      "count": 8
+    },
+    {
+      "subjectId": "matematicas",
+      "categoryId": "matematicas.geometry_measurement",
+      "subtopicId": "matematicas.geometry_measurement.plane_geometry",
+      "competencia": "formulacion_ejecucion",
+      "difficulty": "alta",
+      "targetGrade": 11,
+      "count": 3
+    },
+    {
+      "subjectId": "matematicas",
+      "categoryId": "matematicas.geometry_measurement",
+      "subtopicId": "matematicas.geometry_measurement.plane_geometry",
+      "competencia": "argumentacion",
+      "difficulty": "baja",
+      "targetGrade": 11,
+      "count": 5
+    },
+    {
+      "subjectId": "matematicas",
+      "categoryId": "matematicas.geometry_measurement",
+      "subtopicId": "matematicas.geometry_measurement.plane_geometry",
+      "competencia": "argumentacion",
+      "difficulty": "media",
+      "targetGrade": 11,
+      "count": 8
+    },
+    {
+      "subjectId": "matematicas",
+      "categoryId": "matematicas.geometry_measurement",
+      "subtopicId": "matematicas.geometry_measurement.plane_geometry",
+      "competencia": "argumentacion",
+      "difficulty": "alta",
+      "targetGrade": 11,
+      "count": 3
+    },
+    {
+      "subjectId": "matematicas",
+      "categoryId": "matematicas.geometry_measurement",
+      "subtopicId": "matematicas.geometry_measurement.perimeter_area_volume",
+      "competencia": "interpretacion_representacion",
+      "difficulty": "baja",
+      "targetGrade": 11,
+      "count": 5
+    },
+    {
+      "subjectId": "matematicas",
+      "categoryId": "matematicas.geometry_measurement",
+      "subtopicId": "matematicas.geometry_measurement.perimeter_area_volume",
+      "competencia": "interpretacion_representacion",
+      "difficulty": "media",
+      "targetGrade": 11,
+      "count": 9
+    },
+    {
+      "subjectId": "matematicas",
+      "categoryId": "matematicas.geometry_measurement",
+      "subtopicId": "matematicas.geometry_measurement.perimeter_area_volume",
+      "competencia": "interpretacion_representacion",
+      "difficulty": "alta",
+      "targetGrade": 11,
+      "count": 3
+    },
+    {
+      "subjectId": "matematicas",
+      "categoryId": "matematicas.geometry_measurement",
+      "subtopicId": "matematicas.geometry_measurement.perimeter_area_volume",
+      "competencia": "formulacion_ejecucion",
+      "difficulty": "baja",
+      "targetGrade": 11,
+      "count": 5
+    },
+    {
+      "subjectId": "matematicas",
+      "categoryId": "matematicas.geometry_measurement",
+      "subtopicId": "matematicas.geometry_measurement.perimeter_area_volume",
+      "competencia": "formulacion_ejecucion",
+      "difficulty": "media",
+      "targetGrade": 11,
+      "count": 8
+    },
+    {
+      "subjectId": "matematicas",
+      "categoryId": "matematicas.geometry_measurement",
+      "subtopicId": "matematicas.geometry_measurement.perimeter_area_volume",
+      "competencia": "formulacion_ejecucion",
+      "difficulty": "alta",
+      "targetGrade": 11,
+      "count": 3
+    },
+    {
+      "subjectId": "matematicas",
+      "categoryId": "matematicas.geometry_measurement",
+      "subtopicId": "matematicas.geometry_measurement.perimeter_area_volume",
+      "competencia": "argumentacion",
+      "difficulty": "baja",
+      "targetGrade": 11,
+      "count": 5
+    },
+    {
+      "subjectId": "matematicas",
+      "categoryId": "matematicas.geometry_measurement",
+      "subtopicId": "matematicas.geometry_measurement.perimeter_area_volume",
+      "competencia": "argumentacion",
+      "difficulty": "media",
+      "targetGrade": 11,
+      "count": 8
+    },
+    {
+      "subjectId": "matematicas",
+      "categoryId": "matematicas.geometry_measurement",
+      "subtopicId": "matematicas.geometry_measurement.perimeter_area_volume",
+      "competencia": "argumentacion",
+      "difficulty": "alta",
+      "targetGrade": 11,
+      "count": 3
+    },
+    {
+      "subjectId": "matematicas",
+      "categoryId": "matematicas.data_statistics_chance",
+      "subtopicId": "matematicas.data_statistics_chance.tables_graphs_interpretation",
+      "competencia": "interpretacion_representacion",
+      "difficulty": "baja",
+      "targetGrade": 11,
+      "count": 5
+    },
+    {
+      "subjectId": "matematicas",
+      "categoryId": "matematicas.data_statistics_chance",
+      "subtopicId": "matematicas.data_statistics_chance.tables_graphs_interpretation",
+      "competencia": "interpretacion_representacion",
+      "difficulty": "media",
+      "targetGrade": 11,
+      "count": 9
+    },
+    {
+      "subjectId": "matematicas",
+      "categoryId": "matematicas.data_statistics_chance",
+      "subtopicId": "matematicas.data_statistics_chance.tables_graphs_interpretation",
+      "competencia": "interpretacion_representacion",
+      "difficulty": "alta",
+      "targetGrade": 11,
+      "count": 3
+    },
+    {
+      "subjectId": "matematicas",
+      "categoryId": "matematicas.data_statistics_chance",
+      "subtopicId": "matematicas.data_statistics_chance.tables_graphs_interpretation",
+      "competencia": "formulacion_ejecucion",
+      "difficulty": "baja",
+      "targetGrade": 11,
+      "count": 5
+    },
+    {
+      "subjectId": "matematicas",
+      "categoryId": "matematicas.data_statistics_chance",
+      "subtopicId": "matematicas.data_statistics_chance.tables_graphs_interpretation",
+      "competencia": "formulacion_ejecucion",
+      "difficulty": "media",
+      "targetGrade": 11,
+      "count": 8
+    },
+    {
+      "subjectId": "matematicas",
+      "categoryId": "matematicas.data_statistics_chance",
+      "subtopicId": "matematicas.data_statistics_chance.tables_graphs_interpretation",
+      "competencia": "formulacion_ejecucion",
+      "difficulty": "alta",
+      "targetGrade": 11,
+      "count": 3
+    },
+    {
+      "subjectId": "matematicas",
+      "categoryId": "matematicas.data_statistics_chance",
+      "subtopicId": "matematicas.data_statistics_chance.tables_graphs_interpretation",
+      "competencia": "argumentacion",
+      "difficulty": "baja",
+      "targetGrade": 11,
+      "count": 5
+    },
+    {
+      "subjectId": "matematicas",
+      "categoryId": "matematicas.data_statistics_chance",
+      "subtopicId": "matematicas.data_statistics_chance.tables_graphs_interpretation",
+      "competencia": "argumentacion",
+      "difficulty": "media",
+      "targetGrade": 11,
+      "count": 8
+    },
+    {
+      "subjectId": "matematicas",
+      "categoryId": "matematicas.data_statistics_chance",
+      "subtopicId": "matematicas.data_statistics_chance.tables_graphs_interpretation",
+      "competencia": "argumentacion",
+      "difficulty": "alta",
+      "targetGrade": 11,
+      "count": 3
+    },
+    {
+      "subjectId": "matematicas",
+      "categoryId": "matematicas.data_statistics_chance",
+      "subtopicId": "matematicas.data_statistics_chance.probability_counting",
+      "competencia": "interpretacion_representacion",
+      "difficulty": "baja",
+      "targetGrade": 11,
+      "count": 5
+    },
+    {
+      "subjectId": "matematicas",
+      "categoryId": "matematicas.data_statistics_chance",
+      "subtopicId": "matematicas.data_statistics_chance.probability_counting",
+      "competencia": "interpretacion_representacion",
+      "difficulty": "media",
+      "targetGrade": 11,
+      "count": 9
+    },
+    {
+      "subjectId": "matematicas",
+      "categoryId": "matematicas.data_statistics_chance",
+      "subtopicId": "matematicas.data_statistics_chance.probability_counting",
+      "competencia": "interpretacion_representacion",
+      "difficulty": "alta",
+      "targetGrade": 11,
+      "count": 3
+    },
+    {
+      "subjectId": "matematicas",
+      "categoryId": "matematicas.data_statistics_chance",
+      "subtopicId": "matematicas.data_statistics_chance.probability_counting",
+      "competencia": "formulacion_ejecucion",
+      "difficulty": "baja",
+      "targetGrade": 11,
+      "count": 5
+    },
+    {
+      "subjectId": "matematicas",
+      "categoryId": "matematicas.data_statistics_chance",
+      "subtopicId": "matematicas.data_statistics_chance.probability_counting",
+      "competencia": "formulacion_ejecucion",
+      "difficulty": "media",
+      "targetGrade": 11,
+      "count": 8
+    },
+    {
+      "subjectId": "matematicas",
+      "categoryId": "matematicas.data_statistics_chance",
+      "subtopicId": "matematicas.data_statistics_chance.probability_counting",
+      "competencia": "formulacion_ejecucion",
+      "difficulty": "alta",
+      "targetGrade": 11,
+      "count": 3
+    },
+    {
+      "subjectId": "matematicas",
+      "categoryId": "matematicas.data_statistics_chance",
+      "subtopicId": "matematicas.data_statistics_chance.probability_counting",
+      "competencia": "argumentacion",
+      "difficulty": "baja",
+      "targetGrade": 11,
+      "count": 5
+    },
+    {
+      "subjectId": "matematicas",
+      "categoryId": "matematicas.data_statistics_chance",
+      "subtopicId": "matematicas.data_statistics_chance.probability_counting",
+      "competencia": "argumentacion",
+      "difficulty": "media",
+      "targetGrade": 11,
+      "count": 8
+    },
+    {
+      "subjectId": "matematicas",
+      "categoryId": "matematicas.data_statistics_chance",
+      "subtopicId": "matematicas.data_statistics_chance.probability_counting",
+      "competencia": "argumentacion",
+      "difficulty": "alta",
+      "targetGrade": 11,
+      "count": 3
+    },
+    {
+      "subjectId": "matematicas",
+      "categoryId": "matematicas.modeling_verification",
+      "subtopicId": "matematicas.modeling_verification.modeling_word_problems",
+      "competencia": "interpretacion_representacion",
+      "difficulty": "baja",
+      "targetGrade": 11,
+      "count": 5
+    },
+    {
+      "subjectId": "matematicas",
+      "categoryId": "matematicas.modeling_verification",
+      "subtopicId": "matematicas.modeling_verification.modeling_word_problems",
+      "competencia": "interpretacion_representacion",
+      "difficulty": "media",
+      "targetGrade": 11,
+      "count": 9
+    },
+    {
+      "subjectId": "matematicas",
+      "categoryId": "matematicas.modeling_verification",
+      "subtopicId": "matematicas.modeling_verification.modeling_word_problems",
+      "competencia": "interpretacion_representacion",
+      "difficulty": "alta",
+      "targetGrade": 11,
+      "count": 3
+    },
+    {
+      "subjectId": "matematicas",
+      "categoryId": "matematicas.modeling_verification",
+      "subtopicId": "matematicas.modeling_verification.modeling_word_problems",
+      "competencia": "formulacion_ejecucion",
+      "difficulty": "baja",
+      "targetGrade": 11,
+      "count": 5
+    },
+    {
+      "subjectId": "matematicas",
+      "categoryId": "matematicas.modeling_verification",
+      "subtopicId": "matematicas.modeling_verification.modeling_word_problems",
+      "competencia": "formulacion_ejecucion",
+      "difficulty": "media",
+      "targetGrade": 11,
+      "count": 8
+    },
+    {
+      "subjectId": "matematicas",
+      "categoryId": "matematicas.modeling_verification",
+      "subtopicId": "matematicas.modeling_verification.modeling_word_problems",
+      "competencia": "formulacion_ejecucion",
+      "difficulty": "alta",
+      "targetGrade": 11,
+      "count": 3
+    },
+    {
+      "subjectId": "matematicas",
+      "categoryId": "matematicas.modeling_verification",
+      "subtopicId": "matematicas.modeling_verification.modeling_word_problems",
+      "competencia": "argumentacion",
+      "difficulty": "baja",
+      "targetGrade": 11,
+      "count": 5
+    },
+    {
+      "subjectId": "matematicas",
+      "categoryId": "matematicas.modeling_verification",
+      "subtopicId": "matematicas.modeling_verification.modeling_word_problems",
+      "competencia": "argumentacion",
+      "difficulty": "media",
+      "targetGrade": 11,
+      "count": 8
+    },
+    {
+      "subjectId": "matematicas",
+      "categoryId": "matematicas.modeling_verification",
+      "subtopicId": "matematicas.modeling_verification.modeling_word_problems",
+      "competencia": "argumentacion",
+      "difficulty": "alta",
+      "targetGrade": 11,
+      "count": 3
+    },
+    {
+      "subjectId": "ciencias_naturales",
+      "categoryId": "ciencias_naturales.biology_component",
+      "subtopicId": "ciencias_naturales.biology_component.ecology_evolution_biodiversity",
+      "competencia": "uso_comprensivo",
+      "difficulty": "baja",
+      "targetGrade": 11,
+      "count": 8
+    },
+    {
+      "subjectId": "ciencias_naturales",
+      "categoryId": "ciencias_naturales.biology_component",
+      "subtopicId": "ciencias_naturales.biology_component.ecology_evolution_biodiversity",
+      "competencia": "uso_comprensivo",
+      "difficulty": "media",
+      "targetGrade": 11,
+      "count": 13
+    },
+    {
+      "subjectId": "ciencias_naturales",
+      "categoryId": "ciencias_naturales.biology_component",
+      "subtopicId": "ciencias_naturales.biology_component.ecology_evolution_biodiversity",
+      "competencia": "uso_comprensivo",
+      "difficulty": "alta",
+      "targetGrade": 11,
+      "count": 5
+    },
+    {
+      "subjectId": "ciencias_naturales",
+      "categoryId": "ciencias_naturales.biology_component",
+      "subtopicId": "ciencias_naturales.biology_component.ecology_evolution_biodiversity",
+      "competencia": "explicacion_fenomenos",
+      "difficulty": "baja",
+      "targetGrade": 11,
+      "count": 8
+    },
+    {
+      "subjectId": "ciencias_naturales",
+      "categoryId": "ciencias_naturales.biology_component",
+      "subtopicId": "ciencias_naturales.biology_component.ecology_evolution_biodiversity",
+      "competencia": "explicacion_fenomenos",
+      "difficulty": "media",
+      "targetGrade": 11,
+      "count": 12
+    },
+    {
+      "subjectId": "ciencias_naturales",
+      "categoryId": "ciencias_naturales.biology_component",
+      "subtopicId": "ciencias_naturales.biology_component.ecology_evolution_biodiversity",
+      "competencia": "explicacion_fenomenos",
+      "difficulty": "alta",
+      "targetGrade": 11,
+      "count": 5
+    },
+    {
+      "subjectId": "ciencias_naturales",
+      "categoryId": "ciencias_naturales.biology_component",
+      "subtopicId": "ciencias_naturales.biology_component.ecology_evolution_biodiversity",
+      "competencia": "indagacion",
+      "difficulty": "baja",
+      "targetGrade": 11,
+      "count": 8
+    },
+    {
+      "subjectId": "ciencias_naturales",
+      "categoryId": "ciencias_naturales.biology_component",
+      "subtopicId": "ciencias_naturales.biology_component.ecology_evolution_biodiversity",
+      "competencia": "indagacion",
+      "difficulty": "media",
+      "targetGrade": 11,
+      "count": 12
+    },
+    {
+      "subjectId": "ciencias_naturales",
+      "categoryId": "ciencias_naturales.biology_component",
+      "subtopicId": "ciencias_naturales.biology_component.ecology_evolution_biodiversity",
+      "competencia": "indagacion",
+      "difficulty": "alta",
+      "targetGrade": 11,
+      "count": 5
+    },
+    {
+      "subjectId": "ciencias_naturales",
+      "categoryId": "ciencias_naturales.physics_component",
+      "subtopicId": "ciencias_naturales.physics_component.motion_forces_dynamics",
+      "competencia": "uso_comprensivo",
+      "difficulty": "baja",
+      "targetGrade": 11,
+      "count": 8
+    },
+    {
+      "subjectId": "ciencias_naturales",
+      "categoryId": "ciencias_naturales.physics_component",
+      "subtopicId": "ciencias_naturales.physics_component.motion_forces_dynamics",
+      "competencia": "uso_comprensivo",
+      "difficulty": "media",
+      "targetGrade": 11,
+      "count": 13
+    },
+    {
+      "subjectId": "ciencias_naturales",
+      "categoryId": "ciencias_naturales.physics_component",
+      "subtopicId": "ciencias_naturales.physics_component.motion_forces_dynamics",
+      "competencia": "uso_comprensivo",
+      "difficulty": "alta",
+      "targetGrade": 11,
+      "count": 5
+    },
+    {
+      "subjectId": "ciencias_naturales",
+      "categoryId": "ciencias_naturales.physics_component",
+      "subtopicId": "ciencias_naturales.physics_component.motion_forces_dynamics",
+      "competencia": "explicacion_fenomenos",
+      "difficulty": "baja",
+      "targetGrade": 11,
+      "count": 8
+    },
+    {
+      "subjectId": "ciencias_naturales",
+      "categoryId": "ciencias_naturales.physics_component",
+      "subtopicId": "ciencias_naturales.physics_component.motion_forces_dynamics",
+      "competencia": "explicacion_fenomenos",
+      "difficulty": "media",
+      "targetGrade": 11,
+      "count": 12
+    },
+    {
+      "subjectId": "ciencias_naturales",
+      "categoryId": "ciencias_naturales.physics_component",
+      "subtopicId": "ciencias_naturales.physics_component.motion_forces_dynamics",
+      "competencia": "explicacion_fenomenos",
+      "difficulty": "alta",
+      "targetGrade": 11,
+      "count": 5
+    },
+    {
+      "subjectId": "ciencias_naturales",
+      "categoryId": "ciencias_naturales.physics_component",
+      "subtopicId": "ciencias_naturales.physics_component.motion_forces_dynamics",
+      "competencia": "indagacion",
+      "difficulty": "baja",
+      "targetGrade": 11,
+      "count": 8
+    },
+    {
+      "subjectId": "ciencias_naturales",
+      "categoryId": "ciencias_naturales.physics_component",
+      "subtopicId": "ciencias_naturales.physics_component.motion_forces_dynamics",
+      "competencia": "indagacion",
+      "difficulty": "media",
+      "targetGrade": 11,
+      "count": 12
+    },
+    {
+      "subjectId": "ciencias_naturales",
+      "categoryId": "ciencias_naturales.physics_component",
+      "subtopicId": "ciencias_naturales.physics_component.motion_forces_dynamics",
+      "competencia": "indagacion",
+      "difficulty": "alta",
+      "targetGrade": 11,
+      "count": 5
+    },
+    {
+      "subjectId": "ciencias_naturales",
+      "categoryId": "ciencias_naturales.physics_component",
+      "subtopicId": "ciencias_naturales.physics_component.energy_heat_transformations",
+      "competencia": "uso_comprensivo",
+      "difficulty": "baja",
+      "targetGrade": 11,
+      "count": 8
+    },
+    {
+      "subjectId": "ciencias_naturales",
+      "categoryId": "ciencias_naturales.physics_component",
+      "subtopicId": "ciencias_naturales.physics_component.energy_heat_transformations",
+      "competencia": "uso_comprensivo",
+      "difficulty": "media",
+      "targetGrade": 11,
+      "count": 13
+    },
+    {
+      "subjectId": "ciencias_naturales",
+      "categoryId": "ciencias_naturales.physics_component",
+      "subtopicId": "ciencias_naturales.physics_component.energy_heat_transformations",
+      "competencia": "uso_comprensivo",
+      "difficulty": "alta",
+      "targetGrade": 11,
+      "count": 5
+    },
+    {
+      "subjectId": "ciencias_naturales",
+      "categoryId": "ciencias_naturales.physics_component",
+      "subtopicId": "ciencias_naturales.physics_component.energy_heat_transformations",
+      "competencia": "explicacion_fenomenos",
+      "difficulty": "baja",
+      "targetGrade": 11,
+      "count": 8
+    },
+    {
+      "subjectId": "ciencias_naturales",
+      "categoryId": "ciencias_naturales.physics_component",
+      "subtopicId": "ciencias_naturales.physics_component.energy_heat_transformations",
+      "competencia": "explicacion_fenomenos",
+      "difficulty": "media",
+      "targetGrade": 11,
+      "count": 12
+    },
+    {
+      "subjectId": "ciencias_naturales",
+      "categoryId": "ciencias_naturales.physics_component",
+      "subtopicId": "ciencias_naturales.physics_component.energy_heat_transformations",
+      "competencia": "explicacion_fenomenos",
+      "difficulty": "alta",
+      "targetGrade": 11,
+      "count": 5
+    },
+    {
+      "subjectId": "ciencias_naturales",
+      "categoryId": "ciencias_naturales.physics_component",
+      "subtopicId": "ciencias_naturales.physics_component.energy_heat_transformations",
+      "competencia": "indagacion",
+      "difficulty": "baja",
+      "targetGrade": 11,
+      "count": 8
+    },
+    {
+      "subjectId": "ciencias_naturales",
+      "categoryId": "ciencias_naturales.physics_component",
+      "subtopicId": "ciencias_naturales.physics_component.energy_heat_transformations",
+      "competencia": "indagacion",
+      "difficulty": "media",
+      "targetGrade": 11,
+      "count": 12
+    },
+    {
+      "subjectId": "ciencias_naturales",
+      "categoryId": "ciencias_naturales.physics_component",
+      "subtopicId": "ciencias_naturales.physics_component.energy_heat_transformations",
+      "competencia": "indagacion",
+      "difficulty": "alta",
+      "targetGrade": 11,
+      "count": 5
+    },
+    {
+      "subjectId": "ciencias_naturales",
+      "categoryId": "ciencias_naturales.chemistry_component",
+      "subtopicId": "ciencias_naturales.chemistry_component.chemical_changes_reactions",
+      "competencia": "uso_comprensivo",
+      "difficulty": "baja",
+      "targetGrade": 11,
+      "count": 8
+    },
+    {
+      "subjectId": "ciencias_naturales",
+      "categoryId": "ciencias_naturales.chemistry_component",
+      "subtopicId": "ciencias_naturales.chemistry_component.chemical_changes_reactions",
+      "competencia": "uso_comprensivo",
+      "difficulty": "media",
+      "targetGrade": 11,
+      "count": 13
+    },
+    {
+      "subjectId": "ciencias_naturales",
+      "categoryId": "ciencias_naturales.chemistry_component",
+      "subtopicId": "ciencias_naturales.chemistry_component.chemical_changes_reactions",
+      "competencia": "uso_comprensivo",
+      "difficulty": "alta",
+      "targetGrade": 11,
+      "count": 5
+    },
+    {
+      "subjectId": "ciencias_naturales",
+      "categoryId": "ciencias_naturales.chemistry_component",
+      "subtopicId": "ciencias_naturales.chemistry_component.chemical_changes_reactions",
+      "competencia": "explicacion_fenomenos",
+      "difficulty": "baja",
+      "targetGrade": 11,
+      "count": 8
+    },
+    {
+      "subjectId": "ciencias_naturales",
+      "categoryId": "ciencias_naturales.chemistry_component",
+      "subtopicId": "ciencias_naturales.chemistry_component.chemical_changes_reactions",
+      "competencia": "explicacion_fenomenos",
+      "difficulty": "media",
+      "targetGrade": 11,
+      "count": 12
+    },
+    {
+      "subjectId": "ciencias_naturales",
+      "categoryId": "ciencias_naturales.chemistry_component",
+      "subtopicId": "ciencias_naturales.chemistry_component.chemical_changes_reactions",
+      "competencia": "explicacion_fenomenos",
+      "difficulty": "alta",
+      "targetGrade": 11,
+      "count": 5
+    },
+    {
+      "subjectId": "ciencias_naturales",
+      "categoryId": "ciencias_naturales.chemistry_component",
+      "subtopicId": "ciencias_naturales.chemistry_component.chemical_changes_reactions",
+      "competencia": "indagacion",
+      "difficulty": "baja",
+      "targetGrade": 11,
+      "count": 8
+    },
+    {
+      "subjectId": "ciencias_naturales",
+      "categoryId": "ciencias_naturales.chemistry_component",
+      "subtopicId": "ciencias_naturales.chemistry_component.chemical_changes_reactions",
+      "competencia": "indagacion",
+      "difficulty": "media",
+      "targetGrade": 11,
+      "count": 12
+    },
+    {
+      "subjectId": "ciencias_naturales",
+      "categoryId": "ciencias_naturales.chemistry_component",
+      "subtopicId": "ciencias_naturales.chemistry_component.chemical_changes_reactions",
+      "competencia": "indagacion",
+      "difficulty": "alta",
+      "targetGrade": 11,
+      "count": 5
+    },
+    {
+      "subjectId": "ciencias_naturales",
+      "categoryId": "ciencias_naturales.science_tech_society",
+      "subtopicId": "ciencias_naturales.science_tech_society.environment_sustainability",
+      "competencia": "uso_comprensivo",
+      "difficulty": "baja",
+      "targetGrade": 11,
+      "count": 8
+    },
+    {
+      "subjectId": "ciencias_naturales",
+      "categoryId": "ciencias_naturales.science_tech_society",
+      "subtopicId": "ciencias_naturales.science_tech_society.environment_sustainability",
+      "competencia": "uso_comprensivo",
+      "difficulty": "media",
+      "targetGrade": 11,
+      "count": 13
+    },
+    {
+      "subjectId": "ciencias_naturales",
+      "categoryId": "ciencias_naturales.science_tech_society",
+      "subtopicId": "ciencias_naturales.science_tech_society.environment_sustainability",
+      "competencia": "uso_comprensivo",
+      "difficulty": "alta",
+      "targetGrade": 11,
+      "count": 5
+    },
+    {
+      "subjectId": "ciencias_naturales",
+      "categoryId": "ciencias_naturales.science_tech_society",
+      "subtopicId": "ciencias_naturales.science_tech_society.environment_sustainability",
+      "competencia": "explicacion_fenomenos",
+      "difficulty": "baja",
+      "targetGrade": 11,
+      "count": 8
+    },
+    {
+      "subjectId": "ciencias_naturales",
+      "categoryId": "ciencias_naturales.science_tech_society",
+      "subtopicId": "ciencias_naturales.science_tech_society.environment_sustainability",
+      "competencia": "explicacion_fenomenos",
+      "difficulty": "media",
+      "targetGrade": 11,
+      "count": 12
+    },
+    {
+      "subjectId": "ciencias_naturales",
+      "categoryId": "ciencias_naturales.science_tech_society",
+      "subtopicId": "ciencias_naturales.science_tech_society.environment_sustainability",
+      "competencia": "explicacion_fenomenos",
+      "difficulty": "alta",
+      "targetGrade": 11,
+      "count": 5
+    },
+    {
+      "subjectId": "ciencias_naturales",
+      "categoryId": "ciencias_naturales.science_tech_society",
+      "subtopicId": "ciencias_naturales.science_tech_society.environment_sustainability",
+      "competencia": "indagacion",
+      "difficulty": "baja",
+      "targetGrade": 11,
+      "count": 8
+    },
+    {
+      "subjectId": "ciencias_naturales",
+      "categoryId": "ciencias_naturales.science_tech_society",
+      "subtopicId": "ciencias_naturales.science_tech_society.environment_sustainability",
+      "competencia": "indagacion",
+      "difficulty": "media",
+      "targetGrade": 11,
+      "count": 12
+    },
+    {
+      "subjectId": "ciencias_naturales",
+      "categoryId": "ciencias_naturales.science_tech_society",
+      "subtopicId": "ciencias_naturales.science_tech_society.environment_sustainability",
+      "competencia": "indagacion",
+      "difficulty": "alta",
+      "targetGrade": 11,
+      "count": 5
+    },
+    {
+      "subjectId": "ciencias_naturales",
+      "categoryId": "ciencias_naturales.scientific_skills",
+      "subtopicId": "ciencias_naturales.scientific_skills.data_interpretation_conclusions",
+      "competencia": "uso_comprensivo",
+      "difficulty": "baja",
+      "targetGrade": 11,
+      "count": 8
+    },
+    {
+      "subjectId": "ciencias_naturales",
+      "categoryId": "ciencias_naturales.scientific_skills",
+      "subtopicId": "ciencias_naturales.scientific_skills.data_interpretation_conclusions",
+      "competencia": "uso_comprensivo",
+      "difficulty": "media",
+      "targetGrade": 11,
+      "count": 13
+    },
+    {
+      "subjectId": "ciencias_naturales",
+      "categoryId": "ciencias_naturales.scientific_skills",
+      "subtopicId": "ciencias_naturales.scientific_skills.data_interpretation_conclusions",
+      "competencia": "uso_comprensivo",
+      "difficulty": "alta",
+      "targetGrade": 11,
+      "count": 5
+    },
+    {
+      "subjectId": "ciencias_naturales",
+      "categoryId": "ciencias_naturales.scientific_skills",
+      "subtopicId": "ciencias_naturales.scientific_skills.data_interpretation_conclusions",
+      "competencia": "explicacion_fenomenos",
+      "difficulty": "baja",
+      "targetGrade": 11,
+      "count": 8
+    },
+    {
+      "subjectId": "ciencias_naturales",
+      "categoryId": "ciencias_naturales.scientific_skills",
+      "subtopicId": "ciencias_naturales.scientific_skills.data_interpretation_conclusions",
+      "competencia": "explicacion_fenomenos",
+      "difficulty": "media",
+      "targetGrade": 11,
+      "count": 12
+    },
+    {
+      "subjectId": "ciencias_naturales",
+      "categoryId": "ciencias_naturales.scientific_skills",
+      "subtopicId": "ciencias_naturales.scientific_skills.data_interpretation_conclusions",
+      "competencia": "explicacion_fenomenos",
+      "difficulty": "alta",
+      "targetGrade": 11,
+      "count": 5
+    },
+    {
+      "subjectId": "ciencias_naturales",
+      "categoryId": "ciencias_naturales.scientific_skills",
+      "subtopicId": "ciencias_naturales.scientific_skills.data_interpretation_conclusions",
+      "competencia": "indagacion",
+      "difficulty": "baja",
+      "targetGrade": 11,
+      "count": 8
+    },
+    {
+      "subjectId": "ciencias_naturales",
+      "categoryId": "ciencias_naturales.scientific_skills",
+      "subtopicId": "ciencias_naturales.scientific_skills.data_interpretation_conclusions",
+      "competencia": "indagacion",
+      "difficulty": "media",
+      "targetGrade": 11,
+      "count": 12
+    },
+    {
+      "subjectId": "ciencias_naturales",
+      "categoryId": "ciencias_naturales.scientific_skills",
+      "subtopicId": "ciencias_naturales.scientific_skills.data_interpretation_conclusions",
+      "competencia": "indagacion",
+      "difficulty": "alta",
+      "targetGrade": 11,
+      "count": 5
+    },
+    {
+      "subjectId": "sociales_ciudadanas",
+      "categoryId": "sociales_ciudadanas.history_temporality",
+      "subtopicId": "sociales_ciudadanas.history_temporality.historical_causality_consequences",
+      "competencia": "pensamiento_social",
+      "difficulty": "baja",
+      "targetGrade": 11,
+      "count": 7
+    },
+    {
+      "subjectId": "sociales_ciudadanas",
+      "categoryId": "sociales_ciudadanas.history_temporality",
+      "subtopicId": "sociales_ciudadanas.history_temporality.historical_causality_consequences",
+      "competencia": "pensamiento_social",
+      "difficulty": "media",
+      "targetGrade": 11,
+      "count": 11
+    },
+    {
+      "subjectId": "sociales_ciudadanas",
+      "categoryId": "sociales_ciudadanas.history_temporality",
+      "subtopicId": "sociales_ciudadanas.history_temporality.historical_causality_consequences",
+      "competencia": "pensamiento_social",
+      "difficulty": "alta",
+      "targetGrade": 11,
+      "count": 4
+    },
+    {
+      "subjectId": "sociales_ciudadanas",
+      "categoryId": "sociales_ciudadanas.history_temporality",
+      "subtopicId": "sociales_ciudadanas.history_temporality.historical_causality_consequences",
+      "competencia": "analisis_perspectivas",
+      "difficulty": "baja",
+      "targetGrade": 11,
+      "count": 7
+    },
+    {
+      "subjectId": "sociales_ciudadanas",
+      "categoryId": "sociales_ciudadanas.history_temporality",
+      "subtopicId": "sociales_ciudadanas.history_temporality.historical_causality_consequences",
+      "competencia": "analisis_perspectivas",
+      "difficulty": "media",
+      "targetGrade": 11,
+      "count": 11
+    },
+    {
+      "subjectId": "sociales_ciudadanas",
+      "categoryId": "sociales_ciudadanas.history_temporality",
+      "subtopicId": "sociales_ciudadanas.history_temporality.historical_causality_consequences",
+      "competencia": "analisis_perspectivas",
+      "difficulty": "alta",
+      "targetGrade": 11,
+      "count": 4
+    },
+    {
+      "subjectId": "sociales_ciudadanas",
+      "categoryId": "sociales_ciudadanas.history_temporality",
+      "subtopicId": "sociales_ciudadanas.history_temporality.historical_causality_consequences",
+      "competencia": "pensamiento_reflexivo_sistemico",
+      "difficulty": "baja",
+      "targetGrade": 11,
+      "count": 7
+    },
+    {
+      "subjectId": "sociales_ciudadanas",
+      "categoryId": "sociales_ciudadanas.history_temporality",
+      "subtopicId": "sociales_ciudadanas.history_temporality.historical_causality_consequences",
+      "competencia": "pensamiento_reflexivo_sistemico",
+      "difficulty": "media",
+      "targetGrade": 11,
+      "count": 11
+    },
+    {
+      "subjectId": "sociales_ciudadanas",
+      "categoryId": "sociales_ciudadanas.history_temporality",
+      "subtopicId": "sociales_ciudadanas.history_temporality.historical_causality_consequences",
+      "competencia": "pensamiento_reflexivo_sistemico",
+      "difficulty": "alta",
+      "targetGrade": 11,
+      "count": 4
+    },
+    {
+      "subjectId": "sociales_ciudadanas",
+      "categoryId": "sociales_ciudadanas.state_democracy_participation",
+      "subtopicId": "sociales_ciudadanas.state_democracy_participation.social_rule_of_law_constitution",
+      "competencia": "pensamiento_social",
+      "difficulty": "baja",
+      "targetGrade": 11,
+      "count": 7
+    },
+    {
+      "subjectId": "sociales_ciudadanas",
+      "categoryId": "sociales_ciudadanas.state_democracy_participation",
+      "subtopicId": "sociales_ciudadanas.state_democracy_participation.social_rule_of_law_constitution",
+      "competencia": "pensamiento_social",
+      "difficulty": "media",
+      "targetGrade": 11,
+      "count": 11
+    },
+    {
+      "subjectId": "sociales_ciudadanas",
+      "categoryId": "sociales_ciudadanas.state_democracy_participation",
+      "subtopicId": "sociales_ciudadanas.state_democracy_participation.social_rule_of_law_constitution",
+      "competencia": "pensamiento_social",
+      "difficulty": "alta",
+      "targetGrade": 11,
+      "count": 4
+    },
+    {
+      "subjectId": "sociales_ciudadanas",
+      "categoryId": "sociales_ciudadanas.state_democracy_participation",
+      "subtopicId": "sociales_ciudadanas.state_democracy_participation.social_rule_of_law_constitution",
+      "competencia": "analisis_perspectivas",
+      "difficulty": "baja",
+      "targetGrade": 11,
+      "count": 7
+    },
+    {
+      "subjectId": "sociales_ciudadanas",
+      "categoryId": "sociales_ciudadanas.state_democracy_participation",
+      "subtopicId": "sociales_ciudadanas.state_democracy_participation.social_rule_of_law_constitution",
+      "competencia": "analisis_perspectivas",
+      "difficulty": "media",
+      "targetGrade": 11,
+      "count": 11
+    },
+    {
+      "subjectId": "sociales_ciudadanas",
+      "categoryId": "sociales_ciudadanas.state_democracy_participation",
+      "subtopicId": "sociales_ciudadanas.state_democracy_participation.social_rule_of_law_constitution",
+      "competencia": "analisis_perspectivas",
+      "difficulty": "alta",
+      "targetGrade": 11,
+      "count": 4
+    },
+    {
+      "subjectId": "sociales_ciudadanas",
+      "categoryId": "sociales_ciudadanas.state_democracy_participation",
+      "subtopicId": "sociales_ciudadanas.state_democracy_participation.social_rule_of_law_constitution",
+      "competencia": "pensamiento_reflexivo_sistemico",
+      "difficulty": "baja",
+      "targetGrade": 11,
+      "count": 7
+    },
+    {
+      "subjectId": "sociales_ciudadanas",
+      "categoryId": "sociales_ciudadanas.state_democracy_participation",
+      "subtopicId": "sociales_ciudadanas.state_democracy_participation.social_rule_of_law_constitution",
+      "competencia": "pensamiento_reflexivo_sistemico",
+      "difficulty": "media",
+      "targetGrade": 11,
+      "count": 11
+    },
+    {
+      "subjectId": "sociales_ciudadanas",
+      "categoryId": "sociales_ciudadanas.state_democracy_participation",
+      "subtopicId": "sociales_ciudadanas.state_democracy_participation.social_rule_of_law_constitution",
+      "competencia": "pensamiento_reflexivo_sistemico",
+      "difficulty": "alta",
+      "targetGrade": 11,
+      "count": 4
+    },
+    {
+      "subjectId": "sociales_ciudadanas",
+      "categoryId": "sociales_ciudadanas.state_democracy_participation",
+      "subtopicId": "sociales_ciudadanas.state_democracy_participation.state_branches_accountability",
+      "competencia": "pensamiento_social",
+      "difficulty": "baja",
+      "targetGrade": 11,
+      "count": 7
+    },
+    {
+      "subjectId": "sociales_ciudadanas",
+      "categoryId": "sociales_ciudadanas.state_democracy_participation",
+      "subtopicId": "sociales_ciudadanas.state_democracy_participation.state_branches_accountability",
+      "competencia": "pensamiento_social",
+      "difficulty": "media",
+      "targetGrade": 11,
+      "count": 11
+    },
+    {
+      "subjectId": "sociales_ciudadanas",
+      "categoryId": "sociales_ciudadanas.state_democracy_participation",
+      "subtopicId": "sociales_ciudadanas.state_democracy_participation.state_branches_accountability",
+      "competencia": "pensamiento_social",
+      "difficulty": "alta",
+      "targetGrade": 11,
+      "count": 4
+    },
+    {
+      "subjectId": "sociales_ciudadanas",
+      "categoryId": "sociales_ciudadanas.state_democracy_participation",
+      "subtopicId": "sociales_ciudadanas.state_democracy_participation.state_branches_accountability",
+      "competencia": "analisis_perspectivas",
+      "difficulty": "baja",
+      "targetGrade": 11,
+      "count": 7
+    },
+    {
+      "subjectId": "sociales_ciudadanas",
+      "categoryId": "sociales_ciudadanas.state_democracy_participation",
+      "subtopicId": "sociales_ciudadanas.state_democracy_participation.state_branches_accountability",
+      "competencia": "analisis_perspectivas",
+      "difficulty": "media",
+      "targetGrade": 11,
+      "count": 11
+    },
+    {
+      "subjectId": "sociales_ciudadanas",
+      "categoryId": "sociales_ciudadanas.state_democracy_participation",
+      "subtopicId": "sociales_ciudadanas.state_democracy_participation.state_branches_accountability",
+      "competencia": "analisis_perspectivas",
+      "difficulty": "alta",
+      "targetGrade": 11,
+      "count": 4
+    },
+    {
+      "subjectId": "sociales_ciudadanas",
+      "categoryId": "sociales_ciudadanas.state_democracy_participation",
+      "subtopicId": "sociales_ciudadanas.state_democracy_participation.state_branches_accountability",
+      "competencia": "pensamiento_reflexivo_sistemico",
+      "difficulty": "baja",
+      "targetGrade": 11,
+      "count": 7
+    },
+    {
+      "subjectId": "sociales_ciudadanas",
+      "categoryId": "sociales_ciudadanas.state_democracy_participation",
+      "subtopicId": "sociales_ciudadanas.state_democracy_participation.state_branches_accountability",
+      "competencia": "pensamiento_reflexivo_sistemico",
+      "difficulty": "media",
+      "targetGrade": 11,
+      "count": 11
+    },
+    {
+      "subjectId": "sociales_ciudadanas",
+      "categoryId": "sociales_ciudadanas.state_democracy_participation",
+      "subtopicId": "sociales_ciudadanas.state_democracy_participation.state_branches_accountability",
+      "competencia": "pensamiento_reflexivo_sistemico",
+      "difficulty": "alta",
+      "targetGrade": 11,
+      "count": 4
+    },
+    {
+      "subjectId": "sociales_ciudadanas",
+      "categoryId": "sociales_ciudadanas.sources_perspectives_argumentation",
+      "subtopicId": "sociales_ciudadanas.sources_perspectives_argumentation.primary_secondary_sources",
+      "competencia": "pensamiento_social",
+      "difficulty": "baja",
+      "targetGrade": 11,
+      "count": 7
+    },
+    {
+      "subjectId": "sociales_ciudadanas",
+      "categoryId": "sociales_ciudadanas.sources_perspectives_argumentation",
+      "subtopicId": "sociales_ciudadanas.sources_perspectives_argumentation.primary_secondary_sources",
+      "competencia": "pensamiento_social",
+      "difficulty": "media",
+      "targetGrade": 11,
+      "count": 11
+    },
+    {
+      "subjectId": "sociales_ciudadanas",
+      "categoryId": "sociales_ciudadanas.sources_perspectives_argumentation",
+      "subtopicId": "sociales_ciudadanas.sources_perspectives_argumentation.primary_secondary_sources",
+      "competencia": "pensamiento_social",
+      "difficulty": "alta",
+      "targetGrade": 11,
+      "count": 4
+    },
+    {
+      "subjectId": "sociales_ciudadanas",
+      "categoryId": "sociales_ciudadanas.sources_perspectives_argumentation",
+      "subtopicId": "sociales_ciudadanas.sources_perspectives_argumentation.primary_secondary_sources",
+      "competencia": "analisis_perspectivas",
+      "difficulty": "baja",
+      "targetGrade": 11,
+      "count": 7
+    },
+    {
+      "subjectId": "sociales_ciudadanas",
+      "categoryId": "sociales_ciudadanas.sources_perspectives_argumentation",
+      "subtopicId": "sociales_ciudadanas.sources_perspectives_argumentation.primary_secondary_sources",
+      "competencia": "analisis_perspectivas",
+      "difficulty": "media",
+      "targetGrade": 11,
+      "count": 11
+    },
+    {
+      "subjectId": "sociales_ciudadanas",
+      "categoryId": "sociales_ciudadanas.sources_perspectives_argumentation",
+      "subtopicId": "sociales_ciudadanas.sources_perspectives_argumentation.primary_secondary_sources",
+      "competencia": "analisis_perspectivas",
+      "difficulty": "alta",
+      "targetGrade": 11,
+      "count": 4
+    },
+    {
+      "subjectId": "sociales_ciudadanas",
+      "categoryId": "sociales_ciudadanas.sources_perspectives_argumentation",
+      "subtopicId": "sociales_ciudadanas.sources_perspectives_argumentation.primary_secondary_sources",
+      "competencia": "pensamiento_reflexivo_sistemico",
+      "difficulty": "baja",
+      "targetGrade": 11,
+      "count": 7
+    },
+    {
+      "subjectId": "sociales_ciudadanas",
+      "categoryId": "sociales_ciudadanas.sources_perspectives_argumentation",
+      "subtopicId": "sociales_ciudadanas.sources_perspectives_argumentation.primary_secondary_sources",
+      "competencia": "pensamiento_reflexivo_sistemico",
+      "difficulty": "media",
+      "targetGrade": 11,
+      "count": 11
+    },
+    {
+      "subjectId": "sociales_ciudadanas",
+      "categoryId": "sociales_ciudadanas.sources_perspectives_argumentation",
+      "subtopicId": "sociales_ciudadanas.sources_perspectives_argumentation.primary_secondary_sources",
+      "competencia": "pensamiento_reflexivo_sistemico",
+      "difficulty": "alta",
+      "targetGrade": 11,
+      "count": 4
+    },
+    {
+      "subjectId": "sociales_ciudadanas",
+      "categoryId": "sociales_ciudadanas.sources_perspectives_argumentation",
+      "subtopicId": "sociales_ciudadanas.sources_perspectives_argumentation.actor_group_perspectives",
+      "competencia": "pensamiento_social",
+      "difficulty": "baja",
+      "targetGrade": 11,
+      "count": 7
+    },
+    {
+      "subjectId": "sociales_ciudadanas",
+      "categoryId": "sociales_ciudadanas.sources_perspectives_argumentation",
+      "subtopicId": "sociales_ciudadanas.sources_perspectives_argumentation.actor_group_perspectives",
+      "competencia": "pensamiento_social",
+      "difficulty": "media",
+      "targetGrade": 11,
+      "count": 11
+    },
+    {
+      "subjectId": "sociales_ciudadanas",
+      "categoryId": "sociales_ciudadanas.sources_perspectives_argumentation",
+      "subtopicId": "sociales_ciudadanas.sources_perspectives_argumentation.actor_group_perspectives",
+      "competencia": "pensamiento_social",
+      "difficulty": "alta",
+      "targetGrade": 11,
+      "count": 4
+    },
+    {
+      "subjectId": "sociales_ciudadanas",
+      "categoryId": "sociales_ciudadanas.sources_perspectives_argumentation",
+      "subtopicId": "sociales_ciudadanas.sources_perspectives_argumentation.actor_group_perspectives",
+      "competencia": "analisis_perspectivas",
+      "difficulty": "baja",
+      "targetGrade": 11,
+      "count": 7
+    },
+    {
+      "subjectId": "sociales_ciudadanas",
+      "categoryId": "sociales_ciudadanas.sources_perspectives_argumentation",
+      "subtopicId": "sociales_ciudadanas.sources_perspectives_argumentation.actor_group_perspectives",
+      "competencia": "analisis_perspectivas",
+      "difficulty": "media",
+      "targetGrade": 11,
+      "count": 11
+    },
+    {
+      "subjectId": "sociales_ciudadanas",
+      "categoryId": "sociales_ciudadanas.sources_perspectives_argumentation",
+      "subtopicId": "sociales_ciudadanas.sources_perspectives_argumentation.actor_group_perspectives",
+      "competencia": "analisis_perspectivas",
+      "difficulty": "alta",
+      "targetGrade": 11,
+      "count": 4
+    },
+    {
+      "subjectId": "sociales_ciudadanas",
+      "categoryId": "sociales_ciudadanas.sources_perspectives_argumentation",
+      "subtopicId": "sociales_ciudadanas.sources_perspectives_argumentation.actor_group_perspectives",
+      "competencia": "pensamiento_reflexivo_sistemico",
+      "difficulty": "baja",
+      "targetGrade": 11,
+      "count": 6
+    },
+    {
+      "subjectId": "sociales_ciudadanas",
+      "categoryId": "sociales_ciudadanas.sources_perspectives_argumentation",
+      "subtopicId": "sociales_ciudadanas.sources_perspectives_argumentation.actor_group_perspectives",
+      "competencia": "pensamiento_reflexivo_sistemico",
+      "difficulty": "media",
+      "targetGrade": 11,
+      "count": 11
+    },
+    {
+      "subjectId": "sociales_ciudadanas",
+      "categoryId": "sociales_ciudadanas.sources_perspectives_argumentation",
+      "subtopicId": "sociales_ciudadanas.sources_perspectives_argumentation.actor_group_perspectives",
+      "competencia": "pensamiento_reflexivo_sistemico",
+      "difficulty": "alta",
+      "targetGrade": 11,
+      "count": 4
+    },
+    {
+      "subjectId": "sociales_ciudadanas",
+      "categoryId": "sociales_ciudadanas.systems_thinking_decisions",
+      "subtopicId": "sociales_ciudadanas.systems_thinking_decisions.cross_dimension_relations",
+      "competencia": "pensamiento_social",
+      "difficulty": "baja",
+      "targetGrade": 11,
+      "count": 7
+    },
+    {
+      "subjectId": "sociales_ciudadanas",
+      "categoryId": "sociales_ciudadanas.systems_thinking_decisions",
+      "subtopicId": "sociales_ciudadanas.systems_thinking_decisions.cross_dimension_relations",
+      "competencia": "pensamiento_social",
+      "difficulty": "media",
+      "targetGrade": 11,
+      "count": 11
+    },
+    {
+      "subjectId": "sociales_ciudadanas",
+      "categoryId": "sociales_ciudadanas.systems_thinking_decisions",
+      "subtopicId": "sociales_ciudadanas.systems_thinking_decisions.cross_dimension_relations",
+      "competencia": "pensamiento_social",
+      "difficulty": "alta",
+      "targetGrade": 11,
+      "count": 4
+    },
+    {
+      "subjectId": "sociales_ciudadanas",
+      "categoryId": "sociales_ciudadanas.systems_thinking_decisions",
+      "subtopicId": "sociales_ciudadanas.systems_thinking_decisions.cross_dimension_relations",
+      "competencia": "analisis_perspectivas",
+      "difficulty": "baja",
+      "targetGrade": 11,
+      "count": 7
+    },
+    {
+      "subjectId": "sociales_ciudadanas",
+      "categoryId": "sociales_ciudadanas.systems_thinking_decisions",
+      "subtopicId": "sociales_ciudadanas.systems_thinking_decisions.cross_dimension_relations",
+      "competencia": "analisis_perspectivas",
+      "difficulty": "media",
+      "targetGrade": 11,
+      "count": 11
+    },
+    {
+      "subjectId": "sociales_ciudadanas",
+      "categoryId": "sociales_ciudadanas.systems_thinking_decisions",
+      "subtopicId": "sociales_ciudadanas.systems_thinking_decisions.cross_dimension_relations",
+      "competencia": "analisis_perspectivas",
+      "difficulty": "alta",
+      "targetGrade": 11,
+      "count": 4
+    },
+    {
+      "subjectId": "sociales_ciudadanas",
+      "categoryId": "sociales_ciudadanas.systems_thinking_decisions",
+      "subtopicId": "sociales_ciudadanas.systems_thinking_decisions.cross_dimension_relations",
+      "competencia": "pensamiento_reflexivo_sistemico",
+      "difficulty": "baja",
+      "targetGrade": 11,
+      "count": 6
+    },
+    {
+      "subjectId": "sociales_ciudadanas",
+      "categoryId": "sociales_ciudadanas.systems_thinking_decisions",
+      "subtopicId": "sociales_ciudadanas.systems_thinking_decisions.cross_dimension_relations",
+      "competencia": "pensamiento_reflexivo_sistemico",
+      "difficulty": "media",
+      "targetGrade": 11,
+      "count": 11
+    },
+    {
+      "subjectId": "sociales_ciudadanas",
+      "categoryId": "sociales_ciudadanas.systems_thinking_decisions",
+      "subtopicId": "sociales_ciudadanas.systems_thinking_decisions.cross_dimension_relations",
+      "competencia": "pensamiento_reflexivo_sistemico",
+      "difficulty": "alta",
+      "targetGrade": 11,
+      "count": 4
+    }
+  ]
+}

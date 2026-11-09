@@ -1,0 +1,1347 @@
+[
+ {
+  "slug": "ai-generated",
+  "titulo": "Preguntas generadas por IA",
+  "familia": "Otro",
+  "urls": [],
+  "guiaDeClaves": null,
+  "sha256": [],
+  "preguntas": {
+   "elegible": 100
+  },
+  "clave": {
+   "original_ia": 100
+  }
+ },
+ {
+  "slug": "icfes-01_explicadas_lectura",
+  "titulo": "ICFES · Lectura Crítica · Ejemplos de preguntas explicadas Saber 11",
+  "familia": "Saber 11 (explicadas)",
+  "urls": [
+   "http://icfes.acendra.com.co/wp-content/uploads/2024/12/01_explicadas_lectura.pdf"
+  ],
+  "guiaDeClaves": null,
+  "sha256": [
+   "9474351315a69c0e946ad8e0a91ab4bc01758ee18ff7463199d077cc29b18bb0"
+  ],
+  "preguntas": {
+   "duplicada": 1,
+   "elegible": 1
+  },
+  "clave": {
+   "oficial": 1
+  }
+ },
+ {
+  "slug": "icfes-02_practica_lectura",
+  "titulo": "ICFES · Lectura Crítica (práctica)",
+  "familia": "Saber 11 2021",
+  "urls": [
+   "http://icfes.acendra.com.co/wp-content/uploads/2024/12/02_practica_lectura.pdf"
+  ],
+  "guiaDeClaves": null,
+  "sha256": [
+   "8983f8404e8ece8e622ae4ec0a60c0e27a6f6b4687faecd9d5682a67abcb3c9f"
+  ],
+  "preguntas": {
+   "duplicada": 19,
+   "elegible": 22
+  },
+  "clave": {
+   "oficial": 22
+  }
+ },
+ {
+  "slug": "icfes-04_practica_matematicas",
+  "titulo": "ICFES · Matemáticas (práctica)",
+  "familia": "Saber 11 2021",
+  "urls": [
+   "http://icfes.acendra.com.co/wp-content/uploads/2024/12/04_practica_matematicas.pdf"
+  ],
+  "guiaDeClaves": null,
+  "sha256": [
+   "a5fb6a2103024d3037715240c65ae4ff3b9e24405da13bef9132e33cf31724dd"
+  ],
+  "preguntas": {
+   "elegible": 20,
+   "duplicada": 26
+  },
+  "clave": {
+   "oficial": 20
+  }
+ },
+ {
+  "slug": "icfes-06_practica_sociales",
+  "titulo": "ICFES · Sociales y Ciudadanas (práctica)",
+  "familia": "Saber 11 2021",
+  "urls": [
+   "http://icfes.acendra.com.co/wp-content/uploads/2024/12/06_practica_sociales.pdf"
+  ],
+  "guiaDeClaves": null,
+  "sha256": [
+   "1117639028995f7ca31acdfa54b774a3d2d2dd2dc5d0b93bc3d320249127efed"
+  ],
+  "preguntas": {
+   "elegible": 48
+  },
+  "clave": {
+   "oficial": 48
+  }
+ },
+ {
+  "slug": "icfes-08_practica_ciencias",
+  "titulo": "ICFES · Ciencias Naturales (práctica)",
+  "familia": "Saber 11 2021",
+  "urls": [
+   "http://icfes.acendra.com.co/wp-content/uploads/2024/12/08_practica_ciencias.pdf"
+  ],
+  "guiaDeClaves": null,
+  "sha256": [
+   "36b7077501dc0f57a049a29504a698e9d77a8f5429f5f03cce3644c4076e342b"
+  ],
+  "preguntas": {
+   "elegible": 36,
+   "duplicada": 13
+  },
+  "clave": {
+   "oficial": 36
+  }
+ },
+ {
+  "slug": "icfes-09-marzo_cuadernillo-de-preguntas-matematicas-saber-11-2026",
+  "titulo": "ICFES · Matemáticas · examen 2026 (práctica)",
+  "familia": "Saber 11 2026",
+  "urls": [
+   "https://www.icfes.gov.co/wp-content/uploads/2026/04/09-Marzo_Cuadernillo-de-Preguntas-Matematicas-Saber-11-2026.pdf"
+  ],
+  "guiaDeClaves": null,
+  "sha256": [
+   "6be1c518ce557b4fd25d181be4741ea3873a2e156379a4b4b83f174f7987d0be"
+  ],
+  "preguntas": {
+   "elegible": 37
+  },
+  "clave": {
+   "oficial": 37
+  }
+ },
+ {
+  "slug": "icfes-10_practica_ingles-e1",
+  "titulo": "ICFES · Inglés · Cuadernillo de preguntas Saber 11 2021 · Examen 1",
+  "familia": "Saber 11 2021",
+  "urls": [
+   "http://icfes.acendra.com.co/wp-content/uploads/2024/12/10_practica_ingles.pdf"
+  ],
+  "guiaDeClaves": null,
+  "sha256": [
+   "03d7b903c0c3e6c2a3ba39f8ab0bb8c84c449a346d42667b084d4591e14c622f"
+  ],
+  "preguntas": {
+   "elegible": 24,
+   "duplicada": 1
+  },
+  "clave": {
+   "oficial": 24
+  }
+ },
+ {
+  "slug": "icfes-10_practica_ingles-e2",
+  "titulo": "ICFES · Inglés · Cuadernillo de preguntas Saber 11 2021 · Examen 2",
+  "familia": "Saber 11 2021",
+  "urls": [
+   "http://icfes.acendra.com.co/wp-content/uploads/2024/12/10_practica_ingles.pdf"
+  ],
+  "guiaDeClaves": null,
+  "sha256": [
+   "03d7b903c0c3e6c2a3ba39f8ab0bb8c84c449a346d42667b084d4591e14c622f"
+  ],
+  "preguntas": {
+   "elegible": 25
+  },
+  "clave": {
+   "oficial": 25
+  }
+ },
+ {
+  "slug": "icfes-16-feb-cuadernillo-de-preguntas-lectura-critica-saber-11-2026",
+  "titulo": "ICFES · Lectura Crítica · examen 2026 (práctica)",
+  "familia": "Saber 11 2026",
+  "urls": [
+   "https://www.icfes.gov.co/wp-content/uploads/2026/03/16-feb-cuadernillo-de-preguntas-lectura-critica-saber-11-2026.pdf"
+  ],
+  "guiaDeClaves": null,
+  "sha256": [
+   "fcaf7be0b06490bd071d5bf307ec2dafdf3602bf0b4a036700c01aa93ccc73ac"
+  ],
+  "preguntas": {
+   "elegible": 42,
+   "duplicada": 5
+  },
+  "clave": {
+   "oficial": 42
+  }
+ },
+ {
+  "slug": "icfes-16-octubre-cuadernillo-ingles-saber-11-2024-e1",
+  "titulo": "ICFES · Inglés · Cuadernillo de preguntas Saber 11 octubre 2024 · Examen 1",
+  "familia": "Saber 11 2024",
+  "urls": [
+   "https://www.icfes.gov.co/wp-content/uploads/2025/12/16-octubre-cuadernillo-ingles-saber-11-2024.pdf"
+  ],
+  "guiaDeClaves": null,
+  "sha256": [
+   "e55934a33ed9c246c8509ace51c285fdea424600cee6e89c2c84c080f704bdaf"
+  ],
+  "preguntas": {
+   "elegible": 8
+  },
+  "clave": {
+   "oficial": 8
+  }
+ },
+ {
+  "slug": "icfes-16-octubre-cuadernillo-ingles-saber-11-2024-e2",
+  "titulo": "ICFES · Inglés · Cuadernillo de preguntas Saber 11 octubre 2024 · Examen 2",
+  "familia": "Saber 11 2024",
+  "urls": [
+   "https://www.icfes.gov.co/wp-content/uploads/2025/12/16-octubre-cuadernillo-ingles-saber-11-2024.pdf"
+  ],
+  "guiaDeClaves": null,
+  "sha256": [
+   "e55934a33ed9c246c8509ace51c285fdea424600cee6e89c2c84c080f704bdaf"
+  ],
+  "preguntas": {
+   "elegible": 4
+  },
+  "clave": {
+   "oficial": 4
+  }
+ },
+ {
+  "slug": "icfes-2014-ciencias",
+  "titulo": "ICFES · Ciencias Naturales · Cuadernillo de prueba Saber 11 2014",
+  "familia": "Saber 11 2014",
+  "urls": [
+   "https://altopuntaje.com/prueba-icfes-preguntas-saber-11-examenes/"
+  ],
+  "guiaDeClaves": null,
+  "sha256": [
+   "05d6c3237a1cb8176090b02b6706fb2092223072c4f41c927af722f58a0e752b"
+  ],
+  "preguntas": {
+   "elegible": 3
+  },
+  "clave": {
+   "oficial": 3
+  }
+ },
+ {
+  "slug": "icfes-2014-ingles",
+  "titulo": "ICFES · Inglés · Cuadernillo de prueba Saber 11 2014",
+  "familia": "Saber 11 2014",
+  "urls": [
+   "https://altopuntaje.com/prueba-icfes-preguntas-saber-11-examenes/"
+  ],
+  "guiaDeClaves": null,
+  "sha256": [
+   "05d6c3237a1cb8176090b02b6706fb2092223072c4f41c927af722f58a0e752b"
+  ],
+  "preguntas": {
+   "elegible": 12
+  },
+  "clave": {
+   "oficial": 12
+  }
+ },
+ {
+  "slug": "icfes-2019-ciencias",
+  "titulo": "ICFES · Ciencias Naturales · Cuadernillo de preguntas Saber 11 2019",
+  "familia": "Saber 11 2019",
+  "urls": [
+   "https://universate.co/wp-content/uploads/2023/12/cuadernillo-de-preguntas-saber-11-ciencias-naturales-2019.pdf"
+  ],
+  "guiaDeClaves": null,
+  "sha256": [
+   "cf915150b1c706b856467a5effaea1f009b89bf06f88a833f69694d39da5a409"
+  ],
+  "preguntas": {
+   "elegible": 6
+  },
+  "clave": {
+   "oficial": 6
+  }
+ },
+ {
+  "slug": "icfes-2019-ingles-e1",
+  "titulo": "ICFES · Inglés · Cuadernillo de preguntas Saber 11 2019 · Examen 1",
+  "familia": "Saber 11 2019",
+  "urls": [
+   "https://universate.co/wp-content/uploads/2023/12/cuadernillo-de-preguntas-ingles-saber-11-2019.pdf"
+  ],
+  "guiaDeClaves": null,
+  "sha256": [
+   "9ff08eb8dfaf2ce225a4f3c76c280131498e31bda9518174a224d5e301760459"
+  ],
+  "preguntas": {
+   "elegible": 7
+  },
+  "clave": {
+   "oficial": 7
+  }
+ },
+ {
+  "slug": "icfes-2019-ingles-e2",
+  "titulo": "ICFES · Inglés · Cuadernillo de preguntas Saber 11 2019 · Examen 2",
+  "familia": "Saber 11 2019",
+  "urls": [
+   "https://universate.co/wp-content/uploads/2023/12/cuadernillo-de-preguntas-ingles-saber-11-2019.pdf"
+  ],
+  "guiaDeClaves": null,
+  "sha256": [
+   "9ff08eb8dfaf2ce225a4f3c76c280131498e31bda9518174a224d5e301760459"
+  ],
+  "preguntas": {
+   "elegible": 11
+  },
+  "clave": {
+   "oficial": 11
+  }
+ },
+ {
+  "slug": "icfes-2019-lectura",
+  "titulo": "icfes-2019-lectura",
+  "familia": "Saber 11 2019",
+  "urls": [
+   "https://universate.co/wp-content/uploads/2023/12/cuadernillo-de-preguntas-saber-11-lectura-critica-2019.pdf"
+  ],
+  "guiaDeClaves": null,
+  "sha256": [
+   "5cc2da652d31314ab57b9321df9aa33caabbe27a4dd1b2155e00fc2c690db59a"
+  ],
+  "preguntas": {
+   "en_espera": 1
+  },
+  "clave": {}
+ },
+ {
+  "slug": "icfes-2019-matematicas",
+  "titulo": "ICFES · Matemáticas · Cuadernillo de preguntas Saber 11 2019",
+  "familia": "Saber 11 2019",
+  "urls": [
+   "https://universate.co/wp-content/uploads/2023/12/cuadernillo-de-preguntas-saber-11-matematicas-2019.pdf"
+  ],
+  "guiaDeClaves": null,
+  "sha256": [
+   "a38d6caf5ee078e9486a2445235934b8c63394eea0c6884d6e7a0444a547407d"
+  ],
+  "preguntas": {
+   "duplicada": 1
+  },
+  "clave": {}
+ },
+ {
+  "slug": "icfes-22-diciembre-cuadernillo-de-preguntas-ciencias-naturales-saber-11-2025",
+  "titulo": "ICFES · Ciencias Naturales · examen 2025 (práctica)",
+  "familia": "Saber 11 2025",
+  "urls": [
+   "https://www.icfes.gov.co/wp-content/uploads/2025/12/22-diciembre-cuadernillo-de-preguntas-ciencias-naturales-saber-11-2025.pdf"
+  ],
+  "guiaDeClaves": null,
+  "sha256": [
+   "312f730010bdfa4365687b5a7b35198c9406917cd7d192e29702ad027b4df9af"
+  ],
+  "preguntas": {
+   "duplicada": 12
+  },
+  "clave": {}
+ },
+ {
+  "slug": "icfes-24-feb-cuadernillo-preguntas-ciencias-naturales-saber-11-2026",
+  "titulo": "ICFES · Ciencias Naturales · examen 2026 (práctica)",
+  "familia": "Saber 11 2026",
+  "urls": [
+   "https://www.icfes.gov.co/wp-content/uploads/2026/03/24-feb-cuadernillo-preguntas-ciencias-naturales-saber-11-2026.pdf"
+  ],
+  "guiaDeClaves": null,
+  "sha256": [
+   "87897059d816fd69420ca074ba914003cc97ff461a55748ecbf977c70dc0174d"
+  ],
+  "preguntas": {
+   "elegible": 22
+  },
+  "clave": {
+   "oficial": 22
+  }
+ },
+ {
+  "slug": "icfes-epa-2021-ciencias-1",
+  "titulo": "ICFES · Ciencias Naturales · Evaluar para Avanzar 2021 · Cuadernillo 1",
+  "familia": "Evaluar para Avanzar 2021",
+  "urls": [
+   "https://universate.co/wp-content/uploads/2023/12/Cuadernillo-Ciencias_Naturales-11-2021.pdf"
+  ],
+  "guiaDeClaves": null,
+  "sha256": [
+   "f0e667fd6375237c82ec9ca11569978901299e4c19d169c87851bd8cf2b28b6e"
+  ],
+  "preguntas": {
+   "elegible": 20
+  },
+  "clave": {
+   "dos_soluciones": 20
+  }
+ },
+ {
+  "slug": "icfes-epa-2021-ingles-1",
+  "titulo": "ICFES · Inglés · Evaluar para Avanzar 2021 · Cuadernillo 1",
+  "familia": "Evaluar para Avanzar 2021",
+  "urls": [
+   "https://universate.co/wp-content/uploads/2023/12/Cuadernillo-Ingles-11-2021.pdf"
+  ],
+  "guiaDeClaves": null,
+  "sha256": [
+   "a832a81efa7469b91bca08f45fa56b0cc5930f30aa106c9e7eb69d4ab5992f71"
+  ],
+  "preguntas": {
+   "elegible": 20
+  },
+  "clave": {
+   "dos_soluciones": 20
+  }
+ },
+ {
+  "slug": "icfes-epa-2021-ingles-2",
+  "titulo": "ICFES · Inglés · Evaluar para Avanzar 2021 · Cuadernillo 2",
+  "familia": "Evaluar para Avanzar 2021",
+  "urls": [
+   "https://drive.google.com/file/d/1BnluXVMth08mwFG1Zo8WnzelA7-JQCZU"
+  ],
+  "guiaDeClaves": "https://drive.google.com/file/d/10pSLQY-AF2Blh2RMlW3elmhIiIlL4ll9",
+  "sha256": [
+   "8d3491c63160c34c68b29050d9d993d5e9ed577d0f70d14034feaa01884ead9f"
+  ],
+  "preguntas": {
+   "elegible": 22
+  },
+  "clave": {
+   "oficial": 16,
+   "dos_soluciones": 6
+  }
+ },
+ {
+  "slug": "icfes-epa-2021-lectura-1",
+  "titulo": "ICFES · Lectura Crítica · Evaluar para Avanzar 2021 · Cuadernillo 1",
+  "familia": "Evaluar para Avanzar 2021",
+  "urls": [
+   "https://universate.co/wp-content/uploads/2023/12/Cuadernillo-LecturaCritica-11-2021.pdf",
+   "https://universate.co/wp-content/uploads/2023/12/Matematicas-Grado.11-2021.pdf"
+  ],
+  "guiaDeClaves": null,
+  "sha256": [
+   "b7a6530eb00a97236903e63c97720e996e08baeda30627e393a45881f3975bda",
+   "b7fb37ae1850f658023fd89f1e5c4af203d16f2c5ff8486d53b6fed7c7f83f88"
+  ],
+  "preguntas": {
+   "elegible": 17
+  },
+  "clave": {
+   "dos_soluciones": 17
+  }
+ },
+ {
+  "slug": "icfes-epa-2021-lectura-2",
+  "titulo": "ICFES · Lectura Crítica · Evaluar para Avanzar 2021 · Cuadernillo 2",
+  "familia": "Evaluar para Avanzar 2021",
+  "urls": [
+   "https://drive.google.com/file/d/1mkWzgxjSM7mGP0GhvTbnxvIZB8lVZkqp"
+  ],
+  "guiaDeClaves": "https://drive.google.com/file/d/1gSzbziY2g61inICZ_2wWoxOpsev0ztUU",
+  "sha256": [
+   "4b1af00bfe39dc9e954b1d412cd3ca045f5deabcca645d787bb8a865bbeff379"
+  ],
+  "preguntas": {
+   "elegible": 18,
+   "en_espera": 2
+  },
+  "clave": {
+   "oficial": 15,
+   "dos_soluciones": 3
+  }
+ },
+ {
+  "slug": "icfes-epa-2021-matematicas-1",
+  "titulo": "ICFES · Matemáticas · Evaluar para Avanzar 2021 · Cuadernillo 1",
+  "familia": "Evaluar para Avanzar 2021",
+  "urls": [
+   "https://universate.co/wp-content/uploads/2023/12/Matematicas-Grado.11-2021.pdf"
+  ],
+  "guiaDeClaves": null,
+  "sha256": [
+   "b7fb37ae1850f658023fd89f1e5c4af203d16f2c5ff8486d53b6fed7c7f83f88"
+  ],
+  "preguntas": {
+   "elegible": 19
+  },
+  "clave": {
+   "dos_soluciones": 19
+  }
+ },
+ {
+  "slug": "icfes-epa-2021-matematicas-2",
+  "titulo": "ICFES · Matemáticas · Evaluar para Avanzar 2021 · Cuadernillo 2",
+  "familia": "Evaluar para Avanzar 2021",
+  "urls": [
+   "https://drive.google.com/file/d/1yCt_sdAhzXpV96ou_1kGMtyT-KUzi-Sx"
+  ],
+  "guiaDeClaves": "https://drive.google.com/file/d/10M06gP62ooec89GiXWSE2pfkoEodqn2c",
+  "sha256": [
+   "ca82f967ab82f8c31eb5ddda790bd52e14e70a585214762620f1b430c4f55c41"
+  ],
+  "preguntas": {
+   "elegible": 20
+  },
+  "clave": {
+   "oficial": 18,
+   "dos_soluciones": 2
+  }
+ },
+ {
+  "slug": "icfes-epa-2021-sociales-1",
+  "titulo": "ICFES · Sociales y Ciudadanas · Evaluar para Avanzar 2021 · Cuadernillo 1",
+  "familia": "Evaluar para Avanzar 2021",
+  "urls": [
+   "https://universate.co/wp-content/uploads/2023/12/Cuadernillo-SocialesyCiudadanas-11-2021.pdf"
+  ],
+  "guiaDeClaves": null,
+  "sha256": [
+   "c0c8c3d5dd2f416433ad9d5d1ec0dac3f3b0b166c8f5aff4fee8abe0e0d3e8a1"
+  ],
+  "preguntas": {
+   "elegible": 19,
+   "en_espera": 1
+  },
+  "clave": {
+   "dos_soluciones": 19
+  }
+ },
+ {
+  "slug": "icfes-epa-2021-sociales-2",
+  "titulo": "ICFES · Sociales y Ciudadanas · Evaluar para Avanzar 2021 · Cuadernillo 2",
+  "familia": "Evaluar para Avanzar 2021",
+  "urls": [
+   "https://drive.google.com/file/d/1R3emY3eyx_ezkICTb1poNK-JOlPbuDyP"
+  ],
+  "guiaDeClaves": "https://drive.google.com/file/d/1ZVgEAkY6y2TU16J6MIkqsh3nijmOkWnF",
+  "sha256": [
+   "e973c7567361bcba749f2aad1296ad23077cb96308af1c005f5d797a2a3ecd5f"
+  ],
+  "preguntas": {
+   "elegible": 18,
+   "en_espera": 1
+  },
+  "clave": {
+   "oficial": 18
+  }
+ },
+ {
+  "slug": "icfes-epa-2022-ciencias-1",
+  "titulo": "ICFES · Ciencias Naturales · Evaluar para Avanzar 2022 · Cuadernillo 1",
+  "familia": "Evaluar para Avanzar 2022",
+  "urls": [
+   "https://universate.co/wp-content/uploads/2023/12/Cuadernillo-Ciencias_Naturales-11-2022.pdf"
+  ],
+  "guiaDeClaves": "https://drive.google.com/file/d/1ZBmWu5TlsDLQUG2wNbxOZRWYvowoqaWZ",
+  "sha256": [
+   "019aae9019dce17997bccbca7e4f9093e2a200631f7653884e6bdcade4aee84d"
+  ],
+  "preguntas": {
+   "elegible": 20
+  },
+  "clave": {
+   "oficial": 20
+  }
+ },
+ {
+  "slug": "icfes-epa-2022-ingles-1",
+  "titulo": "ICFES · Inglés · Evaluar para Avanzar 2022 · Cuadernillo 1",
+  "familia": "Evaluar para Avanzar 2022",
+  "urls": [
+   "https://drive.google.com/file/d/1YpHAWHFJTUfW3boExl1ImnFrx0cq-Swu"
+  ],
+  "guiaDeClaves": "https://drive.google.com/file/d/1koFRc_DXbL2iX_7Epbt4oDZE0HZ8WvQ2",
+  "sha256": [
+   "2210bde574e9edef6cf32a3fbab37c62ac9a3db5d230a1f2f9b01848d328baea"
+  ],
+  "preguntas": {
+   "elegible": 23
+  },
+  "clave": {
+   "oficial": 23
+  }
+ },
+ {
+  "slug": "icfes-epa-2022-lectura-1",
+  "titulo": "ICFES · Lectura Crítica · Evaluar para Avanzar 2022 · Cuadernillo 1",
+  "familia": "Evaluar para Avanzar 2022",
+  "urls": [
+   "https://drive.google.com/file/d/1gjvASgQ_BprxSk5EuJW4u3bbAMY0kNr6"
+  ],
+  "guiaDeClaves": "https://drive.google.com/file/d/1CYoYVDqzPYe6801q2mMwW2_2q-4FOBCD",
+  "sha256": [
+   "2a228e4bb2955ba502009139bd87678d068be0c7229370b95e7f2630f629ee35"
+  ],
+  "preguntas": {
+   "elegible": 15,
+   "en_espera": 3
+  },
+  "clave": {
+   "oficial": 15
+  }
+ },
+ {
+  "slug": "icfes-epa-2022-matematicas-1",
+  "titulo": "ICFES · Matemáticas · Evaluar para Avanzar 2022 · Cuadernillo 1",
+  "familia": "Evaluar para Avanzar 2022",
+  "urls": [
+   "https://drive.google.com/file/d/1cUrklBMlc6zT0ttpPqpuiKGN0N1oE_Op",
+   "https://drive.google.com/file/d/1apG7e4Lcu99gyzSTRMMiQOA4LvstbeF6"
+  ],
+  "guiaDeClaves": "https://drive.google.com/file/d/1cUrklBMlc6zT0ttpPqpuiKGN0N1oE_Op",
+  "sha256": [
+   "41563647b7d9ec68afef8ccd837216560204a54323fb115d27dbb45589127a1e",
+   "be1145abd97def29cc938ce62a0b1b66db007afdc68ecd38469e77cdb34b4a9b"
+  ],
+  "preguntas": {
+   "elegible": 20
+  },
+  "clave": {
+   "oficial": 20
+  }
+ },
+ {
+  "slug": "icfes-epa-2022-sociales-1",
+  "titulo": "ICFES · Sociales y Ciudadanas · Evaluar para Avanzar 2022 · Cuadernillo 1",
+  "familia": "Evaluar para Avanzar 2022",
+  "urls": [
+   "https://drive.google.com/file/d/1JbL265Whe87aPgiQ0O5sQeCPQUcOa3ih"
+  ],
+  "guiaDeClaves": "https://drive.google.com/file/d/1cYZZwZqwsJVjCsyO_os-VfJq3Q57SZxG",
+  "sha256": [
+   "377a3017575147dda3c5970c1c0fd4a90ebb01ad8722e33c7b627254774ea89a"
+  ],
+  "preguntas": {
+   "elegible": 20
+  },
+  "clave": {
+   "oficial": 20
+  }
+ },
+ {
+  "slug": "icfes-epa-2023-ciencias-1",
+  "titulo": "ICFES · Ciencias Naturales · Evaluar para Avanzar 2023 · Cuadernillo 1",
+  "familia": "Evaluar para Avanzar 2023",
+  "urls": [
+   "https://drive.google.com/file/d/1Vd0JC9PvU91V903ZJFJKZVidfgpXP0FD"
+  ],
+  "guiaDeClaves": "https://drive.google.com/file/d/1V8v7THI5PX08hhoZsksW3g4E7f0d86Ej",
+  "sha256": [
+   "da9f01be7e5e4d79b5d4655c5ecffe4c2ea1dd9bb24d3d01c9b883a0125c5026"
+  ],
+  "preguntas": {
+   "elegible": 7,
+   "duplicada": 1
+  },
+  "clave": {
+   "oficial": 7
+  }
+ },
+ {
+  "slug": "icfes-epa-2023-ciencias-2",
+  "titulo": "ICFES · Ciencias Naturales · Evaluar para Avanzar 2023 · Cuadernillo 2",
+  "familia": "Evaluar para Avanzar 2023",
+  "urls": [
+   "https://drive.google.com/file/d/1pt4Vmcz0mrKFhJ03DPyMYOreSh-aWkqI"
+  ],
+  "guiaDeClaves": "https://drive.google.com/file/d/1j21dnzKH6yov0s6YH3EbvBdH6Bu5vaMb",
+  "sha256": [
+   "2de4af6bfda6de7e122f6a8f2cddc6934c8d00c495ebfbe0e3d600262ac0b0f4"
+  ],
+  "preguntas": {
+   "elegible": 19,
+   "en_espera": 1
+  },
+  "clave": {
+   "oficial": 19
+  }
+ },
+ {
+  "slug": "icfes-epa-2023-ingles-1",
+  "titulo": "ICFES · Inglés · Evaluar para Avanzar 2023 · Cuadernillo 1",
+  "familia": "Evaluar para Avanzar 2023",
+  "urls": [
+   "https://drive.google.com/file/d/1d1NzzZ9_1GPMAsr_9nAyWBnJeXR7902l"
+  ],
+  "guiaDeClaves": "https://drive.google.com/file/d/13ApO1cEQ-NKwx_TXlXTVrzyx3tlDtRFk",
+  "sha256": [
+   "b7670e77f64a889ccaeb8eaeb61ff828973b4b6c5bfe3c71c37d2faf9f5e7490"
+  ],
+  "preguntas": {
+   "elegible": 10
+  },
+  "clave": {
+   "oficial": 10
+  }
+ },
+ {
+  "slug": "icfes-epa-2023-ingles-2",
+  "titulo": "ICFES · Inglés · Evaluar para Avanzar 2023 · Cuadernillo 2",
+  "familia": "Evaluar para Avanzar 2023",
+  "urls": [
+   "https://drive.google.com/file/d/1q4KX6nhBDFTIdIFW3srC8tBmEYQON2qe"
+  ],
+  "guiaDeClaves": "https://drive.google.com/file/d/1agjTLeQb2PuL55uMvOgVHTvtsljtKnK7",
+  "sha256": [
+   "66088e5b7d7dbdad8c521bb0eb0a2fec670f8589835e94ff801fe41885148b23"
+  ],
+  "preguntas": {
+   "elegible": 24,
+   "en_espera": 1
+  },
+  "clave": {
+   "oficial": 24
+  }
+ },
+ {
+  "slug": "icfes-epa-2023-lectura-1",
+  "titulo": "ICFES · Lectura Crítica · Evaluar para Avanzar 2023 · Cuadernillo 1",
+  "familia": "Evaluar para Avanzar 2023",
+  "urls": [
+   "https://drive.google.com/file/d/1BaWV3usY0AaKwOIGQOGSPHdwJHfle7W9"
+  ],
+  "guiaDeClaves": "https://drive.google.com/file/d/1xzilKKFnDnDszm33zKO_RduTFCV-T8VX",
+  "sha256": [
+   "648a724bdddc815c3483a1d53097aeffa13bf479b2868bb8b04db59681d1b951"
+  ],
+  "preguntas": {
+   "elegible": 2
+  },
+  "clave": {
+   "oficial": 2
+  }
+ },
+ {
+  "slug": "icfes-epa-2023-lectura-2",
+  "titulo": "ICFES · Lectura Crítica · Evaluar para Avanzar 2023 · Cuadernillo 2",
+  "familia": "Evaluar para Avanzar 2023",
+  "urls": [
+   "https://drive.google.com/file/d/1JZlcp4sH6BJ00KQt1wnhcjQtJ7xEt0L9"
+  ],
+  "guiaDeClaves": "https://drive.google.com/file/d/1JwogtMOpyCWrGprbZ9DDArWAdVzEEsqF",
+  "sha256": [
+   "9dd9e59a8d3f85c0dc648ad86fda2aac0799dc453639ea7dd25668690648049c"
+  ],
+  "preguntas": {
+   "elegible": 16,
+   "en_espera": 2
+  },
+  "clave": {
+   "oficial": 16
+  }
+ },
+ {
+  "slug": "icfes-epa-2023-matematicas-1",
+  "titulo": "ICFES · Matemáticas · Evaluar para Avanzar 2023 · Cuadernillo 1",
+  "familia": "Evaluar para Avanzar 2023",
+  "urls": [
+   "https://drive.google.com/file/d/1RkaaYaAVJRjh1Ij44xp4zTy13PFIrMyM"
+  ],
+  "guiaDeClaves": "https://drive.google.com/file/d/1NyRm_O9LEs7A9EyFcj06Q-ZZjQrhl8T2",
+  "sha256": [
+   "b184eb59e74444c03de17c5b8936ce8dfc387b74e1a122dd0ac67a55c9e0cff7"
+  ],
+  "preguntas": {
+   "duplicada": 1,
+   "elegible": 2
+  },
+  "clave": {
+   "oficial": 2
+  }
+ },
+ {
+  "slug": "icfes-epa-2023-matematicas-2",
+  "titulo": "ICFES · Matemáticas · Evaluar para Avanzar 2023 · Cuadernillo 2",
+  "familia": "Evaluar para Avanzar 2023",
+  "urls": [
+   "https://drive.google.com/file/d/1x0i8ofbJpR9NhkrAteXWsALadkJnx6EJ"
+  ],
+  "guiaDeClaves": "https://drive.google.com/file/d/1owwki2uDjw0bEQJvKIEL96RxBcvZIRIk",
+  "sha256": [
+   "6c8177eb7351157b2327e807851101b2bccb7ab3eab97a53f56b603618780a3d"
+  ],
+  "preguntas": {
+   "elegible": 18,
+   "en_espera": 1
+  },
+  "clave": {
+   "oficial": 18
+  }
+ },
+ {
+  "slug": "icfes-epa-2023-sociales-2",
+  "titulo": "ICFES · Sociales y Ciudadanas · Evaluar para Avanzar 2023 · Cuadernillo 2",
+  "familia": "Evaluar para Avanzar 2023",
+  "urls": [
+   "https://drive.google.com/file/d/1XpI_xUWBqmSurGOMx2tcnvvpThBL1OGP"
+  ],
+  "guiaDeClaves": "https://drive.google.com/file/d/1tGdgYZYZ_Kzqe8t6MP71chcZL7aQUFY8",
+  "sha256": [
+   "f2729fc5bac1355d4ad505226163d190b6ecb31b90d054c4ef404ae07432fb23"
+  ],
+  "preguntas": {
+   "elegible": 16,
+   "en_espera": 4
+  },
+  "clave": {
+   "oficial": 16
+  }
+ },
+ {
+  "slug": "icfes-icfes-2021-ciencias-cuadernillo",
+  "titulo": "ICFES · Ciencias Naturales · Cuadernillo de preguntas Saber 11 2021",
+  "familia": "Saber 11 2021",
+  "urls": [
+   "https://web.archive.org/web/20210820141019id_/https://www.icfes.gov.co/documents/20143/1713188/Cuadernillo+de+preguntas+Ciencias+Naturales+Saber+11-2021.pdf"
+  ],
+  "guiaDeClaves": null,
+  "sha256": [
+   "c84994b104dd8e4fa5372534e2407b5ebfd8419fef684cf9f886e0a8ad80ce77"
+  ],
+  "preguntas": {
+   "elegible": 3,
+   "duplicada": 1
+  },
+  "clave": {
+   "oficial": 3
+  }
+ },
+ {
+  "slug": "icfes-icfes-2021-matematicas-cuadernillo",
+  "titulo": "ICFES · Matemáticas · Cuadernillo de preguntas Saber 11 2021",
+  "familia": "Saber 11 2021",
+  "urls": [
+   "https://web.archive.org/web/20210820154126id_/https://www.icfes.gov.co/documents/20143/1713188/Cuadernillo+de+preguntas+Matematicas+Saber+11-2021.pdf"
+  ],
+  "guiaDeClaves": null,
+  "sha256": [
+   "5b53ed428c78f0707a00417f538a82e76dc6e4751d86b15500af802957149f76"
+  ],
+  "preguntas": {
+   "elegible": 12,
+   "needs_person": 1,
+   "duplicada": 1
+  },
+  "clave": {
+   "oficial": 12
+  }
+ },
+ {
+  "slug": "icfes-icfes-2021-sociales-cuadernillo",
+  "titulo": "ICFES · Sociales y Ciudadanas · Cuadernillo de preguntas Saber 11 2021",
+  "familia": "Saber 11 2021",
+  "urls": [
+   "https://web.archive.org/web/20211005234206id_/https://www.icfes.gov.co/documents/20143/1713188/Cuadernillo+de+preguntas+Sociales+y+Ciudadanas+Saber+11-2021.pdf"
+  ],
+  "guiaDeClaves": null,
+  "sha256": [
+   "f9bad55d3fafc5d748843bce6d89ac3560bfba3987019add995cc82b266491c7"
+  ],
+  "preguntas": {
+   "duplicada": 8,
+   "elegible": 3
+  },
+  "clave": {
+   "oficial": 3
+  }
+ },
+ {
+  "slug": "icfes-icfes-guia-2017-1-ciencias",
+  "titulo": "ICFES · Ciencias Naturales · Guía de orientación Saber 11 2017-1",
+  "familia": "Saber 11 2017 (guía)",
+  "urls": [
+   "https://www.icfes.gov.co/wp-content/uploads/2024/11/Guia-de-orientacion-saber-11-2017-1.pdf"
+  ],
+  "guiaDeClaves": null,
+  "sha256": [
+   "04cb92c83c8f137fd9169a553bb30fff97e106f8d4f52854183c6375b26fdd26"
+  ],
+  "preguntas": {
+   "elegible": 9,
+   "duplicada": 1
+  },
+  "clave": {
+   "oficial": 9
+  }
+ },
+ {
+  "slug": "icfes-icfes-guia-2017-1-ingles",
+  "titulo": "ICFES · Inglés · Guía de orientación Saber 11 2017-1",
+  "familia": "Saber 11 2017 (guía)",
+  "urls": [
+   "https://www.icfes.gov.co/wp-content/uploads/2024/11/Guia-de-orientacion-saber-11-2017-1.pdf"
+  ],
+  "guiaDeClaves": null,
+  "sha256": [
+   "04cb92c83c8f137fd9169a553bb30fff97e106f8d4f52854183c6375b26fdd26"
+  ],
+  "preguntas": {
+   "elegible": 9,
+   "needs_person": 1
+  },
+  "clave": {
+   "oficial": 9
+  }
+ },
+ {
+  "slug": "icfes-icfes-guia-2017-1-lectura",
+  "titulo": "ICFES · Lectura Crítica · Guía de orientación Saber 11 2017-1",
+  "familia": "Saber 11 2017 (guía)",
+  "urls": [
+   "https://www.icfes.gov.co/wp-content/uploads/2024/11/Guia-de-orientacion-saber-11-2017-1.pdf"
+  ],
+  "guiaDeClaves": null,
+  "sha256": [
+   "04cb92c83c8f137fd9169a553bb30fff97e106f8d4f52854183c6375b26fdd26"
+  ],
+  "preguntas": {
+   "elegible": 5,
+   "duplicada": 1
+  },
+  "clave": {
+   "oficial": 5
+  }
+ },
+ {
+  "slug": "icfes-icfes-guia-2017-1-matematicas",
+  "titulo": "ICFES · Matemáticas · Guía de orientación Saber 11 2017-1",
+  "familia": "Saber 11 2017 (guía)",
+  "urls": [
+   "https://www.icfes.gov.co/wp-content/uploads/2024/11/Guia-de-orientacion-saber-11-2017-1.pdf"
+  ],
+  "guiaDeClaves": null,
+  "sha256": [
+   "04cb92c83c8f137fd9169a553bb30fff97e106f8d4f52854183c6375b26fdd26"
+  ],
+  "preguntas": {
+   "elegible": 8,
+   "duplicada": 1
+  },
+  "clave": {
+   "oficial": 8
+  }
+ },
+ {
+  "slug": "icfes-icfes-guia-2017-1-sociales",
+  "titulo": "ICFES · Sociales y Ciudadanas · Guía de orientación Saber 11 2017-1",
+  "familia": "Saber 11 2017 (guía)",
+  "urls": [
+   "https://www.icfes.gov.co/wp-content/uploads/2024/11/Guia-de-orientacion-saber-11-2017-1.pdf"
+  ],
+  "guiaDeClaves": null,
+  "sha256": [
+   "04cb92c83c8f137fd9169a553bb30fff97e106f8d4f52854183c6375b26fdd26"
+  ],
+  "preguntas": {
+   "elegible": 8,
+   "duplicada": 1
+  },
+  "clave": {
+   "oficial": 8
+  }
+ },
+ {
+  "slug": "icfes-icfes-guia-2017-2-ciencias",
+  "titulo": "ICFES · Ciencias Naturales · Guía de orientación Saber 11 2017-2",
+  "familia": "Saber 11 2017 (guía)",
+  "urls": [
+   "https://www.icfes.gov.co/wp-content/uploads/2024/11/Guia-de-orientacion-saber-11-2017-2.pdf"
+  ],
+  "guiaDeClaves": null,
+  "sha256": [
+   "eb801d55b0672fbad42a90d92b5d51b7bd5510ce1da8d45969f531722163c298"
+  ],
+  "preguntas": {
+   "elegible": 5
+  },
+  "clave": {
+   "oficial": 5
+  }
+ },
+ {
+  "slug": "icfes-icfes-guia-2017-2-ingles",
+  "titulo": "ICFES · Inglés · Guía de orientación Saber 11 2017-2",
+  "familia": "Saber 11 2017 (guía)",
+  "urls": [
+   "https://www.icfes.gov.co/wp-content/uploads/2024/11/Guia-de-orientacion-saber-11-2017-2.pdf"
+  ],
+  "guiaDeClaves": null,
+  "sha256": [
+   "eb801d55b0672fbad42a90d92b5d51b7bd5510ce1da8d45969f531722163c298"
+  ],
+  "preguntas": {
+   "elegible": 14
+  },
+  "clave": {
+   "oficial": 14
+  }
+ },
+ {
+  "slug": "icfes-icfes-guia-2017-2-lectura",
+  "titulo": "ICFES · Lectura Crítica · Guía de orientación Saber 11 2017-2",
+  "familia": "Saber 11 2017 (guía)",
+  "urls": [
+   "https://www.icfes.gov.co/wp-content/uploads/2024/11/Guia-de-orientacion-saber-11-2017-2.pdf"
+  ],
+  "guiaDeClaves": null,
+  "sha256": [
+   "eb801d55b0672fbad42a90d92b5d51b7bd5510ce1da8d45969f531722163c298"
+  ],
+  "preguntas": {
+   "elegible": 3
+  },
+  "clave": {
+   "oficial": 3
+  }
+ },
+ {
+  "slug": "icfes-icfes-guia-2017-2-matematicas",
+  "titulo": "ICFES · Matemáticas · Guía de orientación Saber 11 2017-2",
+  "familia": "Saber 11 2017 (guía)",
+  "urls": [
+   "https://www.icfes.gov.co/wp-content/uploads/2024/11/Guia-de-orientacion-saber-11-2017-2.pdf"
+  ],
+  "guiaDeClaves": null,
+  "sha256": [
+   "eb801d55b0672fbad42a90d92b5d51b7bd5510ce1da8d45969f531722163c298"
+  ],
+  "preguntas": {
+   "elegible": 3
+  },
+  "clave": {
+   "oficial": 3
+  }
+ },
+ {
+  "slug": "icfes-icfes-guia-2017-2-sociales",
+  "titulo": "ICFES · Sociales y Ciudadanas · Guía de orientación Saber 11 2017-2",
+  "familia": "Saber 11 2017 (guía)",
+  "urls": [
+   "https://www.icfes.gov.co/wp-content/uploads/2024/11/Guia-de-orientacion-saber-11-2017-2.pdf"
+  ],
+  "guiaDeClaves": null,
+  "sha256": [
+   "eb801d55b0672fbad42a90d92b5d51b7bd5510ce1da8d45969f531722163c298"
+  ],
+  "preguntas": {
+   "elegible": 4
+  },
+  "clave": {
+   "oficial": 4
+  }
+ },
+ {
+  "slug": "icfes-reservado-2024-1-s1-ciencias",
+  "titulo": "ICFES · Ciencias Naturales · Saber 11 2024-1 · Primera sesión",
+  "familia": "Examen aplicado (reservado)",
+  "urls": [],
+  "guiaDeClaves": null,
+  "sha256": [],
+  "preguntas": {
+   "elegible": 22,
+   "en_espera": 5
+  },
+  "clave": {
+   "dos_soluciones": 22
+  }
+ },
+ {
+  "slug": "icfes-reservado-2024-1-s1-lectura",
+  "titulo": "ICFES · Lectura Crítica · Saber 11 2024-1 · Primera sesión",
+  "familia": "Examen aplicado (reservado)",
+  "urls": [],
+  "guiaDeClaves": null,
+  "sha256": [],
+  "preguntas": {
+   "elegible": 46,
+   "en_espera": 3
+  },
+  "clave": {
+   "dos_soluciones": 46
+  }
+ },
+ {
+  "slug": "icfes-reservado-2024-1-s1-matematicas",
+  "titulo": "ICFES · Matemáticas · Saber 11 2024-1 · Primera sesión",
+  "familia": "Examen aplicado (reservado)",
+  "urls": [],
+  "guiaDeClaves": null,
+  "sha256": [],
+  "preguntas": {
+   "elegible": 20,
+   "duplicada": 1,
+   "en_espera": 3
+  },
+  "clave": {
+   "dos_soluciones": 20
+  }
+ },
+ {
+  "slug": "icfes-reservado-2024-1-s1-sociales",
+  "titulo": "ICFES · Sociales y Ciudadanas · Saber 11 2024-1 · Primera sesión",
+  "familia": "Examen aplicado (reservado)",
+  "urls": [],
+  "guiaDeClaves": null,
+  "sha256": [],
+  "preguntas": {
+   "elegible": 23,
+   "en_espera": 1
+  },
+  "clave": {
+   "dos_soluciones": 23
+  }
+ },
+ {
+  "slug": "icfes-reservado-2024-2-s1-ciencias",
+  "titulo": "ICFES · Ciencias Naturales · Saber 11 2024-2 · Primera sesión",
+  "familia": "Examen aplicado (reservado)",
+  "urls": [],
+  "guiaDeClaves": null,
+  "sha256": [],
+  "preguntas": {
+   "elegible": 55,
+   "en_espera": 4
+  },
+  "clave": {
+   "dos_soluciones": 55
+  }
+ },
+ {
+  "slug": "icfes-reservado-2024-2-s1-lectura",
+  "titulo": "ICFES · Lectura Crítica · Saber 11 2024-2 · Primera sesión",
+  "familia": "Examen aplicado (reservado)",
+  "urls": [],
+  "guiaDeClaves": null,
+  "sha256": [],
+  "preguntas": {
+   "elegible": 21,
+   "en_espera": 4
+  },
+  "clave": {
+   "dos_soluciones": 21
+  }
+ },
+ {
+  "slug": "icfes-reservado-2024-2-s1-matematicas",
+  "titulo": "ICFES · Matemáticas · Saber 11 2024-2 · Primera sesión",
+  "familia": "Examen aplicado (reservado)",
+  "urls": [],
+  "guiaDeClaves": null,
+  "sha256": [],
+  "preguntas": {
+   "elegible": 42,
+   "en_espera": 8
+  },
+  "clave": {
+   "dos_soluciones": 42
+  }
+ },
+ {
+  "slug": "icfes-reservado-2024-2-s1-sociales",
+  "titulo": "ICFES · Sociales y Ciudadanas · Saber 11 2024-2 · Primera sesión",
+  "familia": "Examen aplicado (reservado)",
+  "urls": [],
+  "guiaDeClaves": null,
+  "sha256": [],
+  "preguntas": {
+   "elegible": 12,
+   "en_espera": 4
+  },
+  "clave": {
+   "dos_soluciones": 12
+  }
+ },
+ {
+  "slug": "icfes-reservado-2024-2-s2-ciencias",
+  "titulo": "ICFES · Ciencias Naturales · Saber 11 2024-2 · Segunda sesión",
+  "familia": "Examen aplicado (reservado)",
+  "urls": [],
+  "guiaDeClaves": null,
+  "sha256": [],
+  "preguntas": {
+   "elegible": 14,
+   "en_espera": 4
+  },
+  "clave": {
+   "dos_soluciones": 14
+  }
+ },
+ {
+  "slug": "icfes-reservado-2024-2-s2-ingles",
+  "titulo": "ICFES · Inglés · Saber 11 2024-2 · Segunda sesión",
+  "familia": "Examen aplicado (reservado)",
+  "urls": [],
+  "guiaDeClaves": null,
+  "sha256": [],
+  "preguntas": {
+   "elegible": 54
+  },
+  "clave": {
+   "dos_soluciones": 54
+  }
+ },
+ {
+  "slug": "icfes-reservado-2024-2-s2-matematicas",
+  "titulo": "ICFES · Matemáticas · Saber 11 2024-2 · Segunda sesión",
+  "familia": "Examen aplicado (reservado)",
+  "urls": [],
+  "guiaDeClaves": null,
+  "sha256": [],
+  "preguntas": {
+   "elegible": 27,
+   "en_espera": 2
+  },
+  "clave": {
+   "dos_soluciones": 27
+  }
+ },
+ {
+  "slug": "icfes-reservado-2024-2-s2-sociales",
+  "titulo": "ICFES · Sociales y Ciudadanas · Saber 11 2024-2 · Segunda sesión",
+  "familia": "Examen aplicado (reservado)",
+  "urls": [],
+  "guiaDeClaves": null,
+  "sha256": [],
+  "preguntas": {
+   "elegible": 22,
+   "en_espera": 3
+  },
+  "clave": {
+   "dos_soluciones": 22
+  }
+ },
+ {
+  "slug": "icfes-reservado-2025-2-s1-ciencias",
+  "titulo": "ICFES · Ciencias Naturales · Saber 11 2025-2 · Primera sesión",
+  "familia": "Examen aplicado (reservado)",
+  "urls": [],
+  "guiaDeClaves": null,
+  "sha256": [],
+  "preguntas": {
+   "elegible": 13
+  },
+  "clave": {
+   "dos_soluciones": 13
+  }
+ },
+ {
+  "slug": "icfes-reservado-2025-2-s1-lectura",
+  "titulo": "ICFES · Lectura Crítica · Saber 11 2025-2 · Primera sesión",
+  "familia": "Examen aplicado (reservado)",
+  "urls": [],
+  "guiaDeClaves": null,
+  "sha256": [],
+  "preguntas": {
+   "elegible": 31,
+   "en_espera": 2
+  },
+  "clave": {
+   "dos_soluciones": 31
+  }
+ },
+ {
+  "slug": "icfes-reservado-2025-2-s1-matematicas",
+  "titulo": "ICFES · Matemáticas · Saber 11 2025-2 · Primera sesión",
+  "familia": "Examen aplicado (reservado)",
+  "urls": [],
+  "guiaDeClaves": null,
+  "sha256": [],
+  "preguntas": {
+   "elegible": 4,
+   "duplicada": 1
+  },
+  "clave": {
+   "dos_soluciones": 4
+  }
+ },
+ {
+  "slug": "icfes-reservado-2025-2-s1-sociales",
+  "titulo": "ICFES · Sociales y Ciudadanas · Saber 11 2025-2 · Primera sesión",
+  "familia": "Examen aplicado (reservado)",
+  "urls": [],
+  "guiaDeClaves": null,
+  "sha256": [],
+  "preguntas": {
+   "elegible": 24,
+   "en_espera": 1
+  },
+  "clave": {
+   "dos_soluciones": 24
+  }
+ },
+ {
+  "slug": "icfes-reservado-2025-2-s2-ciencias",
+  "titulo": "ICFES · Ciencias Naturales · Saber 11 2025-2 · Segunda sesión",
+  "familia": "Examen aplicado (reservado)",
+  "urls": [],
+  "guiaDeClaves": null,
+  "sha256": [],
+  "preguntas": {
+   "elegible": 3
+  },
+  "clave": {
+   "dos_soluciones": 3
+  }
+ },
+ {
+  "slug": "icfes-reservado-2025-2-s2-ingles",
+  "titulo": "ICFES · Inglés · Saber 11 2025-2 · Segunda sesión",
+  "familia": "Examen aplicado (reservado)",
+  "urls": [],
+  "guiaDeClaves": null,
+  "sha256": [],
+  "preguntas": {
+   "elegible": 23
+  },
+  "clave": {
+   "dos_soluciones": 23
+  }
+ },
+ {
+  "slug": "icfes-reservado-2025-2-s2-matematicas",
+  "titulo": "ICFES · Matemáticas · Saber 11 2025-2 · Segunda sesión",
+  "familia": "Examen aplicado (reservado)",
+  "urls": [],
+  "guiaDeClaves": null,
+  "sha256": [],
+  "preguntas": {
+   "elegible": 9,
+   "en_espera": 1
+  },
+  "clave": {
+   "dos_soluciones": 9
+  }
+ },
+ {
+  "slug": "icfes-reservado-2025-2-s2-sociales",
+  "titulo": "ICFES · Sociales y Ciudadanas · Saber 11 2025-2 · Segunda sesión",
+  "familia": "Examen aplicado (reservado)",
+  "urls": [],
+  "guiaDeClaves": null,
+  "sha256": [],
+  "preguntas": {
+   "elegible": 15
+  },
+  "clave": {
+   "dos_soluciones": 15
+  }
+ }
+]

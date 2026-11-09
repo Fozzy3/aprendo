@@ -1,0 +1,35 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "design-system-font",
+        "value": "*",
+        "files": [
+          ".impeccable/mocks/decision/temporada.html"
+        ],
+        "createdAt": "2026-11-09T04:27:54.409Z",
+        "reason": "unchosen decision sketch: owner picked Álbum on 2026-11-08; this file never ships"
+      },
+      {
+        "rule": "design-system-font",
+        "value": "*",
+        "files": [
+          ".impeccable/mocks/decision/tablero.html"
+        ],
+        "createdAt": "2026-11-09T04:27:54.423Z",
+        "reason": "unchosen decision sketch: owner picked Álbum on 2026-11-08; this file never ships"
+      },
+      {
+        "rule": "design-system-font",
+        "value": "*",
+        "files": [
+          ".impeccable/mocks/decision/canon.html"
+        ],
+        "createdAt": "2026-11-09T04:27:54.437Z",
+        "reason": "unchosen decision sketch: owner picked Álbum on 2026-11-08; this file never ships"
+      }
+    ]
+  }
+}

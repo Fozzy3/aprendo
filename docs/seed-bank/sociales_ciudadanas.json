@@ -1,0 +1,3261 @@
+[
+  {
+    "id": "soc-01",
+    "subjectId": "sociales_ciudadanas",
+    "categoryId": "sociales_ciudadanas.history_temporality",
+    "primarySubtopicId": "sociales_ciudadanas.history_temporality.historical_causality_consequences",
+    "competencia": "pensamiento_social",
+    "difficulty": "media",
+    "targetGrade": 11,
+    "context": "Tras años de violencia entre liberales y conservadores, los dos partidos pactaron el Frente Nacional (1958-1974): se turnaron la Presidencia cada cuatro años y repartieron por partes iguales los cargos públicos.",
+    "stem": "¿Cuál fue una consecuencia de ese acuerdo?",
+    "options": [
+      {
+        "label": "A",
+        "text": "Los dos partidos tradicionales perdieron de inmediato su lugar en el Estado, que pasó a manos de fuerzas nuevas."
+      },
+      {
+        "label": "B",
+        "text": "Las elecciones presidenciales se suspendieron durante dieciséis años y el Congreso dejó de funcionar."
+      },
+      {
+        "label": "C",
+        "text": "Bajó la confrontación entre los dos partidos, pero se restringió el espacio político de otras corrientes."
+      },
+      {
+        "label": "D",
+        "text": "Se implantó la elección popular de alcaldes como mecanismo para repartir el poder local entre los partidos."
+      }
+    ],
+    "correctOption": "C",
+    "solution": "El Frente Nacional redujo la violencia bipartidista al garantizar a liberales y conservadores una parte del poder. Como esa parte estaba reservada a ellos, otras corrientes quedaron con poco espacio, lo que muchos historiadores relacionan con la pérdida de legitimidad del sistema político.",
+    "guide": {
+      "hint": "¿Qué cambiaba y qué seguía igual en la forma de acceder al poder durante esos años?",
+      "byOption": {
+        "A": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la A?",
+            "choices": [
+              {
+                "text": "Pensé que el pacto debilitó a los partidos"
+              },
+              {
+                "text": "Creí que después de la violencia llegaron gobiernos de otras fuerzas"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "Según el contexto, ¿quiénes se turnaban la Presidencia durante el Frente Nacional?",
+              "choices": [
+                {
+                  "text": "Liberales y conservadores",
+                  "correct": true
+                },
+                {
+                  "text": "Movimientos nuevos sin partido"
+                }
+              ]
+            },
+            {
+              "prompt": "Si solo dos partidos se reparten los cargos, ¿qué pasa con su lugar en el Estado?",
+              "choices": [
+                {
+                  "text": "Lo pierden apenas empieza el pacto"
+                },
+                {
+                  "text": "Lo aseguran mientras dure el pacto",
+                  "correct": true
+                }
+              ]
+            }
+          ]
+        },
+        "B": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la B?",
+            "choices": [
+              {
+                "text": "Asocié el turno pactado con que no hubo votaciones"
+              },
+              {
+                "text": "Creí que un acuerdo entre partidos reemplazó al Congreso"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "Si la Presidencia se turnaba entre partidos, ¿había que elegir a una persona para cada periodo?",
+              "choices": [
+                {
+                  "text": "No, el cargo quedaba vacío"
+                },
+                {
+                  "text": "Sí, en cada periodo",
+                  "correct": true
+                }
+              ]
+            },
+            {
+              "prompt": "¿Qué hizo el Frente Nacional con las curules del Congreso?",
+              "choices": [
+                {
+                  "text": "Las repartió y el Congreso siguió funcionando",
+                  "correct": true
+                },
+                {
+                  "text": "Las eliminó durante dieciséis años"
+                }
+              ]
+            }
+          ]
+        },
+        "D": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la D?",
+            "choices": [
+              {
+                "text": "Pensé que repartir cargos incluía votar por alcaldes"
+              },
+              {
+                "text": "Recordé la elección de alcaldes y la ubiqué en esos años"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "Durante el Frente Nacional, ¿cómo llegaban los alcaldes a su cargo?",
+              "choices": [
+                {
+                  "text": "Por voto popular directo"
+                },
+                {
+                  "text": "Por nombramiento",
+                  "correct": true
+                }
+              ]
+            },
+            {
+              "prompt": "¿Desde cuándo se eligen popularmente los alcaldes en Colombia?",
+              "choices": [
+                {
+                  "text": "Desde 1988, después del Frente Nacional",
+                  "correct": true
+                },
+                {
+                  "text": "Desde 1958, al iniciar el pacto"
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "reveal": "El acuerdo bajó la violencia entre liberales y conservadores porque les aseguró una parte del poder a ambos. El costo fue cerrar el juego político a otras corrientes, que quedaban por fuera del reparto."
+    }
+  },
+  {
+    "id": "soc-02",
+    "subjectId": "sociales_ciudadanas",
+    "categoryId": "sociales_ciudadanas.history_temporality",
+    "primarySubtopicId": "sociales_ciudadanas.history_temporality.historical_causality_consequences",
+    "competencia": "pensamiento_social",
+    "difficulty": "media",
+    "targetGrade": 11,
+    "context": "En 1808, las tropas de Napoleón ocuparon España y el rey Fernando VII quedó cautivo. En 1810, en Santa Fe y en otras ciudades de la Nueva Granada se formaron juntas de gobierno encabezadas por criollos.",
+    "stem": "¿Qué relación explica mejor el paso de un hecho al otro?",
+    "options": [
+      {
+        "label": "A",
+        "text": "La ausencia del rey abrió un vacío de autoridad que los criollos aprovecharon para reclamar poder local."
+      },
+      {
+        "label": "B",
+        "text": "Napoleón envió apoyo militar a los criollos para que fundaran gobiernos afines a Francia en América."
+      },
+      {
+        "label": "C",
+        "text": "España, ya libre de la guerra, concedió autonomía a las colonias como premio por su lealtad a la Corona."
+      },
+      {
+        "label": "D",
+        "text": "La abolición de la esclavitud decretada por la Corona llevó a los hacendados criollos a rebelarse contra ella."
+      }
+    ],
+    "correctOption": "A",
+    "solution": "Con el rey cautivo, muchos criollos sostuvieron que la autoridad debía volver a los pueblos mientras durara su ausencia. Las juntas de 1810 surgieron de ese vacío de poder, y no de una concesión de España ni de la ayuda de Francia.",
+    "guide": {
+      "hint": "¿Qué cambió en España en 1808 y cómo pudo sentirse ese cambio en América?",
+      "byOption": {
+        "B": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la B?",
+            "choices": [
+              {
+                "text": "Pensé que si Napoleón invadió a España también ayudó a sus enemigos"
+              },
+              {
+                "text": "Creí que los criollos y Francia eran aliados"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "Según el contexto, ¿dónde estaban las tropas de Napoleón en 1808?",
+              "choices": [
+                {
+                  "text": "En la Nueva Granada"
+                },
+                {
+                  "text": "En España",
+                  "correct": true
+                }
+              ]
+            },
+            {
+              "prompt": "¿Quiénes encabezaron las juntas de 1810 en la Nueva Granada?",
+              "choices": [
+                {
+                  "text": "Los criollos",
+                  "correct": true
+                },
+                {
+                  "text": "Oficiales franceses"
+                }
+              ]
+            }
+          ]
+        },
+        "C": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la C?",
+            "choices": [
+              {
+                "text": "Entendí que las juntas fueron autorizadas por España"
+              },
+              {
+                "text": "Pensé que la guerra ya había terminado en 1810"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "En 1810, ¿seguía Fernando VII gobernando desde el trono de España?",
+              "choices": [
+                {
+                  "text": "No, seguía cautivo",
+                  "correct": true
+                },
+                {
+                  "text": "Sí, ya había regresado"
+                }
+              ]
+            },
+            {
+              "prompt": "¿Quién tomó la iniciativa de formar las juntas en la Nueva Granada?",
+              "choices": [
+                {
+                  "text": "La Corona española"
+                },
+                {
+                  "text": "Los criollos de las ciudades",
+                  "correct": true
+                }
+              ]
+            }
+          ]
+        },
+        "D": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la D?",
+            "choices": [
+              {
+                "text": "Asocié la rebelión criolla con la esclavitud"
+              },
+              {
+                "text": "Creí que la esclavitud terminó en la época colonial"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Qué hecho presenta el contexto como antecedente de las juntas?",
+              "choices": [
+                {
+                  "text": "Un decreto sobre la esclavitud"
+                },
+                {
+                  "text": "La ocupación de España por Napoleón",
+                  "correct": true
+                }
+              ]
+            },
+            {
+              "prompt": "¿En qué época se abolió la esclavitud en Colombia?",
+              "choices": [
+                {
+                  "text": "En la república, con una ley de 1851",
+                  "correct": true
+                },
+                {
+                  "text": "En la Colonia, antes de 1810"
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "reveal": "La crisis de la monarquía en 1808 abrió una pregunta: ¿quién manda si el rey no puede? En la Nueva Granada, los criollos respondieron formando juntas de gobierno que les dieron poder local."
+    }
+  },
+  {
+    "id": "soc-03",
+    "subjectId": "sociales_ciudadanas",
+    "categoryId": "sociales_ciudadanas.history_temporality",
+    "primarySubtopicId": "sociales_ciudadanas.history_temporality.historical_causality_consequences",
+    "competencia": "pensamiento_reflexivo_sistemico",
+    "difficulty": "alta",
+    "targetGrade": 11,
+    "context": "| Fecha | Hecho |\n|---|---|\n| Agosto de 1989 | Asesinan al candidato presidencial Luis Carlos Galán, en medio de una ola de violencia política y del narcotráfico. |\n| Marzo de 1990 | Un movimiento estudiantil promueve la «séptima papeleta», un voto adicional que pide una Asamblea Constituyente. |\n| Diciembre de 1990 | Se elige la Asamblea Nacional Constituyente, con presencia de movimientos indígenas y de exguerrilleros desmovilizados. |\n| Julio de 1991 | Se proclama la nueva Constitución, que reemplaza a la de 1886. |",
+    "stem": "¿Qué interpretación respaldan mejor estos hechos?",
+    "options": [
+      {
+        "label": "A",
+        "text": "El asesinato de Galán fue la causa única de la nueva Constitución, por lo que los hechos posteriores solo fueron trámites."
+      },
+      {
+        "label": "B",
+        "text": "La nueva Constitución fue una reforma ordinaria que el Congreso diseñó y aprobó sin que influyera la presión de la ciudadanía."
+      },
+      {
+        "label": "C",
+        "text": "La Asamblea surgió porque un organismo internacional obligó a Colombia a cambiar su Constitución como condición de paz."
+      },
+      {
+        "label": "D",
+        "text": "La violencia política y la movilización ciudadana abrieron juntas una vía de cambio constitucional participativa."
+      }
+    ],
+    "correctOption": "D",
+    "solution": "La tabla muestra una cadena de hechos: violencia política, movilización estudiantil, elección de una Asamblea amplia y nueva Constitución. Ninguno de esos hechos por sí solo explica el cambio; juntos muestran un proceso con presión ciudadana y participación.",
+    "guide": {
+      "hint": "¿Qué papel cumple cada fila de la tabla dentro del proceso completo?",
+      "byOption": {
+        "A": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la A?",
+            "choices": [
+              {
+                "text": "El hecho más grave me pareció la causa de todo"
+              },
+              {
+                "text": "Pensé que un solo hecho puede explicar un cambio tan grande"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Qué actor aparece en la fila de marzo de 1990?",
+              "choices": [
+                {
+                  "text": "El candidato asesinado"
+                },
+                {
+                  "text": "Un movimiento estudiantil",
+                  "correct": true
+                }
+              ]
+            },
+            {
+              "prompt": "Si ese movimiento presionó por una Asamblea, ¿fue su acción un simple trámite?",
+              "choices": [
+                {
+                  "text": "No, fue un paso decisivo",
+                  "correct": true
+                },
+                {
+                  "text": "Sí, ya estaba todo decidido"
+                }
+              ]
+            }
+          ]
+        },
+        "B": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la B?",
+            "choices": [
+              {
+                "text": "Pensé que las constituciones solo las cambia el Congreso"
+              },
+              {
+                "text": "No noté el papel de la séptima papeleta"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "Según la tabla, ¿qué órgano se eligió en diciembre de 1990?",
+              "choices": [
+                {
+                  "text": "Un nuevo Congreso"
+                },
+                {
+                  "text": "Una Asamblea Nacional Constituyente",
+                  "correct": true
+                }
+              ]
+            },
+            {
+              "prompt": "Si la redacción fue de una Asamblea elegida tras la presión ciudadana, ¿fue una reforma ordinaria del Congreso?",
+              "choices": [
+                {
+                  "text": "Sí, fue una ley común"
+                },
+                {
+                  "text": "No, siguió otra vía",
+                  "correct": true
+                }
+              ]
+            }
+          ]
+        },
+        "C": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la C?",
+            "choices": [
+              {
+                "text": "Asocié el cambio con exigencias de otros países"
+              },
+              {
+                "text": "Pensé que la paz la impuso la comunidad internacional"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Aparece en la tabla algún organismo internacional?",
+              "choices": [
+                {
+                  "text": "Sí, en 1990"
+                },
+                {
+                  "text": "No, ninguno",
+                  "correct": true
+                }
+              ]
+            },
+            {
+              "prompt": "Según la tabla, ¿de dónde salió la petición de una Asamblea?",
+              "choices": [
+                {
+                  "text": "De un movimiento estudiantil colombiano",
+                  "correct": true
+                },
+                {
+                  "text": "De una orden extranjera"
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "reveal": "Los grandes cambios políticos suelen tener varias causas que se encadenan. La Constitución de 1991 nació de la crisis de violencia, de la presión de estudiantes y ciudadanos, y de una Asamblea con sectores antes excluidos."
+    }
+  },
+  {
+    "id": "soc-04",
+    "subjectId": "sociales_ciudadanas",
+    "categoryId": "sociales_ciudadanas.state_democracy_participation",
+    "primarySubtopicId": "sociales_ciudadanas.state_democracy_participation.social_rule_of_law_constitution",
+    "competencia": "pensamiento_social",
+    "difficulty": "baja",
+    "targetGrade": 11,
+    "stem": "El artículo 1.º de la Constitución de 1991 define a Colombia como un Estado social de derecho. ¿Qué agrega la palabra «social» a la idea de un Estado que solo se somete a la ley?",
+    "options": [
+      {
+        "label": "A",
+        "text": "Que todas las empresas privadas deben pasar a ser propiedad del Estado."
+      },
+      {
+        "label": "B",
+        "text": "Que el Estado también debe buscar condiciones de vida digna para las personas."
+      },
+      {
+        "label": "C",
+        "text": "Que las leyes se reemplazan por lo que decidan las asambleas de cada barrio."
+      },
+      {
+        "label": "D",
+        "text": "Que los derechos solo protegen a quienes viven en situación de pobreza."
+      }
+    ],
+    "correctOption": "B",
+    "solution": "El Estado social de derecho no solo se somete a la ley: también tiene el deber de actuar para que las personas vivan con dignidad. Por eso garantiza, por ejemplo, salud y educación, sin eliminar la propiedad privada ni reemplazar las leyes.",
+    "guide": {
+      "hint": "¿Qué tareas adicionales tendría un Estado que no se limita a aplicar normas?",
+      "byOption": {
+        "A": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la A?",
+            "choices": [
+              {
+                "text": "Asocié «social» con socialismo"
+              },
+              {
+                "text": "Creí que el Estado debe administrar toda la economía"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Reconoce la Constitución de 1991 la propiedad privada?",
+              "choices": [
+                {
+                  "text": "No, la elimina"
+                },
+                {
+                  "text": "Sí, la garantiza",
+                  "correct": true
+                }
+              ]
+            },
+            {
+              "prompt": "Si la propiedad privada está garantizada, ¿deben todas las empresas pasar al Estado?",
+              "choices": [
+                {
+                  "text": "No, pueden seguir siendo privadas",
+                  "correct": true
+                },
+                {
+                  "text": "Sí, sin excepción"
+                }
+              ]
+            }
+          ]
+        },
+        "C": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la C?",
+            "choices": [
+              {
+                "text": "Entendí «social» como decisiones de la comunidad"
+              },
+              {
+                "text": "Pensé que la participación reemplaza a la ley"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Qué significa «de derecho» en la expresión Estado social de derecho?",
+              "choices": [
+                {
+                  "text": "Que cada barrio hace sus reglas"
+                },
+                {
+                  "text": "Que todos se someten a la ley",
+                  "correct": true
+                }
+              ]
+            },
+            {
+              "prompt": "¿Puede una asamblea barrial dejar sin efecto una ley nacional?",
+              "choices": [
+                {
+                  "text": "No, la ley sigue vigente",
+                  "correct": true
+                },
+                {
+                  "text": "Sí, si la mayoría vota"
+                }
+              ]
+            }
+          ]
+        },
+        "D": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la D?",
+            "choices": [
+              {
+                "text": "Pensé que «social» significa ayudar solo a los pobres"
+              },
+              {
+                "text": "Creí que los derechos dependen de los ingresos"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿El derecho a la vida protege también a una persona con altos ingresos?",
+              "choices": [
+                {
+                  "text": "No, solo a las pobres"
+                },
+                {
+                  "text": "Sí, protege a todas las personas",
+                  "correct": true
+                }
+              ]
+            },
+            {
+              "prompt": "¿Tienen derechos fundamentales todas las personas, sea cual sea su ingreso?",
+              "choices": [
+                {
+                  "text": "No, dependen del ingreso"
+                },
+                {
+                  "text": "Sí, todas son iguales ante la ley",
+                  "correct": true
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "reveal": "La palabra «social» añade deberes al Estado frente a las condiciones reales de vida. Los derechos valen para todas las personas, aunque el Estado atienda con prioridad a quienes están en mayor desventaja."
+    }
+  },
+  {
+    "id": "soc-05",
+    "subjectId": "sociales_ciudadanas",
+    "categoryId": "sociales_ciudadanas.state_democracy_participation",
+    "primarySubtopicId": "sociales_ciudadanas.state_democracy_participation.social_rule_of_law_constitution",
+    "competencia": "pensamiento_social",
+    "difficulty": "alta",
+    "targetGrade": 11,
+    "context": "Renata le prestó dinero a un conocido y tiene un documento firmado que lo prueba. Él no le ha pagado, pero esa deuda no pone en riesgo la salud, la vida ni el mínimo vital de ella. Un amigo le aconseja presentar una acción de tutela para recuperar el dinero.",
+    "stem": "De acuerdo con el artículo 86 de la Constitución, ¿es adecuado el consejo?",
+    "options": [
+      {
+        "label": "A",
+        "text": "Sí, porque la tutela sirve para reclamar cualquier derecho reconocido en una norma o en un contrato."
+      },
+      {
+        "label": "B",
+        "text": "Sí, porque toda deuda sin pagar afecta la propiedad privada y esta siempre exige tutela inmediata."
+      },
+      {
+        "label": "C",
+        "text": "No, porque la deuda puede reclamarse por vía judicial ordinaria y no hay un perjuicio irremediable."
+      },
+      {
+        "label": "D",
+        "text": "No, porque la tutela solo puede presentarse contra el presidente de la República y sus ministros."
+      }
+    ],
+    "correctOption": "C",
+    "solution": "El artículo 86 establece la tutela para proteger derechos fundamentales y solo cuando no existe otro medio de defensa judicial, salvo que se use para evitar un perjuicio irremediable. Una deuda con documento firmado puede cobrarse ante un juez ordinario y aquí no hay un riesgo grave que justifique la tutela.",
+    "guide": {
+      "hint": "¿Qué condiciones exige el artículo 86 para acudir a esta acción?",
+      "byOption": {
+        "A": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la A?",
+            "choices": [
+              {
+                "text": "Pensé que la tutela sirve para cualquier reclamo"
+              },
+              {
+                "text": "Creí que el contrato firmado bastaba para usarla"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Qué protege específicamente la acción de tutela?",
+              "choices": [
+                {
+                  "text": "Cualquier obligación de dinero"
+                },
+                {
+                  "text": "Derechos constitucionales fundamentales",
+                  "correct": true
+                }
+              ]
+            },
+            {
+              "prompt": "¿Un incumplimiento de préstamo entre particulares es, por sí solo, una violación de un derecho fundamental?",
+              "choices": [
+                {
+                  "text": "Sí, siempre lo es"
+                },
+                {
+                  "text": "No, es un conflicto de dinero",
+                  "correct": true
+                }
+              ]
+            }
+          ]
+        },
+        "B": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la B?",
+            "choices": [
+              {
+                "text": "Creí que la propiedad privada se protege siempre con tutela"
+              },
+              {
+                "text": "Me pareció grave que no le pagaran"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Pone esta deuda en riesgo la vida, la salud o el mínimo vital de Renata?",
+              "choices": [
+                {
+                  "text": "Sí, afecta todo su sustento"
+                },
+                {
+                  "text": "No, el contexto lo descarta",
+                  "correct": true
+                }
+              ]
+            },
+            {
+              "prompt": "¿Exige toda deuda sin pagar una protección inmediata por tutela?",
+              "choices": [
+                {
+                  "text": "No, los cobros tienen su propio proceso",
+                  "correct": true
+                },
+                {
+                  "text": "Sí, todas las deudas"
+                }
+              ]
+            }
+          ]
+        },
+        "D": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la D?",
+            "choices": [
+              {
+                "text": "Creí que la tutela es solo contra altas autoridades"
+              },
+              {
+                "text": "La conclusión me pareció bien y no revisé la razón"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Puede dirigirse una tutela contra una autoridad municipal?",
+              "choices": [
+                {
+                  "text": "No, solo contra ministros"
+                },
+                {
+                  "text": "Sí, también cabe",
+                  "correct": true
+                }
+              ]
+            },
+            {
+              "prompt": "¿Contra quiénes permite el artículo 86 dirigir una tutela?",
+              "choices": [
+                {
+                  "text": "Cualquier autoridad pública y ciertos particulares",
+                  "correct": true
+                },
+                {
+                  "text": "Solo el presidente y sus ministros"
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "reveal": "La tutela es rápida, pero no reemplaza los procesos ordinarios. Renata debe acudir a la vía judicial civil para cobrar su deuda."
+    }
+  },
+  {
+    "id": "soc-06",
+    "subjectId": "sociales_ciudadanas",
+    "categoryId": "sociales_ciudadanas.state_democracy_participation",
+    "primarySubtopicId": "sociales_ciudadanas.state_democracy_participation.state_branches_accountability",
+    "competencia": "pensamiento_social",
+    "difficulty": "baja",
+    "targetGrade": 11,
+    "context": "En un municipio ficticio, mucha gente votó por una alcaldesa que prometió construir un acueducto. Dos años después la obra no ha empezado y varios ciudadanos quieren promover un mecanismo para que ella deje el cargo antes de terminar su periodo por incumplir el programa.",
+    "stem": "¿Qué mecanismo de participación corresponde a ese propósito?",
+    "options": [
+      {
+        "label": "A",
+        "text": "El cabildo abierto"
+      },
+      {
+        "label": "B",
+        "text": "El plebiscito"
+      },
+      {
+        "label": "C",
+        "text": "La iniciativa popular legislativa"
+      },
+      {
+        "label": "D",
+        "text": "La revocatoria del mandato"
+      }
+    ],
+    "correctOption": "D",
+    "solution": "La revocatoria del mandato permite a los ciudadanos retirar del cargo a un alcalde o gobernador, y se relaciona con el incumplimiento del programa de gobierno. Los otros mecanismos sirven para debatir, para que el Ejecutivo consulte una decisión o para proponer normas.",
+    "guide": {
+      "hint": "¿Cuál es el resultado concreto que buscan estos ciudadanos?",
+      "byOption": {
+        "A": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la A?",
+            "choices": [
+              {
+                "text": "Pensé que en un cabildo se puede destituir"
+              },
+              {
+                "text": "Lo asocié con reclamarle a la alcaldesa en público"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Qué se hace en un cabildo abierto?",
+              "choices": [
+                {
+                  "text": "Se vota para destituir mandatarios"
+                },
+                {
+                  "text": "Se discuten asuntos públicos con el concejo",
+                  "correct": true
+                }
+              ]
+            },
+            {
+              "prompt": "¿Saca un cabildo abierto del cargo a una alcaldesa?",
+              "choices": [
+                {
+                  "text": "Sí, al terminar la reunión"
+                },
+                {
+                  "text": "No, solo abre una discusión pública",
+                  "correct": true
+                }
+              ]
+            }
+          ]
+        },
+        "B": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la B?",
+            "choices": [
+              {
+                "text": "Creí que el plebiscito sirve para cualquier votación"
+              },
+              {
+                "text": "Lo asocié con que la gente decide con su voto"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Quién convoca un plebiscito en Colombia?",
+              "choices": [
+                {
+                  "text": "Un grupo de vecinos"
+                },
+                {
+                  "text": "El presidente de la República",
+                  "correct": true
+                }
+              ]
+            },
+            {
+              "prompt": "¿Sobre qué se pronuncia el pueblo en un plebiscito?",
+              "choices": [
+                {
+                  "text": "La permanencia de una alcaldesa"
+                },
+                {
+                  "text": "Una decisión del Ejecutivo",
+                  "correct": true
+                }
+              ]
+            }
+          ]
+        },
+        "C": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la C?",
+            "choices": [
+              {
+                "text": "Pensé que una ley podría obligar a la alcaldesa a irse"
+              },
+              {
+                "text": "Lo asocié con que los ciudadanos presentan algo"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Qué presentan los ciudadanos con una iniciativa popular legislativa?",
+              "choices": [
+                {
+                  "text": "Una solicitud de destitución"
+                },
+                {
+                  "text": "Un proyecto de norma",
+                  "correct": true
+                }
+              ]
+            },
+            {
+              "prompt": "¿Decide un proyecto de norma si una mandataria sigue en el cargo?",
+              "choices": [
+                {
+                  "text": "Sí, apenas se radica"
+                },
+                {
+                  "text": "No, su objeto es crear normas",
+                  "correct": true
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "reveal": "Quien vota por un programa puede exigir que se cumpla. Por eso la Constitución prevé que los electores puedan decidir si una mandataria local sigue en su cargo."
+    }
+  },
+  {
+    "id": "soc-07",
+    "subjectId": "sociales_ciudadanas",
+    "categoryId": "sociales_ciudadanas.state_democracy_participation",
+    "primarySubtopicId": "sociales_ciudadanas.state_democracy_participation.social_rule_of_law_constitution",
+    "competencia": "pensamiento_social",
+    "difficulty": "media",
+    "targetGrade": 11,
+    "context": "En un colegio de un resguardo wayuu (caso ficticio), la mayoría de las familias habla wayuunaiki. Un nuevo directivo propone enseñar todo solo en castellano, con el argumento de que es la lengua oficial del país.",
+    "stem": "Según el artículo 10 de la Constitución, ¿qué debería concluirse de esa propuesta?",
+    "options": [
+      {
+        "label": "A",
+        "text": "Contradice la Constitución, porque la enseñanza en comunidades con lengua propia debe ser bilingüe."
+      },
+      {
+        "label": "B",
+        "text": "Se ajusta a la Constitución, porque el castellano es la única lengua oficial en todo el territorio."
+      },
+      {
+        "label": "C",
+        "text": "Contradice la Constitución, porque en los resguardos está prohibido enseñar en castellano."
+      },
+      {
+        "label": "D",
+        "text": "Se ajusta a la Constitución, porque las lenguas indígenas solo se protegen en el ámbito familiar."
+      }
+    ],
+    "correctOption": "A",
+    "solution": "El artículo 10 reconoce el castellano como idioma oficial, pero también hace oficiales las lenguas de los grupos étnicos en sus territorios y ordena que la enseñanza en comunidades con tradición lingüística propia sea bilingüe. Por eso enseñar todo solo en castellano en ese colegio va en contra de la norma.",
+    "guide": {
+      "hint": "¿Qué dice la Constitución sobre las lenguas de los grupos étnicos en sus territorios?",
+      "byOption": {
+        "B": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la B?",
+            "choices": [
+              {
+                "text": "Recordé que el castellano es el idioma oficial"
+              },
+              {
+                "text": "Pensé que un solo idioma evita problemas legales"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "Además del castellano, ¿qué lenguas reconoce el artículo 10 como oficiales?",
+              "choices": [
+                {
+                  "text": "Ninguna otra"
+                },
+                {
+                  "text": "Las de grupos étnicos en sus territorios",
+                  "correct": true
+                }
+              ]
+            },
+            {
+              "prompt": "¿Es el castellano la única lengua oficial dentro de un territorio wayuu?",
+              "choices": [
+                {
+                  "text": "No, también lo es el wayuunaiki",
+                  "correct": true
+                },
+                {
+                  "text": "Sí, en todo el país"
+                }
+              ]
+            }
+          ]
+        },
+        "C": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la C?",
+            "choices": [
+              {
+                "text": "Pensé que proteger la lengua propia excluye el castellano"
+              },
+              {
+                "text": "Entendí que en los resguardos solo se enseña la lengua propia"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Cuántas lenguas se usan en una enseñanza bilingüe?",
+              "choices": [
+                {
+                  "text": "Una"
+                },
+                {
+                  "text": "Dos",
+                  "correct": true
+                }
+              ]
+            },
+            {
+              "prompt": "¿Prohíbe la Constitución enseñar castellano en los resguardos?",
+              "choices": [
+                {
+                  "text": "No, el castellano sigue presente",
+                  "correct": true
+                },
+                {
+                  "text": "Sí, lo excluye"
+                }
+              ]
+            }
+          ]
+        },
+        "D": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la D?",
+            "choices": [
+              {
+                "text": "Pensé que son lenguas solo para la casa"
+              },
+              {
+                "text": "Creí que el colegio no tiene que ver con la lengua indígena"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Qué ámbito menciona expresamente el artículo 10 además del territorio?",
+              "choices": [
+                {
+                  "text": "La vida en familia"
+                },
+                {
+                  "text": "La enseñanza",
+                  "correct": true
+                }
+              ]
+            },
+            {
+              "prompt": "Si el artículo 10 menciona la enseñanza, ¿queda la lengua indígena limitada al hogar?",
+              "choices": [
+                {
+                  "text": "Sí, solo en casa"
+                },
+                {
+                  "text": "No, llega también a la escuela",
+                  "correct": true
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "reveal": "La Constitución protege a la vez el castellano y las lenguas propias de los pueblos étnicos. La escuela de una comunidad con lengua propia debe usar las dos."
+    }
+  },
+  {
+    "id": "soc-08",
+    "subjectId": "sociales_ciudadanas",
+    "categoryId": "sociales_ciudadanas.state_democracy_participation",
+    "primarySubtopicId": "sociales_ciudadanas.state_democracy_participation.social_rule_of_law_constitution",
+    "competencia": "pensamiento_social",
+    "difficulty": "alta",
+    "targetGrade": 11,
+    "context": "Una universidad pública ficticia reserva un pequeño número de cupos para jóvenes de comunidades indígenas y afrocolombianas con pocas oportunidades educativas. Un aspirante sostiene que esto viola su derecho a la igualdad porque no se trata igual a todos.",
+    "stem": "A partir del artículo 13 de la Constitución, ¿cuál es la evaluación más sólida de ese argumento?",
+    "options": [
+      {
+        "label": "A",
+        "text": "Es acertado, porque la igualdad exige dar exactamente el mismo trato a todas las personas en toda situación."
+      },
+      {
+        "label": "B",
+        "text": "Es débil, porque la Constitución también ordena medidas a favor de grupos discriminados o marginados."
+      },
+      {
+        "label": "C",
+        "text": "Es acertado, porque solo el Congreso puede crear un trato diferente y nunca una universidad."
+      },
+      {
+        "label": "D",
+        "text": "Es débil, porque la Constitución ordena favorecer siempre a estos grupos, sin revisar si la medida es razonable."
+      }
+    ],
+    "correctOption": "B",
+    "solution": "El artículo 13 prohíbe discriminar, pero también ordena al Estado promover una igualdad real y adoptar medidas en favor de grupos discriminados o marginados. Un cupo reservado puede ser una medida de ese tipo, siempre que sea razonable y proporcionada.",
+    "guide": {
+      "hint": "¿Qué dicen los distintos incisos del artículo 13 sobre la igualdad?",
+      "byOption": {
+        "A": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la A?",
+            "choices": [
+              {
+                "text": "Pensé que igualdad es tratar a todos exactamente igual"
+              },
+              {
+                "text": "Creí que cualquier diferencia de trato es discriminación"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Un examen adaptado para una persona ciega le da una ventaja indebida?",
+              "choices": [
+                {
+                  "text": "No, compensa una barrera",
+                  "correct": true
+                },
+                {
+                  "text": "Sí, rompe la igualdad"
+                }
+              ]
+            },
+            {
+              "prompt": "¿La igualdad del artículo 13 consiste solo en tratar idéntico a todos?",
+              "choices": [
+                {
+                  "text": "No, también busca que sea real y efectiva",
+                  "correct": true
+                },
+                {
+                  "text": "Sí, nada más que eso"
+                }
+              ]
+            }
+          ]
+        },
+        "C": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la C?",
+            "choices": [
+              {
+                "text": "Pensé que solo el Congreso decide quién recibe un trato especial"
+              },
+              {
+                "text": "Creí que las universidades no pueden definir cupos"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿A quién ordena el artículo 13 promover la igualdad real?",
+              "choices": [
+                {
+                  "text": "Solo al Congreso"
+                },
+                {
+                  "text": "Al Estado en general",
+                  "correct": true
+                }
+              ]
+            },
+            {
+              "prompt": "¿Puede una universidad pública, con autonomía, adoptar reglas propias de admisión?",
+              "choices": [
+                {
+                  "text": "Sí, dentro de la Constitución y la ley",
+                  "correct": true
+                },
+                {
+                  "text": "No, jamás"
+                }
+              ]
+            }
+          ]
+        },
+        "D": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la D?",
+            "choices": [
+              {
+                "text": "Creí que estas medidas no necesitan justificación"
+              },
+              {
+                "text": "La conclusión me convenció y no revisé la razón"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Puede un juez revisar si una medida de favor es desproporcionada?",
+              "choices": [
+                {
+                  "text": "Sí, puede hacerlo",
+                  "correct": true
+                },
+                {
+                  "text": "No, nunca"
+                }
+              ]
+            },
+            {
+              "prompt": "¿Debe una medida de favor ser razonable y proporcionada?",
+              "choices": [
+                {
+                  "text": "Sí, debe justificarse",
+                  "correct": true
+                },
+                {
+                  "text": "No, basta con pertenecer al grupo"
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "reveal": "Igualdad no siempre significa trato idéntico: a veces hay que compensar desventajas para que las oportunidades sean reales. Estas medidas son válidas si se justifican y no se aplican de forma automática."
+    }
+  },
+  {
+    "id": "soc-09",
+    "subjectId": "sociales_ciudadanas",
+    "categoryId": "sociales_ciudadanas.state_democracy_participation",
+    "primarySubtopicId": "sociales_ciudadanas.state_democracy_participation.state_branches_accountability",
+    "competencia": "pensamiento_social",
+    "difficulty": "baja",
+    "targetGrade": 11,
+    "context": "Una ciudadana considera que una ley recién aprobada por el Congreso viola un derecho de la Constitución y quiere demandarla.",
+    "stem": "¿Ante qué entidad debe presentar la demanda de inconstitucionalidad?",
+    "options": [
+      {
+        "label": "A",
+        "text": "El Consejo de Estado"
+      },
+      {
+        "label": "B",
+        "text": "La Corte Suprema de Justicia"
+      },
+      {
+        "label": "C",
+        "text": "La Corte Constitucional"
+      },
+      {
+        "label": "D",
+        "text": "La Procuraduría General de la Nación"
+      }
+    ],
+    "correctOption": "C",
+    "solution": "El artículo 241 le asigna a la Corte Constitucional decidir las demandas de inconstitucionalidad que los ciudadanos presentan contra las leyes. El Consejo de Estado, la Corte Suprema y la Procuraduría cumplen otras funciones.",
+    "guide": {
+      "hint": "¿Qué tipo de norma se está demandando y contra qué se compara?",
+      "byOption": {
+        "A": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la A?",
+            "choices": [
+              {
+                "text": "Pensé que las demandas contra el Estado van allí"
+              },
+              {
+                "text": "Lo asocié con revisar decisiones del Gobierno"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Qué norma demanda la ciudadana?",
+              "choices": [
+                {
+                  "text": "Una ley del Congreso",
+                  "correct": true
+                },
+                {
+                  "text": "Un decreto de la Alcaldía"
+                }
+              ]
+            },
+            {
+              "prompt": "¿Qué juzga principalmente el Consejo de Estado?",
+              "choices": [
+                {
+                  "text": "Las leyes del Congreso"
+                },
+                {
+                  "text": "Actos y decisiones de la administración",
+                  "correct": true
+                }
+              ]
+            }
+          ]
+        },
+        "B": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la B?",
+            "choices": [
+              {
+                "text": "Creí que es el máximo tribunal para todo"
+              },
+              {
+                "text": "Recordé que antes esa Corte revisaba las leyes"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Qué casos resuelve la Corte Suprema como tribunal de casación?",
+              "choices": [
+                {
+                  "text": "Demandas contra las leyes"
+                },
+                {
+                  "text": "Casos de la justicia ordinaria",
+                  "correct": true
+                }
+              ]
+            },
+            {
+              "prompt": "Desde 1991, ¿sigue la Corte Suprema decidiendo demandas contra las leyes?",
+              "choices": [
+                {
+                  "text": "Sí, sigue igual"
+                },
+                {
+                  "text": "No, perdió esa función",
+                  "correct": true
+                }
+              ]
+            }
+          ]
+        },
+        "D": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la D?",
+            "choices": [
+              {
+                "text": "Pensé que la Procuraduría vigila todo lo público"
+              },
+              {
+                "text": "Creí que una entidad de control puede anular leyes"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Cuál es una función principal de la Procuraduría?",
+              "choices": [
+                {
+                  "text": "Vigilar la conducta de funcionarios públicos",
+                  "correct": true
+                },
+                {
+                  "text": "Dictar sentencias sobre leyes"
+                }
+              ]
+            },
+            {
+              "prompt": "¿Puede la Procuraduría anular una ley del Congreso?",
+              "choices": [
+                {
+                  "text": "Sí, por fallo propio"
+                },
+                {
+                  "text": "No, ese no es su papel",
+                  "correct": true
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "reveal": "En Colombia, cualquier ciudadano puede pedir que se revise si una ley respeta la Constitución. Desde 1991, esa decisión le corresponde a la Corte Constitucional."
+    }
+  },
+  {
+    "id": "soc-10",
+    "subjectId": "sociales_ciudadanas",
+    "categoryId": "sociales_ciudadanas.state_democracy_participation",
+    "primarySubtopicId": "sociales_ciudadanas.state_democracy_participation.state_branches_accountability",
+    "competencia": "pensamiento_social",
+    "difficulty": "media",
+    "targetGrade": 11,
+    "context": "Una obra financiada con recursos de la Nación se pagó por completo, pero nunca se construyó. Una entidad debe determinar si hubo daño al patrimonio público y exigir a los responsables que lo resarzan económicamente (responsabilidad fiscal).",
+    "stem": "¿Qué entidad tiene esa función?",
+    "options": [
+      {
+        "label": "A",
+        "text": "La Contraloría General de la República"
+      },
+      {
+        "label": "B",
+        "text": "La Procuraduría General de la Nación"
+      },
+      {
+        "label": "C",
+        "text": "La Fiscalía General de la Nación"
+      },
+      {
+        "label": "D",
+        "text": "La Defensoría del Pueblo"
+      }
+    ],
+    "correctOption": "A",
+    "solution": "La Contraloría General vigila la gestión fiscal y puede establecer la responsabilidad que se deriva de esa gestión, es decir, exigir que se resarza el daño al patrimonio público. La Procuraduría se ocupa de lo disciplinario y la Fiscalía de lo penal.",
+    "guide": {
+      "hint": "¿Qué palabra del contexto indica el tipo de responsabilidad que se busca?",
+      "byOption": {
+        "B": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la B?",
+            "choices": [
+              {
+                "text": "Creí que la Procuraduría investiga todo lo de funcionarios"
+              },
+              {
+                "text": "Confundí la sanción a un funcionario con recuperar dinero"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "Según el contexto, ¿qué se busca exigirles a los responsables?",
+              "choices": [
+                {
+                  "text": "Reparar económicamente el daño",
+                  "correct": true
+                },
+                {
+                  "text": "Una suspensión del cargo"
+                }
+              ]
+            },
+            {
+              "prompt": "¿Qué tipo de responsabilidad examina la Procuraduría?",
+              "choices": [
+                {
+                  "text": "La fiscal sobre recursos públicos"
+                },
+                {
+                  "text": "La disciplinaria de los servidores públicos",
+                  "correct": true
+                }
+              ]
+            }
+          ]
+        },
+        "C": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la C?",
+            "choices": [
+              {
+                "text": "Pensé que si hay dinero perdido hay un delito que investigar"
+              },
+              {
+                "text": "Confundí «fiscal» con la Fiscalía"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Qué investiga la Fiscalía General?",
+              "choices": [
+                {
+                  "text": "El manejo contable de los recursos"
+                },
+                {
+                  "text": "Conductas que pueden ser delitos",
+                  "correct": true
+                }
+              ]
+            },
+            {
+              "prompt": "En el contexto, ¿la palabra «fiscal» se refiere a delitos o a recursos públicos?",
+              "choices": [
+                {
+                  "text": "Al manejo de recursos públicos",
+                  "correct": true
+                },
+                {
+                  "text": "Al trabajo de los fiscales penales"
+                }
+              ]
+            }
+          ]
+        },
+        "D": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la D?",
+            "choices": [
+              {
+                "text": "Pensé que defiende a la gente de cualquier abuso"
+              },
+              {
+                "text": "Creí que la Defensoría recupera dinero público"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Qué hace principalmente la Defensoría del Pueblo?",
+              "choices": [
+                {
+                  "text": "Promover y divulgar los derechos humanos",
+                  "correct": true
+                },
+                {
+                  "text": "Auditar las cuentas del Estado"
+                }
+              ]
+            },
+            {
+              "prompt": "¿Puede la Defensoría declarar a alguien responsable de devolver dinero público?",
+              "choices": [
+                {
+                  "text": "Sí, es su función principal"
+                },
+                {
+                  "text": "No, esa no es su función",
+                  "correct": true
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "reveal": "Un mismo hecho puede tener varias responsabilidades: fiscal, disciplinaria y penal. La que busca recuperar el dinero público perdido es la fiscal, a cargo de la Contraloría."
+    }
+  },
+  {
+    "id": "soc-11",
+    "subjectId": "sociales_ciudadanas",
+    "categoryId": "sociales_ciudadanas.state_democracy_participation",
+    "primarySubtopicId": "sociales_ciudadanas.state_democracy_participation.state_branches_accountability",
+    "competencia": "pensamiento_social",
+    "difficulty": "media",
+    "targetGrade": 11,
+    "context": "El Congreso, siguiendo el trámite constitucional, aprueba una moción de censura contra un ministro que desatendió sus citaciones, y el ministro queda separado del cargo.",
+    "stem": "¿Qué tipo de control ilustra este caso?",
+    "options": [
+      {
+        "label": "A",
+        "text": "Control judicial, porque una corte decidió si el ministro había violado la ley."
+      },
+      {
+        "label": "B",
+        "text": "Control disciplinario, porque la Procuraduría sancionó a un funcionario público."
+      },
+      {
+        "label": "C",
+        "text": "Control ciudadano, porque los electores votaron directamente para retirar al ministro."
+      },
+      {
+        "label": "D",
+        "text": "Control político, porque la rama legislativa le exigió responsabilidad al Gobierno."
+      }
+    ],
+    "correctOption": "D",
+    "solution": "La moción de censura es una herramienta del Congreso para exigir responsabilidad política a ministros y otros altos funcionarios del Gobierno. Es un ejemplo de frenos y contrapesos entre las ramas del poder.",
+    "guide": {
+      "hint": "¿Quién toma la decisión y qué función ordinaria cumple esa institución?",
+      "byOption": {
+        "A": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la A?",
+            "choices": [
+              {
+                "text": "Pensé que toda decisión sobre un funcionario la toma una corte"
+              },
+              {
+                "text": "Creí que el Congreso actúa aquí como juez"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "En el caso, ¿qué institución aprueba la decisión?",
+              "choices": [
+                {
+                  "text": "Una corte"
+                },
+                {
+                  "text": "El Congreso",
+                  "correct": true
+                }
+              ]
+            },
+            {
+              "prompt": "¿A qué rama del poder pertenece el Congreso?",
+              "choices": [
+                {
+                  "text": "A la legislativa",
+                  "correct": true
+                },
+                {
+                  "text": "A la judicial"
+                }
+              ]
+            }
+          ]
+        },
+        "B": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la B?",
+            "choices": [
+              {
+                "text": "Asocié la sanción a un funcionario con la Procuraduría"
+              },
+              {
+                "text": "Pensé que separarlo del cargo es una sanción disciplinaria"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Aparece la Procuraduría en el caso?",
+              "choices": [
+                {
+                  "text": "No, actúa el Congreso",
+                  "correct": true
+                },
+                {
+                  "text": "Sí, es quien decide"
+                }
+              ]
+            },
+            {
+              "prompt": "Si decide el Congreso, ¿se trata de un control disciplinario de la Procuraduría?",
+              "choices": [
+                {
+                  "text": "No, es otra clase de control",
+                  "correct": true
+                },
+                {
+                  "text": "Sí, es el mismo"
+                }
+              ]
+            }
+          ]
+        },
+        "C": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la C?",
+            "choices": [
+              {
+                "text": "Pensé que el Congreso equivale a los ciudadanos"
+              },
+              {
+                "text": "Creí que basta con que participen personas elegidas"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Quiénes votaron en este caso?",
+              "choices": [
+                {
+                  "text": "Los congresistas",
+                  "correct": true
+                },
+                {
+                  "text": "Todos los electores"
+                }
+              ]
+            },
+            {
+              "prompt": "¿Hubo una votación directa de los ciudadanos sobre el ministro?",
+              "choices": [
+                {
+                  "text": "Sí, en las urnas"
+                },
+                {
+                  "text": "No, votó solo el Congreso",
+                  "correct": true
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "reveal": "Este control lo ejerce el Congreso, no un juez ni los votantes en las urnas. Su sentido es que el Gobierno responda ante quienes representan a la ciudadanía."
+    }
+  },
+  {
+    "id": "soc-12",
+    "subjectId": "sociales_ciudadanas",
+    "categoryId": "sociales_ciudadanas.sources_perspectives_argumentation",
+    "primarySubtopicId": "sociales_ciudadanas.sources_perspectives_argumentation.primary_secondary_sources",
+    "competencia": "pensamiento_reflexivo_sistemico",
+    "difficulty": "baja",
+    "targetGrade": 11,
+    "context": "Una estudiante investiga qué vivieron los habitantes de Bogotá el 9 de abril de 1948, día del asesinato de Jorge Eliécer Gaitán.",
+    "stem": "¿Cuál de estas es una fuente primaria para su investigación?",
+    "options": [
+      {
+        "label": "A",
+        "text": "Un capítulo de un libro de historia publicado en 2010 sobre la violencia en Colombia."
+      },
+      {
+        "label": "B",
+        "text": "Una carta que un testigo de los hechos escribió a su hermana esa misma semana."
+      },
+      {
+        "label": "C",
+        "text": "Un documental de 2018 con entrevistas a historiadores sobre la época."
+      },
+      {
+        "label": "D",
+        "text": "Un artículo de enciclopedia en línea que resume las causas del Bogotazo."
+      }
+    ],
+    "correctOption": "B",
+    "solution": "Una fuente primaria se produce en el momento de los hechos o por alguien que los vivió. La carta de un testigo cumple esa condición; el libro, el documental y la enciclopedia interpretan o resumen los hechos tiempo después.",
+    "guide": {
+      "hint": "¿Cuándo y por quién fue producida cada fuente?",
+      "byOption": {
+        "A": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la A?",
+            "choices": [
+              {
+                "text": "Pensé que un libro serio siempre es primario"
+              },
+              {
+                "text": "Creí que «primaria» significa la más importante"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Cuándo se publicó el capítulo?",
+              "choices": [
+                {
+                  "text": "En 1948"
+                },
+                {
+                  "text": "En 2010",
+                  "correct": true
+                }
+              ]
+            },
+            {
+              "prompt": "¿Produce una fuente de la época un autor que escribe sesenta años después?",
+              "choices": [
+                {
+                  "text": "No, analiza hechos pasados",
+                  "correct": true
+                },
+                {
+                  "text": "Sí, si es experto"
+                }
+              ]
+            }
+          ]
+        },
+        "C": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la C?",
+            "choices": [
+              {
+                "text": "Pensé que las entrevistas lo hacen fuente directa"
+              },
+              {
+                "text": "Creí que un video es más real que un texto"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Quiénes hablan en el documental?",
+              "choices": [
+                {
+                  "text": "Personas de 1948"
+                },
+                {
+                  "text": "Historiadores actuales",
+                  "correct": true
+                }
+              ]
+            },
+            {
+              "prompt": "¿Es testigo directo un historiador de 2018 que interpreta 1948?",
+              "choices": [
+                {
+                  "text": "Sí, por ser experto"
+                },
+                {
+                  "text": "No, interpreta lo que otros dejaron",
+                  "correct": true
+                }
+              ]
+            }
+          ]
+        },
+        "D": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la D?",
+            "choices": [
+              {
+                "text": "Pensé que la enciclopedia es la fuente más confiable"
+              },
+              {
+                "text": "Creí que resumir las causas es dar el dato original"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Qué hace este artículo con la información?",
+              "choices": [
+                {
+                  "text": "La registra en el momento"
+                },
+                {
+                  "text": "La resume a partir de otros textos",
+                  "correct": true
+                }
+              ]
+            },
+            {
+              "prompt": "¿Viene directamente del momento de los hechos un resumen hecho después?",
+              "choices": [
+                {
+                  "text": "Sí, siempre"
+                },
+                {
+                  "text": "No, se elaboró después",
+                  "correct": true
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "reveal": "Para saber qué vivieron las personas ese día sirve un testimonio directo de la época. Las obras posteriores ayudan a entender el hecho, pero son fuentes secundarias."
+    }
+  },
+  {
+    "id": "soc-13",
+    "subjectId": "sociales_ciudadanas",
+    "categoryId": "sociales_ciudadanas.sources_perspectives_argumentation",
+    "primarySubtopicId": "sociales_ciudadanas.sources_perspectives_argumentation.primary_secondary_sources",
+    "competencia": "pensamiento_reflexivo_sistemico",
+    "difficulty": "alta",
+    "targetGrade": 11,
+    "context": "Carta ficticia, escrita para este ejercicio: «Bogotá, 1935. Señor ministro: los colonos han invadido mis tierras del Sumapaz, sin título alguno. Son gente sin ley que amenaza la paz del campo. Le ruego enviar a la autoridad». Firma: un hacendado.",
+    "stem": "Una historiadora quiere usar un documento como este para estudiar los conflictos por la tierra en los años treinta. ¿Cuál es el uso más adecuado?",
+    "options": [
+      {
+        "label": "A",
+        "text": "Tomarlo como prueba de que los colonos ocuparon ilegalmente, porque es un documento de la época."
+      },
+      {
+        "label": "B",
+        "text": "Descartarlo, porque un relato que expresa intereses personales no aporta información histórica."
+      },
+      {
+        "label": "C",
+        "text": "Usarlo para conocer la visión de un propietario, contrastándola con otras fuentes."
+      },
+      {
+        "label": "D",
+        "text": "Usarlo para calcular cuántas hectáreas estaban ocupadas en toda la región durante esa década."
+      }
+    ],
+    "correctOption": "C",
+    "solution": "La carta es valiosa para conocer cómo veía el conflicto un propietario, pero expresa su interés y solo muestra una versión. Una historiadora debe contrastarla con otras fuentes, como documentos de los colonos o expedientes judiciales.",
+    "guide": {
+      "hint": "¿Qué información ofrece este documento y cuál no puede ofrecer por sí solo?",
+      "byOption": {
+        "A": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la A?",
+            "choices": [
+              {
+                "text": "Pensé que un documento antiguo siempre dice la verdad"
+              },
+              {
+                "text": "Me convenció lo que afirma el hacendado"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Quién escribe la carta?",
+              "choices": [
+                {
+                  "text": "Un hacendado involucrado en el conflicto",
+                  "correct": true
+                },
+                {
+                  "text": "Un juez imparcial"
+                }
+              ]
+            },
+            {
+              "prompt": "¿Prueba la acusación de una de las partes que la ocupación fue ilegal?",
+              "choices": [
+                {
+                  "text": "No, es solo su versión",
+                  "correct": true
+                },
+                {
+                  "text": "Sí, por ser antigua"
+                }
+              ]
+            }
+          ]
+        },
+        "B": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la B?",
+            "choices": [
+              {
+                "text": "Pensé que las fuentes subjetivas no sirven"
+              },
+              {
+                "text": "Creí que la historia solo usa documentos neutrales"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Deja ver la carta las ideas de su autor sobre los colonos?",
+              "choices": [
+                {
+                  "text": "No, no dice nada"
+                },
+                {
+                  "text": "Sí, muestra sus ideas y temores",
+                  "correct": true
+                }
+              ]
+            },
+            {
+              "prompt": "¿Es inútil una fuente por expresar los intereses de su autor?",
+              "choices": [
+                {
+                  "text": "Sí, debe descartarse"
+                },
+                {
+                  "text": "No, esos intereses también informan",
+                  "correct": true
+                }
+              ]
+            }
+          ]
+        },
+        "D": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la D?",
+            "choices": [
+              {
+                "text": "Pensé que las tierras mencionadas permiten calcular el total"
+              },
+              {
+                "text": "Creí que una carta al ministro trae cifras exactas"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Qué cifra de hectáreas aparece en la carta?",
+              "choices": [
+                {
+                  "text": "Ninguna",
+                  "correct": true
+                },
+                {
+                  "text": "La de toda la región"
+                }
+              ]
+            },
+            {
+              "prompt": "¿Puede la carta de un solo propietario medir lo ocurrido en toda una región?",
+              "choices": [
+                {
+                  "text": "No, habla de un caso",
+                  "correct": true
+                },
+                {
+                  "text": "Sí, es suficiente"
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "reveal": "Una fuente parcial no es una fuente inútil: informa sobre quien la escribió. La clave es preguntarse qué puede y qué no puede demostrar."
+    }
+  },
+  {
+    "id": "soc-14",
+    "subjectId": "sociales_ciudadanas",
+    "categoryId": "sociales_ciudadanas.sources_perspectives_argumentation",
+    "primarySubtopicId": "sociales_ciudadanas.sources_perspectives_argumentation.primary_secondary_sources",
+    "competencia": "analisis_perspectivas",
+    "difficulty": "media",
+    "targetGrade": 11,
+    "context": "Sobre una protesta en Villa Clara (municipio ficticio) circulan dos versiones:\n\n| Fuente | Relato |\n|---|---|\n| Boletín de la Alcaldía | «Cerca de 200 personas bloquearon la vía y afectaron el comercio». |\n| Emisora comunitaria | «Más de 2 000 vecinos marcharon en paz para exigir agua potable». |",
+    "stem": "Una estudiante debe escribir qué ocurrió. ¿Qué debe hacer primero?",
+    "options": [
+      {
+        "label": "A",
+        "text": "Usar solo el boletín, porque lo emite una autoridad pública responsable de informar."
+      },
+      {
+        "label": "B",
+        "text": "Usar solo la emisora, porque está más cerca de los vecinos que vivieron la protesta."
+      },
+      {
+        "label": "C",
+        "text": "Promediar las dos cifras y escribir que asistieron unas 1 100 personas a la protesta."
+      },
+      {
+        "label": "D",
+        "text": "Comparar ambos relatos con otras evidencias, como videos fechados y testimonios."
+      }
+    ],
+    "correctOption": "D",
+    "solution": "Las dos fuentes pueden tener intereses y ninguna explica cómo contó a los asistentes. Antes de afirmar qué ocurrió hay que buscar evidencias independientes y compararlas con ambos relatos.",
+    "guide": {
+      "hint": "¿Qué interés o punto de vista podría tener cada fuente al contar lo ocurrido?",
+      "byOption": {
+        "A": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la A?",
+            "choices": [
+              {
+                "text": "Pensé que lo oficial es automáticamente cierto"
+              },
+              {
+                "text": "Creí que una entidad pública no tiene interés en el tema"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Qué tema menciona el boletín y no menciona la emisora?",
+              "choices": [
+                {
+                  "text": "El agua potable"
+                },
+                {
+                  "text": "La afectación al comercio",
+                  "correct": true
+                }
+              ]
+            },
+            {
+              "prompt": "¿Podría la Alcaldía tener interés en cómo se cuenta una protesta sobre un servicio público?",
+              "choices": [
+                {
+                  "text": "No, es imposible"
+                },
+                {
+                  "text": "Sí, también es parte del asunto",
+                  "correct": true
+                }
+              ]
+            }
+          ]
+        },
+        "B": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la B?",
+            "choices": [
+              {
+                "text": "Pensé que quien está cerca de la gente cuenta lo real"
+              },
+              {
+                "text": "Me pareció más justa la versión de los vecinos"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Qué aspecto destaca la emisora y omite la Alcaldía?",
+              "choices": [
+                {
+                  "text": "La exigencia de agua potable",
+                  "correct": true
+                },
+                {
+                  "text": "Los daños al comercio"
+                }
+              ]
+            },
+            {
+              "prompt": "¿Garantiza la cercanía con una comunidad que una cifra sea exacta?",
+              "choices": [
+                {
+                  "text": "No, también puede haber sesgo",
+                  "correct": true
+                },
+                {
+                  "text": "Sí, siempre"
+                }
+              ]
+            }
+          ]
+        },
+        "C": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la C?",
+            "choices": [
+              {
+                "text": "Pensé que la verdad está en el punto medio"
+              },
+              {
+                "text": "Creí que promediar es una forma justa de equilibrar"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Explica alguna de las fuentes cómo contó a los asistentes?",
+              "choices": [
+                {
+                  "text": "Sí, ambas lo detallan"
+                },
+                {
+                  "text": "No, ninguna lo explica",
+                  "correct": true
+                }
+              ]
+            },
+            {
+              "prompt": "Si ninguna cifra tiene método conocido, ¿es confiable su promedio?",
+              "choices": [
+                {
+                  "text": "No, sigue sin sustento",
+                  "correct": true
+                },
+                {
+                  "text": "Sí, equilibra todo"
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "reveal": "Ni lo oficial ni lo comunitario son ciertos por sí mismos, y promediar cifras no las vuelve confiables. Contrastar con más evidencias permite sostener mejor lo que se afirma."
+    }
+  },
+  {
+    "id": "soc-15",
+    "subjectId": "sociales_ciudadanas",
+    "categoryId": "sociales_ciudadanas.sources_perspectives_argumentation",
+    "primarySubtopicId": "sociales_ciudadanas.sources_perspectives_argumentation.actor_group_perspectives",
+    "competencia": "analisis_perspectivas",
+    "difficulty": "media",
+    "targetGrade": 11,
+    "context": "En un territorio colectivo ficticio, una empresa propone instalar un parque eólico.\n\n- **Vocera de la comunidad:** «En ese lugar están los cementerios de nuestros mayores y nadie nos ha consultado».\n- **Gerente de la empresa:** «Aportaremos energía limpia y empleo, y tenemos las licencias que nos exigieron».",
+    "stem": "¿Cuál es el punto central del desacuerdo entre las dos posiciones?",
+    "options": [
+      {
+        "label": "A",
+        "text": "Si el proyecto puede avanzar sin consultar antes a la comunidad del territorio."
+      },
+      {
+        "label": "B",
+        "text": "Si la energía eólica contamina más que las demás fuentes de generación de energía."
+      },
+      {
+        "label": "C",
+        "text": "Si los empleos del parque deben darse primero a personas de otra región del país."
+      },
+      {
+        "label": "D",
+        "text": "Si la empresa debe pagarle a la Alcaldía más impuestos que las otras empresas."
+      }
+    ],
+    "correctOption": "A",
+    "solution": "La vocera reclama que nadie consultó a la comunidad sobre un lugar de valor cultural, y el gerente responde con beneficios y licencias. Por eso el desacuerdo está en si el proyecto puede avanzar sin esa consulta.",
+    "guide": {
+      "hint": "¿Qué le reclama la vocera a la empresa y cómo responde el gerente?",
+      "byOption": {
+        "B": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la B?",
+            "choices": [
+              {
+                "text": "Pensé que hablaban de contaminación"
+              },
+              {
+                "text": "Lo asocié con que un parque eólico afecta el ambiente"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Qué dice la vocera sobre la calidad de la energía?",
+              "choices": [
+                {
+                  "text": "Que contamina mucho"
+                },
+                {
+                  "text": "Nada sobre ese tema",
+                  "correct": true
+                }
+              ]
+            },
+            {
+              "prompt": "¿Discuten las dos personas cuánto contamina cada fuente de energía?",
+              "choices": [
+                {
+                  "text": "Sí, es su tema"
+                },
+                {
+                  "text": "No, nadie compara fuentes",
+                  "correct": true
+                }
+              ]
+            }
+          ]
+        },
+        "C": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la C?",
+            "choices": [
+              {
+                "text": "Pensé que el empleo era el problema"
+              },
+              {
+                "text": "Creí que la comunidad exigía los puestos de trabajo"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Quién menciona el empleo en el caso?",
+              "choices": [
+                {
+                  "text": "La vocera, como un reclamo"
+                },
+                {
+                  "text": "El gerente, como un beneficio",
+                  "correct": true
+                }
+              ]
+            },
+            {
+              "prompt": "¿Dice alguien que los empleos deban ir a otra región?",
+              "choices": [
+                {
+                  "text": "Sí, la vocera"
+                },
+                {
+                  "text": "No, nadie lo plantea",
+                  "correct": true
+                }
+              ]
+            }
+          ]
+        },
+        "D": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la D?",
+            "choices": [
+              {
+                "text": "Pensé que el conflicto era por dinero"
+              },
+              {
+                "text": "Supuse que la empresa se quejaba de impuestos"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Aparece la Alcaldía como participante en lo que se dice?",
+              "choices": [
+                {
+                  "text": "Sí, es quien habla"
+                },
+                {
+                  "text": "No, no se menciona",
+                  "correct": true
+                }
+              ]
+            },
+            {
+              "prompt": "¿Hablan las dos personas de impuestos en algún momento?",
+              "choices": [
+                {
+                  "text": "Sí, es el centro"
+                },
+                {
+                  "text": "No, ese tema no aparece",
+                  "correct": true
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "reveal": "En Colombia, la participación de las comunidades étnicas en decisiones que las afectan está ligada al artículo 330 de la Constitución y al Convenio 169 de la OIT. Las dos personas no están discutiendo ni de contaminación ni de impuestos."
+    }
+  },
+  {
+    "id": "soc-16",
+    "subjectId": "sociales_ciudadanas",
+    "categoryId": "sociales_ciudadanas.sources_perspectives_argumentation",
+    "primarySubtopicId": "sociales_ciudadanas.sources_perspectives_argumentation.actor_group_perspectives",
+    "competencia": "analisis_perspectivas",
+    "difficulty": "media",
+    "targetGrade": 11,
+    "context": "En una calle comercial de una ciudad ficticia se planea una ciclorruta. Estas son las preocupaciones de tres grupos:\n\n| Grupo | Preocupación |\n|---|---|\n| Comerciantes | Perder espacio para descargar mercancía. |\n| Ciclistas | Sufrir accidentes al compartir carril con buses. |\n| Personas con discapacidad | Que la obra deje andenes sin rampas. |",
+    "stem": "¿Qué propuesta atiende a los tres grupos?",
+    "options": [
+      {
+        "label": "A",
+        "text": "Prohibir las bicicletas en esa calle y ampliar la zona de descargue, con andenes y rampas nuevas."
+      },
+      {
+        "label": "B",
+        "text": "Separar la ciclorruta de los buses, fijar horarios de descargue y construir rampas en los andenes."
+      },
+      {
+        "label": "C",
+        "text": "Separar la ciclorruta de los buses, eliminar toda zona de descargue y construir rampas en los andenes."
+      },
+      {
+        "label": "D",
+        "text": "Mantener las zonas de descargue, pintar una franja para bicicletas en el carril de buses y dejar los andenes como están."
+      }
+    ],
+    "correctOption": "B",
+    "solution": "La propuesta correcta separa a ciclistas de buses, organiza el descargue de mercancía y agrega rampas, así que responde a cada preocupación. Las demás resuelven una o dos y dejan por fuera a algún grupo.",
+    "guide": {
+      "hint": "¿Qué pide cada grupo y qué queda sin resolver en cada propuesta?",
+      "byOption": {
+        "A": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la A?",
+            "choices": [
+              {
+                "text": "Pensé que la calle es sobre todo comercial"
+              },
+              {
+                "text": "Creí que sin bicicletas no hay accidentes y todos ganan"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Qué quieren los ciclistas?",
+              "choices": [
+                {
+                  "text": "Dejar de circular"
+                },
+                {
+                  "text": "Circular sin el riesgo de los buses",
+                  "correct": true
+                }
+              ]
+            },
+            {
+              "prompt": "¿Se atiende a los ciclistas si se les prohíbe usar la calle?",
+              "choices": [
+                {
+                  "text": "No, quedan excluidos",
+                  "correct": true
+                },
+                {
+                  "text": "Sí, se evitan accidentes"
+                }
+              ]
+            }
+          ]
+        },
+        "C": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la C?",
+            "choices": [
+              {
+                "text": "Pensé que la seguridad vale más que el descargue"
+              },
+              {
+                "text": "Creí que los comerciantes se adaptarían"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Qué necesita un comerciante para recibir su mercancía?",
+              "choices": [
+                {
+                  "text": "Más clientes en bicicleta"
+                },
+                {
+                  "text": "Un lugar y un momento para descargar",
+                  "correct": true
+                }
+              ]
+            },
+            {
+              "prompt": "¿Se atiende a los comerciantes si se elimina toda zona de descargue?",
+              "choices": [
+                {
+                  "text": "No, su problema empeora",
+                  "correct": true
+                },
+                {
+                  "text": "Sí, igual venden"
+                }
+              ]
+            }
+          ]
+        },
+        "D": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la D?",
+            "choices": [
+              {
+                "text": "Pensé que la franja pintada basta"
+              },
+              {
+                "text": "Creí que no cambiar los andenes evita problemas"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Dónde quedan los ciclistas con una franja pintada en el carril de buses?",
+              "choices": [
+                {
+                  "text": "Lejos de los buses"
+                },
+                {
+                  "text": "Junto a los buses",
+                  "correct": true
+                }
+              ]
+            },
+            {
+              "prompt": "¿Qué pasa con las rampas si los andenes se dejan como están?",
+              "choices": [
+                {
+                  "text": "Siguen faltando",
+                  "correct": true
+                },
+                {
+                  "text": "Aparecen solas"
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "reveal": "Una buena decisión pública identifica qué pierde y qué gana cada grupo. Separar, fijar horarios y construir rampas permite que nadie quede excluido."
+    }
+  },
+  {
+    "id": "soc-17",
+    "subjectId": "sociales_ciudadanas",
+    "categoryId": "sociales_ciudadanas.sources_perspectives_argumentation",
+    "primarySubtopicId": "sociales_ciudadanas.sources_perspectives_argumentation.actor_group_perspectives",
+    "competencia": "analisis_perspectivas",
+    "difficulty": "alta",
+    "targetGrade": 11,
+    "context": "Dos vecinas conversan sobre un programa de apoyo a excombatientes en proceso de reincorporación:\n\n- **Marta:** «Si no tienen cómo vivir, muchos pueden volver a las armas. Apoyarlos protege a todos».\n- **Inés:** «Perdí a mi hijo en el conflicto. Me cuesta aceptar esos apoyos cuando tantas víctimas siguen esperando reparación».",
+    "stem": "¿Qué afirmación describe mejor la relación entre las dos posiciones?",
+    "options": [
+      {
+        "label": "A",
+        "text": "Marta niega que las víctimas del conflicto tengan derecho a ser reparadas por el Estado."
+      },
+      {
+        "label": "B",
+        "text": "Inés rechaza cualquier forma de paz y prefiere que el conflicto armado continúe."
+      },
+      {
+        "label": "C",
+        "text": "Las dos coinciden en que el programa debe suspenderse hasta reparar a todas las víctimas."
+      },
+      {
+        "label": "D",
+        "text": "Una prioriza evitar que la violencia se repita; la otra, reparar a las víctimas."
+      }
+    ],
+    "correctOption": "D",
+    "solution": "Marta se enfoca en evitar que la violencia se repita; Inés, en la deuda pendiente con las víctimas. Ninguna rechaza directamente lo que dice la otra, ni ninguna propone continuar la guerra o suspender el programa.",
+    "guide": {
+      "hint": "¿Qué dice exactamente cada una y qué no llega a decir?",
+      "byOption": {
+        "A": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la A?",
+            "choices": [
+              {
+                "text": "Pensé que defender el programa es estar contra las víctimas"
+              },
+              {
+                "text": "Supuse que a Marta no le importan las víctimas"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿De qué habla Marta en su frase?",
+              "choices": [
+                {
+                  "text": "Del riesgo de que vuelvan las armas",
+                  "correct": true
+                },
+                {
+                  "text": "Del derecho de las víctimas"
+                }
+              ]
+            },
+            {
+              "prompt": "¿Dice Marta algo contra la reparación de las víctimas?",
+              "choices": [
+                {
+                  "text": "No, no toca ese tema",
+                  "correct": true
+                },
+                {
+                  "text": "Sí, la rechaza"
+                }
+              ]
+            }
+          ]
+        },
+        "B": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la B?",
+            "choices": [
+              {
+                "text": "Interpreté su dolor como rechazo a la paz"
+              },
+              {
+                "text": "Creí que criticar el programa es querer la guerra"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Qué le preocupa a Inés según sus palabras?",
+              "choices": [
+                {
+                  "text": "Que se acabe la guerra"
+                },
+                {
+                  "text": "La espera de tantas víctimas",
+                  "correct": true
+                }
+              ]
+            },
+            {
+              "prompt": "¿Afirma Inés que desea que el conflicto continúe?",
+              "choices": [
+                {
+                  "text": "Sí, lo pide"
+                },
+                {
+                  "text": "No, no dice eso",
+                  "correct": true
+                }
+              ]
+            }
+          ]
+        },
+        "C": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la C?",
+            "choices": [
+              {
+                "text": "Pensé que ambas estaban en contra del programa"
+              },
+              {
+                "text": "Creí que buscaban el mismo resultado"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Qué opina Marta del programa?",
+              "choices": [
+                {
+                  "text": "Lo considera protector para todos",
+                  "correct": true
+                },
+                {
+                  "text": "Quiere que se suspenda"
+                }
+              ]
+            },
+            {
+              "prompt": "¿Propone alguna de las dos suspender el programa?",
+              "choices": [
+                {
+                  "text": "Sí, ambas"
+                },
+                {
+                  "text": "No, ninguna lo propone",
+                  "correct": true
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "reveal": "Dos personas pueden querer un país mejor y aun así priorizar cosas distintas. Entender esa diferencia evita atribuirle a alguien ideas que no ha expresado."
+    }
+  },
+  {
+    "id": "soc-18",
+    "subjectId": "sociales_ciudadanas",
+    "categoryId": "sociales_ciudadanas.systems_thinking_decisions",
+    "primarySubtopicId": "sociales_ciudadanas.systems_thinking_decisions.cross_dimension_relations",
+    "competencia": "pensamiento_reflexivo_sistemico",
+    "difficulty": "baja",
+    "targetGrade": 11,
+    "context": "Una ciudad ficticia prohíbe a cada carro circular dos días a la semana, según su placa, para reducir los trancones. Un año después, muchas familias con recursos tienen un segundo carro y la congestión volvió a los niveles anteriores.",
+    "stem": "¿Qué explicación relaciona mejor la medida y el resultado?",
+    "options": [
+      {
+        "label": "A",
+        "text": "La compra de un segundo carro permitió evadir la restricción y redujo su efecto."
+      },
+      {
+        "label": "B",
+        "text": "La restricción hizo que cada carro contaminara más y por eso aumentó la congestión."
+      },
+      {
+        "label": "C",
+        "text": "La congestión de una ciudad no depende de cuántos carros circulan cada día."
+      },
+      {
+        "label": "D",
+        "text": "La medida fracasó porque la Constitución impide regular la circulación de vehículos."
+      }
+    ],
+    "correctOption": "A",
+    "solution": "Las personas reaccionan a las normas: quienes podían compraron un segundo carro para circular en los días restringidos, y así se anuló buena parte del efecto esperado. Es un ejemplo de consecuencia no prevista de una política.",
+    "guide": {
+      "hint": "¿Qué hicieron las personas después de la medida y qué efecto pudo tener?",
+      "byOption": {
+        "B": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la B?",
+            "choices": [
+              {
+                "text": "Pensé que más contaminación significa más trancón"
+              },
+              {
+                "text": "Mezclé contaminación con congestión"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Menciona el contexto cambios en la contaminación?",
+              "choices": [
+                {
+                  "text": "No, habla de carros y congestión",
+                  "correct": true
+                },
+                {
+                  "text": "Sí, los mide"
+                }
+              ]
+            },
+            {
+              "prompt": "¿Cambia la contaminación de un carro cuántos carros ocupan la vía?",
+              "choices": [
+                {
+                  "text": "No, son asuntos diferentes",
+                  "correct": true
+                },
+                {
+                  "text": "Sí, los aumenta"
+                }
+              ]
+            }
+          ]
+        },
+        "C": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la C?",
+            "choices": [
+              {
+                "text": "Pensé que los trancones dependen de la hora y no de los carros"
+              },
+              {
+                "text": "Como no mejoró, creí que no había relación"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "Si una calle recibe el doble de carros, ¿qué ocurre con el tráfico?",
+              "choices": [
+                {
+                  "text": "Sigue igual"
+                },
+                {
+                  "text": "Tiende a aumentar",
+                  "correct": true
+                }
+              ]
+            },
+            {
+              "prompt": "¿Influye el número de carros en la congestión de una ciudad?",
+              "choices": [
+                {
+                  "text": "Sí, influye directamente",
+                  "correct": true
+                },
+                {
+                  "text": "No, no importa"
+                }
+              ]
+            }
+          ]
+        },
+        "D": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la D?",
+            "choices": [
+              {
+                "text": "Pensé que limitar la circulación viola la libertad de movimiento"
+              },
+              {
+                "text": "Creí que una ciudad no puede hacer normas de tránsito"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Menciona el contexto alguna decisión judicial contra la medida?",
+              "choices": [
+                {
+                  "text": "No, ninguna",
+                  "correct": true
+                },
+                {
+                  "text": "Sí, fue anulada"
+                }
+              ]
+            },
+            {
+              "prompt": "Según el artículo 24, ¿puede la ley poner límites a la libre circulación?",
+              "choices": [
+                {
+                  "text": "No, jamás"
+                },
+                {
+                  "text": "Sí, la Constitución lo permite",
+                  "correct": true
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "reveal": "Una medida puede cambiar conductas de maneras que no se esperaban. En este caso, la adaptación de algunos hogares devolvió la congestión a su nivel anterior."
+    }
+  },
+  {
+    "id": "soc-19",
+    "subjectId": "sociales_ciudadanas",
+    "categoryId": "sociales_ciudadanas.systems_thinking_decisions",
+    "primarySubtopicId": "sociales_ciudadanas.systems_thinking_decisions.cross_dimension_relations",
+    "competencia": "pensamiento_reflexivo_sistemico",
+    "difficulty": "alta",
+    "targetGrade": 11,
+    "context": "En un páramo ficticio viven familias que cultivan papa. Esa zona regula el agua que consumen varias ciudades. Para proteger el agua, una autoridad decide que en tres meses todas las familias deben abandonar sus cultivos, sin ofrecer otras opciones.",
+    "stem": "¿Qué crítica identifica mejor una relación que la decisión no está teniendo en cuenta?",
+    "options": [
+      {
+        "label": "A",
+        "text": "Al conservar el páramo bajará el agua para las ciudades, porque la vegetación la retiene y no la deja pasar."
+      },
+      {
+        "label": "B",
+        "text": "Bastaría sembrar árboles frutales en todo el páramo, para que el suelo se conserve y las familias tengan ingresos."
+      },
+      {
+        "label": "C",
+        "text": "Sin alternativas de ingreso, las familias podrían empobrecerse o abrir cultivos en otras zonas frágiles."
+      },
+      {
+        "label": "D",
+        "text": "Los cultivos son un asunto privado de las familias, así que el Estado no debe intervenir en sus impactos."
+      }
+    ],
+    "correctOption": "C",
+    "solution": "La decisión atiende el agua pero no considera cómo vivirán las familias. Sin alternativas, su situación puede empeorar y la presión sobre otras zonas frágiles puede aumentar, lo cual también daña el ambiente.",
+    "guide": {
+      "hint": "¿Qué dimensiones del problema (ambiental, económica, social) están conectadas?",
+      "byOption": {
+        "A": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la A?",
+            "choices": [
+              {
+                "text": "Pensé que las plantas del páramo consumen el agua"
+              },
+              {
+                "text": "Creí que sin cultivos el agua no baja"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Qué función le da el contexto al páramo?",
+              "choices": [
+                {
+                  "text": "Consumir el agua"
+                },
+                {
+                  "text": "Regular el agua de las ciudades",
+                  "correct": true
+                }
+              ]
+            },
+            {
+              "prompt": "¿Qué hace la vegetación de páramo con el agua?",
+              "choices": [
+                {
+                  "text": "La almacena y la libera poco a poco",
+                  "correct": true
+                },
+                {
+                  "text": "La retiene para siempre"
+                }
+              ]
+            }
+          ]
+        },
+        "B": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la B?",
+            "choices": [
+              {
+                "text": "Pensé que sembrar árboles siempre ayuda al ambiente"
+              },
+              {
+                "text": "Me pareció una solución para todos"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Qué tipo de vegetación es propia del páramo?",
+              "choices": [
+                {
+                  "text": "Árboles frutales"
+                },
+                {
+                  "text": "Frailejones y pajonales",
+                  "correct": true
+                }
+              ]
+            },
+            {
+              "prompt": "¿Beneficia al páramo reemplazar su vegetación propia por plantaciones?",
+              "choices": [
+                {
+                  "text": "No, altera su funcionamiento",
+                  "correct": true
+                },
+                {
+                  "text": "Sí, siempre"
+                }
+              ]
+            }
+          ]
+        },
+        "D": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la D?",
+            "choices": [
+              {
+                "text": "Creí que lo que hacen en su tierra solo les importa a ellas"
+              },
+              {
+                "text": "Pensé que el Estado no debe regular cultivos"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿A quiénes afecta lo que pasa con el agua de ese páramo?",
+              "choices": [
+                {
+                  "text": "También a varias ciudades",
+                  "correct": true
+                },
+                {
+                  "text": "Solo a las familias"
+                }
+              ]
+            },
+            {
+              "prompt": "Según el artículo 58, ¿qué función es inherente a la propiedad?",
+              "choices": [
+                {
+                  "text": "Ninguna obligación"
+                },
+                {
+                  "text": "Una función ecológica",
+                  "correct": true
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "reveal": "Los problemas ambientales suelen ser también económicos y sociales. Proteger un páramo funciona mejor cuando se planea cómo vivirá quien hoy depende de él."
+    }
+  },
+  {
+    "id": "soc-20",
+    "subjectId": "sociales_ciudadanas",
+    "categoryId": "sociales_ciudadanas.systems_thinking_decisions",
+    "primarySubtopicId": "sociales_ciudadanas.systems_thinking_decisions.cross_dimension_relations",
+    "competencia": "pensamiento_reflexivo_sistemico",
+    "difficulty": "media",
+    "targetGrade": 11,
+    "context": "A finales de 2019, la escuela de una vereda ficticia cerró por baja matrícula.\n\n| Año | Hogares | Estudiantes |\n|---|---:|---:|\n| 2015 | 300 | 120 |\n| 2017 | 280 | 90 |\n| 2019 | 260 | 50 |\n| 2021 | 200 | 0 |\n| 2023 | 130 | 0 |",
+    "stem": "¿Qué relación entre población y servicios sugieren mejor estos datos?",
+    "options": [
+      {
+        "label": "A",
+        "text": "El cierre de la escuela fue la causa inicial de que las familias comenzaran a irse de la vereda."
+      },
+      {
+        "label": "B",
+        "text": "La matrícula bajó mientras salían hogares, y el cierre parece haber acelerado la salida de más hogares."
+      },
+      {
+        "label": "C",
+        "text": "La población y la escuela cambiaron de manera independiente, sin ninguna relación entre las dos cosas."
+      },
+      {
+        "label": "D",
+        "text": "Después del cierre la salida de hogares se detuvo, pues las familias que quedaban ya no dependían de la escuela."
+      }
+    ],
+    "correctOption": "B",
+    "solution": "Los hogares venían disminuyendo antes del cierre, y con ellos los estudiantes. Después del cierre la salida fue más rápida: se perdían 10 hogares al año antes de 2019 y más de 30 al año entre 2019 y 2023.",
+    "guide": {
+      "hint": "¿Cómo cambia el número de hogares antes y después del cierre?",
+      "byOption": {
+        "A": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la A?",
+            "choices": [
+              {
+                "text": "Vi el cierre y lo tomé como el comienzo"
+              },
+              {
+                "text": "Pensé que las familias se van solo por la escuela"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Cuántos hogares había en 2015 y cuántos en 2019?",
+              "choices": [
+                {
+                  "text": "300 y 300"
+                },
+                {
+                  "text": "300 y 260",
+                  "correct": true
+                }
+              ]
+            },
+            {
+              "prompt": "¿Empezó la salida de hogares antes o después del cierre?",
+              "choices": [
+                {
+                  "text": "Antes del cierre",
+                  "correct": true
+                },
+                {
+                  "text": "Después del cierre"
+                }
+              ]
+            }
+          ]
+        },
+        "C": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la C?",
+            "choices": [
+              {
+                "text": "Pensé que los datos solo son números separados"
+              },
+              {
+                "text": "Creí que una relación necesita prueba exacta para mencionarla"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Qué pasa con los estudiantes cuando bajan los hogares entre 2015 y 2019?",
+              "choices": [
+                {
+                  "text": "Suben"
+                },
+                {
+                  "text": "También bajan",
+                  "correct": true
+                }
+              ]
+            },
+            {
+              "prompt": "Si ambos cambian en la misma dirección y hay una razón lógica, ¿conviene descartar toda relación?",
+              "choices": [
+                {
+                  "text": "Sí, no tienen nada que ver"
+                },
+                {
+                  "text": "No, es razonable sospecharla",
+                  "correct": true
+                }
+              ]
+            }
+          ]
+        },
+        "D": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la D?",
+            "choices": [
+              {
+                "text": "Creí que sin escuela ya no había razones para irse"
+              },
+              {
+                "text": "No revisé las filas de 2021 y 2023"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Cuántos hogares había en 2021 y en 2023?",
+              "choices": [
+                {
+                  "text": "260 y 260"
+                },
+                {
+                  "text": "200 y 130",
+                  "correct": true
+                }
+              ]
+            },
+            {
+              "prompt": "¿Se detuvo la salida de hogares después del cierre?",
+              "choices": [
+                {
+                  "text": "Sí, se detuvo"
+                },
+                {
+                  "text": "No, siguió y fue más rápida",
+                  "correct": true
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "reveal": "Los datos sugieren un círculo: menos gente lleva a menos servicios, y menos servicios llevan a que se vaya más gente. Esa relación es una hipótesis razonable, que otras pruebas podrían confirmar."
+    }
+  }
+]

@@ -1,0 +1,3259 @@
+[
+  {
+    "id": "cn-01",
+    "subjectId": "ciencias_naturales",
+    "categoryId": "ciencias_naturales.biology_component",
+    "primarySubtopicId": "ciencias_naturales.biology_component.ecology_evolution_biodiversity",
+    "competencia": "uso_comprensivo",
+    "difficulty": "baja",
+    "targetGrade": 11,
+    "context": "En un páramo de Cundinamarca se estudia esta cadena alimentaria simplificada: pastos de páramo → conejo de páramo → águila paramuna.",
+    "stem": "¿Qué ocurre con la energía disponible al pasar de un eslabón al siguiente?",
+    "options": [
+      {
+        "label": "A",
+        "text": "Se mantiene igual en cada eslabón, porque la energía de un organismo pasa completa al que se lo come."
+      },
+      {
+        "label": "B",
+        "text": "Disminuye, porque cada organismo usa gran parte en sus funciones vitales y otra parte se pierde como calor."
+      },
+      {
+        "label": "C",
+        "text": "Aumenta, porque cada depredador acumula la energía de todas las presas que consume."
+      },
+      {
+        "label": "D",
+        "text": "Vuelve a los pastos cuando actúan los descomponedores, de modo que la misma energía circula sin perderse."
+      }
+    ],
+    "correctOption": "B",
+    "solution": "En cada eslabón, los organismos usan buena parte de la energía en respiración y movimiento, y esa energía sale como calor. Solo cerca del 10 % queda en biomasa para el nivel siguiente, por lo que la energía disponible disminuye a lo largo de la cadena.",
+    "guide": {
+      "hint": "¿En qué usa un conejo la energía de lo que come durante un día?",
+      "byOption": {
+        "A": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la A?",
+            "choices": [
+              {
+                "text": "Recordé que la energía no se crea ni se destruye"
+              },
+              {
+                "text": "Pensé que el águila aprovecha todo lo que tenía el conejo"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿En qué gasta un conejo parte de la energía de su comida?",
+              "choices": [
+                {
+                  "text": "En correr y mantener su temperatura",
+                  "correct": true
+                },
+                {
+                  "text": "En nada: toda se guarda en su cuerpo"
+                }
+              ]
+            },
+            {
+              "prompt": "La energía que el conejo gastó en correr, ¿puede aprovecharla el águila al comérselo?",
+              "choices": [
+                {
+                  "text": "Sí, sigue guardada en su cuerpo"
+                },
+                {
+                  "text": "No, ya salió del conejo como calor y movimiento",
+                  "correct": true
+                }
+              ]
+            }
+          ]
+        },
+        "C": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la C?",
+            "choices": [
+              {
+                "text": "Pensé que comer muchas presas suma toda su energía"
+              },
+              {
+                "text": "Vi que el águila es el animal más grande de la cadena"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Qué hay más en un páramo: masa total de pastos o masa total de águilas?",
+              "choices": [
+                {
+                  "text": "Mucha más masa de pastos",
+                  "correct": true
+                },
+                {
+                  "text": "Mucha más masa de águilas"
+                }
+              ]
+            },
+            {
+              "prompt": "El águila come muchos conejos, ¿queda en su cuerpo toda la energía de ellos?",
+              "choices": [
+                {
+                  "text": "Sí, se va sumando toda"
+                },
+                {
+                  "text": "No, los conejos gastaron buena parte al vivir",
+                  "correct": true
+                }
+              ]
+            }
+          ]
+        },
+        "D": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la D?",
+            "choices": [
+              {
+                "text": "Recordé que la materia circula en los ecosistemas"
+              },
+              {
+                "text": "Pensé que los descomponedores lo devuelven todo a las plantas"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Qué reciben las plantas de los descomponedores: nutrientes o energía útil?",
+              "choices": [
+                {
+                  "text": "Energía útil"
+                },
+                {
+                  "text": "Nutrientes minerales",
+                  "correct": true
+                }
+              ]
+            },
+            {
+              "prompt": "¿De dónde sacan los pastos la energía para fabricar su alimento?",
+              "choices": [
+                {
+                  "text": "De la luz del Sol",
+                  "correct": true
+                },
+                {
+                  "text": "De los descomponedores"
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "reveal": "La energía fluye en una sola dirección y se va disipando como calor, así que hay menos disponible en cada nivel: por eso la B es correcta. Los nutrientes sí se reciclan, pero la energía no."
+    }
+  },
+  {
+    "id": "cn-02",
+    "subjectId": "ciencias_naturales",
+    "categoryId": "ciencias_naturales.biology_component",
+    "primarySubtopicId": "ciencias_naturales.biology_component.ecology_evolution_biodiversity",
+    "competencia": "explicacion_fenomenos",
+    "difficulty": "media",
+    "targetGrade": 11,
+    "context": "Los frailejones crecen en los páramos andinos, donde son frecuentes las noches heladas y la radiación solar intensa. La mayoría tiene hojas cubiertas de pelos densos que reducen la pérdida de calor y protegen el tejido.",
+    "stem": "¿Cuál es la explicación evolutiva más adecuada para que las hojas peludas sean tan comunes en los frailejones?",
+    "options": [
+      {
+        "label": "A",
+        "text": "Cada planta desarrolló pelos por vivir en el frío y transmitió ese rasgo adquirido a sus descendientes."
+      },
+      {
+        "label": "B",
+        "text": "Los frailejones necesitaban protegerse y por eso produjeron las mutaciones que les hacían falta."
+      },
+      {
+        "label": "C",
+        "text": "Entre plantas con variación heredable, las más peludas sobrevivieron más y dejaron más descendencia."
+      },
+      {
+        "label": "D",
+        "text": "El ambiente frío cambió a todos los individuos de la población al mismo tiempo y en la misma medida."
+      }
+    ],
+    "correctOption": "C",
+    "solution": "En una población hay variación heredable; las plantas con más pelos toleraban mejor el frío y la radiación, así que se reprodujeron más. Con el paso de muchas generaciones, ese rasgo se hizo común por selección natural.",
+    "guide": {
+      "hint": "¿En qué se diferencian entre sí los frailejones de una misma población?",
+      "byOption": {
+        "A": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la A?",
+            "choices": [
+              {
+                "text": "Pensé que lo que vive una planta se hereda"
+              },
+              {
+                "text": "Creí que el frío hace crecer pelos y eso pasa a las semillas"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Dónde está la información que una planta transmite a sus semillas?",
+              "choices": [
+                {
+                  "text": "En sus hojas adultas"
+                },
+                {
+                  "text": "En su ADN",
+                  "correct": true
+                }
+              ]
+            },
+            {
+              "prompt": "Un rasgo adquirido durante la vida, ¿queda escrito en el ADN de las semillas?",
+              "choices": [
+                {
+                  "text": "No, por lo general no se hereda",
+                  "correct": true
+                },
+                {
+                  "text": "Sí, siempre se hereda"
+                }
+              ]
+            }
+          ]
+        },
+        "B": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la B?",
+            "choices": [
+              {
+                "text": "Pensé que las especies cambian porque lo necesitan"
+              },
+              {
+                "text": "Creí que la planta puede elegir cómo adaptarse"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Las mutaciones aparecen según lo que el organismo necesita o al azar?",
+              "choices": [
+                {
+                  "text": "Según lo que necesita"
+                },
+                {
+                  "text": "Al azar",
+                  "correct": true
+                }
+              ]
+            },
+            {
+              "prompt": "¿Puede un frailejón producir a propósito una mutación útil?",
+              "choices": [
+                {
+                  "text": "No, no controla sus mutaciones",
+                  "correct": true
+                },
+                {
+                  "text": "Sí, cuando hace mucho frío"
+                }
+              ]
+            }
+          ]
+        },
+        "D": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la D?",
+            "choices": [
+              {
+                "text": "Pensé que todos los individuos viven lo mismo y cambian igual"
+              },
+              {
+                "text": "Creí que la evolución ocurre dentro de cada individuo"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Todos los frailejones de una población son genéticamente idénticos?",
+              "choices": [
+                {
+                  "text": "No, hay variación entre ellos",
+                  "correct": true
+                },
+                {
+                  "text": "Sí, son copias iguales"
+                }
+              ]
+            },
+            {
+              "prompt": "Si todos cambiaran igual, ¿habría diferencias que favorecieran a unos sobre otros?",
+              "choices": [
+                {
+                  "text": "Sí, aunque todos fueran iguales"
+                },
+                {
+                  "text": "No, la selección no tendría sobre qué actuar",
+                  "correct": true
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "reveal": "La selección natural actúa sobre variación que ya existe: los individuos mejor adaptados dejan más descendencia, como dice la C. Los individuos no cambian por necesidad ni heredan lo que adquieren en vida."
+    }
+  },
+  {
+    "id": "cn-03",
+    "subjectId": "ciencias_naturales",
+    "categoryId": "ciencias_naturales.biology_component",
+    "primarySubtopicId": "ciencias_naturales.biology_component.ecology_evolution_biodiversity",
+    "competencia": "indagacion",
+    "difficulty": "alta",
+    "targetGrade": 11,
+    "context": "Un grupo de estudiantes de Ciénaga (Magdalena) quiere saber si la salinidad del agua influye en el crecimiento de plántulas de mangle rojo. Dispone de 30 plántulas, agua dulce, sal y materas.",
+    "stem": "¿Cuál de estos diseños permite responder mejor la pregunta?",
+    "options": [
+      {
+        "label": "A",
+        "text": "Sembrar las 30 plántulas en agua de la ciénaga y medir su altura cada semana durante tres meses."
+      },
+      {
+        "label": "B",
+        "text": "Regar 15 plántulas con agua dulce a la sombra y 15 con agua salada al sol, y comparar su altura."
+      },
+      {
+        "label": "C",
+        "text": "Medir la altura de mangles adultos en varios puntos de la ciénaga y relacionarla con la salinidad de cada punto."
+      },
+      {
+        "label": "D",
+        "text": "Regar tres grupos de 10 plántulas similares con tres salinidades, con igual luz y matera, y comparar su crecimiento."
+      }
+    ],
+    "correctOption": "D",
+    "solution": "Para saber si la salinidad influye hay que cambiar solo esa variable y mantener iguales las demás. El diseño con tres grupos comparables, repeticiones e igual luz y matera aísla el efecto de la salinidad.",
+    "guide": {
+      "hint": "¿Qué tendría que ser distinto y qué igual entre las plántulas que se comparan?",
+      "byOption": {
+        "A": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la A?",
+            "choices": [
+              {
+                "text": "Pensé que medir muchas veces es suficiente"
+              },
+              {
+                "text": "Usar agua natural me pareció lo más real"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Con cuántas salinidades crecen las plántulas en ese diseño?",
+              "choices": [
+                {
+                  "text": "Con varias diferentes"
+                },
+                {
+                  "text": "Con una sola, la de la ciénaga",
+                  "correct": true
+                }
+              ]
+            },
+            {
+              "prompt": "Sin otra salinidad para comparar, ¿se puede saber si la salinidad influye?",
+              "choices": [
+                {
+                  "text": "No, falta con qué comparar",
+                  "correct": true
+                },
+                {
+                  "text": "Sí, basta con medir la altura"
+                }
+              ]
+            }
+          ]
+        },
+        "B": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la B?",
+            "choices": [
+              {
+                "text": "Vi que compara agua dulce con agua salada"
+              },
+              {
+                "text": "Pensé que la luz no afecta este experimento"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Cuántas cosas cambian entre los dos grupos de ese diseño?",
+              "choices": [
+                {
+                  "text": "Dos: el agua y la luz",
+                  "correct": true
+                },
+                {
+                  "text": "Una: solo el agua"
+                }
+              ]
+            },
+            {
+              "prompt": "Si un grupo crece más, ¿podrías saber si fue por el agua o por el sol?",
+              "choices": [
+                {
+                  "text": "Sí, sería por el agua"
+                },
+                {
+                  "text": "No, ambas variables cambiaron juntas",
+                  "correct": true
+                }
+              ]
+            }
+          ]
+        },
+        "C": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la C?",
+            "choices": [
+              {
+                "text": "Pensé que los datos del ambiente natural son los más confiables"
+              },
+              {
+                "text": "Creí que medir en muchos puntos es suficiente"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "Además de la salinidad, ¿qué otras cosas pueden cambiar entre puntos de la ciénaga?",
+              "choices": [
+                {
+                  "text": "Nada, solo cambia la salinidad"
+                },
+                {
+                  "text": "La edad de los árboles, el suelo y la marea",
+                  "correct": true
+                }
+              ]
+            },
+            {
+              "prompt": "Si los árboles tienen distinta edad, ¿su altura muestra solo el efecto de la sal?",
+              "choices": [
+                {
+                  "text": "No, la edad también influye",
+                  "correct": true
+                },
+                {
+                  "text": "Sí, la edad no importa"
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "reveal": "Un buen experimento cambia solo la variable que se estudia, mantiene controladas las demás e incluye repeticiones. La D es la única opción que cumple esas condiciones."
+    }
+  },
+  {
+    "id": "cn-04",
+    "subjectId": "ciencias_naturales",
+    "categoryId": "ciencias_naturales.biology_component",
+    "primarySubtopicId": "ciencias_naturales.biology_component.ecology_evolution_biodiversity",
+    "competencia": "explicacion_fenomenos",
+    "difficulty": "media",
+    "targetGrade": 11,
+    "context": "Las hormigas arrieras cortan hojas y las llevan al hormiguero, pero no se las comen: con ellas cultivan un hongo, y ese hongo es el principal alimento de la colonia.",
+    "stem": "Si un producto eliminara únicamente el hongo de una colonia que sigue teniendo hojas disponibles, ¿qué se esperaría?",
+    "options": [
+      {
+        "label": "A",
+        "text": "La colonia se debilita aunque haya hojas, porque perdió su fuente principal de alimento."
+      },
+      {
+        "label": "B",
+        "text": "La colonia crece, porque las hormigas tendrán todas las hojas para comérselas directamente."
+      },
+      {
+        "label": "C",
+        "text": "La colonia no cambia, porque el hongo es un parásito que solo le quita recursos."
+      },
+      {
+        "label": "D",
+        "text": "Las hormigas se vuelven capaces de digerir hojas de inmediato, porque las especies se adaptan rápido."
+      }
+    ],
+    "correctOption": "A",
+    "solution": "La relación entre las hormigas arrieras y el hongo es mutualista: la colonia le da hojas al hongo y este la alimenta. Sin el hongo, las hojas no le sirven como alimento principal y la colonia se debilita.",
+    "guide": {
+      "hint": "¿Qué organismo del hormiguero aprovecha directamente las hojas cortadas?",
+      "byOption": {
+        "B": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la B?",
+            "choices": [
+              {
+                "text": "Pensé que si cortan hojas es porque se las comen"
+              },
+              {
+                "text": "Creí que sin el hongo les quedaría más comida"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "Según el texto, ¿qué se comen las hormigas?",
+              "choices": [
+                {
+                  "text": "El hongo",
+                  "correct": true
+                },
+                {
+                  "text": "Las hojas"
+                }
+              ]
+            },
+            {
+              "prompt": "Si el hongo desaparece, ¿las hojas se convierten en su comida principal?",
+              "choices": [
+                {
+                  "text": "Sí, las comerían directamente"
+                },
+                {
+                  "text": "No, ellas no las aprovechan así",
+                  "correct": true
+                }
+              ]
+            }
+          ]
+        },
+        "C": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la C?",
+            "choices": [
+              {
+                "text": "Pensé que el hongo vive a costa de las hormigas"
+              },
+              {
+                "text": "Creí que, al alimentar al hongo, ellas solo pierden"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Qué reciben las hormigas del hongo?",
+              "choices": [
+                {
+                  "text": "Nada"
+                },
+                {
+                  "text": "Comida para la colonia",
+                  "correct": true
+                }
+              ]
+            },
+            {
+              "prompt": "Si ambas especies ganan, ¿la relación puede ser parasitismo?",
+              "choices": [
+                {
+                  "text": "No, en el parasitismo una sale perjudicada",
+                  "correct": true
+                },
+                {
+                  "text": "Sí, igual es parasitismo"
+                }
+              ]
+            }
+          ]
+        },
+        "D": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la D?",
+            "choices": [
+              {
+                "text": "Pensé que los seres vivos se adaptan cuando les hace falta"
+              },
+              {
+                "text": "Creí que, sin hongo, aprenderían a digerir hojas"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿La adaptación de una especie toma unos días o muchas generaciones?",
+              "choices": [
+                {
+                  "text": "Muchas generaciones",
+                  "correct": true
+                },
+                {
+                  "text": "Unos pocos días"
+                }
+              ]
+            },
+            {
+              "prompt": "¿Pueden las hormigas de esa colonia ganar de repente la capacidad de digerir hojas?",
+              "choices": [
+                {
+                  "text": "Sí, si tienen hambre"
+                },
+                {
+                  "text": "No, no cambian así durante su vida",
+                  "correct": true
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "reveal": "Las arrieras y su hongo dependen uno del otro: es un mutualismo. Sin el hongo, la colonia pierde el alimento que necesita, como indica la A."
+    }
+  },
+  {
+    "id": "cn-05",
+    "subjectId": "ciencias_naturales",
+    "categoryId": "ciencias_naturales.biology_component",
+    "primarySubtopicId": "ciencias_naturales.biology_component.ecology_evolution_biodiversity",
+    "competencia": "explicacion_fenomenos",
+    "difficulty": "baja",
+    "targetGrade": 11,
+    "context": "En una región cafetera se comparan dos fincas. La finca 1 tiene una sola variedad, con plantas casi idénticas genéticamente. La finca 2 tiene varias variedades con características genéticas distintas. Llega a la región una nueva cepa del hongo de la roya.",
+    "stem": "¿Qué es más probable que ocurra?",
+    "options": [
+      {
+        "label": "A",
+        "text": "La finca 1 resiste mejor, porque todas sus plantas tienen las mismas defensas."
+      },
+      {
+        "label": "B",
+        "text": "La finca 1 puede perder casi toda su cosecha, porque si una planta es susceptible, las demás también."
+      },
+      {
+        "label": "C",
+        "text": "Las dos fincas se afectan igual, porque la roya ataca a todos los cafetos sin importar sus genes."
+      },
+      {
+        "label": "D",
+        "text": "La finca 2 se afecta más, porque tener varias variedades le facilita a la roya pasar de una a otra."
+      }
+    ],
+    "correctOption": "B",
+    "solution": "Si las plantas son casi idénticas, una cepa capaz de infectar a una puede infectar a casi todas. Con varias variedades es más probable que algunas resistan, de modo que la finca 2 corre menos riesgo de perderlo todo.",
+    "guide": {
+      "hint": "¿Qué importancia tiene que las plantas de un cultivo difieran en sus genes?",
+      "byOption": {
+        "A": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la A?",
+            "choices": [
+              {
+                "text": "Pensé que plantas iguales son plantas igual de fuertes"
+              },
+              {
+                "text": "Creí que una sola variedad es mejor porque fue seleccionada"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Cómo responden a un hongo nuevo unas plantas con genes casi iguales?",
+              "choices": [
+                {
+                  "text": "Cada una de forma muy distinta"
+                },
+                {
+                  "text": "Casi todas de la misma forma",
+                  "correct": true
+                }
+              ]
+            },
+            {
+              "prompt": "¿Pueden unas defensas iguales fallar contra una cepa que nunca habían enfrentado?",
+              "choices": [
+                {
+                  "text": "Sí, y fallarían en casi todas a la vez",
+                  "correct": true
+                },
+                {
+                  "text": "No, nunca fallan"
+                }
+              ]
+            }
+          ]
+        },
+        "C": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la C?",
+            "choices": [
+              {
+                "text": "Pensé que la roya afecta a todos los cafetos"
+              },
+              {
+                "text": "Creí que los genes no influyen en enfermarse"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Existen variedades de café más resistentes a la roya que otras?",
+              "choices": [
+                {
+                  "text": "No, todas son iguales"
+                },
+                {
+                  "text": "Sí, y esa resistencia se hereda",
+                  "correct": true
+                }
+              ]
+            },
+            {
+              "prompt": "Si unas plantas resisten y otras no, ¿sufre igual una finca con más variedad?",
+              "choices": [
+                {
+                  "text": "No, algunas plantas pueden sobrevivir",
+                  "correct": true
+                },
+                {
+                  "text": "Sí, todas se afectan igual"
+                }
+              ]
+            }
+          ]
+        },
+        "D": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la D?",
+            "choices": [
+              {
+                "text": "Pensé que más variedades significa más enfermedades"
+              },
+              {
+                "text": "Creí que mezclar plantas ayuda a propagar el hongo"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "Para un hongo, ¿es más fácil propagarse entre plantas susceptibles o entre resistentes?",
+              "choices": [
+                {
+                  "text": "Entre susceptibles",
+                  "correct": true
+                },
+                {
+                  "text": "Entre resistentes"
+                }
+              ]
+            },
+            {
+              "prompt": "En una finca con variedades resistentes, ¿el hongo encuentra todas las plantas susceptibles?",
+              "choices": [
+                {
+                  "text": "Sí, todas son susceptibles"
+                },
+                {
+                  "text": "No, algunas frenan su avance",
+                  "correct": true
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "reveal": "La variación genética funciona como un seguro, porque alguna parte del cultivo puede resistir. Por eso la B es correcta y conservar variedades distintas es una estrategia útil contra las plagas."
+    }
+  },
+  {
+    "id": "cn-06",
+    "subjectId": "ciencias_naturales",
+    "categoryId": "ciencias_naturales.physics_component",
+    "primarySubtopicId": "ciencias_naturales.physics_component.motion_forces_dynamics",
+    "competencia": "explicacion_fenomenos",
+    "difficulty": "baja",
+    "targetGrade": 11,
+    "stem": "Un bus de TransMilenio frena de golpe y un pasajero que iba de pie se inclina hacia adelante. ¿Cuál es la mejor explicación?",
+    "options": [
+      {
+        "label": "A",
+        "text": "El frenado crea una fuerza hacia adelante que empuja al pasajero."
+      },
+      {
+        "label": "B",
+        "text": "El peso del pasajero aumenta durante el frenado y lo desequilibra."
+      },
+      {
+        "label": "C",
+        "text": "El aire dentro del bus sigue avanzando y arrastra al pasajero hacia adelante."
+      },
+      {
+        "label": "D",
+        "text": "Su cuerpo tiende a seguir con la velocidad que llevaba, mientras el bus se detiene."
+      }
+    ],
+    "correctOption": "D",
+    "solution": "Por inercia, un cuerpo tiende a conservar su estado de movimiento. Cuando el bus frena, los pies se detienen con el piso, pero el resto del cuerpo sigue avanzando y el pasajero se inclina.",
+    "guide": {
+      "hint": "¿Cómo se movía el pasajero justo antes de que el bus frenara?",
+      "byOption": {
+        "A": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la A?",
+            "choices": [
+              {
+                "text": "Siento que algo me empuja cuando el bus frena"
+              },
+              {
+                "text": "Pensé que todo movimiento necesita una fuerza"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Qué objeto podría estar empujando al pasajero hacia adelante durante el frenado?",
+              "choices": [
+                {
+                  "text": "El asiento de atrás"
+                },
+                {
+                  "text": "Ninguno, nada lo empuja",
+                  "correct": true
+                }
+              ]
+            },
+            {
+              "prompt": "Si nada lo empuja hacia adelante, ¿necesita una fuerza para seguir moviéndose?",
+              "choices": [
+                {
+                  "text": "No, ya venía en movimiento",
+                  "correct": true
+                },
+                {
+                  "text": "Sí, siempre necesita una fuerza"
+                }
+              ]
+            }
+          ]
+        },
+        "B": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la B?",
+            "choices": [
+              {
+                "text": "Pensé que al frenar el cuerpo pesa más"
+              },
+              {
+                "text": "Noté que cuesta más sostenerse cuando frena"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Qué dos factores determinan el peso de una persona?",
+              "choices": [
+                {
+                  "text": "Su masa y la gravedad",
+                  "correct": true
+                },
+                {
+                  "text": "Su velocidad y el frenado"
+                }
+              ]
+            },
+            {
+              "prompt": "¿Cambian la masa del pasajero o la gravedad cuando el bus frena?",
+              "choices": [
+                {
+                  "text": "Sí, ambas aumentan"
+                },
+                {
+                  "text": "No, ninguna cambia",
+                  "correct": true
+                }
+              ]
+            }
+          ]
+        },
+        "C": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la C?",
+            "choices": [
+              {
+                "text": "Pensé que el aire siempre empuja los objetos"
+              },
+              {
+                "text": "Creí que dentro del bus se forma un viento fuerte"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "Dentro de un bus cerrado, ¿sientes un viento fuerte cuando frena?",
+              "choices": [
+                {
+                  "text": "No, casi nada",
+                  "correct": true
+                },
+                {
+                  "text": "Sí, mucho"
+                }
+              ]
+            },
+            {
+              "prompt": "¿Seguirías inclinándote si dentro del bus no hubiera aire?",
+              "choices": [
+                {
+                  "text": "No, sin aire no pasaría"
+                },
+                {
+                  "text": "Sí, porque el aire no es la causa",
+                  "correct": true
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "reveal": "La inercia hace que un cuerpo mantenga su movimiento si nada lo cambia. Al frenar el bus, los pies se detienen con él, pero el torso sigue avanzando: eso describe la D."
+    }
+  },
+  {
+    "id": "cn-07",
+    "subjectId": "ciencias_naturales",
+    "categoryId": "ciencias_naturales.physics_component",
+    "primarySubtopicId": "ciencias_naturales.physics_component.motion_forces_dynamics",
+    "competencia": "uso_comprensivo",
+    "difficulty": "media",
+    "targetGrade": 11,
+    "context": "Un pescador del río Atrato está en una canoa quieta junto a un muelle. Apoya el remo en el muelle y empuja; la canoa se aleja.",
+    "stem": "Mientras dura el empujón, ¿cómo se comparan la fuerza del remo sobre el muelle y la fuerza del muelle sobre el remo?",
+    "options": [
+      {
+        "label": "A",
+        "text": "Tienen igual magnitud y sentidos opuestos."
+      },
+      {
+        "label": "B",
+        "text": "La del remo es mayor, porque fue el pescador quien inició el empujón."
+      },
+      {
+        "label": "C",
+        "text": "La del muelle es mayor, porque el muelle no se mueve y la canoa sí."
+      },
+      {
+        "label": "D",
+        "text": "La del muelle es cero, porque un objeto quieto no puede ejercer fuerza."
+      }
+    ],
+    "correctOption": "A",
+    "solution": "Según la tercera ley de Newton, las dos fuerzas forman un par acción-reacción, de igual magnitud y sentidos opuestos. La canoa se aleja porque flota y puede moverse con facilidad, mientras que el muelle está anclado al suelo.",
+    "guide": {
+      "hint": "¿Qué fuerzas aparecen cada vez que dos objetos se empujan entre sí?",
+      "byOption": {
+        "B": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la B?",
+            "choices": [
+              {
+                "text": "Pensé que quien empieza a empujar hace más fuerza"
+              },
+              {
+                "text": "Creí que la acción siempre supera a la reacción"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "Cuando remo y muelle se tocan, ¿las dos fuerzas aparecen juntas o una después?",
+              "choices": [
+                {
+                  "text": "Primero la del remo"
+                },
+                {
+                  "text": "Las dos al mismo tiempo",
+                  "correct": true
+                }
+              ]
+            },
+            {
+              "prompt": "¿Importa quién inició el contacto para comparar esas dos fuerzas?",
+              "choices": [
+                {
+                  "text": "No, eso no cambia las fuerzas",
+                  "correct": true
+                },
+                {
+                  "text": "Sí, quien inicia hace más"
+                }
+              ]
+            }
+          ]
+        },
+        "C": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la C?",
+            "choices": [
+              {
+                "text": "Pensé que lo que se mueve recibió más fuerza"
+              },
+              {
+                "text": "Creí que el objeto más firme hace más fuerza"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Sobre qué objeto actúa cada fuerza del par: sobre el mismo o sobre distintos?",
+              "choices": [
+                {
+                  "text": "Sobre objetos distintos",
+                  "correct": true
+                },
+                {
+                  "text": "Sobre el mismo objeto"
+                }
+              ]
+            },
+            {
+              "prompt": "Si el muelle no se mueve, ¿es porque recibe menos fuerza o porque está anclado?",
+              "choices": [
+                {
+                  "text": "Porque recibe menos fuerza"
+                },
+                {
+                  "text": "Porque está anclado al suelo",
+                  "correct": true
+                }
+              ]
+            }
+          ]
+        },
+        "D": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la D?",
+            "choices": [
+              {
+                "text": "Pensé que solo lo que se mueve hace fuerza"
+              },
+              {
+                "text": "Creí que un muelle no puede empujar"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "Una mesa quieta sostiene un libro: ¿ejerce fuerza sobre él?",
+              "choices": [
+                {
+                  "text": "Sí, lo sostiene hacia arriba",
+                  "correct": true
+                },
+                {
+                  "text": "No, porque está quieta"
+                }
+              ]
+            },
+            {
+              "prompt": "Si el muelle no ejerciera fuerza sobre el remo, ¿qué le pasaría a la canoa?",
+              "choices": [
+                {
+                  "text": "Se alejaría igual"
+                },
+                {
+                  "text": "No se alejaría del muelle",
+                  "correct": true
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "reveal": "Las fuerzas de interacción siempre vienen en pares iguales y opuestos que actúan sobre objetos distintos, como dice la A. Lo que cambia es el efecto de cada fuerza, según la masa y si el objeto está fijo."
+    }
+  },
+  {
+    "id": "cn-08",
+    "subjectId": "ciencias_naturales",
+    "categoryId": "ciencias_naturales.physics_component",
+    "primarySubtopicId": "ciencias_naturales.physics_component.motion_forces_dynamics",
+    "competencia": "uso_comprensivo",
+    "difficulty": "media",
+    "targetGrade": 11,
+    "context": "En una finca del Quindío se arrastra un bulto de café de 60 kg por el piso con una cuerda horizontal. La cuerda ejerce 180 N hacia adelante y la fricción ejerce 120 N hacia atrás.",
+    "stem": "¿Cuál es la aceleración del bulto?",
+    "options": [
+      {
+        "label": "A",
+        "text": "$5\\ \\text{m/s}^2$"
+      },
+      {
+        "label": "B",
+        "text": "$3\\ \\text{m/s}^2$"
+      },
+      {
+        "label": "C",
+        "text": "$1\\ \\text{m/s}^2$"
+      },
+      {
+        "label": "D",
+        "text": "$0\\ \\text{m/s}^2$"
+      }
+    ],
+    "correctOption": "C",
+    "solution": "La fuerza neta es $180 - 120 = 60$ N hacia adelante. Por la segunda ley de Newton, $a = F_{neta}/m = 60/60 = 1\\ \\text{m/s}^2$.",
+    "guide": {
+      "hint": "¿Hacia dónde apunta cada una de las fuerzas que actúan sobre el bulto?",
+      "byOption": {
+        "A": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la A?",
+            "choices": [
+              {
+                "text": "Sumé las dos fuerzas"
+              },
+              {
+                "text": "Pensé que las dos fuerzas ayudan a mover el bulto"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿La fricción actúa en el mismo sentido que la cuerda o en sentido opuesto?",
+              "choices": [
+                {
+                  "text": "En el mismo sentido"
+                },
+                {
+                  "text": "En sentido opuesto",
+                  "correct": true
+                }
+              ]
+            },
+            {
+              "prompt": "¿Una fuerza que se opone al movimiento se suma o se resta para hallar la neta?",
+              "choices": [
+                {
+                  "text": "Se resta",
+                  "correct": true
+                },
+                {
+                  "text": "Se suma"
+                }
+              ]
+            }
+          ]
+        },
+        "B": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la B?",
+            "choices": [
+              {
+                "text": "Usé solo la fuerza de la cuerda"
+              },
+              {
+                "text": "Pensé que la fricción no cuenta si el bulto se mueve"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Qué fuerza se usa en F = ma: una sola o la neta?",
+              "choices": [
+                {
+                  "text": "La fuerza neta",
+                  "correct": true
+                },
+                {
+                  "text": "Solo la de la cuerda"
+                }
+              ]
+            },
+            {
+              "prompt": "¿La fricción influye en la fuerza neta aunque el bulto se esté moviendo?",
+              "choices": [
+                {
+                  "text": "No, se ignora si se mueve"
+                },
+                {
+                  "text": "Sí, le resta a la fuerza de la cuerda",
+                  "correct": true
+                }
+              ]
+            }
+          ]
+        },
+        "D": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la D?",
+            "choices": [
+              {
+                "text": "Pensé que con fricción no hay aceleración"
+              },
+              {
+                "text": "Creí que una fuerza constante da velocidad constante"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Cuánto vale la fuerza neta sobre el bulto?",
+              "choices": [
+                {
+                  "text": "60 N",
+                  "correct": true
+                },
+                {
+                  "text": "0 N"
+                }
+              ]
+            },
+            {
+              "prompt": "Si la fuerza neta no es cero, ¿la aceleración puede ser cero?",
+              "choices": [
+                {
+                  "text": "Sí, puede ser cero"
+                },
+                {
+                  "text": "No, debe haber aceleración",
+                  "correct": true
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "reveal": "Para usar $F = ma$ primero se combinan las fuerzas según su sentido: 180 N menos 120 N da 60 N. Al dividir entre 60 kg resulta la aceleración de la opción C."
+    }
+  },
+  {
+    "id": "cn-09",
+    "subjectId": "ciencias_naturales",
+    "categoryId": "ciencias_naturales.physics_component",
+    "primarySubtopicId": "ciencias_naturales.physics_component.motion_forces_dynamics",
+    "competencia": "indagacion",
+    "difficulty": "alta",
+    "targetGrade": 11,
+    "context": "Un grupo de estudiantes de Tunja mide el período de un péndulo simple, con ángulos pequeños, y obtiene estos resultados:\n\n| Ensayo | Longitud (m) | Masa (g) | Período (s) |\n|---|---|---|---|\n| 1 | 0,25 | 50 | 1,0 |\n| 2 | 0,25 | 100 | 1,0 |\n| 3 | 1,00 | 50 | 2,0 |\n| 4 | 1,00 | 100 | 2,0 |",
+    "stem": "¿Qué conclusión apoyan los datos de la tabla?",
+    "options": [
+      {
+        "label": "A",
+        "text": "El período aumenta al disminuir la masa, pues el ensayo 3 tarda más que el ensayo 2."
+      },
+      {
+        "label": "B",
+        "text": "El período aumenta con la longitud y, en este rango, no depende de la masa."
+      },
+      {
+        "label": "C",
+        "text": "Al cuadruplicar la longitud, el período también se cuadruplica."
+      },
+      {
+        "label": "D",
+        "text": "La longitud y la masa influyen por igual en el período."
+      }
+    ],
+    "correctOption": "B",
+    "solution": "Al comparar ensayos de igual longitud (1 con 2, 3 con 4), cambiar la masa no cambia el período. Al comparar ensayos de igual masa (1 con 3, 2 con 4), cuadruplicar la longitud duplica el período.",
+    "guide": {
+      "hint": "¿Qué pares de ensayos cambian una sola variable?",
+      "byOption": {
+        "A": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la A?",
+            "choices": [
+              {
+                "text": "Comparé los ensayos 3 y 2"
+              },
+              {
+                "text": "Pensé que los péndulos livianos tardan más"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "Entre los ensayos 2 y 3, ¿cuántas variables cambian?",
+              "choices": [
+                {
+                  "text": "Solo la masa"
+                },
+                {
+                  "text": "Dos: longitud y masa",
+                  "correct": true
+                }
+              ]
+            },
+            {
+              "prompt": "En los ensayos 1 y 2 solo cambia la masa, ¿cambió el período?",
+              "choices": [
+                {
+                  "text": "No, es 1,0 s en ambos",
+                  "correct": true
+                },
+                {
+                  "text": "Sí, aumentó"
+                }
+              ]
+            }
+          ]
+        },
+        "C": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la C?",
+            "choices": [
+              {
+                "text": "Pensé que el período cambia en la misma proporción que la longitud"
+              },
+              {
+                "text": "No revisé cuánto cambiaba el período en la tabla"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "Del ensayo 1 al ensayo 3, ¿cuántas veces aumenta la longitud?",
+              "choices": [
+                {
+                  "text": "4 veces",
+                  "correct": true
+                },
+                {
+                  "text": "2 veces"
+                }
+              ]
+            },
+            {
+              "prompt": "En esos mismos ensayos, ¿cuántas veces aumentó el período?",
+              "choices": [
+                {
+                  "text": "4 veces"
+                },
+                {
+                  "text": "2 veces",
+                  "correct": true
+                }
+              ]
+            }
+          ]
+        },
+        "D": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la D?",
+            "choices": [
+              {
+                "text": "Pensé que si hay dos variables, ambas influyen igual"
+              },
+              {
+                "text": "Vi cambiar el período y supuse que ambas lo afectan"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Qué tienen de diferente los ensayos 3 y 4?",
+              "choices": [
+                {
+                  "text": "Solo la masa",
+                  "correct": true
+                },
+                {
+                  "text": "Solo la longitud"
+                }
+              ]
+            },
+            {
+              "prompt": "Entre los ensayos 3 y 4, ¿cambió el período?",
+              "choices": [
+                {
+                  "text": "Sí, cambió mucho"
+                },
+                {
+                  "text": "No, se mantuvo en 2,0 s",
+                  "correct": true
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "reveal": "Para evaluar una variable se deben comparar ensayos donde solo ella cambie. Así se ve que la masa no altera el período y la longitud sí: esa es la conclusión de la B."
+    }
+  },
+  {
+    "id": "cn-10",
+    "subjectId": "ciencias_naturales",
+    "categoryId": "ciencias_naturales.physics_component",
+    "primarySubtopicId": "ciencias_naturales.physics_component.energy_heat_transformations",
+    "competencia": "uso_comprensivo",
+    "difficulty": "baja",
+    "targetGrade": 11,
+    "context": "Una central hidroeléctrica en el oriente antioqueño conduce el agua de un embalse situado a gran altura, por tuberías, hasta unas turbinas conectadas a generadores.",
+    "stem": "¿Cuál secuencia describe mejor las transformaciones de energía desde el agua del embalse hasta la red eléctrica?",
+    "options": [
+      {
+        "label": "A",
+        "text": "Potencial gravitacional → cinética → eléctrica."
+      },
+      {
+        "label": "B",
+        "text": "Eléctrica → cinética → potencial gravitacional."
+      },
+      {
+        "label": "C",
+        "text": "Térmica → cinética → eléctrica."
+      },
+      {
+        "label": "D",
+        "text": "Química → potencial gravitacional → eléctrica."
+      }
+    ],
+    "correctOption": "A",
+    "solution": "El agua almacenada en altura tiene energía potencial gravitacional, que se convierte en cinética al bajar por las tuberías. La turbina y el generador transforman ese movimiento en energía eléctrica.",
+    "guide": {
+      "hint": "¿Qué le sucede al agua desde que sale del embalse hasta que llega a la turbina?",
+      "byOption": {
+        "B": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la B?",
+            "choices": [
+              {
+                "text": "Pensé que las represas gastan electricidad para subir el agua"
+              },
+              {
+                "text": "Confundí el orden de los pasos"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Qué produce la central como resultado final?",
+              "choices": [
+                {
+                  "text": "Electricidad",
+                  "correct": true
+                },
+                {
+                  "text": "Agua en altura"
+                }
+              ]
+            },
+            {
+              "prompt": "Si la electricidad es el resultado, ¿puede ser la primera forma de energía?",
+              "choices": [
+                {
+                  "text": "Sí, puede ser la primera"
+                },
+                {
+                  "text": "No, debe ser la última",
+                  "correct": true
+                }
+              ]
+            }
+          ]
+        },
+        "C": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la C?",
+            "choices": [
+              {
+                "text": "Pensé que el agua del embalse se calienta"
+              },
+              {
+                "text": "La confundí con una central térmica"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Qué hace girar las turbinas: vapor caliente o agua que baja?",
+              "choices": [
+                {
+                  "text": "Vapor caliente"
+                },
+                {
+                  "text": "Agua que baja",
+                  "correct": true
+                }
+              ]
+            },
+            {
+              "prompt": "¿Necesita la central calentar el agua para generar electricidad?",
+              "choices": [
+                {
+                  "text": "No, aprovecha su caída",
+                  "correct": true
+                },
+                {
+                  "text": "Sí, debe calentarla"
+                }
+              ]
+            }
+          ]
+        },
+        "D": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la D?",
+            "choices": [
+              {
+                "text": "Pensé que el agua guarda energía química"
+              },
+              {
+                "text": "Creí que toda central usa un combustible"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Se quema algo o reacciona el agua al pasar por la turbina?",
+              "choices": [
+                {
+                  "text": "No, el agua no reacciona",
+                  "correct": true
+                },
+                {
+                  "text": "Sí, reacciona químicamente"
+                }
+              ]
+            },
+            {
+              "prompt": "Si el agua no reacciona, ¿de dónde sale la energía que mueve la turbina?",
+              "choices": [
+                {
+                  "text": "De una sustancia que se quema"
+                },
+                {
+                  "text": "De que el agua baja desde la altura",
+                  "correct": true
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "reveal": "En una hidroeléctrica no se quema nada: la altura del agua le da energía potencial, que se vuelve movimiento y finalmente electricidad. Por eso la A es la secuencia correcta."
+    }
+  },
+  {
+    "id": "cn-11",
+    "subjectId": "ciencias_naturales",
+    "categoryId": "ciencias_naturales.physics_component",
+    "primarySubtopicId": "ciencias_naturales.physics_component.energy_heat_transformations",
+    "competencia": "explicacion_fenomenos",
+    "difficulty": "media",
+    "targetGrade": 11,
+    "stem": "Una familia prepara fríjoles en olla destapada en Bogotá (2 600 m de altitud) y otra en Cartagena (nivel del mar), con la misma receta y un fuego similar. En Bogotá los fríjoles tardan más en cocinarse. ¿Cuál es la mejor explicación?",
+    "options": [
+      {
+        "label": "A",
+        "text": "La presión atmosférica es menor y por eso el agua necesita más de 100 °C para hervir."
+      },
+      {
+        "label": "B",
+        "text": "El aire tiene menos oxígeno, y los fríjoles necesitan oxígeno disuelto para ablandarse."
+      },
+      {
+        "label": "C",
+        "text": "La presión atmosférica es menor y el agua hierve a menos de 100 °C, así que cocina a menor temperatura."
+      },
+      {
+        "label": "D",
+        "text": "El agua de la llave es más fría, y ese tiempo inicial de calentamiento explica toda la diferencia."
+      }
+    ],
+    "correctOption": "C",
+    "solution": "El agua hierve cuando su presión de vapor iguala la presión atmosférica. En Bogotá esa presión es menor, así que hierve cerca de 92 °C, y a esa temperatura los fríjoles se cocinan más despacio.",
+    "guide": {
+      "hint": "¿Qué relación hay entre la presión del aire y la temperatura a la que hierve el agua?",
+      "byOption": {
+        "A": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la A?",
+            "choices": [
+              {
+                "text": "Pensé que con menos presión cuesta más hervir"
+              },
+              {
+                "text": "Creí que en la altura hay que calentar más el agua"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Qué presión debe vencer el agua para formar burbujas de vapor al hervir?",
+              "choices": [
+                {
+                  "text": "La de la llama"
+                },
+                {
+                  "text": "La del aire que está encima",
+                  "correct": true
+                }
+              ]
+            },
+            {
+              "prompt": "Si el aire hace menos presión, ¿el agua necesita más o menos temperatura para hervir?",
+              "choices": [
+                {
+                  "text": "Menos temperatura",
+                  "correct": true
+                },
+                {
+                  "text": "Más temperatura"
+                }
+              ]
+            }
+          ]
+        },
+        "B": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la B?",
+            "choices": [
+              {
+                "text": "Recordé que en Bogotá hay menos oxígeno"
+              },
+              {
+                "text": "Pensé que cocinar necesita oxígeno, como respirar"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Qué ablanda los fríjoles al cocinarlos: el calor o el oxígeno del aire?",
+              "choices": [
+                {
+                  "text": "El oxígeno del aire"
+                },
+                {
+                  "text": "El calor con el agua",
+                  "correct": true
+                }
+              ]
+            },
+            {
+              "prompt": "¿Una olla a presión cerrada, con poco aire nuevo, cocina más rápido o más lento?",
+              "choices": [
+                {
+                  "text": "Más rápido",
+                  "correct": true
+                },
+                {
+                  "text": "Más lento"
+                }
+              ]
+            }
+          ]
+        },
+        "D": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la D?",
+            "choices": [
+              {
+                "text": "Pensé que el agua de Bogotá sale mucho más fría"
+              },
+              {
+                "text": "Creí que el calentamiento inicial es lo que más tarda"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "Una vez el agua hierve, ¿la temperatura inicial del agua sigue importando?",
+              "choices": [
+                {
+                  "text": "Sí, sigue importando"
+                },
+                {
+                  "text": "No, ya está hirviendo",
+                  "correct": true
+                }
+              ]
+            },
+            {
+              "prompt": "¿Qué parte de la cocción de los fríjoles dura más: calentar el agua o hervirlos?",
+              "choices": [
+                {
+                  "text": "Hervirlos, que toma mucho más",
+                  "correct": true
+                },
+                {
+                  "text": "Calentar el agua"
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "reveal": "Cocinar depende de la temperatura del agua, y en una olla destapada esta no sube más allá del punto de ebullición. En Bogotá ese punto está alrededor de 92 °C: por eso la C explica la demora."
+    }
+  },
+  {
+    "id": "cn-12",
+    "subjectId": "ciencias_naturales",
+    "categoryId": "ciencias_naturales.physics_component",
+    "primarySubtopicId": "ciencias_naturales.physics_component.energy_heat_transformations",
+    "competencia": "uso_comprensivo",
+    "difficulty": "alta",
+    "targetGrade": 11,
+    "stem": "Para preparar una aguapanela tibia se mezclan en un termo 200 g de agua a 80 °C con 600 g de agua a 20 °C. Si no se pierde calor hacia el ambiente, ¿cuál será la temperatura final de la mezcla?",
+    "options": [
+      {
+        "label": "A",
+        "text": "65 °C"
+      },
+      {
+        "label": "B",
+        "text": "50 °C"
+      },
+      {
+        "label": "C",
+        "text": "60 °C"
+      },
+      {
+        "label": "D",
+        "text": "35 °C"
+      }
+    ],
+    "correctOption": "D",
+    "solution": "El calor cedido por el agua caliente es igual al ganado por la fría: $200(80-T) = 600(T-20)$. Al resolver se obtiene $T = 35$ °C.",
+    "guide": {
+      "hint": "¿Qué condición cumplen el calor que cede una parte del agua y el que gana la otra?",
+      "byOption": {
+        "A": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la A?",
+            "choices": [
+              {
+                "text": "Pensé que el agua caliente pesa más en el resultado"
+              },
+              {
+                "text": "Invertí las cantidades al calcular el promedio"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Qué hay en mayor cantidad: agua caliente o agua fría?",
+              "choices": [
+                {
+                  "text": "Agua fría",
+                  "correct": true
+                },
+                {
+                  "text": "Agua caliente"
+                }
+              ]
+            },
+            {
+              "prompt": "Si predomina el agua fría, ¿la mezcla queda más cerca de 20 o de 80 grados?",
+              "choices": [
+                {
+                  "text": "Más cerca de 80 grados"
+                },
+                {
+                  "text": "Más cerca de 20 grados",
+                  "correct": true
+                }
+              ]
+            }
+          ]
+        },
+        "B": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la B?",
+            "choices": [
+              {
+                "text": "Promedié 80 y 20"
+              },
+              {
+                "text": "Pensé que las masas no importan"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Cuándo daría 50 grados exactos la mezcla?",
+              "choices": [
+                {
+                  "text": "Si las dos masas fueran iguales",
+                  "correct": true
+                },
+                {
+                  "text": "Con cualquier masa"
+                }
+              ]
+            },
+            {
+              "prompt": "Aquí hay tres veces más agua fría, ¿el promedio simple sigue sirviendo?",
+              "choices": [
+                {
+                  "text": "Sí, sigue igual"
+                },
+                {
+                  "text": "No, hay que ponderar por la masa",
+                  "correct": true
+                }
+              ]
+            }
+          ]
+        },
+        "C": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la C?",
+            "choices": [
+              {
+                "text": "Resté 80 menos 20"
+              },
+              {
+                "text": "Pensé que la temperatura final es la diferencia"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Qué representa la resta 80 − 20 = 60?",
+              "choices": [
+                {
+                  "text": "Cuánto difieren las temperaturas",
+                  "correct": true
+                },
+                {
+                  "text": "La temperatura de la mezcla"
+                }
+              ]
+            },
+            {
+              "prompt": "Si hay tres veces más agua fría, ¿la mezcla puede quedar cerca de 60 grados?",
+              "choices": [
+                {
+                  "text": "Sí, puede quedar cerca de 60"
+                },
+                {
+                  "text": "No, debe quedar más cerca de 20",
+                  "correct": true
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "reveal": "En una mezcla sin pérdidas, el calor que pierde el agua caliente lo gana la fría, y la masa mayor influye más. Con tres veces más agua fría, la temperatura queda más cerca de 20 °C: la respuesta es la D."
+    }
+  },
+  {
+    "id": "cn-13",
+    "subjectId": "ciencias_naturales",
+    "categoryId": "ciencias_naturales.chemistry_component",
+    "primarySubtopicId": "ciencias_naturales.chemistry_component.chemical_changes_reactions",
+    "competencia": "uso_comprensivo",
+    "difficulty": "baja",
+    "targetGrade": 11,
+    "context": "En un trapiche de Santander se realizan varias actividades con la caña de azúcar.",
+    "stem": "¿Cuál de estas actividades implica un cambio químico?",
+    "options": [
+      {
+        "label": "A",
+        "text": "Exprimir la caña hasta separar su jugo del bagazo."
+      },
+      {
+        "label": "B",
+        "text": "Calentar el jugo para que parte de su agua pase a vapor."
+      },
+      {
+        "label": "C",
+        "text": "Dejar que los azúcares del guarapo se conviertan en etanol."
+      },
+      {
+        "label": "D",
+        "text": "Verter la miel caliente en moldes para que tome forma de bloque."
+      }
+    ],
+    "correctOption": "C",
+    "solution": "En un cambio químico se forman sustancias nuevas. En la fermentación, los azúcares del guarapo se transforman en etanol y dióxido de carbono; en las demás actividades se separan componentes o cambian la forma o el estado.",
+    "guide": {
+      "hint": "¿Qué debe aparecer para que un cambio se considere químico?",
+      "byOption": {
+        "A": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la A?",
+            "choices": [
+              {
+                "text": "Pensé que separar el jugo cambia la caña"
+              },
+              {
+                "text": "Creí que cualquier cambio en la caña es químico"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿El jugo ya estaba dentro de la caña antes de exprimirla?",
+              "choices": [
+                {
+                  "text": "No, apareció al exprimirla"
+                },
+                {
+                  "text": "Sí, solo se separó",
+                  "correct": true
+                }
+              ]
+            },
+            {
+              "prompt": "Si el jugo ya existía, ¿se formó una sustancia nueva?",
+              "choices": [
+                {
+                  "text": "No, ninguna sustancia nueva",
+                  "correct": true
+                },
+                {
+                  "text": "Sí, se formó una nueva"
+                }
+              ]
+            }
+          ]
+        },
+        "B": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la B?",
+            "choices": [
+              {
+                "text": "Pensé que si algo se calienta cambia químicamente"
+              },
+              {
+                "text": "Creí que el agua desaparece al evaporarse"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Qué sustancia sale del jugo como vapor?",
+              "choices": [
+                {
+                  "text": "Agua",
+                  "correct": true
+                },
+                {
+                  "text": "Un gas nuevo"
+                }
+              ]
+            },
+            {
+              "prompt": "El vapor de agua, ¿sigue siendo agua?",
+              "choices": [
+                {
+                  "text": "No, ya es otra sustancia"
+                },
+                {
+                  "text": "Sí, solo cambió de estado",
+                  "correct": true
+                }
+              ]
+            }
+          ]
+        },
+        "D": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la D?",
+            "choices": [
+              {
+                "text": "Pensé que cambiar de forma es un cambio químico"
+              },
+              {
+                "text": "Creí que al endurecerse aparece una sustancia nueva"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "Al tomar la forma del molde, ¿cambian las sustancias que hay en la miel?",
+              "choices": [
+                {
+                  "text": "No, solo cambia su forma",
+                  "correct": true
+                },
+                {
+                  "text": "Sí, cambian todas"
+                }
+              ]
+            },
+            {
+              "prompt": "Si derrites una vela y la enfrías en otro molde, ¿tienes una cera distinta?",
+              "choices": [
+                {
+                  "text": "Sí, ya es otra sustancia"
+                },
+                {
+                  "text": "No, sigue siendo la misma cera",
+                  "correct": true
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "reveal": "Un cambio químico produce sustancias con propiedades distintas, como el etanol que aparece cuando fermentan los azúcares. Exprimir, evaporar y moldear no forman sustancias nuevas, así que la C es la correcta."
+    }
+  },
+  {
+    "id": "cn-14",
+    "subjectId": "ciencias_naturales",
+    "categoryId": "ciencias_naturales.chemistry_component",
+    "primarySubtopicId": "ciencias_naturales.chemistry_component.chemical_changes_reactions",
+    "competencia": "uso_comprensivo",
+    "difficulty": "media",
+    "targetGrade": 11,
+    "context": "Un biodigestor en una finca porcina de Antioquia produce metano, que se quema en la estufa según la reacción $\\mathrm{CH_4 + 2O_2 \\rightarrow CO_2 + 2H_2O}$. Al reaccionar por completo 16 g de metano con 64 g de oxígeno se forman 44 g de dióxido de carbono.",
+    "stem": "¿Qué masa de agua se produce?",
+    "options": [
+      {
+        "label": "A",
+        "text": "80 g"
+      },
+      {
+        "label": "B",
+        "text": "36 g"
+      },
+      {
+        "label": "C",
+        "text": "20 g"
+      },
+      {
+        "label": "D",
+        "text": "18 g"
+      }
+    ],
+    "correctOption": "B",
+    "solution": "Por conservación de la masa, los reactivos suman $16 + 64 = 80$ g y los productos también deben sumar 80 g. La masa de agua es $80 - 44 = 36$ g.",
+    "guide": {
+      "hint": "¿Cómo se relaciona la masa total de los reactivos con la de los productos?",
+      "byOption": {
+        "A": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la A?",
+            "choices": [
+              {
+                "text": "Sumé las masas de los reactivos y me detuve"
+              },
+              {
+                "text": "Pensé que toda esa masa se vuelve agua"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Cuál es la masa total de los productos de la reacción?",
+              "choices": [
+                {
+                  "text": "44 g"
+                },
+                {
+                  "text": "80 g",
+                  "correct": true
+                }
+              ]
+            },
+            {
+              "prompt": "Si ya hay 44 g de dióxido de carbono, ¿el agua puede pesar 80 g?",
+              "choices": [
+                {
+                  "text": "No, los productos juntos suman 80 g",
+                  "correct": true
+                },
+                {
+                  "text": "Sí, puede pesar 80 g"
+                }
+              ]
+            }
+          ]
+        },
+        "C": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la C?",
+            "choices": [
+              {
+                "text": "Resté 64 menos 44"
+              },
+              {
+                "text": "Pensé que el metano no cuenta para el agua"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Qué reactivos aportan átomos a las moléculas de agua?",
+              "choices": [
+                {
+                  "text": "Metano y oxígeno",
+                  "correct": true
+                },
+                {
+                  "text": "Solo el oxígeno"
+                }
+              ]
+            },
+            {
+              "prompt": "¿Al restar 64 menos 44 usaste toda la masa de los reactivos?",
+              "choices": [
+                {
+                  "text": "Sí, ya está toda"
+                },
+                {
+                  "text": "No, faltó la masa del metano",
+                  "correct": true
+                }
+              ]
+            }
+          ]
+        },
+        "D": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la D?",
+            "choices": [
+              {
+                "text": "Usé la masa molar del agua"
+              },
+              {
+                "text": "Olvidé el coeficiente 2 de la ecuación"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Cuántas moléculas de agua aparecen por cada molécula de metano?",
+              "choices": [
+                {
+                  "text": "Una"
+                },
+                {
+                  "text": "Dos",
+                  "correct": true
+                }
+              ]
+            },
+            {
+              "prompt": "Según la ecuación, ¿se forma un solo mol de agua?",
+              "choices": [
+                {
+                  "text": "No, se forman dos moles",
+                  "correct": true
+                },
+                {
+                  "text": "Sí, solo uno"
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "reveal": "La masa se conserva en toda reacción: lo que entra debe salir. Como los productos suman 80 g y el dióxido de carbono aporta 44 g, el agua aporta los 36 g de la opción B."
+    }
+  },
+  {
+    "id": "cn-15",
+    "subjectId": "ciencias_naturales",
+    "categoryId": "ciencias_naturales.chemistry_component",
+    "primarySubtopicId": "ciencias_naturales.chemistry_component.chemical_changes_reactions",
+    "competencia": "explicacion_fenomenos",
+    "difficulty": "alta",
+    "targetGrade": 11,
+    "context": "En la altillanura colombiana muchos suelos son ácidos. Un agricultor aplica cal agrícola ($\\mathrm{CaCO_3}$), que reacciona con los iones $\\mathrm{H^+}$ del suelo, y el pH pasa de 4,5 a 5,5.",
+    "stem": "¿Qué ocurrió con la concentración de iones $\\mathrm{H^+}$ en el agua del suelo?",
+    "options": [
+      {
+        "label": "A",
+        "text": "Se redujo a la décima parte, porque la cal consumió iones $\\mathrm{H^+}$."
+      },
+      {
+        "label": "B",
+        "text": "Aumentó diez veces, porque un pH mayor indica más iones $\\mathrm{H^+}$."
+      },
+      {
+        "label": "C",
+        "text": "Disminuyó cerca de un 20 %, en proporción al cambio entre 4,5 y 5,5."
+      },
+      {
+        "label": "D",
+        "text": "No cambió, porque la cal solo aporta calcio como nutriente."
+      }
+    ],
+    "correctOption": "A",
+    "solution": "La escala de pH es logarítmica: $[\\mathrm{H^+}] = 10^{-\\mathrm{pH}}$. Subir una unidad de pH divide entre 10 la concentración de $\\mathrm{H^+}$; el carbonato reacciona con esos iones y reduce la acidez.",
+    "guide": {
+      "hint": "¿Qué indica un valor de pH sobre la concentración de iones en la solución?",
+      "byOption": {
+        "B": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la B?",
+            "choices": [
+              {
+                "text": "Pensé que más pH significa más iones H⁺"
+              },
+              {
+                "text": "Creí que un número mayor indica más acidez"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Qué es más ácido: una solución de pH 3 o una de pH 6?",
+              "choices": [
+                {
+                  "text": "La de pH 3",
+                  "correct": true
+                },
+                {
+                  "text": "La de pH 6"
+                }
+              ]
+            },
+            {
+              "prompt": "Si el pH subió, ¿el suelo quedó más ácido o menos ácido?",
+              "choices": [
+                {
+                  "text": "Más ácido"
+                },
+                {
+                  "text": "Menos ácido",
+                  "correct": true
+                }
+              ]
+            }
+          ]
+        },
+        "C": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la C?",
+            "choices": [
+              {
+                "text": "Calculé cuánto cambió el número 4,5"
+              },
+              {
+                "text": "Pensé que el pH es una escala lineal"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Cuántas veces cambia la concentración de H⁺ al cambiar el pH en una unidad?",
+              "choices": [
+                {
+                  "text": "Cambia 10 veces",
+                  "correct": true
+                },
+                {
+                  "text": "Cambia un 20 %"
+                }
+              ]
+            },
+            {
+              "prompt": "Entonces, ¿se puede calcular el cambio de concentración con porcentajes del valor del pH?",
+              "choices": [
+                {
+                  "text": "Sí, basta con el porcentaje"
+                },
+                {
+                  "text": "No, la escala es logarítmica",
+                  "correct": true
+                }
+              ]
+            }
+          ]
+        },
+        "D": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la D?",
+            "choices": [
+              {
+                "text": "Pensé que la cal solo aporta nutrientes"
+              },
+              {
+                "text": "Creí que el pH no depende de lo que se añade"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "Según el texto, ¿qué hace la cal con los iones H⁺ del suelo?",
+              "choices": [
+                {
+                  "text": "Reacciona con ellos",
+                  "correct": true
+                },
+                {
+                  "text": "No los afecta"
+                }
+              ]
+            },
+            {
+              "prompt": "Si el pH pasó de 4,5 a 5,5, ¿la concentración de iones quedó igual?",
+              "choices": [
+                {
+                  "text": "Sí, quedó igual"
+                },
+                {
+                  "text": "No, el pH cambió",
+                  "correct": true
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "reveal": "Cada unidad de pH corresponde a un factor de 10 en la concentración de iones $\\mathrm{H^+}$. Al subir de 4,5 a 5,5, esa concentración es diez veces menor, como indica la A."
+    }
+  },
+  {
+    "id": "cn-16",
+    "subjectId": "ciencias_naturales",
+    "categoryId": "ciencias_naturales.chemistry_component",
+    "primarySubtopicId": "ciencias_naturales.chemistry_component.chemical_changes_reactions",
+    "competencia": "indagacion",
+    "difficulty": "media",
+    "targetGrade": 11,
+    "context": "En un colegio de Pasto se colocan 100 mL del mismo vinagre en dos vasos, a la misma temperatura. Al vaso 1 se le agrega 1 g de cáscara de huevo en trozos grandes y al vaso 2, 1 g de cáscara molida. Se recoge el gas producido:\n\n| Tiempo (min) | Vaso 1 (mL) | Vaso 2 (mL) |\n|---|---|---|\n| 1 | 20 | 90 |\n| 5 | 70 | 180 |\n| 60 | 200 | 200 |",
+    "stem": "¿Qué conclusión apoyan estos datos?",
+    "options": [
+      {
+        "label": "A",
+        "text": "La cáscara molida libera más gas en total, porque moler aumenta su contenido de carbonato."
+      },
+      {
+        "label": "B",
+        "text": "Moler la cáscara la transforma en una sustancia diferente, que reacciona mejor con el vinagre."
+      },
+      {
+        "label": "C",
+        "text": "Los trozos grandes reaccionan más rápido, porque cada trozo concentra más masa."
+      },
+      {
+        "label": "D",
+        "text": "Moler la cáscara aumenta la velocidad de reacción, pero no cambia la cantidad final de gas."
+      }
+    ],
+    "correctOption": "D",
+    "solution": "En el vaso 2 el gas aparece antes, así que la reacción es más rápida cuando hay más superficie expuesta. A los 60 minutos ambos vasos llegan a 200 mL, por lo que la cantidad total de gas no cambió.",
+    "guide": {
+      "hint": "¿Qué muestran los datos al inicio y al final del experimento?",
+      "byOption": {
+        "A": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la A?",
+            "choices": [
+              {
+                "text": "Vi que el vaso 2 tenía más gas al principio"
+              },
+              {
+                "text": "Pensé que moler libera carbonato adicional"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Cuánto gas había en cada vaso a los 60 minutos?",
+              "choices": [
+                {
+                  "text": "Más en el vaso 2"
+                },
+                {
+                  "text": "200 mL en ambos",
+                  "correct": true
+                }
+              ]
+            },
+            {
+              "prompt": "Con la misma masa y el mismo gas final, ¿tenían distinta cantidad de carbonato?",
+              "choices": [
+                {
+                  "text": "No, tenían la misma",
+                  "correct": true
+                },
+                {
+                  "text": "Sí, el vaso 2 tenía más"
+                }
+              ]
+            }
+          ]
+        },
+        "B": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la B?",
+            "choices": [
+              {
+                "text": "Pensé que moler cambia la sustancia"
+              },
+              {
+                "text": "Creí que reaccionar más rápido indica otra sustancia"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "Al moler la cáscara, ¿cambia su composición o solo el tamaño de sus trozos?",
+              "choices": [
+                {
+                  "text": "Cambia la composición"
+                },
+                {
+                  "text": "Solo el tamaño",
+                  "correct": true
+                }
+              ]
+            },
+            {
+              "prompt": "¿Moler es un cambio físico o un cambio químico?",
+              "choices": [
+                {
+                  "text": "Físico",
+                  "correct": true
+                },
+                {
+                  "text": "Químico"
+                }
+              ]
+            }
+          ]
+        },
+        "C": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la C?",
+            "choices": [
+              {
+                "text": "Pensé que algo más grande reacciona con más fuerza"
+              },
+              {
+                "text": "Leí la tabla al revés"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Qué vaso tiene más gas en el primer minuto?",
+              "choices": [
+                {
+                  "text": "El vaso 1"
+                },
+                {
+                  "text": "El vaso 2",
+                  "correct": true
+                }
+              ]
+            },
+            {
+              "prompt": "Si el vaso con más gas al inicio es el de cáscara molida, ¿qué trozos reaccionan más lento?",
+              "choices": [
+                {
+                  "text": "Los trozos grandes",
+                  "correct": true
+                },
+                {
+                  "text": "Los trozos molidos"
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "reveal": "Al moler la cáscara hay más superficie expuesta y más choques con el ácido por segundo, así que la reacción es más rápida. La masa es la misma, de modo que el gas final también: eso afirma la D."
+    }
+  },
+  {
+    "id": "cn-17",
+    "subjectId": "ciencias_naturales",
+    "categoryId": "ciencias_naturales.science_tech_society",
+    "primarySubtopicId": "ciencias_naturales.science_tech_society.environment_sustainability",
+    "competencia": "explicacion_fenomenos",
+    "difficulty": "media",
+    "targetGrade": 11,
+    "context": "En ciénagas afectadas por la minería de oro con mercurio, los peces acumulan metilmercurio, una forma que el cuerpo elimina muy lentamente. En una ciénaga del Bajo Cauca viven estas especies:\n\n| Especie | Alimentación |\n|---|---|\n| Bocachico | Detritos y algas del fondo |\n| Sardina | Pequeños invertebrados y algas |\n| Bagre | Otros peces |",
+    "stem": "Si se mide el mercurio en el músculo de ejemplares adultos, ¿cuál resultado es el más probable?",
+    "options": [
+      {
+        "label": "A",
+        "text": "El bocachico tiene la mayor concentración, porque se alimenta en el fondo, donde se deposita el mercurio."
+      },
+      {
+        "label": "B",
+        "text": "El bagre tiene la mayor concentración, porque al comer otros peces acumula el mercurio de sus presas."
+      },
+      {
+        "label": "C",
+        "text": "La sardina tiene la mayor concentración, porque su cuerpo pequeño se satura rápidamente de mercurio."
+      },
+      {
+        "label": "D",
+        "text": "Las tres especies tienen igual concentración, porque todas viven en la misma agua contaminada."
+      }
+    ],
+    "correctOption": "B",
+    "solution": "El metilmercurio se elimina lentamente y se acumula de un nivel trófico a otro, un proceso llamado biomagnificación. Por eso los depredadores como el bagre suelen presentar las mayores concentraciones.",
+    "guide": {
+      "hint": "¿Qué hace el cuerpo de un pez con una sustancia que casi no puede eliminar?",
+      "byOption": {
+        "A": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la A?",
+            "choices": [
+              {
+                "text": "Pensé que el mercurio solo está en el fondo"
+              },
+              {
+                "text": "Creí que comer lodo contamina más que comer peces"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "Un pez piscívoro come muchas presas en su vida: ¿qué pasa con el mercurio de ellas?",
+              "choices": [
+                {
+                  "text": "Se elimina por completo"
+                },
+                {
+                  "text": "Se va acumulando en su cuerpo",
+                  "correct": true
+                }
+              ]
+            },
+            {
+              "prompt": "¿Un pez que come detritos recibe el mercurio acumulado en muchas presas?",
+              "choices": [
+                {
+                  "text": "No, no consume presas con mercurio acumulado",
+                  "correct": true
+                },
+                {
+                  "text": "Sí, recibe lo mismo"
+                }
+              ]
+            }
+          ]
+        },
+        "C": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la C?",
+            "choices": [
+              {
+                "text": "Pensé que un cuerpo pequeño se llena más rápido"
+              },
+              {
+                "text": "Creí que los peces pequeños son los más afectados"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿La sardina come otros peces con mercurio acumulado?",
+              "choices": [
+                {
+                  "text": "No, come invertebrados y algas",
+                  "correct": true
+                },
+                {
+                  "text": "Sí, come peces grandes"
+                }
+              ]
+            },
+            {
+              "prompt": "¿Su tamaño pequeño hace que acumule más que un depredador que consume muchas presas?",
+              "choices": [
+                {
+                  "text": "Sí, acumula más"
+                },
+                {
+                  "text": "No, acumula menos",
+                  "correct": true
+                }
+              ]
+            }
+          ]
+        },
+        "D": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la D?",
+            "choices": [
+              {
+                "text": "Pensé que el agua contamina a todos igual"
+              },
+              {
+                "text": "Creí que el alimento no influye"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Cuál es la principal vía de entrada del metilmercurio en los peces?",
+              "choices": [
+                {
+                  "text": "El alimento",
+                  "correct": true
+                },
+                {
+                  "text": "Solo el agua"
+                }
+              ]
+            },
+            {
+              "prompt": "Si comen cosas distintas, ¿reciben todos la misma cantidad de mercurio?",
+              "choices": [
+                {
+                  "text": "Sí, todos la misma"
+                },
+                {
+                  "text": "No, depende de su dieta",
+                  "correct": true
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "reveal": "El metilmercurio casi no se elimina y pasa de presa a depredador, concentrándose a medida que sube el nivel trófico. El pez que come otros peces acumula más: por eso la B."
+    }
+  },
+  {
+    "id": "cn-18",
+    "subjectId": "ciencias_naturales",
+    "categoryId": "ciencias_naturales.science_tech_society",
+    "primarySubtopicId": "ciencias_naturales.science_tech_society.environment_sustainability",
+    "competencia": "explicacion_fenomenos",
+    "difficulty": "alta",
+    "targetGrade": 11,
+    "context": "El suelo del páramo de Chingaza retiene agua como una esponja y la libera lentamente hacia las quebradas que abastecen a Bogotá. En una zona se drena el suelo y se introduce ganado, que lo compacta.",
+    "stem": "¿Qué cambio se espera en el caudal de la quebrada que nace en esa zona?",
+    "options": [
+      {
+        "label": "A",
+        "text": "Aumenta todo el año, porque se libera el agua que el suelo tenía guardada."
+      },
+      {
+        "label": "B",
+        "text": "No cambia, porque el caudal depende solo de cuánto llueve."
+      },
+      {
+        "label": "C",
+        "text": "Baja en lluvias y sube en sequía, porque el suelo compactado guarda mejor el agua."
+      },
+      {
+        "label": "D",
+        "text": "Sube mucho tras las lluvias y baja en sequía, porque el agua escurre sin almacenarse."
+      }
+    ],
+    "correctOption": "D",
+    "solution": "Un suelo drenado y compactado infiltra y almacena menos agua, por lo que la lluvia escurre rápido. Esto produce crecidas más fuertes en lluvias y menos agua disponible en los meses secos.",
+    "guide": {
+      "hint": "¿Qué ruta sigue el agua de lluvia cuando cae en un suelo esponjoso?",
+      "byOption": {
+        "A": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la A?",
+            "choices": [
+              {
+                "text": "Pensé que el agua drenada sigue saliendo siempre"
+              },
+              {
+                "text": "Creí que al perder suelo llega más agua a la quebrada"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Cuánta agua extra sale al drenar un suelo: una cantidad limitada o sin fin?",
+              "choices": [
+                {
+                  "text": "Una cantidad limitada",
+                  "correct": true
+                },
+                {
+                  "text": "Sin fin"
+                }
+              ]
+            },
+            {
+              "prompt": "Agotada esa reserva, ¿de dónde saldría el agua de la quebrada en meses secos?",
+              "choices": [
+                {
+                  "text": "Seguiría saliendo del suelo drenado"
+                },
+                {
+                  "text": "Casi no tendría de dónde salir",
+                  "correct": true
+                }
+              ]
+            }
+          ]
+        },
+        "B": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la B?",
+            "choices": [
+              {
+                "text": "Pensé que el agua depende únicamente del clima"
+              },
+              {
+                "text": "Creí que el suelo no cambia el agua que llega"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "Una misma lluvia cae sobre una esponja y sobre cemento: ¿escurre igual?",
+              "choices": [
+                {
+                  "text": "No, sobre el cemento escurre más rápido",
+                  "correct": true
+                },
+                {
+                  "text": "Sí, escurre igual"
+                }
+              ]
+            },
+            {
+              "prompt": "¿Cambiar el suelo puede cambiar el momento en que el agua llega a la quebrada?",
+              "choices": [
+                {
+                  "text": "No, solo importa la lluvia"
+                },
+                {
+                  "text": "Sí, aunque la lluvia sea la misma",
+                  "correct": true
+                }
+              ]
+            }
+          ]
+        },
+        "C": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la C?",
+            "choices": [
+              {
+                "text": "Pensé que un suelo compacto guarda mejor el agua"
+              },
+              {
+                "text": "Creí que el ganado mejora el suelo"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "Al compactar un suelo, ¿sus poros quedan más grandes o más pequeños?",
+              "choices": [
+                {
+                  "text": "Más pequeños",
+                  "correct": true
+                },
+                {
+                  "text": "Más grandes"
+                }
+              ]
+            },
+            {
+              "prompt": "Con poros más pequeños, ¿entra más o menos agua de lluvia en el suelo?",
+              "choices": [
+                {
+                  "text": "Más agua"
+                },
+                {
+                  "text": "Menos agua",
+                  "correct": true
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "reveal": "Sin la esponja del suelo, el agua corre de inmediato hacia la quebrada y no queda reserva para la sequía. Por eso la D es la opción correcta, y proteger los páramos ayuda a mantener el agua de las ciudades."
+    }
+  },
+  {
+    "id": "cn-19",
+    "subjectId": "ciencias_naturales",
+    "categoryId": "ciencias_naturales.scientific_skills",
+    "primarySubtopicId": "ciencias_naturales.scientific_skills.data_interpretation_conclusions",
+    "competencia": "indagacion",
+    "difficulty": "alta",
+    "targetGrade": 11,
+    "context": "Un colegio de la Sabana de Bogotá registra estos datos hipotéticos a lo largo de un río:\n\n| Estación | Distancia al nacimiento (km) | Descargas urbanas aguas arriba | Oxígeno disuelto (mg/L) | Temperatura del agua (°C) |\n|---|---|---|---|---|\n| 1 | 10 | No | 8,0 | 12 |\n| 2 | 60 | No | 7,5 | 14 |\n| 3 | 110 | Sí | 1,5 | 16 |\n| 4 | 180 | Sí | 2,5 | 19 |",
+    "stem": "¿Qué conclusión apoyan estos datos?",
+    "options": [
+      {
+        "label": "A",
+        "text": "El oxígeno cae donde hay descargas urbanas, aunque estos datos no prueban la causa."
+      },
+      {
+        "label": "B",
+        "text": "El oxígeno disminuye de forma constante a medida que aumenta la distancia al nacimiento."
+      },
+      {
+        "label": "C",
+        "text": "El aumento de temperatura explica por completo la caída del oxígeno a lo largo del río."
+      },
+      {
+        "label": "D",
+        "text": "Las descargas urbanas mataron a los peces del tramo entre las estaciones 2 y 3."
+      }
+    ],
+    "correctOption": "A",
+    "solution": "El oxígeno pasa de 7,5 a 1,5 mg/L justo cuando aparecen descargas aguas arriba, y ni la temperatura ni la distancia explican ese salto. Como son solo cuatro estaciones sin control de otros factores, los datos muestran una asociación, no prueban la causa.",
+    "guide": {
+      "hint": "¿Qué tan bien coincide cada variable con los cambios del oxígeno en las cuatro estaciones?",
+      "byOption": {
+        "B": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la B?",
+            "choices": [
+              {
+                "text": "Vi que el oxígeno baja de la estación 1 a la 3"
+              },
+              {
+                "text": "Pensé que todos los ríos pierden oxígeno al avanzar"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Qué pasa con el oxígeno entre las estaciones 3 y 4?",
+              "choices": [
+                {
+                  "text": "Sube de 1,5 a 2,5 mg/L",
+                  "correct": true
+                },
+                {
+                  "text": "Sigue bajando"
+                }
+              ]
+            },
+            {
+              "prompt": "Si en un tramo sube, ¿se puede decir que disminuye de forma constante?",
+              "choices": [
+                {
+                  "text": "Sí, es constante"
+                },
+                {
+                  "text": "No, no es constante",
+                  "correct": true
+                }
+              ]
+            }
+          ]
+        },
+        "C": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la C?",
+            "choices": [
+              {
+                "text": "Noté que la temperatura sube mientras el oxígeno baja"
+              },
+              {
+                "text": "Recordé que el agua caliente disuelve menos oxígeno"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Qué pasa con la temperatura y el oxígeno de la estación 3 a la 4?",
+              "choices": [
+                {
+                  "text": "Ambos suben",
+                  "correct": true
+                },
+                {
+                  "text": "Ambos bajan"
+                }
+              ]
+            },
+            {
+              "prompt": "Entre las estaciones 2 y 3, ¿puede un aumento de 2 grados explicar la caída observada?",
+              "choices": [
+                {
+                  "text": "Sí, lo explica todo"
+                },
+                {
+                  "text": "No, es muy poco para esa caída",
+                  "correct": true
+                }
+              ]
+            }
+          ]
+        },
+        "D": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la D?",
+            "choices": [
+              {
+                "text": "Pensé que poco oxígeno significa peces muertos"
+              },
+              {
+                "text": "Creí que la tabla habla de peces"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿La tabla incluye alguna medición de peces?",
+              "choices": [
+                {
+                  "text": "No, ninguna",
+                  "correct": true
+                },
+                {
+                  "text": "Sí, varias"
+                }
+              ]
+            },
+            {
+              "prompt": "Sin datos de peces, ¿se puede concluir que murieron por las descargas?",
+              "choices": [
+                {
+                  "text": "Sí, es evidente"
+                },
+                {
+                  "text": "No, esos datos no lo permiten",
+                  "correct": true
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "reveal": "Una conclusión válida no va más allá de los datos: estos muestran una caída fuerte del oxígeno junto con las descargas, pero no prueban la causa ni miden peces. Por eso la A es la mejor conclusión."
+    }
+  },
+  {
+    "id": "cn-20",
+    "subjectId": "ciencias_naturales",
+    "categoryId": "ciencias_naturales.scientific_skills",
+    "primarySubtopicId": "ciencias_naturales.scientific_skills.data_interpretation_conclusions",
+    "competencia": "indagacion",
+    "difficulty": "baja",
+    "targetGrade": 11,
+    "context": "Un grupo de estudiantes registra la temperatura media a distintas altitudes en la Sierra Nevada de Santa Marta:\n\n| Altitud (m) | Temperatura media (°C) |\n|---|---|\n| 0 | 28 |\n| 1 000 | 22 |\n| 2 000 | 16 |\n| 3 000 | 10 |",
+    "stem": "Si la tendencia se mantiene, ¿qué temperatura media se espera a 3 500 m?",
+    "options": [
+      {
+        "label": "A",
+        "text": "4 °C"
+      },
+      {
+        "label": "B",
+        "text": "10 °C"
+      },
+      {
+        "label": "C",
+        "text": "7 °C"
+      },
+      {
+        "label": "D",
+        "text": "13 °C"
+      }
+    ],
+    "correctOption": "C",
+    "solution": "Los datos bajan 6 °C por cada 1 000 m, es decir, 3 °C por cada 500 m. A 3 500 m la temperatura sería $10 - 3 = 7$ °C.",
+    "guide": {
+      "hint": "¿Cuánto cambia la temperatura entre una fila de la tabla y la siguiente?",
+      "byOption": {
+        "A": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la A?",
+            "choices": [
+              {
+                "text": "Calculé la temperatura a 4 000 m"
+              },
+              {
+                "text": "Resté 6 grados al valor de los 3 000 m"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿Cuántos metros hay entre 3 000 m y 3 500 m?",
+              "choices": [
+                {
+                  "text": "1 000 m"
+                },
+                {
+                  "text": "500 m",
+                  "correct": true
+                }
+              ]
+            },
+            {
+              "prompt": "Si en 1 000 m baja 6 grados, ¿en 500 m baja también 6?",
+              "choices": [
+                {
+                  "text": "No, baja la mitad",
+                  "correct": true
+                },
+                {
+                  "text": "Sí, baja lo mismo"
+                }
+              ]
+            }
+          ]
+        },
+        "B": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la B?",
+            "choices": [
+              {
+                "text": "Tomé el último valor de la tabla"
+              },
+              {
+                "text": "Pensé que la temperatura deja de cambiar después de 3 000 m"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "¿A qué altitud corresponde el dato de 10 grados en la tabla?",
+              "choices": [
+                {
+                  "text": "A 3 500 m"
+                },
+                {
+                  "text": "A 3 000 m",
+                  "correct": true
+                }
+              ]
+            },
+            {
+              "prompt": "¿Seguirá bajando la temperatura por encima de esa altitud, si la tendencia se mantiene?",
+              "choices": [
+                {
+                  "text": "Sí, sigue bajando",
+                  "correct": true
+                },
+                {
+                  "text": "No, se queda igual"
+                }
+              ]
+            }
+          ]
+        },
+        "D": {
+          "diagnose": {
+            "prompt": "¿Qué te hizo elegir la D?",
+            "choices": [
+              {
+                "text": "Sumé 3 grados en vez de restarlos"
+              },
+              {
+                "text": "Pensé que en la altura hace más calor por estar más cerca del Sol"
+              },
+              {
+                "text": "La adiviné"
+              }
+            ]
+          },
+          "steps": [
+            {
+              "prompt": "Según la tabla, al subir de altitud, ¿la temperatura aumenta o disminuye?",
+              "choices": [
+                {
+                  "text": "Aumenta"
+                },
+                {
+                  "text": "Disminuye",
+                  "correct": true
+                }
+              ]
+            },
+            {
+              "prompt": "Si disminuye, ¿a 3 500 m puede hacer más calor que a 3 000 m?",
+              "choices": [
+                {
+                  "text": "No, debe hacer menos calor",
+                  "correct": true
+                },
+                {
+                  "text": "Sí, puede hacer más calor"
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "reveal": "La tabla muestra una disminución regular de 6 °C por cada 1 000 m. En 500 m cae la mitad, por lo que a 3 500 m la temperatura esperada es la de la opción C."
+    }
+  }
+]

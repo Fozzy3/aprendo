@@ -1,7 +1,8 @@
 import { internalAction, internalMutation, internalQuery } from './_generated/server'
 import { internal } from './_generated/api'
 import { v } from 'convex/values'
-import type { Id } from './_generated/dataModel'
+import type { Doc, Id } from './_generated/dataModel'
+import { BOOKLET_CONTENT_TYPE, ensureAudit } from './audit'
 
 /**
  * Import an ICFES practice booklet without OCR and without a model.
@@ -18,8 +19,6 @@ import type { Id } from './_generated/dataModel'
  *   without a re-import. They stay eligible for placement anyway — see the note
  *   on `eligibility` below for why that is safe.
  */
-
-const BOOKLET_CONTENT_TYPE = 'application/x-aprendo-icfes-booklet'
 
 export const prepareBookletUpload = internalAction({
   args: { slug: v.string(), fileName: v.string() },
@@ -84,7 +83,7 @@ export const createBooklet = internalMutation({
  * delete-and-reinsert left every one of them dangling. So a question is matched
  * by its number within the booklet and a group by its context key, and a reload
  * patches the row that already exists. Fields this loader does not own (Elo,
- * rendered crops) survive the patch.
+ * rendered crops, a signed key or text) survive the patch.
  *
  * Group ranges and positions arrive computed over the whole booklet
  * (`groupSlots`), so a passage that straddles two slices is still one row.
@@ -93,6 +92,8 @@ export const upsertBookletQuestions = internalMutation({
   args: {
     pdfUploadId: v.id('pdfUploads'),
     subjectId: v.string(),
+    /** A later pass over a booklet already in the bank: what exists is left exactly as it is. */
+    addOnly: v.optional(v.boolean()),
     questions: v.array(
       v.object({
         number: v.number(),
@@ -109,10 +110,14 @@ export const upsertBookletQuestions = internalMutation({
         ),
         options: v.array(v.object({ label: v.string(), bodyMarkdown: v.string() })),
         correctOption: v.string(),
+        /** Set only when the booklet prints no key and ours comes from solving it. */
+        answerModelId: v.optional(v.string()),
         categoryId: v.string(),
         subtopicId: v.string(),
         tagConfidence: v.number(),
         confidentTag: v.boolean(),
+        /** Leans on a figure: kept for a person to read against the crop, not dropped. */
+        needsArtwork: v.optional(v.boolean()),
       }),
     ),
   },
@@ -145,7 +150,7 @@ export const upsertBookletQuestions = internalMutation({
       }
       const groupId = groupIdByKey.get(group.key)
       if (groupId != null) {
-        await ctx.db.patch("questionGroups", groupId, fields)
+        if (!args.addOnly) await ctx.db.patch("questionGroups", groupId, fields)
       } else {
         groupIdByKey.set(
           group.key,
@@ -160,22 +165,25 @@ export const upsertBookletQuestions = internalMutation({
     }
 
     let inserted = 0
+    const keyConflicts: number[] = []
     for (const question of args.questions) {
-      const fields = {
+      const layout = {
         sequence: question.number,
-        bodyMarkdown: question.stem,
-        options: question.options,
         groupId: question.group == null ? undefined : groupIdByKey.get(question.group.key),
         groupPosition: question.group?.position,
-
-        // Printed in the booklet, so it is settled — not inferred, not scored.
+      }
+      const text = { bodyMarkdown: question.stem, options: question.options }
+      // Printed in the booklet, so it is settled — not inferred, not scored.
+      // Only a new row takes it: a reload reports a difference, never applies it.
+      const answer = {
         answerStatus: 'completed' as const,
         answerCorrectOption: question.correctOption,
-        answerConfidence: 1,
-        answerModelId: 'icfes-booklet-key',
+        answerConfidence: question.answerModelId == null ? 1 : 0.8,
+        answerModelId: question.answerModelId ?? 'icfes-booklet-key',
         answerPromptVersion: 'deterministic-v1',
         answerCompletedAt: now,
-
+      }
+      const settled = {
         // The one field the booklet does not carry. Flagged for review so the
         // model pipeline can improve it later without re-importing anything.
         taxonomyStatus: question.confidentTag ? ('completed' as const) : ('needs_review' as const),
@@ -189,17 +197,10 @@ export const upsertBookletQuestions = internalMutation({
         taxonomyPromptVersion: 'keyword-v1',
         taxonomyCompletedAt: now,
 
-        // Eligible for placement regardless of how sure the subtopic tag is.
-        //
-        // Placement reads `learnerSubjectAggregates.accuracy` — accuracy per
-        // AREA — and the area is certain here: it is which booklet the question
-        // came from. A weak subtopic tag misattributes credit inside the
-        // learning path and the recommendations, and those are wrong either way
-        // until the model re-tags. Gating placement on it would have left
-        // Matemáticas with zero usable questions to measure a student with,
-        // which is a worse answer to "what level am I" than a slightly
-        // misfiled subtopic.
-        eligibility: 'diagnostic' as const,
+        // Every new row waits for the audit (stage 10). Once published it joins
+        // the placement pool whatever the subtopic tag says: placement reads
+        // accuracy per AREA, and the area is certain here.
+        eligibility: 'pending' as const,
         eligibilityReasons: question.confidentTag
           ? ['icfes_answer_key', 'keyword_taxonomy_confident']
           : ['icfes_answer_key', 'keyword_taxonomy_low_confidence'],
@@ -207,22 +208,89 @@ export const upsertBookletQuestions = internalMutation({
       }
 
       const existing = questionByNumber.get(question.number)
+      if (existing != null && args.addOnly) continue
       if (existing != null) {
-        await ctx.db.patch("questions", existing._id, fields)
+        const audit = await ensureAudit(ctx, existing)
+        const textIsSettled = auditSettlesText(audit)
+        await ctx.db.patch("questions", existing._id, bookletReloadPatch(existing, textIsSettled ? layout : { ...layout, ...text }, settled))
+        if (existing.answerCorrectOption !== question.correctOption) keyConflicts.push(question.number)
+        const differences = printedDifferences(audit.history, [
+          { field: 'key', stored: existing.answerCorrectOption, printed: question.correctOption },
+          ...(textIsSettled
+            ? [
+                { field: 'stem' as const, stored: existing.bodyMarkdown, printed: question.stem },
+                { field: 'options' as const, stored: JSON.stringify(existing.options), printed: JSON.stringify(question.options) },
+              ]
+            : []),
+        ], now)
+        if (differences.length > 0) {
+          await ctx.db.patch('questionAudits', audit._id, {
+            // A rejection is a person's call: the difference is on record and the rejection stands.
+            ...(audit.status === 'rejected' ? {} : { status: 'needs_review' as const }),
+            history: [...audit.history, ...differences],
+            updatedAt: now,
+          })
+        }
       } else {
-        await ctx.db.insert('questions', {
+        const questionId = await ctx.db.insert('questions', {
           pdfUploadId: args.pdfUploadId,
           questionNumber: question.number,
           createdAt: now,
-          ...fields,
+          ...layout,
+          ...text,
+          ...answer,
+          ...settled,
+          ...(args.addOnly ? { bankTier: 'icfes' as const, targetGrade: 11 } : {}),
+          ...(question.needsArtwork ? { stemDisplay: 'scan' as const } : {}),
         })
+        await ensureAudit(ctx, (await ctx.db.get('questions', questionId))!, question.needsArtwork
+          ? { status: 'needs_review', checks: [{ id: 'missing_figure', result: 'warn', detail: 'Depende de una figura: compárala con el recorte.' }] }
+          : {})
         inserted += 1
       }
     }
 
-    return { inserted, updated: args.questions.length - inserted, groups: written.size }
+    return { inserted, updated: args.questions.length - inserted, groups: written.size, keyConflicts }
   },
 })
+
+/**
+ * What a reload may change on a row that already exists. Taxonomy and
+ * eligibility belong to the audit from here on; only a question the booklet had
+ * dropped takes them back. The key is never here: a printed key that differs is
+ * reported as a `keyConflict`, never applied.
+ */
+export function bookletReloadPatch<C extends object, S extends object>(
+  existing: { eligibilityReasons?: string[] },
+  content: C,
+  settled: S,
+): C | (C & S) {
+  return existing.eligibilityReasons?.includes('removed_from_booklet') ? { ...content, ...settled } : content
+}
+
+/** A person's mark on the audit, or a model's pass over this text: from then on a parser only reports. */
+function auditSettlesText(audit: Doc<'questionAudits'>) {
+  return audit.reviewedBy != null
+    || audit.history.some((entry) => entry.by != null)
+    || !['pending_checks', 'needs_review'].includes(audit.status)
+}
+
+/**
+ * The `printed_reread` entries for what a reload read that the row does not say:
+ * each once, and never what a reviewer already replaced on purpose.
+ */
+function printedDifferences(
+  history: Doc<'questionAudits'>['history'],
+  fields: { field: 'key' | 'stem' | 'options'; stored: string | undefined; printed: string }[],
+  at: number,
+): Doc<'questionAudits'>['history'] {
+  return fields.flatMap(({ field, stored, printed }) => {
+    const ofField = history.filter((entry) => entry.field === field)
+    const known = ofField.filter((entry) => entry.source === 'printed_reread').at(-1)?.after === printed
+      || ofField.some((entry) => entry.by != null && entry.before === printed)
+    return stored === printed || known ? [] : [{ field, before: stored, after: printed, source: 'printed_reread', at }]
+  })
+}
 
 /**
  * Split a reload into the questions it kept, the ones it no longer has, and the
@@ -286,12 +354,11 @@ export const finishBookletLoad = internalMutation({
     }
     for (const group of orphanGroups) await ctx.db.delete("questionGroups", group._id)
 
-    const confident = kept.filter((question) => question.taxonomyStatus === 'completed')
     await ctx.db.patch("pdfUploads", args.pdfUploadId, {
       questionCount: kept.length,
       answerCompletedCount: kept.length,
       taxonomyCompletedCount: kept.length,
-      diagnosticEligibleCount: confident.length,
+      diagnosticEligibleCount: kept.filter((question) => question.eligibility === 'diagnostic').length,
       excludedQuestionCount: retired.length,
       updatedAt: now,
       processedAt: now,
@@ -347,7 +414,13 @@ export const generateCropUploadUrls = internalMutation({
 export const attachCrops = internalMutation({
   args: {
     pdfUploadId: v.id('pdfUploads'),
-    questions: v.array(v.object({ number: v.number(), storageId: v.id('_storage') })),
+    questions: v.array(v.object({
+      number: v.number(),
+      storageId: v.id('_storage'),
+      page: v.optional(v.number()),
+      y: v.optional(v.number()),
+      pageStorageId: v.optional(v.id('_storage')),
+    })),
     groups: v.array(
       v.object({ first: v.number(), last: v.number(), storageId: v.id('_storage') }),
     ),
@@ -360,11 +433,20 @@ export const attachCrops = internalMutation({
     const byNumber = new Map(rows.map((row) => [row.questionNumber, row]))
 
     let attached = 0
+    const orphans: number[] = []
     for (const crop of args.questions) {
       const row = byNumber.get(crop.number)
-      if (row == null) continue
+      if (row == null) {
+        orphans.push(crop.number)
+        continue
+      }
       await ctx.db.patch("questions", row._id, { renderedStemImageId: crop.storageId })
       attached += 1
+      if (crop.page == null) continue
+      const audit = await ensureAudit(ctx, row)
+      await ctx.db.patch('questionAudits', audit._id, {
+        source: { ...audit.source, page: crop.page, yStart: crop.y, ...(crop.pageStorageId == null ? {} : { pageImageId: crop.pageStorageId }) },
+      })
     }
 
     const groupRows = await ctx.db
@@ -381,7 +463,7 @@ export const attachCrops = internalMutation({
       attachedGroups += 1
     }
 
-    return { attached, attachedGroups, skipped: args.questions.length - attached }
+    return { attached, attachedGroups, skipped: args.questions.length - attached, orphans }
   },
 })
 

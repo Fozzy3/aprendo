@@ -68,7 +68,7 @@ export interface EnrichmentQuestionInput {
    * booklet text layer drops figures, tables and typeset equations; without the
    * picture the model solves a different question.
    */
-  images?: Array<{ url: string; mediaType: string }>
+  images?: Array<{ url: string }>
 }
 
 export interface TaxonomyDimension {
@@ -146,40 +146,22 @@ function extractImageUrls(markdown: string) {
     .filter((value): value is string => value != null && value.length > 0)
 }
 
-function guessImageMediaType(url: string) {
-  if (url.endsWith('.png')) return 'image/png'
-  if (url.endsWith('.jpg') || url.endsWith('.jpeg')) return 'image/jpeg'
-  if (url.endsWith('.gif')) return 'image/gif'
-  if (url.endsWith('.webp')) return 'image/webp'
-  return null
-}
-
-function buildFileParts(question: EnrichmentQuestionInput) {
+/**
+ * Every image as an image part. No media type is guessed from the URL: Convex's
+ * storage URLs have no extension, and guessing one dropped every picture of an
+ * OCR-ingested question. The SDK sniffs the type when it downloads the file.
+ */
+export function buildFileParts(question: EnrichmentQuestionInput) {
   const imageUrls = [
     ...extractImageUrls(question.contextMarkdown ?? ''),
     ...extractImageUrls(question.bodyMarkdown),
     ...question.options.flatMap((option) => extractImageUrls(option.bodyMarkdown)),
+    ...(question.images ?? []).map((image) => image.url),
   ]
 
   return imageUrls
-    .map((url) => {
-      const mediaType = guessImageMediaType(url)
-      if (mediaType == null) return null
-
-      return {
-        type: 'file' as const,
-        data: new URL(url),
-        mediaType,
-      }
-    })
-    .filter((part): part is { type: 'file'; data: URL; mediaType: string } => part != null)
-    .concat(
-      (question.images ?? []).map((image) => ({
-        type: 'file' as const,
-        data: new URL(image.url),
-        mediaType: image.mediaType,
-      })),
-    )
+    .filter((url) => /^https?:\/\//.test(url))
+    .map((url) => ({ type: 'image' as const, image: new URL(url) }))
 }
 
 function buildAnswerPrompt(question: EnrichmentQuestionInput) {
@@ -268,6 +250,13 @@ function validateTaxonomyResult(args: {
   }
 }
 
+/** The schema allows A-H whatever the question offers, so the label is checked here. */
+export function assertAnswerIsAnOption(correctOption: string, options: Array<{ label: string }>) {
+  if (!options.some((option) => option.label === correctOption)) {
+    throw new Error(`The model answered ${correctOption}, which is not an option of this question.`)
+  }
+}
+
 export async function inferQuestionAnswer(args: {
   apiKey: string
   question: EnrichmentQuestionInput
@@ -295,6 +284,8 @@ export async function inferQuestionAnswer(args: {
       },
     ],
   })
+
+  assertAnswerIsAnOption(object.correctOption, args.question.options)
 
   return {
     correctOption: object.correctOption,

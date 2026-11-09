@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { belowFamiliar, classItemAnalysis, classTeachingPlan, type SubtopicEvidence } from '../src/teacher'
+import { belowFamiliar, classItemAnalysis, classTeachingPlan, guidedStudySignal, type SubtopicEvidence } from '../src/teacher'
 
 describe('classItemAnalysis', () => {
   const answer = (questionId: string, selectedOption: string, isCorrect: boolean) => ({ questionId, selectedOption, isCorrect })
@@ -13,6 +13,26 @@ describe('classItemAnalysis', () => {
     // q3 has 2 answers: too few to say anything about it.
     expect(rows.map((row) => row.questionId)).toEqual(['q1', 'q2'])
     expect(rows[0]).toMatchObject({ answered: 4, wrong: 3, topWrongOption: 'A', topWrongCount: 2 })
+  })
+})
+
+describe('guided study signal', () => {
+  test('of the guided paths walked, how many needed the answer shown', () => {
+    expect(guidedStudySignal([
+      { guidedOutcome: 'revealed' },
+      { guidedOutcome: 'self_corrected' },
+      { guidedOutcome: 'self_corrected' },
+      {},
+    ])).toEqual({ guidedCount: 3, revealedCount: 1 })
+  })
+
+  test('each missed question says how many needed the answer shown', () => {
+    const [row] = classItemAnalysis([
+      { questionId: 'q1', selectedOption: 'A', isCorrect: false, guidedOutcome: 'revealed' },
+      { questionId: 'q1', selectedOption: 'A', isCorrect: false, guidedOutcome: 'self_corrected' },
+      { questionId: 'q1', selectedOption: 'B', isCorrect: true },
+    ])
+    expect(row).toMatchObject({ questionId: 'q1', revealedCount: 1 })
   })
 })
 

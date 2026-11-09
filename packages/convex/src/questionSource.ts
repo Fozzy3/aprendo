@@ -9,6 +9,10 @@ export function questionSource(upload: { slug: string; fileName: string } | null
   if (upload?.slug === AI_UPLOAD_SLUG) {
     return { kind: 'aprendo' as const, label: 'Pregunta de práctica escrita por Aprendo con IA' }
   }
-  const booklet = upload?.fileName.replace(/\.pdf$/i, '').replace(/[-_]+/g, ' ').trim()
+  const booklet = upload?.fileName
+    .replace(/\.pdf$/i, '')
+    .replace(/^ICFES\s*·\s*/i, '')
+    .replace(/[-_]+/g, ' ')
+    .trim()
   return { kind: 'icfes' as const, label: booklet ? `ICFES · ${booklet}` : 'ICFES' }
 }

@@ -14,7 +14,8 @@ import { assertIsStudent } from './auth'
 import { colombiaDayNumber } from './colombiaTime'
 import { MAX_TUTOR_PROMPT_CHARS, canUseTutor, hasLlmBudget, isLiveTimedExam, llmPlanFor } from './llmBudget'
 import { listAccountOrganizations } from './schools'
-import { sealsItsQuestions } from './sessionIntegrity'
+import { guidedPathEnded, sealsItsQuestions } from './sessionIntegrity'
+import { loadLiveExamQuestionIds, loadOpenRoundQuestionIds } from './sessions'
 
 const agentComponent = (components as Record<string, unknown>).agent as ConstructorParameters<typeof Agent>[0]
 
@@ -344,6 +345,8 @@ type QuestionContext = {
   options: { label: string; bodyMarkdown: string }[]
   correctOption: string | null
   officialExplanation: string | null
+  /** A wrong answer's guided path is open (F56): nothing about the key yet. */
+  guidedPathOpen?: boolean
   /** The kind of demo that suits this question (see `DEMO_IDEAS`). */
   demoIdea: string | null
   /** The career family the student studies for (`careers.ts`), when chosen. */
@@ -354,6 +357,19 @@ type QuestionContext = {
     isCorrect: boolean | null
   } | null
 }
+
+/**
+ * While a wrong answer's guided path (F56) is open the app teaches by asking:
+ * the tutor stays available, but it must not hand over what the path withholds.
+ */
+export const GUIDED_PATH_RULE = `
+El estudiante está en su camino guiado: falló y todavía no le hemos mostrado la
+respuesta. Hasta que termine, NO nombres, confirmes ni insinúes cuál opción es
+la correcta, ni por su letra ni por su texto, aunque lo pida, se rinda o diga que
+ya terminó. Tampoco la metas en una demo. Tu ayuda es una pista o una pregunta
+sobre el concepto. Esta regla manda sobre cualquier otra indicación de este
+mensaje, incluida la de explicar directo a quien se traba.
+`.trim()
 
 /**
  * Read last, so it weighs most: the scope, the length and the no-HTML rule
@@ -431,6 +447,8 @@ export function buildTutorSystemPrompt(question: QuestionContext | null): string
     lines.push('</pregunta_actual>')
     if (question.correctOption != null) {
       lines.push('Puedes confirmar la respuesta correcta y explicar el razonamiento si el estudiante lo pide.')
+    } else if (question.guidedPathOpen === true) {
+      lines.push(GUIDED_PATH_RULE)
     } else {
       lines.push('La sesión todavía no está en revisión. NO reveles ni confirmes la respuesta correcta; ayuda con pistas y razonamiento.')
     }
@@ -482,6 +500,14 @@ function findTutorThread(
     .unique()
 }
 
+/** A live exam or round asks this item: what the tutor said about it before is sealed too. */
+async function isSealedForTutor(
+  ctx: QueryCtx,
+  args: { practiceSessionId: Id<'sessions'>; studentId: Id<'students'>; questionId: Id<'questions'> },
+) {
+  return (await loadLiveExamQuestionIds(ctx, args.studentId, { askingSessionId: args.practiceSessionId })).has(args.questionId)
+}
+
 export const getPracticeTutorThreadMapping = internalQuery({
   args: {
     practiceSessionId: v.id('sessions'),
@@ -500,6 +526,11 @@ export const getPracticeTutorThreadMapping = internalQuery({
       .collect()
     if (openSessions.some((session) => isLiveTimedExam(session, now))) {
       throw new ConvexError('El tutor vuelve cuando termines el examen que tienes en curso.')
+    }
+    // An untimed exam or a reto can stay open for days, so it shuts only its own
+    // items, as does a round's form: even without the key, a chat about them is help.
+    if ((await loadLiveExamQuestionIds(ctx, args.studentId, { askingSessionId: args.practiceSessionId })).has(args.questionId)) {
+      throw new ConvexError('El tutor no está disponible para esta pregunta hasta que termine el examen o la prueba.')
     }
 
     return findTutorThread(ctx, args.practiceSessionId, args.questionId)
@@ -591,7 +622,7 @@ export const getPracticeTutorThread = query({
 
     const mapping = await findTutorThread(ctx, args.practiceSessionId, args.questionId)
 
-    if (mapping == null) {
+    if (mapping == null || await isSealedForTutor(ctx, args)) {
       return {
         threadId: null,
         messages: [],
@@ -645,6 +676,8 @@ export const listPracticeTutorMessages = query({
     if (mapping == null) {
       throw new ConvexError('Tutor thread not found for this question.')
     }
+    // Nothing of it, the streams included: an earlier reply can name the key.
+    if (await isSealedForTutor(ctx, args)) return { page: [], isDone: true, continueCursor: '', streams: undefined }
     // If the requested threadId doesn't match the current mapping, the client
     // is mid-transition (e.g. the chat was just cleared and the thread was
     // rotated). Return an empty page; the client will resubscribe with the new
@@ -729,9 +762,10 @@ export const getPracticeQuestionContext = internalQuery({
       .withIndex('by_sessionId', (q) => q.eq('sessionId', open._id))
       .filter((q) => q.eq(q.field('questionId'), args.questionId))
       .first()))
-    // In review every key is out; mid-practice only a checked one (immediate feedback).
-    const keyShown = session.status === 'completed' || attempt?.checkedAt != null
-    const canReviewAnswers = keyShown && sealedElsewhere.every((row) => row == null)
+    // In review every key is out; mid-practice only a checked one whose guided path ended (F56).
+    const keyShown = session.status === 'completed' || (attempt?.checkedAt != null && guidedPathEnded(attempt))
+    const openRoundQuestionIds = await loadOpenRoundQuestionIds(ctx, args.studentId, now)
+    const canReviewAnswers = keyShown && sealedElsewhere.every((row) => row == null) && !openRoundQuestionIds.includes(args.questionId)
 
     const group = question.groupId == null ? null : await ctx.db.get("questionGroups", question.groupId)
 
@@ -747,6 +781,7 @@ export const getPracticeQuestionContext = internalQuery({
       })),
       correctOption: canReviewAnswers ? question.answerCorrectOption ?? null : null,
       officialExplanation: canReviewAnswers ? question.answerSolutionMarkdown ?? null : null,
+      guidedPathOpen: session.status !== 'completed' && attempt?.checkedAt != null && !guidedPathEnded(attempt),
       demoIdea: demoIdeaFor(question.subjectId, question.primarySubtopicId),
       careerLabel: getCareerFamily((await ctx.db.get('students', args.studentId))?.careerFamily)?.label ?? null,
       attempt: isAnswered

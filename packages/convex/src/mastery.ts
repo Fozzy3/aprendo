@@ -54,7 +54,7 @@ export const MIXED_MIN_SUBTOPICS = 3
  */
 export type MasteryContext = 'practica' | 'mixta' | 'reto' | 'repaso'
 
-const MIXED_KINDS: readonly SessionKind[] = ['diagnostic', 'nivelacion', 'simulacro']
+const MIXED_KINDS: readonly SessionKind[] = ['diagnostic', 'nivelacion', 'simulacro', 'prueba']
 /** Builder sources made of items the student already saw graded, keys included. */
 const SEEN_KEY_SOURCES: readonly PracticeSource[] = ['falladas', 'marcadas']
 

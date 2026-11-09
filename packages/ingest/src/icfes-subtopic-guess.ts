@@ -31,6 +31,19 @@ interface Rule {
 }
 
 const RULES: Record<string, Rule[]> = {
+  // The first rule is the fallback: an English item with no signal is most likely a reading item.
+  ingles: [
+    { categoryId: 'ingles.reading_literal', subtopicId: 'ingles.reading_literal.explicit_info_paraphrase',
+      terms: ['the text says', 'according to the text', 'can the reader find', 'what does the text'] },
+    { categoryId: 'ingles.grammar_language_use', subtopicId: 'ingles.grammar_language_use.verb_tenses_forms',
+      terms: ['espacio', 'palabra correcta', 'complete the', 'gap', 'blank'] },
+    { categoryId: 'ingles.lexis', subtopicId: 'ingles.lexis.vocab_definitions',
+      terms: ['descripcion', 'concuerda', 'definition', 'meaning', 'word'] },
+    { categoryId: 'ingles.pragmatics_functions', subtopicId: 'ingles.pragmatics_functions.notices_instructions_signage',
+      terms: ['aviso', 'donde puede ver', 'notice', 'sign'] },
+    { categoryId: 'ingles.reading_inferential', subtopicId: 'ingles.reading_inferential.inferences_conclusions',
+      terms: ['writer', 'trying to', 'probably', 'author', 'suggest', 'infer', 'feel'] },
+  ],
   lectura_critica: [
     { categoryId: 'lectura_critica.literal_comprehension', subtopicId: 'lectura_critica.literal_comprehension.word_phrase_meaning',
       terms: ['significa', 'significado', 'expresion', 'palabra', 'termino', 'sinonimo', 'sentido de la frase'] },

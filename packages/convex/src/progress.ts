@@ -112,6 +112,9 @@ export const rebuildStudentProgress = internalMutation({
     studentId: v.id('students'),
   },
   handler: async (ctx, args) => {
+    // Scheduled before an erasure and run after it: nothing may come back.
+    if ((await ctx.db.get('students', args.studentId)) == null) return
+
     const attempts = await ctx.db
       .query('questionAttempts')
       .withIndex('by_studentId', (q) => q.eq('studentId', args.studentId))
@@ -152,6 +155,7 @@ export const rebuildStudentProgress = internalMutation({
       const question = questionById.get(attempt.questionId)
       if (
         question == null
+        || question.voidedAt != null
         || question.subjectId == null
         || question.primarySubtopicId == null
         || question.categoryId == null

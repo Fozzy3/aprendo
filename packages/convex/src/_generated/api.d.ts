@@ -8,16 +8,21 @@
  * @module
  */
 
+import type * as accountExport from "../accountExport.js";
 import type * as adaptive from "../adaptive.js";
 import type * as aiCache from "../aiCache.js";
 import type * as aiProvider from "../aiProvider.js";
 import type * as answerStats from "../answerStats.js";
+import type * as audit from "../audit.js";
+import type * as auditChecks from "../auditChecks.js";
+import type * as auditDecision from "../auditDecision.js";
 import type * as auth from "../auth.js";
 import type * as booklets from "../booklets.js";
 import type * as careers from "../careers.js";
 import type * as coach from "../coach.js";
 import type * as colombiaTime from "../colombiaTime.js";
 import type * as confidence from "../confidence.js";
+import type * as duels from "../duels.js";
 import type * as elo from "../elo.js";
 import type * as email from "../email.js";
 import type * as examPlan from "../examPlan.js";
@@ -25,12 +30,15 @@ import type * as examReport from "../examReport.js";
 import type * as explanations from "../explanations.js";
 import type * as generatedQuestions from "../generatedQuestions.js";
 import type * as globalScore from "../globalScore.js";
+import type * as guides from "../guides.js";
 import type * as history from "../history.js";
 import type * as http from "../http.js";
+import type * as league from "../league.js";
 import type * as lessons from "../lessons.js";
 import type * as levels from "../levels.js";
 import type * as llmBudget from "../llmBudget.js";
 import type * as mastery from "../mastery.js";
+import type * as measurement from "../measurement.js";
 import type * as migrations from "../migrations.js";
 import type * as national from "../national.js";
 import type * as pacing from "../pacing.js";
@@ -42,7 +50,10 @@ import type * as progress from "../progress.js";
 import type * as questionPool from "../questionPool.js";
 import type * as questionReports from "../questionReports.js";
 import type * as questionSource from "../questionSource.js";
+import type * as rewards from "../rewards.js";
+import type * as schoolTests from "../schoolTests.js";
 import type * as schools from "../schools.js";
+import type * as seedBank from "../seedBank.js";
 import type * as sessionIntegrity from "../sessionIntegrity.js";
 import type * as sessionKinds from "../sessionKinds.js";
 import type * as sessions from "../sessions.js";
@@ -64,16 +75,21 @@ import type {
 } from "convex/server";
 
 declare const fullApi: ApiFromModules<{
+  accountExport: typeof accountExport;
   adaptive: typeof adaptive;
   aiCache: typeof aiCache;
   aiProvider: typeof aiProvider;
   answerStats: typeof answerStats;
+  audit: typeof audit;
+  auditChecks: typeof auditChecks;
+  auditDecision: typeof auditDecision;
   auth: typeof auth;
   booklets: typeof booklets;
   careers: typeof careers;
   coach: typeof coach;
   colombiaTime: typeof colombiaTime;
   confidence: typeof confidence;
+  duels: typeof duels;
   elo: typeof elo;
   email: typeof email;
   examPlan: typeof examPlan;
@@ -81,12 +97,15 @@ declare const fullApi: ApiFromModules<{
   explanations: typeof explanations;
   generatedQuestions: typeof generatedQuestions;
   globalScore: typeof globalScore;
+  guides: typeof guides;
   history: typeof history;
   http: typeof http;
+  league: typeof league;
   lessons: typeof lessons;
   levels: typeof levels;
   llmBudget: typeof llmBudget;
   mastery: typeof mastery;
+  measurement: typeof measurement;
   migrations: typeof migrations;
   national: typeof national;
   pacing: typeof pacing;
@@ -98,7 +117,10 @@ declare const fullApi: ApiFromModules<{
   questionPool: typeof questionPool;
   questionReports: typeof questionReports;
   questionSource: typeof questionSource;
+  rewards: typeof rewards;
+  schoolTests: typeof schoolTests;
   schools: typeof schools;
+  seedBank: typeof seedBank;
   sessionIntegrity: typeof sessionIntegrity;
   sessionKinds: typeof sessionKinds;
   sessions: typeof sessions;

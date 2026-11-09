@@ -28,6 +28,7 @@ export const SESSION_KINDS = [
   'repaso',
   'personalizada',
   'reto',
+  'prueba',
 ] as const
 export type SessionKind = (typeof SESSION_KINDS)[number]
 
@@ -54,6 +55,8 @@ export type SelectionStrategy =
   | 'custom'
   /** Khan's Mastery Challenge: 3 practiced subtopics, 2 questions each (see `mastery.ts`). */
   | 'mastery_challenge'
+  /** The fixed form of a school test round (see `schoolTests.ts`). */
+  | 'school_test'
 
 /** Which question-bank eligibility tiers a kind may draw from. */
 export type QuestionEligibilityPool = 'diagnostic' | 'practice_only'
@@ -141,7 +144,8 @@ export const SESSION_KIND_CONFIG: Record<SessionKind, SessionKindConfig> = {
     tutorInSolve: false,
     // This IS the entry point — requiring a diagnostic would be circular.
     requiresDiagnostic: false,
-    launchableFromHub: true,
+    // Lives on /diagnostic; Retos only launches Repaso, Reto and Simulacro.
+    launchableFromHub: false,
     requiresSubject: true,
     allowsImmediateFeedback: false,
     defaultFeedbackMode: 'al_final',
@@ -151,12 +155,14 @@ export const SESSION_KIND_CONFIG: Record<SessionKind, SessionKindConfig> = {
     labelEs: 'Práctica recomendada',
     taglineEs: 'Una sesión corta enfocada en tus áreas más débiles.',
     strategy: 'recommended',
-    totalQuestions: 10,
+    // The hero session of Hoy (F54).
+    totalQuestions: 5,
     eligibilityPools: ['diagnostic', 'practice_only'],
     timeLimitMs: null,
     tutorInSolve: true,
     requiresDiagnostic: true,
-    launchableFromHub: true,
+    // Launched from Hoy's one big button.
+    launchableFromHub: false,
     requiresSubject: false,
     allowsImmediateFeedback: true,
     defaultFeedbackMode: 'inmediata',
@@ -171,7 +177,8 @@ export const SESSION_KIND_CONFIG: Record<SessionKind, SessionKindConfig> = {
     timeLimitMs: null,
     tutorInSolve: true,
     requiresDiagnostic: true,
-    launchableFromHub: true,
+    // Launched from a topic's row on Aprende.
+    launchableFromHub: false,
     requiresSubject: true,
     allowsImmediateFeedback: true,
     defaultFeedbackMode: 'inmediata',
@@ -260,6 +267,22 @@ export const SESSION_KIND_CONFIG: Record<SessionKind, SessionKindConfig> = {
     tutorInSolve: false,
     requiresDiagnostic: true,
     launchableFromHub: true,
+    requiresSubject: false,
+    allowsImmediateFeedback: false,
+    defaultFeedbackMode: 'al_final',
+  },
+  prueba: {
+    kind: 'prueba',
+    labelEs: 'Prueba del colegio',
+    taglineEs: 'La prueba periódica de tu colegio: la misma para todo el grado.',
+    strategy: 'school_test',
+    eligibilityPools: ['diagnostic', 'practice_only'],
+    // The clock is the form's length at the official pace (`createSession`).
+    timeLimitMs: null,
+    tutorInSolve: false,
+    // The school sets it: nobody needs a placement to sit it.
+    requiresDiagnostic: false,
+    launchableFromHub: false,
     requiresSubject: false,
     allowsImmediateFeedback: false,
     defaultFeedbackMode: 'al_final',

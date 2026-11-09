@@ -9,8 +9,10 @@ import {
   organizationPlanValidator,
   pdfUploadStatusValidator,
   questionAttemptValidator,
+  questionAuditDocumentValidator,
   questionDocumentValidator,
   questionGroupDocumentValidator,
+  questionGuideDocumentValidator,
   questionReportDocumentValidator,
   selectionReasonValidator,
   sessionDocumentValidator,
@@ -83,6 +85,15 @@ export default defineSchema(
       abilityAttemptsBySubject: v.optional(v.record(v.string(), v.number())),
       /** Minutes a week the student means to study (G07); unset until they choose. */
       weeklyGoalMinutes: v.optional(v.number()),
+      /** School grade, 6-11. Absent means 11. */
+      grade: v.optional(v.number()),
+      /** Built from closed word lists (G4); what classmates see in a league. */
+      nickname: v.optional(v.string()),
+      leagueOptOut: v.optional(v.boolean()),
+      /** Part ids of the student's sticker portrait; nothing is uploaded. */
+      avatar: v.optional(v.object({ skin: v.string(), hair: v.string(), top: v.string(), accessory: v.string() })),
+      /** Subjects this account may sign off in the question audit. */
+      reviewerSubjects: v.optional(v.array(v.string())),
       createdAt: v.number(),
       updatedAt: v.number(),
       lastSeenAt: v.number(),
@@ -102,14 +113,18 @@ export default defineSchema(
       classGroupId: v.id('classGroups'),
       orgId: v.id('organizations'),
       createdBy: v.id('students'),
-      subtopicId: v.string(),
-      /** 'practica': 10 questions, each corrected; 'tiquete': the 3-question exit ticket, corrected at the end. */
-      kind: v.union(v.literal('practica'), v.literal('tiquete')),
+      /** Absent only on a school test round, whose form spans every area. */
+      subtopicId: v.optional(v.string()),
+      /** 'practica': 10 questions, each corrected; 'tiquete': the 3-question exit ticket, corrected at the end; 'prueba': a round of the school's test (F67). */
+      kind: v.union(v.literal('practica'), v.literal('tiquete'), v.literal('prueba')),
+      schoolTestId: v.optional(v.id('schoolTests')),
       /** Absent means the whole class. */
       studentIds: v.optional(v.array(v.id('students'))),
       dueAt: v.number(),
       createdAt: v.number(),
-    }).index('by_classGroupId', ['classGroupId']),
+    })
+      .index('by_classGroupId', ['classGroupId'])
+      .index('by_schoolTestId', ['schoolTestId']),
     // A two-week teaching cycle (F42): the week plan frozen at its start, so its
     // end can show before and after. Groups are the teacher's to edit (F39).
     classCycles: defineTable({
@@ -126,8 +141,52 @@ export default defineSchema(
         evidencedCount: v.number(),
       })),
       groups: v.array(v.object({ subtopicId: v.string(), studentIds: v.array(v.id('students')) })),
+      /** The school test round this cycle answers (F68). */
+      schoolTestId: v.optional(v.id('schoolTests')),
+      /** The improvement plan: what the class will do, by when. */
+      actions: v.optional(v.array(v.object({ subtopicId: v.string(), text: v.string(), dueAt: v.number() }))),
     }).index('by_classGroupId', ['classGroupId'])
       .index('by_orgId', ['orgId']),
+    questionGuides: defineTable(questionGuideDocumentValidator)
+      .index('by_questionId', ['questionId'])
+      .index('by_status', ['status']),
+    questionAudits: defineTable(questionAuditDocumentValidator)
+      .index('by_questionId', ['questionId'])
+      .index('by_subjectId_status', ['subjectId', 'status'])
+      .index('by_reviewedBy_reviewedAt', ['reviewedBy', 'reviewedAt']),
+    // A round of a school-wide periodic test, on one fixed form (F67).
+    schoolTests: defineTable({
+      orgId: v.id('organizations'),
+      title: v.string(),
+      grades: v.array(v.string()),
+      opensAt: v.number(),
+      closesAt: v.number(),
+      questionIds: v.array(v.id('questions')),
+      createdBy: v.id('students'),
+      createdAt: v.number(),
+    }).index('by_orgId', ['orgId']),
+    // A live team game a teacher hosts on the projector (F60). It writes no
+    // `questionAttempts`: answers given in a team race are not learning evidence.
+    classDuels: defineTable({
+      classGroupId: v.id('classGroups'),
+      orgId: v.id('organizations'),
+      hostId: v.id('students'),
+      questionIds: v.array(v.id('questions')),
+      status: v.union(v.literal('lobby'), v.literal('playing'), v.literal('finished')),
+      currentIndex: v.number(),
+      teams: v.array(v.object({ name: v.string(), studentIds: v.array(v.id('students')) })),
+      createdAt: v.number(),
+    }).index('by_classGroupId', ['classGroupId']),
+    duelAnswers: defineTable({
+      duelId: v.id('classDuels'),
+      questionIndex: v.number(),
+      studentId: v.id('students'),
+      teamIndex: v.number(),
+      isCorrect: v.boolean(),
+      answeredAt: v.number(),
+    })
+      .index('by_duelId_questionIndex', ['duelId', 'questionIndex'])
+      .index('by_studentId', ['studentId']),
     sessionQuestions: defineTable({
       sessionId: v.id('sessions'),
       questionId: v.id('questions'),
@@ -224,6 +283,8 @@ export default defineSchema(
       plan: organizationPlanValidator,
       seatLimit: v.number(),
       licenseEndsAt: v.number(),
+      /** Off until the school signs the minors' data addendum (G2). */
+      leagueEnabled: v.optional(v.boolean()),
       createdAt: v.number(),
     }).index('by_createdAt', ['createdAt']),
     memberships: defineTable({
@@ -240,6 +301,8 @@ export default defineSchema(
       name: v.string(),
       grade: v.string(),
       inviteCode: v.string(),
+      /** The class left the league (F61); it never overrides a school that is off (G2). */
+      leagueOff: v.optional(v.boolean()),
       createdAt: v.number(),
     })
       .index('by_orgId', ['orgId'])

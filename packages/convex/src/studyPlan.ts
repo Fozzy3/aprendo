@@ -52,6 +52,8 @@ export interface StudyPlanInput {
   /** Completed simulacro sittings (Sesión 1 or 2), by Colombia day. */
   simulacroSittings: { day: number; sessionNumber: number }[]
   weeklyGoalMinutes: number
+  /** Answers in sessions closed today: what the daily mission counts. */
+  answeredToday?: number
   /**
    * The career's area weights (`careers.careerWeights`), when the student chose
    * one: the plan then works where the career's weighted score gains most. Absent,
@@ -93,7 +95,25 @@ const TOPIC_MINUTES = practiceMinutes(SESSION_KIND_CONFIG.topic.totalQuestions ?
 /** How many of the next subtopics the other screens show (Progreso, Ruta, Hoy). */
 const NEXT_SUBTOPIC_COUNT = 3
 
-export function buildStudyPlan(input: StudyPlanInput): {
+/**
+ * The main session of the day (F54): five questions, the one big button on
+ * Hoy. "Misión cumplida" is derived: five answers in sessions closed today,
+ * whichever session they came from. Light days keep it: it is short.
+ */
+export function buildStudyPlan(input: StudyPlanInput) {
+  const questionCount = SESSION_KIND_CONFIG.recommended.totalQuestions ?? 5
+  return {
+    ...buildTasks(input),
+    hero: {
+      questionCount,
+      minutes: practiceMinutes(questionCount),
+      action: { type: 'session', kind: 'recommended' } satisfies StudyTaskAction,
+      missionComplete: (input.answeredToday ?? 0) >= questionCount,
+    },
+  }
+}
+
+function buildTasks(input: StudyPlanInput): {
   tasks: StudyTask[]
   /**
    * The subtopics worth the most global points now, best first: the one answer

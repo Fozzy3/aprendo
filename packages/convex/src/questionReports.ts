@@ -9,6 +9,7 @@
 import { mutation, query } from './_generated/server'
 import { ConvexError, v } from 'convex/values'
 import { assertIsStudent, requirePlatformAdmin, requireAuthenticatedStudentId } from './auth'
+import { returnToReview } from './audit'
 import { colombiaDayNumber, colombiaDayStartMs } from './colombiaTime'
 import { questionReportReasonValidator, questionReportStatusValidator } from './validators'
 
@@ -35,10 +36,12 @@ export function hasReportBudget(reportsToday: number): boolean {
  * Files a report, or updates the student's open report on the same question —
  * one open report per student and question, so a repeated tap is not spam.
  */
+const SENDS_BACK_TO_REVIEW: readonly string[] = ['respuesta_incorrecta', 'imagen_ilegible']
+
 export const reportQuestionProblem = mutation({
   args: {
     questionId: v.id('questions'),
-    sessionId: v.optional(v.id('sessions')),
+    sessionId: v.id('sessions'),
     reason: questionReportReasonValidator,
     note: v.optional(v.string()),
   },
@@ -48,10 +51,12 @@ export const reportQuestionProblem = mutation({
     if ((await ctx.db.get('questions', args.questionId)) == null) {
       throw new ConvexError('Pregunta no encontrada.')
     }
-    if (args.sessionId != null) {
-      const session = await ctx.db.get('sessions', args.sessionId)
-      if (session == null) throw new ConvexError('Sesión no encontrada.')
-      await assertIsStudent(ctx, session.studentId)
+    const session = await ctx.db.get('sessions', args.sessionId)
+    if (session == null) throw new ConvexError('Sesión no encontrada.')
+    await assertIsStudent(ctx, session.studentId)
+    const served = await ctx.db.query('sessionQuestions').withIndex('by_sessionId', (q) => q.eq('sessionId', session._id)).collect()
+    if (!served.some((row) => row.questionId === args.questionId)) {
+      throw new ConvexError('Esta pregunta no hace parte de esa sesión.')
     }
 
     const open = (
@@ -85,6 +90,9 @@ export const reportQuestionProblem = mutation({
       status: 'open',
       createdAt: now,
     })
+    // A wrong key or an unreadable image reopens the question for a person (F64),
+    // once per report: editing it is free but changes nothing about the question.
+    if (SENDS_BACK_TO_REVIEW.includes(args.reason)) await returnToReview(ctx, args.questionId)
     return { reportId }
   },
 })
@@ -113,6 +121,7 @@ export const listQuestionReports = query({
                   _id: question._id,
                   pdfUploadId: question.pdfUploadId,
                   questionNumber: question.questionNumber,
+                  sequence: question.sequence,
                   subjectId: question.subjectId ?? null,
                   primarySubtopicId: question.primarySubtopicId ?? null,
                   bodyMarkdown: question.bodyMarkdown,

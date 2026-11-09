@@ -19,7 +19,7 @@ export type FormQuestion = { _id: string; groupId?: string; groupPosition?: numb
 type Unit<Q> = { key: string; members: Q[]; firstIndex: number }
 
 /** FNV-1a: a cheap, stable string hash — enough to shuffle, not to secure. */
-function hash(text: string) {
+export function hash(text: string) {
   let value = 0x811c9dc5
   for (let index = 0; index < text.length; index += 1) {
     value ^= text.charCodeAt(index)

@@ -65,9 +65,13 @@ function rewriteAssetUrls(markdown: string, assetUrlBySourcePath: Map<string, st
  * Ungrouped questions still fold in whatever context they carry, so nothing is
  * lost when the extractor sees a stimulus but no group.
  */
-function buildQuestionBodyMarkdown(question: QuestionExtraction, isGrouped: boolean) {
-  if (isGrouped) return question.stem
-  return [question.context, question.stem].filter(Boolean).join('\n\n')
+export function buildQuestionBodyMarkdown(
+  question: Pick<QuestionExtraction, 'context' | 'contextImages' | 'stem' | 'stemImages'>,
+  isGrouped: boolean,
+) {
+  const stemImages = (question.stemImages ?? []).map((path) => `![](${path})`)
+  const contextImages = isGrouped ? [] : (question.contextImages ?? []).map((path) => `![](${path})`)
+  return [isGrouped ? undefined : question.context, ...contextImages, question.stem, ...stemImages].filter(Boolean).join('\n\n')
 }
 
 function buildOptionBodyMarkdown(option: QuestionExtraction['options'][number]) {
@@ -100,6 +104,7 @@ function formatError(error: unknown) {
 function toEnrichmentQuestion(question: {
   bodyMarkdown: string
   contextMarkdown?: string
+  images?: Array<{ url: string }>
   options: Array<{
     label: string
     bodyMarkdown: string
@@ -107,6 +112,7 @@ function toEnrichmentQuestion(question: {
 }): EnrichmentQuestionInput {
   return {
     bodyMarkdown: question.bodyMarkdown,
+    ...(question.images == null ? {} : { images: question.images }),
     // A grouped question's stem is meaningless without its stimulus; passing it
     // is what makes answer inference and taxonomy tagging trustworthy for
     // Lectura Crítica, Sociales and Inglés.
@@ -168,6 +174,15 @@ function evaluateEligibility(args: {
     eligibility: 'practice_only' as const,
     reasons: ['practice_only_confidence'],
   }
+}
+
+/**
+ * What enrichment may decide on its own. Nothing reaches a student before the
+ * audit publishes it (stage 10): a good score waits in `pending`, an automatic
+ * exclusion needs no person.
+ */
+export function gatedEligibility(result: ReturnType<typeof evaluateEligibility>) {
+  return result.eligibility === 'excluded' ? result : { eligibility: 'pending' as const, reasons: result.reasons }
 }
 
 export const processUploadedPdf = internalAction({
@@ -437,12 +452,12 @@ export const enrichQuestionsChunk = internalAction({
         })
       }
 
-      const eligibility = evaluateEligibility({
+      const eligibility = gatedEligibility(evaluateEligibility({
         answerStatus,
         answerConfidence,
         taxonomyStatus,
         taxonomyConfidence,
-      })
+      }))
 
       await ctx.runMutation(internal.pdfs.setQuestionEligibility, {
         questionId: question._id,

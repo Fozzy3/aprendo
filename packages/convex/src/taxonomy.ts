@@ -35,6 +35,9 @@ for (const subject of taxonomyContract.subjects) {
 
 export const SUBJECT_IDS = taxonomyContract.subjects.map((subject) => subject.id)
 
+/** The grades a class can be (F70); content by grade below 11 comes later. */
+export const SCHOOL_GRADES = ['6', '7', '8', '9', '10', '11']
+
 export function getSubtopicContext(subtopicId: string): SubtopicContext | undefined {
   return subtopicContextById.get(subtopicId)
 }

@@ -2,7 +2,7 @@ import { query } from './_generated/server'
 import { v } from 'convex/values'
 import taxonomyContract from '../../../docs/taxonomy.v1.json'
 import { assertIsStudent } from './auth'
-import { collectUsableQuestionsBySubject } from './questionPool'
+import { bankTiersForStudent, collectUsableQuestionsBySubject } from './questionPool'
 import type { QuestionEligibilityPool } from './sessionKinds'
 
 /**
@@ -35,9 +35,10 @@ export const getSyllabus = query({
 
     const subjectQuestionCounts = new Map<string, number>()
     const subtopicQuestionCounts = new Map<string, number>()
+    const tiers = await bankTiersForStudent(ctx, args.studentId)
     await Promise.all(
       taxonomyContract.subjects.map(async (subject) => {
-        const usable = await collectUsableQuestionsBySubject(ctx, subject.id, ELIGIBILITY_POOLS)
+        const usable = await collectUsableQuestionsBySubject(ctx, subject.id, ELIGIBILITY_POOLS, tiers)
         subjectQuestionCounts.set(subject.id, usable.length)
         for (const question of usable) {
           if (question.primarySubtopicId == null) continue

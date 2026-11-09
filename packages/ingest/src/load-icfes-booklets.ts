@@ -7,11 +7,15 @@
  * their context key, so a reload updates rows in place and keeps their ids, and
  * with them every student's attempts and history. What a booklet no longer has
  * is retired (kept, but out of every pool), and only after all of it loaded.
+ *
+ * New rows arrive `pending` with an audit row: nothing reaches a student until
+ * the audit publishes it. Questions that lean on a figure load too, for a person
+ * to read against the crop.
  */
 import { execFileSync } from 'node:child_process'
 import { existsSync } from 'node:fs'
 import { resolve } from 'node:path'
-import { groupSlots, parseBooklet, usableQuestions } from './icfes-booklet'
+import { figureQuestions, groupSlots, parseBooklet, usableQuestions } from './icfes-booklet'
 import { CONFIDENT_AT, guessSubtopic } from './icfes-subtopic-guess'
 
 // `import.meta.dirname` is the portable spelling; `import.meta.dir` is Bun-only
@@ -97,9 +101,11 @@ for (const booklet of BOOKLETS) {
   })
   const parsed = parseBooklet(text)
   const usable = usableQuestions(parsed)
-  const slots = groupSlots(usable)
+  const figures = figureQuestions(parsed)
+  const loadable = [...usable, ...figures].sort((a, b) => a.number - b.number)
+  const slots = groupSlots(loadable)
 
-  const questions = usable.map((question, index) => {
+  const questions = loadable.map((question, index) => {
     const guess = guessSubtopic(
       booklet.subjectId,
       `${question.contextMarkdown ?? ''}\n${question.stem}`,
@@ -121,6 +127,7 @@ for (const booklet of BOOKLETS) {
       subtopicId: guess.subtopicId,
       tagConfidence: guess.confidence,
       confidentTag: guess.confidence >= CONFIDENT_AT,
+      ...(question.needsArtwork ? { needsArtwork: true } : {}),
     }
   })
 
@@ -133,7 +140,8 @@ for (const booklet of BOOKLETS) {
     `${booklet.label.padEnd(22)} ${String(questions.length).padStart(3)} preguntas`
     + `  ·  ${String(confident).padStart(3)} con etiqueta confiable`
     + `  ·  ${String(contextKeys.length).padStart(2)} estímulos`
-    + `  ·  ${parsed.length - usable.length} descartadas`,
+    + `  ·  ${figures.length} con figura`
+    + `  ·  ${parsed.length - loadable.length} descartadas`,
   )
 
   if (dryRun || questions.length === 0) continue
@@ -152,11 +160,14 @@ for (const booklet of BOOKLETS) {
   // in slices rather than as one 200-question blob. A failed slice throws and
   // stops the run before `finishBookletLoad`, so nothing is pruned on a partial load.
   for (let start = 0; start < questions.length; start += 20) {
-    convexRun('booklets:upsertBookletQuestions', {
+    const { keyConflicts } = convexRun('booklets:upsertBookletQuestions', {
       pdfUploadId,
       subjectId: booklet.subjectId,
       questions: questions.slice(start, start + 20),
-    })
+    }) as { keyConflicts: number[] }
+    if (keyConflicts.length > 0) {
+      console.warn(`  key differs from the stored one, left unchanged: ${keyConflicts.join(', ')}`)
+    }
   }
   const finished = convexRun('booklets:finishBookletLoad', {
     pdfUploadId,

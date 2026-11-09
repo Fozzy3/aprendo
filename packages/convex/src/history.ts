@@ -3,7 +3,8 @@ import { v } from 'convex/values'
 import { query } from './_generated/server'
 import { assertCanViewStudent, assertIsStudent } from './auth'
 import { colombiaDayNumber, colombiaDayStartMs } from './colombiaTime'
-import { settledAttempts } from './sessionIntegrity'
+import { streakFrom } from './rewards'
+import { sealSessionResults, settledAttempts } from './sessionIntegrity'
 import { sessionKindValidator } from './validators'
 
 /**
@@ -119,31 +120,13 @@ export function summarizeActivity(
       totalCorrect,
       accuracy: totalGraded === 0 ? null : totalCorrect / totalGraded,
       activeDayCount: byDay.size,
-      currentStreakDays: currentStreak(byDay, today),
+      currentStreakDays: streakFrom(new Set(byDay.keys()), today).streakDays,
       longestStreakDays: longestStreak(byDay),
       totalStudyTimeMs: totalResponseTimeMs,
       firstActivityMs:
         byDay.size === 0 ? null : colombiaDayStartMs(Math.min(...byDay.keys())),
     },
   }
-}
-
-/**
- * Current run of consecutive active days. Anchored on today *or* yesterday so a
- * streak isn't reported as broken before the day is over — same rule as the
- * streak card on "Hoy" (`today.ts`).
- */
-function currentStreak(byDay: Map<number, DayBucket>, today: number): number {
-  const anchor = byDay.has(today) ? today : byDay.has(today - 1) ? today - 1 : null
-  if (anchor == null) return 0
-
-  let streak = 0
-  let cursor = anchor
-  while (byDay.has(cursor)) {
-    streak += 1
-    cursor -= 1
-  }
-  return streak
 }
 
 function longestStreak(byDay: Map<number, DayBucket>): number {
@@ -195,6 +178,7 @@ export const listHistory = query({
       sessionQuery = sessionQuery.filter((q) => q.eq(q.field('subjectId'), subjectId))
     }
 
-    return sessionQuery.paginate(args.paginationOpts)
+    const result = await sessionQuery.paginate(args.paginationOpts)
+    return { ...result, page: result.page.map((session) => sealSessionResults(session)) }
   },
 })

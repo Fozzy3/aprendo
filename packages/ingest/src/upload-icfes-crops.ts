@@ -7,6 +7,9 @@
  * Run after `load-icfes-booklets.ts`: the crops are matched to questions by
  * number within an upload, so the rows have to exist first.
  *
+ * The full-page images and the crop index go up too, so the audit can show each
+ * question beside its page. Crops whose question did not load are reported.
+ *
  * Files go through Convex's upload URLs rather than as base64 in a function
  * argument — 418 PNGs at ~75 KB each is binary that has no business being
  * encoded into JSON.
@@ -109,6 +112,13 @@ if (!existsSync(CROPS)) {
   process.exit(1)
 }
 
+type CropIndex = { questions?: Array<{ number: number; page: number; y: number }> }
+
+function readIndex(stem: string): CropIndex {
+  const path = resolve(CROPS, `${stem}.index.json`)
+  return existsSync(path) ? (JSON.parse(readFileSync(path, 'utf8')) as CropIndex) : {}
+}
+
 const files = readdirSync(CROPS).filter((f) => f.endsWith('.png'))
 let uploaded = 0
 let failed = 0
@@ -123,8 +133,11 @@ for (const stem of BOOKLETS) {
     continue
   }
 
-  const questions: Array<{ number: number; storageId: string }> = []
+  const index = readIndex(stem)
+  const sourceByNumber = new Map((index.questions ?? []).map((record) => [record.number, record]))
+  const questions: Array<{ number: number; storageId: string; page?: number; y?: number; pageStorageId?: string }> = []
   const groups: Array<{ first: number; last: number; storageId: string }> = []
+  const pageIds = new Map<number, string>()
   const sorted = mine.sort()
 
   for (let start = 0; start < sorted.length; start += BATCH) {
@@ -141,18 +154,27 @@ for (const stem of BOOKLETS) {
 
       const question = name.match(/-q(\d{3})\.png$/)
       const group = name.match(/-g(\d{3})-(\d{3})\.png$/)
-      if (question != null) {
-        questions.push({ number: Number(question[1]), storageId })
+      const page = name.match(/-p(\d{3})\.png$/)
+      if (page != null) {
+        pageIds.set(Number(page[1]), storageId)
+      } else if (question != null) {
+        const number = Number(question[1])
+        questions.push({ number, storageId, page: sourceByNumber.get(number)?.page, y: sourceByNumber.get(number)?.y })
       } else if (group != null) {
         groups.push({ first: Number(group[1]), last: Number(group[2]), storageId })
       }
     }
   }
 
+  for (const crop of questions) {
+    if (crop.page != null && pageIds.has(crop.page)) crop.pageStorageId = pageIds.get(crop.page)
+  }
+
   const result = convexRun('booklets:attachCrops', { pdfUploadId, questions, groups }) as {
     attached?: number
     attachedGroups?: number
     skipped?: number
+    orphans?: number[]
   } | null
 
   console.log(
@@ -161,6 +183,9 @@ for (const stem of BOOKLETS) {
     + `  ·  grupos ${String(result?.attachedGroups ?? 0).padStart(2)}`
     + `  ·  sin fila ${result?.skipped ?? 0}`,
   )
+  if ((result?.orphans?.length ?? 0) > 0) {
+    console.log(`   recortes sin pregunta (el texto no se pudo leer): ${result!.orphans!.join(', ')}`)
+  }
 }
 
 console.log(`\nTOTAL subidas ${uploaded}${failed > 0 ? ` · fallidas ${failed}` : ''}`)

@@ -120,6 +120,16 @@ export const questionDocumentValidator = v.object({
   explanationSource: v.optional(
     v.union(v.literal('icfes'), v.literal('ai_generated'), v.literal('human')),
   ),
+  /** The `id` of its item in docs/seed-bank: what a re-import matches on, whatever a reviewer changed. */
+  seedItemId: v.optional(v.string()),
+  /** Absent means 'icfes'. Paying schools only ever draw 'original' (G1). */
+  bankTier: v.optional(v.union(v.literal('icfes'), v.literal('original'))),
+  /** Absent means today's behaviour: a scan when one exists. Flipped item by item as audited. */
+  stemDisplay: v.optional(v.union(v.literal('text'), v.literal('scan'))),
+  /** Absent means 11. */
+  targetGrade: v.optional(v.number()),
+  /** Withdrawn by the audit: the row stays, because attempts point at it. */
+  voidedAt: v.optional(v.number()),
 })
 
 /**
@@ -152,6 +162,7 @@ export const sessionKindValidator = v.union(
   v.literal('repaso'),
   v.literal('personalizada'),
   v.literal('reto'),
+  v.literal('prueba'),
 )
 
 // Compile-time guard: keep the validator literals in sync with SESSION_KINDS.
@@ -270,12 +281,20 @@ export const sessionDocumentValidator = v.object({
   practiceSource: v.optional(practiceSourceValidator),
   /** A teacher's assignment this session fulfils (F40). */
   assignmentId: v.optional(v.id('assignments')),
+  /** A school test only: its round's close, copied at the start. Results wait for it (`canRevealAnswers`). */
+  roundClosesAt: v.optional(v.number()),
   /** Each subtopic this session judged, before and after: the close of the review (F32). */
   masteryChanges: v.optional(v.array(v.object({
     subtopicId: v.string(),
     from: masteryLevelValidator,
     to: masteryLevelValidator,
   }))),
+  /** Computed once by `completeSession`: effort only, never fed back into learning metrics. */
+  reward: v.optional(v.object({
+    xp: v.number(),
+    medals: v.array(v.string()),
+    streakDays: v.number(),
+  })),
 })
 
 export const questionAttemptValidator = v.object({
@@ -309,6 +328,96 @@ export const questionAttemptValidator = v.object({
    * (`checkAnswer`). The key is then shown, so the answer is locked.
    */
   checkedAt: v.optional(v.number()),
+  /** How the guided path ended (F56). The first answer alone is the evidence; this never changes `isCorrect`. */
+  guidedOutcome: v.optional(v.union(v.literal('self_corrected'), v.literal('revealed'))),
+  /** How many steps of the guided path the student has walked. */
+  guidedStep: v.optional(v.number()),
+  /** "Muéstrame" before the end of the ladder: skipped, so no XP for the path. */
+  guidedSkipped: v.optional(v.boolean()),
+})
+
+/** One tappable Socratic question. `correct` is absent on the diagnose step, which has no wrong answer. */
+export const guideStepValidator = v.object({
+  prompt: v.string(),
+  choices: v.array(v.object({ text: v.string(), correct: v.optional(v.boolean()) })),
+})
+
+/** Pre-generated study path for one question (F56). Its own table: `getSession` ships the question document to the client. */
+export const questionGuideDocumentValidator = v.object({
+  questionId: v.id('questions'),
+  hint: v.string(),
+  /** Keyed by the wrong option's label. */
+  byOption: v.record(v.string(), v.object({
+    diagnose: guideStepValidator,
+    steps: v.array(guideStepValidator),
+  })),
+  /** Shown only when the path ends: 2-3 sentences. */
+  reveal: v.string(),
+  modelId: v.string(),
+  promptVersion: v.string(),
+  status: v.union(v.literal('pending'), v.literal('approved'), v.literal('rejected')),
+  reviewedBy: v.optional(v.id('students')),
+  reviewedAt: v.optional(v.number()),
+  createdAt: v.number(),
+})
+
+export const questionAuditStatusValidator = v.union(
+  v.literal('pending_checks'),
+  v.literal('needs_review'),
+  v.literal('auto_passed'),
+  v.literal('rejected'),
+  v.literal('approved'),
+  v.literal('fixed'),
+)
+
+/** One row per question: the audit of its image, answer and text (F62-F65). */
+export const questionAuditDocumentValidator = v.object({
+  questionId: v.id('questions'),
+  subjectId: v.string(),
+  status: questionAuditStatusValidator,
+  pipelineVersion: v.string(),
+  source: v.object({
+    kind: v.union(v.literal('booklet'), v.literal('ocr'), v.literal('authored')),
+    page: v.optional(v.number()),
+    yStart: v.optional(v.number()),
+    pageImageId: v.optional(v.id('_storage')),
+    licenseNote: v.optional(v.string()),
+  }),
+  checks: v.array(v.object({
+    id: v.string(),
+    result: v.union(v.literal('pass'), v.literal('warn'), v.literal('fail')),
+    detail: v.optional(v.string()),
+  })),
+  vision: v.optional(v.object({
+    stemMatches: v.boolean(),
+    optionsMatch: v.boolean(),
+    figureNeeded: v.boolean(),
+    figureLegible: v.boolean(),
+    textSufficient: v.boolean(),
+    modelId: v.string(),
+  })),
+  solvers: v.array(v.object({ modelId: v.string(), option: v.string(), confidence: v.number() })),
+  sampled: v.optional(v.boolean()),
+  reviewedBy: v.optional(v.id('students')),
+  reviewedAt: v.optional(v.number()),
+  reviewNote: v.optional(v.string()),
+  history: v.array(v.object({
+    field: v.union(v.literal('key'), v.literal('stem'), v.literal('options'), v.literal('taxonomy'), v.literal('context'), v.literal('guide')),
+    before: v.optional(v.string()),
+    after: v.optional(v.string()),
+    source: v.string(),
+    by: v.optional(v.id('students')),
+    at: v.number(),
+  })),
+  /** The latest repair of this question's attempts: each page commits its cursor, so a stopped one shows and resumes. */
+  repair: v.optional(v.object({
+    status: v.union(v.literal('running'), v.literal('done')),
+    regrade: v.boolean(),
+    cursor: v.optional(v.string()),
+    repaired: v.number(),
+    updatedAt: v.number(),
+  })),
+  updatedAt: v.number(),
 })
 
 /** Why a student says a question is broken ("Reportar un problema"). */
@@ -362,6 +471,8 @@ export const conceptLessonDocumentValidator = v.object({
   stage: v.optional(conceptLessonStageValidator),
   // The explanation that teaches the concept — markdown (may contain LaTeX).
   ideaBody: v.optional(v.string()),
+  /** F56: 3-5 steps, each asking the student to predict before showing why. Old lessons have none and keep `ideaBody`. */
+  steps: v.optional(v.array(v.object({ predict: v.string(), reveal: v.string() }))),
   // Optional self-contained interactive demo (rendered in a sandboxed iframe).
   demoHtml: v.optional(v.string()),
   modelId: v.string(),

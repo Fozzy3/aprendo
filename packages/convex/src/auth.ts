@@ -159,6 +159,19 @@ export const getCurrentAdmin = query({
   },
 })
 
+/** Whoever may enter /admin: staff, or a reviewer, who only sees the audit tab. */
+export const getCurrentStaffMember = query({
+  args: {},
+  handler: async (ctx) => {
+    const authUser = await authComponent.safeGetAuthUser(ctx)
+    if (!authUser?.userId) return null
+    const student = await ctx.db.get("students", authUser.userId as Id<'students'>)
+    const reviewerSubjects = student?.reviewerSubjects ?? []
+    if (student == null || (!student.isAdmin && reviewerSubjects.length === 0)) return null
+    return { _id: student._id, email: student.email, isAdmin: student.isAdmin === true, reviewerSubjects }
+  },
+})
+
 export async function requireAuthenticatedStudentId(
   ctx: GenericCtx<DataModel>,
 ): Promise<Id<'students'>> {
@@ -242,4 +255,18 @@ export async function requirePlatformAdmin(
     throw new ConvexError('Necesitas permisos de administrador.')
   }
   return studentId
+}
+
+/** Signs off the audit of a question: Aprendo staff, or a teacher hired for that area. */
+export async function requireReviewer(
+  ctx: GenericCtx<DataModel> & Pick<QueryCtx, 'db'>,
+  subjectId: string,
+): Promise<{ studentId: Id<'students'>; isAdmin: boolean }> {
+  const studentId = await requireAuthenticatedStudentId(ctx)
+  const student = await ctx.db.get("students", studentId)
+  const isAdmin = student?.isAdmin === true
+  if (!isAdmin && !student?.reviewerSubjects?.includes(subjectId)) {
+    throw new ConvexError('Necesitas permisos de revisor para esta área.')
+  }
+  return { studentId, isAdmin }
 }

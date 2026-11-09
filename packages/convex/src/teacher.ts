@@ -7,16 +7,16 @@
 import { ConvexError, v } from 'convex/values'
 import { internalQuery, mutation, query, type QueryCtx } from './_generated/server'
 import type { Doc, Id } from './_generated/dataModel'
-import { assertIsStudent, requireAuthenticatedStudentId, requireOrgRole } from './auth'
+import { assertCanViewStudent, assertIsStudent, requireAuthenticatedStudentId, requireOrgRole } from './auth'
 import { LEVELLED_SUBJECT_IDS } from './levels'
 import { MASTERY_LEVELS, masteryLevelOf, type MasteryLevel } from './mastery'
 import { SUBJECT_WEIGHTS } from './globalScore'
 import { buildSubjectLevels } from './progress'
-import { collectUsableQuestionsBySubject } from './questionPool'
+import { ALL_BANK_TIERS, type BankTier, bankTiersForOrg, collectUsableQuestionsBySubject, inBankTier } from './questionPool'
 import { isLicenseActive, listAccountOrganizations } from './schools'
 import { competenciaOf, competencyBreakdown, getSubjectIdForSubtopic } from './taxonomy'
 import { ASSIGNMENT_QUESTION_COUNT } from './sessionKinds'
-import { settledAttempts } from './sessionIntegrity'
+import { ANSWER_GRACE_MS, COMPLETION_GRACE_MS, isPastDeadline, settledAttempts } from './sessionIntegrity'
 
 /** Days without starting a session before a student counts as inactive. */
 export const INACTIVE_DAYS = 14
@@ -133,11 +133,12 @@ const MAX_ITEMS = 5
  * that option is the class's misconception, and the question is the one to put
  * on the board for a vote (peer instruction).
  */
-export function classItemAnalysis(answers: { questionId: string; selectedOption: string; isCorrect: boolean }[]) {
-  const byQuestion = new Map<string, { answered: number; wrong: number; wrongByOption: Map<string, number> }>()
+export function classItemAnalysis(answers: { questionId: string; selectedOption: string; isCorrect: boolean; guidedOutcome?: string }[]) {
+  const byQuestion = new Map<string, { answered: number; wrong: number; revealedCount: number; wrongByOption: Map<string, number> }>()
   for (const answer of answers) {
-    const entry = byQuestion.get(answer.questionId) ?? { answered: 0, wrong: 0, wrongByOption: new Map() }
+    const entry = byQuestion.get(answer.questionId) ?? { answered: 0, wrong: 0, revealedCount: 0, wrongByOption: new Map() }
     entry.answered += 1
+    if (answer.guidedOutcome === 'revealed') entry.revealedCount += 1
     if (!answer.isCorrect) {
       entry.wrong += 1
       entry.wrongByOption.set(answer.selectedOption, (entry.wrongByOption.get(answer.selectedOption) ?? 0) + 1)
@@ -148,13 +149,30 @@ export function classItemAnalysis(answers: { questionId: string; selectedOption:
     .filter(([, entry]) => entry.answered >= MIN_ITEM_ANSWERS && entry.wrong > 0)
     .map(([questionId, entry]) => {
       const [topWrongOption, topWrongCount] = [...entry.wrongByOption.entries()].sort((a, b) => b[1] - a[1])[0]!
-      return { questionId, answered: entry.answered, wrong: entry.wrong, topWrongOption, topWrongCount }
+      return { questionId, answered: entry.answered, wrong: entry.wrong, revealedCount: entry.revealedCount, topWrongOption, topWrongCount }
     })
     .sort((a, b) => b.wrong / b.answered - a.wrong / a.answered || b.answered - a.answered)
     .slice(0, MAX_ITEMS)
 }
 
-async function requireClassGroupStaff(ctx: QueryCtx, classGroupId: Id<'classGroups'>) {
+/** Questions on a school's forms that have not settled, open or upcoming: their key still matters to someone. */
+export async function unsettledFormQuestionIds(ctx: QueryCtx, orgId: Id<'organizations'>, now: number) {
+  const rounds = await ctx.db.query('schoolTests').withIndex('by_orgId', (q) => q.eq('orgId', orgId)).collect()
+  return new Set<string>(rounds.filter((round) => now <= round.closesAt + ANSWER_GRACE_MS).flatMap((round) => round.questionIds))
+}
+
+/** Whether a question may go on a teacher's board: the school's tiers (G1), not voided, on no form still sealed. */
+export function isBoardItem(question: Doc<'questions'> | null, tiers: BankTier[], sealedForms: ReadonlySet<string>) {
+  return question != null && question.voidedAt == null && inBankTier(question, tiers) && !sealedForms.has(question._id)
+}
+
+/** Of the guided paths walked (F56), how many needed the answer shown. */
+export function guidedStudySignal(answers: { guidedOutcome?: string }[]) {
+  const guided = answers.filter((answer) => answer.guidedOutcome != null)
+  return { guidedCount: guided.length, revealedCount: guided.filter((answer) => answer.guidedOutcome === 'revealed').length }
+}
+
+export async function requireClassGroupStaff(ctx: QueryCtx, classGroupId: Id<'classGroups'>) {
   const classGroup = await ctx.db.get('classGroups', classGroupId)
   if (classGroup == null) throw new ConvexError('Curso no encontrado.')
   await requireOrgRole(ctx, classGroup.orgId, ['teacher', 'org_admin'])
@@ -164,21 +182,25 @@ async function requireClassGroupStaff(ctx: QueryCtx, classGroupId: Id<'classGrou
 }
 
 /**
- * Writes to a class (assignments, cycles) belong to its own teachers or the
- * school admin; any teacher of the school can still read it.
+ * Writes to a class (assignments, cycles, duels) belong to its own teachers or
+ * the school admin; any teacher of the school can still read it.
  */
-async function requireClassGroupWriter(ctx: QueryCtx, classGroupId: Id<'classGroups'>) {
+async function classAccess(ctx: QueryCtx, classGroupId: Id<'classGroups'>) {
   const { classGroup, organization } = await requireClassGroupStaff(ctx, classGroupId)
   const accountId = await requireAuthenticatedStudentId(ctx)
   const membership = await requireOrgRole(ctx, classGroup.orgId, ['teacher', 'org_admin'])
-  if (membership.role !== 'org_admin') {
-    const teachers = await ctx.db
-      .query('classGroupMembers')
-      .withIndex('by_classGroupId_role', (q) => q.eq('classGroupId', classGroupId).eq('role', 'teacher'))
-      .collect()
-    if (!teachers.some((row) => row.accountId === accountId)) throw new ConvexError('Solo los docentes de este curso pueden hacer esto.')
-  }
-  return { classGroup, organization, accountId }
+  const teachers = await ctx.db
+    .query('classGroupMembers')
+    .withIndex('by_classGroupId_role', (q) => q.eq('classGroupId', classGroupId).eq('role', 'teacher'))
+    .collect()
+  const canWrite = membership.role === 'org_admin' || teachers.some((row) => row.accountId === accountId)
+  return { classGroup, organization, accountId, canWrite }
+}
+
+export async function requireClassGroupWriter(ctx: QueryCtx, classGroupId: Id<'classGroups'>) {
+  const access = await classAccess(ctx, classGroupId)
+  if (!access.canWrite) throw new ConvexError('Solo los docentes de este curso pueden hacer esto.')
+  return access
 }
 
 /** Only ids of students in the class; anything else is dropped. */
@@ -203,7 +225,7 @@ async function recentSettledAnswers(ctx: QueryCtx, studentId: Id<'students'>) {
  * Evidence on a few subtopics from the aggregates alone: what a cycle compares.
  * Light enough for the cycle views and the whole school (no answers read).
  */
-async function subtopicEvidenceFromAggregates(
+export async function subtopicEvidenceFromAggregates(
   ctx: QueryCtx,
   classGroupId: Id<'classGroups'>,
   subtopics: { subtopicId: string; subjectId: string }[],
@@ -224,7 +246,7 @@ async function subtopicEvidenceFromAggregates(
   return bySubtopic
 }
 
-async function listClassStudents(ctx: QueryCtx, classGroupId: Id<'classGroups'>) {
+export async function listClassStudents(ctx: QueryCtx, classGroupId: Id<'classGroups'>) {
   const rows = await ctx.db
     .query('classGroupMembers')
     .withIndex('by_classGroupId_role', (q) => q.eq('classGroupId', classGroupId).eq('role', 'student'))
@@ -297,7 +319,7 @@ async function gatherClassEvidence(ctx: QueryCtx, classGroupId: Id<'classGroups'
     if (!questionCache.has(questionId)) questionCache.set(questionId, await ctx.db.get('questions', questionId))
     return questionCache.get(questionId)!
   }
-  const answers: { questionId: string; selectedOption: string; isCorrect: boolean }[] = []
+  const answers: { questionId: string; selectedOption: string; isCorrect: boolean; guidedOutcome?: string }[] = []
   const rows: Awaited<ReturnType<typeof buildStudentRow>>[] = []
 
   for (const student of students) {
@@ -316,7 +338,7 @@ async function gatherClassEvidence(ctx: QueryCtx, classGroupId: Id<'classGroups'
     }
     for (const attempt of await recentSettledAnswers(ctx, student._id)) {
       if (attempt.isCorrect == null || attempt.selectedOption == null) continue
-      answers.push({ questionId: attempt.questionId, selectedOption: attempt.selectedOption, isCorrect: attempt.isCorrect })
+      answers.push({ questionId: attempt.questionId, selectedOption: attempt.selectedOption, isCorrect: attempt.isCorrect, guidedOutcome: attempt.guidedOutcome })
       if (attempt.confidence == null) continue
       const question = await getQuestion(attempt.questionId)
       if (question?.primarySubtopicId == null || question.subjectId == null) continue
@@ -336,12 +358,18 @@ async function gatherClassEvidence(ctx: QueryCtx, classGroupId: Id<'classGroups'
 export const getClassTeachingPlan = query({
   args: { classGroupId: v.id('classGroups') },
   handler: async (ctx, args) => {
-    await requireClassGroupStaff(ctx, args.classGroupId)
+    const { organization } = await requireClassGroupStaff(ctx, args.classGroupId)
     const now = Date.now()
     const { rows, subtopics, answers, getQuestion } = await gatherClassEvidence(ctx, args.classGroupId, now)
     const plan = classTeachingPlan({ subtopics, students: rows })
     const nameOf = new Map(rows.map((row) => [row.studentId as string, { name: row.name, email: row.email }]))
-    const items = await Promise.all(classItemAnalysis(answers).map(async (item) => {
+    const tiers = bankTiersForOrg(organization)
+    const sealedForms = await unsettledFormQuestionIds(ctx, organization._id, now)
+    const boardAnswers: typeof answers = []
+    for (const answer of answers) {
+      if (isBoardItem(await getQuestion(answer.questionId as Id<'questions'>), tiers, sealedForms)) boardAnswers.push(answer)
+    }
+    const items = await Promise.all(classItemAnalysis(boardAnswers).map(async (item) => {
       const question = await getQuestion(item.questionId as Id<'questions'>)
       return {
         ...item,
@@ -354,6 +382,7 @@ export const getClassTeachingPlan = query({
     }))
 
     return {
+      guided: guidedStudySignal(answers),
       wholeClass: plan.wholeClass,
       groups: plan.groups.map((group) => ({
         ...group,
@@ -392,6 +421,15 @@ export const getClassCompetencias = query({
   },
 })
 
+/** The student report's guided-study signal, from finished sessions only. */
+export const getStudentGuidedSignal = query({
+  args: { studentId: v.id('students') },
+  handler: async (ctx, args) => {
+    await assertCanViewStudent(ctx, args.studentId)
+    return guidedStudySignal(await recentSettledAnswers(ctx, args.studentId))
+  },
+})
+
 /**
  * How much of the bank carries a competencia (F35: measure before showing).
  * `bunx convex run teacher:competenciaCoverage`.
@@ -400,7 +438,7 @@ export const competenciaCoverage = internalQuery({
   args: {},
   handler: async (ctx) =>
     Promise.all(LEVELLED_SUBJECT_IDS.map(async (subjectId) => {
-      const usable = await collectUsableQuestionsBySubject(ctx, subjectId, ['diagnostic', 'practice_only'])
+      const usable = await collectUsableQuestionsBySubject(ctx, subjectId, ['diagnostic', 'practice_only'], ALL_BANK_TIERS)
       return { subjectId, usable: usable.length, tagged: usable.filter((question) => competenciaOf(question) != null).length }
     })),
 })
@@ -445,6 +483,7 @@ export const deleteAssignment = mutation({
     const assignment = await ctx.db.get('assignments', args.assignmentId)
     if (assignment == null) return
     await requireClassGroupWriter(ctx, assignment.classGroupId)
+    if (assignment.schoolTestId != null) throw new ConvexError('Las pruebas del colegio las administra el colegio.')
     await ctx.db.delete('assignments', args.assignmentId)
   },
 })
@@ -460,11 +499,12 @@ export const getClassAssignments = query({
   args: { classGroupId: v.id('classGroups') },
   handler: async (ctx, args) => {
     await requireClassGroupStaff(ctx, args.classGroupId)
-    const assignments = await ctx.db
+    // Rounds have their own report (`schoolTests.ts`), sealed until they close.
+    const assignments = (await ctx.db
       .query('assignments')
       .withIndex('by_classGroupId', (q) => q.eq('classGroupId', args.classGroupId))
       .order('desc')
-      .take(10)
+      .collect()).filter((assignment) => assignment.schoolTestId == null).slice(0, 10)
     return Promise.all(assignments.map(async (assignment) => {
       const targets = await assignmentTargets(ctx, assignment)
       const sessions = await ctx.db
@@ -480,8 +520,8 @@ export const getClassAssignments = query({
       const correct = done.reduce((sum, session) => sum + (session.summary?.correctCount ?? 0), 0)
       return {
         assignmentId: assignment._id,
-        subtopicId: assignment.subtopicId,
-        kind: assignment.kind,
+        subtopicId: assignment.subtopicId!,
+        kind: assignment.kind as 'practica' | 'tiquete',
         dueAt: assignment.dueAt,
         isGroup: assignment.studentIds != null,
         targetCount: targets.length,
@@ -512,17 +552,22 @@ export const listMyAssignments = query({
       for (const assignment of assignments) {
         if (assignment.dueAt < now - OVERDUE_GRACE_MS) continue
         if (assignment.studentIds != null && !assignment.studentIds.includes(args.studentId)) continue
+        const schoolTest = assignment.schoolTestId == null ? null : await ctx.db.get('schoolTests', assignment.schoolTestId)
+        if (assignment.schoolTestId != null && (schoolTest == null || now < schoolTest.opensAt || now > schoolTest.closesAt)) continue
         const sessions = (await ctx.db
           .query('sessions')
           .withIndex('by_assignmentId', (q) => q.eq('assignmentId', assignment._id))
           .collect()).filter((session) => session.studentId === args.studentId)
         if (sessions.some((session) => session.status === 'completed')) continue
+        // A round's sitting past its clock can no longer be finished: it settles at the close.
+        if (schoolTest != null && sessions.some((session) => isPastDeadline(session, now, COMPLETION_GRACE_MS))) continue
         const open = sessions.find((session) => session.status === 'in_progress')
         result.push({
           assignmentId: assignment._id,
-          subtopicId: assignment.subtopicId,
+          subtopicId: assignment.subtopicId ?? null,
+          testTitle: schoolTest?.title ?? null,
           kind: assignment.kind,
-          questionCount: ASSIGNMENT_QUESTION_COUNT[assignment.kind],
+          questionCount: schoolTest?.questionIds.length ?? ASSIGNMENT_QUESTION_COUNT[assignment.kind as 'practica' | 'tiquete'],
           dueAt: assignment.dueAt,
           status: open != null ? ('en_curso' as const) : ('pendiente' as const),
           sessionId: open?._id ?? null,
@@ -623,6 +668,8 @@ export const getCurrentCycle = query({
       startedAt: cycle.startedAt,
       endsAt: cycle.endsAt,
       isOver: now >= cycle.endsAt,
+      schoolTestId: cycle.schoolTestId ?? null,
+      actions: cycle.actions ?? [],
       progress: cycle.subtopics.map((item) => {
         const entry = evidence.get(item.subtopicId)
         return {
@@ -688,6 +735,9 @@ export const listMyClassGroups = query({
     const result = []
     for (const { membership, organization } of await listAccountOrganizations(ctx, accountId)) {
       if (membership.role === 'student') continue
+      const nextTest = (await ctx.db.query('schoolTests').withIndex('by_orgId', (q) => q.eq('orgId', organization._id)).collect())
+        .filter((test) => test.closesAt > now)
+        .sort((a, b) => a.opensAt - b.opensAt)[0] ?? null
       let classGroups: Doc<'classGroups'>[]
       if (membership.role === 'org_admin') {
         classGroups = await ctx.db.query('classGroups').withIndex('by_orgId', (q) => q.eq('orgId', organization._id)).collect()
@@ -714,6 +764,7 @@ export const listMyClassGroups = query({
           orgId: organization._id,
           orgName: organization.name,
           licenseActive: isLicenseActive(organization, now),
+          nextTest: nextTest == null ? null : { title: nextTest.title, opensAt: nextTest.opensAt, closesAt: nextTest.closesAt },
           studentCount: students.length,
         })
       }
@@ -732,7 +783,7 @@ export const listMyClassGroups = query({
 export const getClassOverview = query({
   args: { classGroupId: v.id('classGroups') },
   handler: async (ctx, args) => {
-    const { classGroup, organization } = await requireClassGroupStaff(ctx, args.classGroupId)
+    const { classGroup, organization, canWrite } = await classAccess(ctx, args.classGroupId)
     const now = Date.now()
 
     const students = await Promise.all(
@@ -755,6 +806,7 @@ export const getClassOverview = query({
     return {
       classGroup: { _id: classGroup._id, name: classGroup.name, grade: classGroup.grade, inviteCode: classGroup.inviteCode },
       organization: { _id: organization._id, name: organization.name, licenseActive: isLicenseActive(organization, now) },
+      canWrite,
       subjects,
       students: students.sort((a, b) => b.riskReasons.length - a.riskReasons.length || (a.name ?? a.email).localeCompare(b.name ?? b.email, 'es')),
     }

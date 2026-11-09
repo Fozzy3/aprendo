@@ -233,7 +233,7 @@ export const backfillExplanations = internalAction({
             // Booklet crops are PNG (`upload-icfes-crops.ts`).
             images: urls
               .filter((url): url is string => url != null)
-              .map((url) => ({ url, mediaType: 'image/png' })),
+              .map((url) => ({ url })),
           },
         })
         const decision = decideExplanation({

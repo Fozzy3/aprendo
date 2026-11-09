@@ -9,11 +9,21 @@
 import { SESSION_KIND_CONFIG, type FeedbackMode, type SessionKind } from './sessionKinds'
 
 /**
- * Answers and explanations are only disclosed once the session is complete. An
- * abandoned session stays sealed: the student never finished it.
+ * Answers, explanations and results are only disclosed once the session is
+ * settled: complete, and, for a school test, past its round's close and the
+ * answer grace, because the whole grade shares that form and a sitting at the
+ * wire may still hand in. An abandoned session stays sealed: the student never
+ * finished it. The one definition of "settled".
  */
-export function canRevealAnswers(session: { status: string }) {
-  return session.status === 'completed'
+export function canRevealAnswers(session: { status: string; roundClosesAt?: number }, now = Date.now()) {
+  return session.status === 'completed' && (session.roundClosesAt == null || now > session.roundClosesAt + ANSWER_GRACE_MS)
+}
+
+/** A session document as it may be read: a handed-in round shows no result until it closes. */
+export function sealSessionResults<T extends { status: string; roundClosesAt?: number }>(session: T, now = Date.now()): T {
+  return session.status === 'completed' && !canRevealAnswers(session, now)
+    ? { ...session, summary: undefined, masteryChanges: undefined }
+    : session
 }
 
 /**
@@ -60,17 +70,20 @@ export function canRevealQuestion(
 /**
  * Whether an open session keeps its questions sealed in every other session:
  * any kind that discloses nothing before the end (exams and the reto), timed or
- * not, until it is completed or its clock runs out. The bank is shared, so a
- * practice that grades one of them would hand over the key mid-sitting. The
- * tutor gate is narrower on purpose (`llmBudget.isLiveTimedExam`).
+ * not, until it is completed or its clock runs out. An assignment seals by what
+ * it was given: an exit ticket is a `topic` corrected at the end. The bank is
+ * shared, so a practice that grades one of them would hand over the key
+ * mid-sitting. Shutting the tutor altogether is narrower on purpose
+ * (`llmBudget.isLiveTimedExam`).
  */
 export function sealsItsQuestions(
-  session: { kind: SessionKind; status: string; expiresAt?: number },
+  session: { kind: SessionKind; status: string; expiresAt?: number; assignmentId?: string; feedbackMode?: FeedbackMode },
   now: number,
 ) {
-  return session.status === 'in_progress'
-    && !SESSION_KIND_CONFIG[session.kind].allowsImmediateFeedback
-    && !isPastDeadline(session, now)
+  const disclosesNothing = session.assignmentId != null
+    ? !canCheckAnswers(session)
+    : !SESSION_KIND_CONFIG[session.kind].allowsImmediateFeedback
+  return session.status === 'in_progress' && disclosesNothing && !isPastDeadline(session, now)
 }
 
 /**
@@ -105,21 +118,30 @@ export function canCheckAnswers(session: { kind: SessionKind; feedbackMode?: Fee
 }
 
 /**
+ * Whether a checked answer may see its key: a right one at once, a wrong one
+ * only when its guided path (F56) has ended.
+ */
+export function guidedPathEnded(attempt: { isCorrect?: boolean; guidedOutcome?: string }) {
+  return attempt.isCorrect === true || attempt.guidedOutcome != null
+}
+
+/**
  * Whether one question of `session` may show its key: every question once the
  * session is completed (`canRevealQuestion`), or, while an immediate-feedback
- * practice is open, the questions already checked — their answer is locked, so
- * the key can no longer be traded for a changed answer. A live exam's items stay
- * sealed either way.
+ * practice is open, the questions already checked whose guided path has ended —
+ * the answer is locked, so the key can no longer be traded for a changed one. A
+ * live exam's items stay sealed either way.
  */
 export function canRevealSessionQuestion(
   session: { status: string; kind: SessionKind; feedbackMode?: FeedbackMode },
-  attempt: { checkedAt?: number } | null | undefined,
+  attempt: { checkedAt?: number; isCorrect?: boolean; guidedOutcome?: string } | null | undefined,
   questionId: string,
   liveExamQuestionIds: ReadonlySet<string>,
 ) {
   if (canRevealQuestion(session, questionId, liveExamQuestionIds)) return true
   return canCheckAnswers(session)
     && attempt?.checkedAt != null
+    && guidedPathEnded(attempt)
     && !liveExamQuestionIds.has(questionId)
 }
 
@@ -134,6 +156,18 @@ export const ANSWER_GRACE_MS = 60_000
  */
 export const COMPLETION_GRACE_MS = 5 * 60_000
 
+/** Slot each sitting of a closing round gets to apply its results in. */
+export const ROUND_RESULTS_PER_SITTING_MS = 2_000
+
+/**
+ * When a handed-in sitting applies its results: once the round can be revealed,
+ * in one slot per sitting of the round, so a whole grade does not write the
+ * same question documents at once. `completedAt` picks the slot.
+ */
+export function roundResultsRunAt(roundClosesAt: number, completedAt: number, sittings: number) {
+  return roundClosesAt + ANSWER_GRACE_MS + 1 + (completedAt % (Math.max(1, sittings) * ROUND_RESULTS_PER_SITTING_MS))
+}
+
 /** Whether a timed session's clock ran out (untimed sessions never do). */
 export function isPastDeadline(
   session: { expiresAt?: number },
@@ -144,15 +178,17 @@ export function isPastDeadline(
 }
 
 /**
- * The attempts that may count outside their own session: those of completed
- * sessions. An open sitting's grades are sealed, so any count built from them —
- * the review queue, "N correctas", weekly accuracy — leaks them one changed
- * answer at a time. An abandoned session never finished: not evidence either.
+ * The attempts that may count outside their own session: those of settled
+ * sessions (`canRevealAnswers`). An open sitting's grades are sealed, so any
+ * count built from them — the review queue, "N correctas", weekly accuracy —
+ * leaks them one changed answer at a time. An abandoned session never finished:
+ * not evidence either.
  */
 export function settledAttempts<A extends { sessionId: string }>(
   attempts: A[],
-  sessions: { _id: string; status: string }[],
+  sessions: { _id: string; status: string; roundClosesAt?: number }[],
+  now = Date.now(),
 ): A[] {
-  const completedIds = new Set(sessions.filter(canRevealAnswers).map((session) => session._id))
-  return attempts.filter((attempt) => completedIds.has(attempt.sessionId))
+  const settledIds = new Set(sessions.filter((session) => canRevealAnswers(session, now)).map((session) => session._id))
+  return attempts.filter((attempt) => settledIds.has(attempt.sessionId))
 }

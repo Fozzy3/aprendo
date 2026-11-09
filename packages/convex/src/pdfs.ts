@@ -4,6 +4,7 @@ import { internal } from './_generated/api'
 import type { Doc, Id } from './_generated/dataModel'
 import { slugify } from '@aprendo/ingest/slug'
 import { distractorRationaleValidator, questionDocumentValidator } from './validators'
+import { ensureAudit } from './audit'
 import { requirePlatformAdmin } from './auth'
 
 async function serializeUpload(
@@ -76,6 +77,21 @@ export const retryPdfUpload = mutation({
 
     if (upload.status === 'processing' || upload.status === 'enriching') {
       throw new ConvexError('PDF is already processing.')
+    }
+
+    // Reprocessing replaces the upload's questions with new ids.
+    const questions = await ctx.db
+      .query('questions')
+      .withIndex('by_pdfUploadId', (q) => q.eq('pdfUploadId', args.pdfUploadId))
+      .collect()
+    for (const question of questions) {
+      const attempt = await ctx.db
+        .query('questionAttempts')
+        .withIndex('by_questionId', (q) => q.eq('questionId', question._id))
+        .first()
+      if (attempt != null) {
+        throw new ConvexError('Este PDF ya tiene respuestas de estudiantes: reprocesarlo las dejaría sin pregunta.')
+      }
     }
 
     await ctx.db.patch("pdfUploads", args.pdfUploadId, {
@@ -193,6 +209,11 @@ export const clearPdfQuestions = internalMutation({
 
     for (const question of existing) {
       await ctx.db.delete("questions", question._id)
+      const audit = await ctx.db
+        .query('questionAudits')
+        .withIndex('by_questionId', (q) => q.eq('questionId', question._id))
+        .unique()
+      if (audit != null) await ctx.db.delete('questionAudits', audit._id)
     }
 
     // Groups belong to the upload too — leaving them behind on a reprocess
@@ -246,7 +267,8 @@ export const insertPdfQuestionsChunk = internalMutation({
   },
   handler: async (ctx, args) => {
     for (const question of args.questions) {
-      await ctx.db.insert('questions', question)
+      const questionId = await ctx.db.insert('questions', question)
+      await ensureAudit(ctx, (await ctx.db.get('questions', questionId))!)
     }
   },
 })
@@ -320,9 +342,17 @@ export const getQuestionsForEnrichment = internalQuery({
         .filter((question): question is Doc<'questions'> => question != null)
         .map(async (question) => {
           const group = question.groupId == null ? null : await ctx.db.get("questionGroups", question.groupId)
+          // The printed crop and the stimulus' own images: without them the
+          // model solves a question that lost its figure.
+          const stored = [question.renderedStemImageId, group?.renderedContextImageId]
+            .filter((id): id is Id<'_storage'> => id != null)
+          const urls = await Promise.all(stored.map((id) => ctx.storage.getUrl(id)))
+          const images = [...urls.filter((url): url is string => url != null), ...(group?.contextImages ?? [])]
+            .map((url) => ({ url }))
           return {
             ...question,
             ...(group == null ? {} : { contextMarkdown: group.contextMarkdown }),
+            ...(images.length === 0 ? {} : { images }),
           }
         }),
     )
@@ -354,19 +384,45 @@ export const setQuestionAnswerResult = internalMutation({
     errorMessage: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
-    await ctx.db.patch("questions", args.questionId, {
-      answerStatus: args.status,
-      answerCorrectOption: args.correctOption,
-      answerSolutionMarkdown: args.solutionMarkdown,
-      answerDistractorRationales: args.distractorRationales,
-      answerConfidence: args.confidence,
-      answerModelId: args.modelId,
-      answerPromptVersion: args.promptVersion,
-      answerCompletedAt: Date.now(),
-      answerErrorMessage: args.errorMessage,
-    })
+    const { questionId, ...result } = args
+    await ctx.db.patch("questions", questionId, answerResultPatch(result, Date.now()))
   },
 })
+
+/**
+ * Without a new answer nothing about the old one is touched: Convex removes a
+ * field patched with undefined, and `submitAnswer` throws on a question with no
+ * key.
+ */
+export function answerResultPatch(
+  result: {
+    status: 'completed' | 'failed' | 'needs_review'
+    correctOption?: string
+    solutionMarkdown?: string
+    distractorRationales?: Array<{ label: string; rationaleMarkdown: string }>
+    confidence?: number
+    modelId?: string
+    promptVersion?: string
+    errorMessage?: string
+  },
+  now: number,
+) {
+  const outcome = {
+    answerStatus: result.status,
+    answerCompletedAt: now,
+    answerErrorMessage: result.errorMessage,
+  }
+  if (result.correctOption == null) return outcome
+  return {
+    ...outcome,
+    answerCorrectOption: result.correctOption,
+    answerSolutionMarkdown: result.solutionMarkdown,
+    answerDistractorRationales: result.distractorRationales,
+    answerConfidence: result.confidence,
+    answerModelId: result.modelId,
+    answerPromptVersion: result.promptVersion,
+  }
+}
 
 export const setQuestionTaxonomyProcessing = internalMutation({
   args: {
@@ -456,8 +512,7 @@ export const refreshPdfEnrichmentStats = internalMutation({
       question.answerStatus !== 'pending'
       && question.answerStatus !== 'processing'
       && question.taxonomyStatus !== 'pending'
-      && question.taxonomyStatus !== 'processing'
-      && question.eligibility !== 'pending',
+      && question.taxonomyStatus !== 'processing',
     )
 
     await ctx.db.patch("pdfUploads", args.pdfUploadId, {

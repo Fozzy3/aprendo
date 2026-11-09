@@ -7,10 +7,13 @@ import {
   canRevealQuestion,
   canRevealSessionQuestion,
   canSettleSession,
+  ROUND_RESULTS_PER_SITTING_MS,
   isOutsideLiveExam,
   isPastDeadline,
+  roundResultsRunAt,
   sealAttempt,
   sealQuestion,
+  sealSessionResults,
   sealsItsQuestions,
   settledAttempts,
 } from '../src/sessionIntegrity'
@@ -171,6 +174,71 @@ describe('settledAttempts', () => {
   })
 })
 
+describe('roundResultsRunAt', () => {
+  test('runs past the close and its grace', () => {
+    expect(roundResultsRunAt(1000, 0, 5)).toBeGreaterThan(1000 + ANSWER_GRACE_MS)
+  })
+
+  test('spreads over one slot per sitting, so a whole grade does not land at once', () => {
+    const delay = (completedAt: number, sittings: number) => roundResultsRunAt(0, completedAt, sittings) - ANSWER_GRACE_MS - 1
+    expect(delay(ROUND_RESULTS_PER_SITTING_MS - 1, 1)).toBe(ROUND_RESULTS_PER_SITTING_MS - 1)
+    expect(delay(ROUND_RESULTS_PER_SITTING_MS, 1)).toBe(0)
+    expect(delay(200 * ROUND_RESULTS_PER_SITTING_MS - 1, 200)).toBe(200 * ROUND_RESULTS_PER_SITTING_MS - 1)
+  })
+
+  test('an empty roster still has a slot', () => {
+    expect(roundResultsRunAt(0, 12_345, 0) - ANSWER_GRACE_MS - 1).toBeLessThan(ROUND_RESULTS_PER_SITTING_MS)
+  })
+})
+
+describe('a handed-in round', () => {
+  const sitting = { _id: 's-round', status: 'completed', roundClosesAt: 1000 }
+  // A sitting at the wire still has the answer grace to hand in.
+  const lastSealed = 1000 + ANSWER_GRACE_MS
+  const firstOpen = lastSealed + 1
+
+  test('is unsettled until its close and the answer grace are over', () => {
+    expect(canRevealAnswers(sitting, 999)).toBe(false)
+    expect(canRevealAnswers(sitting, 1001)).toBe(false)
+    expect(canRevealAnswers(sitting, lastSealed)).toBe(false)
+    expect(canRevealAnswers(sitting, firstOpen)).toBe(true)
+  })
+
+  test('a session with no round settles when it completes', () => {
+    expect(canRevealAnswers({ status: 'completed' }, 0)).toBe(true)
+    expect(canRevealAnswers({ status: 'in_progress', roundClosesAt: 1 }, 2)).toBe(false)
+  })
+
+  test('its attempts count nowhere before the close', () => {
+    const attempts = [{ sessionId: 's-round' }]
+    expect(settledAttempts(attempts, [sitting], lastSealed)).toEqual([])
+    expect(settledAttempts(attempts, [sitting], firstOpen)).toEqual(attempts)
+  })
+
+  test('its document loses the score and the mastery changes until then', () => {
+    const results = { summary: { accuracy: 1 }, masteryChanges: [{}] }
+    expect(sealSessionResults({ ...sitting, ...results }, lastSealed)).toEqual({ ...sitting, summary: undefined, masteryChanges: undefined })
+    expect(sealSessionResults({ ...sitting, ...results }, firstOpen)).toEqual({ ...sitting, ...results })
+    expect(sealSessionResults({ status: 'completed', ...results }, 0)).toEqual({ status: 'completed', ...results })
+  })
+})
+
+describe('sealsItsQuestions for an assignment', () => {
+  const open = { kind: 'topic' as const, status: 'in_progress' }
+
+  test('an exit ticket, corrected at the end, seals', () => {
+    expect(sealsItsQuestions({ ...open, assignmentId: 'a1' }, 1000)).toBe(true)
+  })
+
+  test('assigned practice, corrected at once, does not', () => {
+    expect(sealsItsQuestions({ ...open, assignmentId: 'a1', feedbackMode: 'inmediata' }, 1000)).toBe(false)
+  })
+
+  test('a self-started practice corrected at the end does not', () => {
+    expect(sealsItsQuestions(open, 1000)).toBe(false)
+  })
+})
+
 describe('canRevealQuestion', () => {
   const live = new Set(['q-live'])
 
@@ -207,7 +275,7 @@ describe('canCheckAnswers', () => {
 describe('canRevealSessionQuestion', () => {
   const live = new Set(['q-live'])
   const practice = { status: 'in_progress', kind: 'topic', feedbackMode: 'inmediata' } as const
-  const checked = { checkedAt: 1 }
+  const checked = { checkedAt: 1, isCorrect: true }
 
   test('a completed session follows canRevealQuestion', () => {
     expect(canRevealSessionQuestion({ ...practice, status: 'completed' }, null, 'q-other', live)).toBe(true)
@@ -216,6 +284,12 @@ describe('canRevealSessionQuestion', () => {
 
   test('an open immediate-feedback practice discloses the questions already checked', () => {
     expect(canRevealSessionQuestion(practice, checked, 'q-other', live)).toBe(true)
+  })
+
+  test('a checked wrong answer stays sealed until its guided path ends (F56)', () => {
+    expect(canRevealSessionQuestion(practice, { checkedAt: 1, isCorrect: false }, 'q-other', live)).toBe(false)
+    expect(canRevealSessionQuestion(practice, { checkedAt: 1, isCorrect: false, guidedOutcome: 'revealed' }, 'q-other', live)).toBe(true)
+    expect(canRevealSessionQuestion(practice, { checkedAt: 1, isCorrect: false, guidedOutcome: 'self_corrected' }, 'q-other', live)).toBe(true)
   })
 
   test('…and nothing else of that session', () => {
@@ -296,7 +370,7 @@ describe('sealsItsQuestions', () => {
     expect(canRevealQuestion({ status: 'completed' }, 'q-reto', sealed)).toBe(false)
     expect(canRevealSessionQuestion(
       { status: 'in_progress', kind: 'personalizada', feedbackMode: 'inmediata' },
-      { checkedAt: 1 },
+      { checkedAt: 1, isCorrect: true },
       'q-reto',
       sealed,
     )).toBe(false)

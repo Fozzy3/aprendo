@@ -49,7 +49,7 @@ export function llmPlanFor(
  * Kinds that measure the student. Saber 11 gives no help during the sitting, so
  * these never get the tutor before they are completed, whatever their config says.
  */
-const EXAM_KINDS: readonly SessionKind[] = ['diagnostic', 'nivelacion', 'simulacro']
+const EXAM_KINDS: readonly SessionKind[] = ['diagnostic', 'nivelacion', 'simulacro', 'prueba']
 
 export function canUseTutor(
   kind: SessionKind,
@@ -65,7 +65,8 @@ export function canUseTutor(
 /**
  * A timed exam the student is still taking. While one runs the tutor stays shut
  * in every session, or another session's review would answer its questions.
- * Untimed sessions never count: one left open would shut the tutor for good.
+ * Untimed sessions never count: one left open would shut the tutor for good, so
+ * `tutor.getPracticeTutorThreadMapping` refuses only their own questions.
  */
 export function isLiveTimedExam(
   session: Pick<Doc<'sessions'>, 'kind' | 'status' | 'expiresAt'>,

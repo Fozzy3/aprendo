@@ -5,6 +5,8 @@ import type { Doc, Id, TableNames } from './_generated/dataModel'
 import { assertIsStudent } from './auth'
 import { MAX_GLOBAL_SCORE } from './globalScore'
 import { MAX_WEEKLY_GOAL_MINUTES, MIN_WEEKLY_GOAL_MINUTES, isValidWeeklyGoal } from './studyTime'
+import { isValidAvatar, nicknameFrom } from './rewards'
+import { scrubClassRosters } from './schools'
 
 export const getStudent = query({
   args: {
@@ -110,6 +112,36 @@ export const setWeeklyGoal = mutation({
   },
 })
 
+/** The sticker portrait (F55): closed part ids, nothing is uploaded. */
+export const setAvatar = mutation({
+  args: {
+    studentId: v.id('students'),
+    avatar: v.object({ skin: v.string(), hair: v.string(), top: v.string(), accessory: v.string() }),
+  },
+  handler: async (ctx, args) => {
+    await assertIsStudent(ctx, args.studentId)
+    if (!isValidAvatar(args.avatar)) throw new ConvexError('Esa parte del avatar no existe.')
+    await ctx.db.patch('students', args.studentId, { avatar: args.avatar, updatedAt: Date.now() })
+    return { avatar: args.avatar }
+  },
+})
+
+/** The nickname classmates see in a league: one noun and one adjective off the closed lists (G4). */
+export const setNickname = mutation({
+  args: {
+    studentId: v.id('students'),
+    noun: v.string(),
+    adjective: v.string(),
+  },
+  handler: async (ctx, args) => {
+    await assertIsStudent(ctx, args.studentId)
+    const nickname = nicknameFrom(args.noun, args.adjective)
+    if (nickname == null) throw new ConvexError('Elige una palabra de la lista.')
+    await ctx.db.patch('students', args.studentId, { nickname, updatedAt: Date.now() })
+    return { nickname }
+  },
+})
+
 export const getStudentAppState = query({
   args: {
     studentId: v.id('students'),
@@ -157,12 +189,21 @@ async function computeStudentAppState(ctx: QueryCtx, studentId: Id<'students'>) 
     (session) => session.status === 'completed',
   )
 
-  // Teachers and school admins land on their panel; they never sit placement.
+  // Staff land on their own side; they never sit placement. Most senior first:
+  // `roles[0]` is where the account goes, the rest are what it can switch to.
   const memberships = await ctx.db
     .query('memberships')
     .withIndex('by_accountId', (q) => q.eq('accountId', studentId))
     .collect()
-  const isStaff = memberships.some((membership) => membership.role !== 'student')
+  const isAdmin = student.isAdmin === true
+  const isReviewer = (student.reviewerSubjects?.length ?? 0) > 0
+  const teaches = memberships.some((membership) => membership.role !== 'student')
+  const isStaff = isAdmin || isReviewer || teaches
+  const roles = [
+    ...(isAdmin ? ['admin' as const] : isReviewer ? ['reviewer' as const] : []),
+    ...(teaches ? ['teacher' as const] : []),
+    ...(!isStaff || memberships.some((membership) => membership.role === 'student') ? ['student' as const] : []),
+  ]
 
   const placedSubjectIds = [
     ...new Set(
@@ -179,9 +220,13 @@ async function computeStudentAppState(ctx: QueryCtx, studentId: Id<'students'>) 
     /** Areas the student has actually levelled, for the placement screen. */
     placedSubjectIds,
     isStaff,
-    defaultRoute: isStaff
-      ? '/teacher' as const
-      : hasPlacement ? '/today' as const : '/diagnostic' as const,
+    roles,
+    defaultRoute: isAdmin || isReviewer
+      ? '/admin' as const
+      : teaches
+        ? '/teacher' as const
+        : hasPlacement ? '/today' as const : '/diagnostic' as const,
+    defaultSearch: !isAdmin && isReviewer ? { tab: 'audit' as const } : undefined,
   }
 }
 
@@ -212,6 +257,9 @@ export async function deleteStudentData(ctx: MutationCtx, studentId: Id<'student
     await ctx.db.delete('sessions', session._id)
   }
 
+  // Read first: the rows that say where the student took part are erased below.
+  const participation = await schoolsOf(ctx, studentId, sessions)
+
   const remove = async <T extends TableNames>(table: T, rows: Doc<T>[]) => {
     for (const row of rows) await ctx.db.delete(table, row._id)
   }
@@ -223,8 +271,29 @@ export async function deleteStudentData(ctx: MutationCtx, studentId: Id<'student
   await remove('practiceTutorThreads', await ctx.db.query('practiceTutorThreads').withIndex('by_studentId', (q) => q.eq('studentId', studentId)).collect())
   await remove('llmUsage', await ctx.db.query('llmUsage').withIndex('by_studentId_day_feature', (q) => q.eq('studentId', studentId)).collect())
   await remove('questionReports', await ctx.db.query('questionReports').withIndex('by_studentId_createdAt', (q) => q.eq('studentId', studentId)).collect())
+  await remove('duelAnswers', await ctx.db.query('duelAnswers').withIndex('by_studentId', (q) => q.eq('studentId', studentId)).collect())
+  // Duels, assignments and cycles keep going, minus the student: the class's work
+  // is not theirs to take along. Every class of those schools, not just their
+  // current one: leaving a class does not take the id off what it assigned.
+  for (const orgId of participation) {
+    for (const { _id: classGroupId } of await ctx.db.query('classGroups').withIndex('by_orgId', (q) => q.eq('orgId', orgId)).collect()) {
+      await scrubClassRosters(ctx, classGroupId, (id) => id !== studentId)
+    }
+  }
   await remove('memberships', await ctx.db.query('memberships').withIndex('by_accountId', (q) => q.eq('accountId', studentId)).collect())
   await remove('classGroupMembers', await ctx.db.query('classGroupMembers').withIndex('by_accountId', (q) => q.eq('accountId', studentId)).collect())
 
   if ((await ctx.db.get('students', studentId)) != null) await ctx.db.delete('students', studentId)
+}
+
+/** Every school the student belongs to or left a trace in: assigned sessions and duels played there. */
+async function schoolsOf(ctx: QueryCtx, studentId: Id<'students'>, sessions: Doc<'sessions'>[]) {
+  const [memberships, classRows, duelAnswers, assignments] = await Promise.all([
+    ctx.db.query('memberships').withIndex('by_accountId', (q) => q.eq('accountId', studentId)).collect(),
+    ctx.db.query('classGroupMembers').withIndex('by_accountId', (q) => q.eq('accountId', studentId)).collect(),
+    ctx.db.query('duelAnswers').withIndex('by_studentId', (q) => q.eq('studentId', studentId)).collect(),
+    Promise.all(sessions.flatMap((session) => (session.assignmentId == null ? [] : [ctx.db.get('assignments', session.assignmentId)]))),
+  ])
+  const duels = await Promise.all([...new Set(duelAnswers.map((answer) => answer.duelId))].map((duelId) => ctx.db.get('classDuels', duelId)))
+  return new Set([...memberships, ...classRows, ...assignments, ...duels].flatMap((row) => row?.orgId ?? []))
 }

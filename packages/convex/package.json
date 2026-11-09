@@ -19,6 +19,7 @@
     "./examPlan": "./src/examPlan.ts",
     "./elo": "./src/elo.ts",
     "./pacing": "./src/pacing.ts",
+    "./rewards": "./src/rewards.ts",
     "./sessionIntegrity": "./src/sessionIntegrity.ts",
     "./mastery": "./src/mastery.ts",
     "./practiceBuilder": "./src/practiceBuilder.ts",

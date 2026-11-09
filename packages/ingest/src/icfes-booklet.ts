@@ -50,7 +50,10 @@ const NOISE = [
   // sitting inside the reading passages.
   /^Saber 11\.?[º°]?(\s+\d{1,3})?\s*$/i,
   /^\d{4}\s*$/,
-  /^Cuadernillo de\s*$/i,
+  /^Cuadernillo de(\s+preguntas)?\s*$/i,
+  // The 2026 footer prints a lone dot and the area on their own lines.
+  /^\.\s*$/,
+  /^Prueba\s+(Lectura|Matemáticas|Sociales|Ciencias|Inglés)/i,
   /^preguntas\s*$/i,
   /^Módulo de\s*$/i,
   /^Prueba\s*$/i,
@@ -89,9 +92,16 @@ export function referencesArtwork(text: string): boolean {
  * level after each. Only the tail of the document is scanned: `3 B` shaped
  * fragments occur inside question bodies too.
  */
-/** Headings the booklets put above their answer key, in every format seen. */
-const KEY_HEADING =
-  /(Tabla de respuestas correctas|Respuestas? correctas?|Clave de respuestas|Posición\s+Afirmación)/gi
+/**
+ * Headings the booklets put above their answer key, strongest first. The covers
+ * of the 2026 booklets say "respuestas correctas" too, so the weak form is only
+ * trusted when nothing better exists.
+ */
+const KEY_HEADINGS = [
+  /Tabla de respuestas correctas/i,
+  /Clave de respuestas|Posición\s+Afirmación/i,
+  /Respuestas? correctas?/i,
+]
 
 export function parseAnswerKey(text: string): Map<number, { option: string; level?: string }> {
   // Scan from the key's own heading rather than from a fixed tail.
@@ -101,15 +111,22 @@ export function parseAnswerKey(text: string): Map<number, { option: string; leve
   // key runs well past any fixed window. A 6000-character tail saw the last
   // fourteen rows of Ciencias Naturales and silently dropped the other
   // thirty-two.
-  const headings = [...text.matchAll(KEY_HEADING)]
-  const from = headings.length > 0 ? headings[0]!.index! : Math.max(0, text.length - 6000)
-  const tail = text.slice(from)
+  const heading = KEY_HEADINGS.map((pattern) => pattern.exec(text)).find((match) => match != null)
+  const from = heading?.index ?? Math.max(0, text.length - 6000)
+  return readKeyRows(text.slice(from))
+}
+
+/** Every `number letter` row of an answer key, wherever it starts. */
+function readKeyRows(section: string): Map<number, { option: string; level?: string }> {
   const key = new Map<number, { option: string; level?: string }>()
 
-  for (const line of tail.split('\n')) {
-    const pairs = line.matchAll(
-      /(?<![\d.,])(\d{1,3})\s+([A-H])(?![\w])(?:\s+(Pre\s?A1|A1|A2|B1|B\+|[1-4])(?![\d]))?/g,
-    )
+  for (const line of section.split('\n')) {
+    // `4   naturaleza con base en…   B`: the statement shares the row. It needs
+    // a real word in the middle, or two key columns (`1  A   26  C`) would match.
+    const statementRow = line.match(/^\s*(\d{1,3})\s{2,}(?=.*\p{L}{2,}).*\S\s{3,}([A-H])\s*$/u)
+    const pairs = statementRow != null
+      ? [statementRow]
+      : line.matchAll(/(?<![\d.,])(\d{1,3})\s+([A-H])(?![\w])(?:\s+(Pre\s?A1|A1|A2|B1|B\+|[1-4])(?![\d]))?/g)
     for (const pair of pairs) {
       const number = Number(pair[1])
       // Booklets top out well under 200 questions; anything larger is a year,
@@ -124,24 +141,103 @@ export function parseAnswerKey(text: string): Map<number, { option: string; leve
   return key
 }
 
+/** `Tabla de respuestas correctas - Examen 2`, with or without the dash or a line break. */
+const EXAM_KEY_HEADING = /Tabla de respuestas correctas\s*(?:[-–]\s*)?Examen\s+(\d)/gi
+
+/**
+ * The answer keys of a booklet that prints two exams, by exam number.
+ *
+ * Both exams number their questions from 1, so read as one key the second table
+ * would overwrite the first. Empty when the booklet has no exam sections.
+ */
+export function parseExamAnswerKeys(
+  text: string,
+): Map<number, Map<number, { option: string; level?: string }>> {
+  const headings = [...text.matchAll(EXAM_KEY_HEADING)]
+  return new Map(
+    headings.map((heading, index) => [
+      Number(heading[1]),
+      readKeyRows(text.slice(heading.index, headings[index + 1]?.index)),
+    ]),
+  )
+}
+
+/**
+ * The ways a booklet prints an answer right beside its question.
+ *
+ * Case matters in the first one: the explanations also say "la opción de
+ * respuesta correcta", which is prose, not a key.
+ */
+const INLINE_ANSWER = [
+  /Respuesta correcta(?:\s+de la descripción \d+)?[ \t]*:?[ \t]*([A-H])\b/,
+  /encuentra en la opción ([A-H])\b/i,
+]
+
+/** The answer printed beside a question, for booklets with no key table. */
+export function inlineAnswer(block: string): string | undefined {
+  for (const pattern of INLINE_ANSWER) {
+    const match = pattern.exec(block)
+    if (match != null) return match[1]
+  }
+  return undefined
+}
+
+interface OptionCell {
+  label: string
+  /** Where the label starts. */
+  column: number
+  /** Just past the label's dot. */
+  end: number
+}
+
+/**
+ * The options a line opens with. Figure answers print side by side (`A. 12   B. 5`)
+ * or as bare labels above their drawings.
+ *
+ * A later label needs a column gap and a later letter, or it is prose inside the
+ * option: "la opción B." is not option B.
+ */
+function optionCells(line: string): OptionCell[] {
+  const first = line.match(/^(\s*)([A-H])\.(?=\s|$)/)
+  if (first == null) return []
+  const cells: OptionCell[] = [{ label: first[2]!, column: first[1]!.length, end: first[0].length }]
+  for (const match of line.matchAll(/(?:\s{2,}|\t)([B-H])\.(?=\s|$)/g)) {
+    const end = match.index + match[0].length
+    if (match[1]! > cells[cells.length - 1]!.label) {
+      cells.push({ label: match[1]!, column: end - 2, end })
+    }
+  }
+  return cells
+}
+
 /** Split the option block off the end of a question and label each choice. */
 function splitOptions(block: string): { stem: string; options: ParsedOption[] } {
   const lines = block.split('\n')
-  const options: ParsedOption[] = []
+  let options: ParsedOption[] = []
   let firstOptionLine = -1
-  // Column where the current option's own text begins. A wrapped line is
-  // indented to sit under it; anything starting further left is new material.
-  let continuationIndent = -1
+  // The options of the row being read. A wrapped line continues them, column by
+  // column; anything starting further left is new material.
+  let open: Array<{ option: ParsedOption; column: number }> = []
 
   for (let index = 0; index < lines.length; index += 1) {
     const line = lines[index]
     if (line == null) continue
 
-    const match = line.match(/^(\s{2,})([A-H])\.\s+(.*)$/)
-    if (match != null) {
-      if (firstOptionLine === -1) firstOptionLine = index
-      options.push({ label: match[2]!, text: (match[3] ?? '').trim() })
-      continuationIndent = match[1]!.length + match[2]!.length + 2
+    const cells = optionCells(line)
+    if (cells.length > 0) {
+      // A second `A.` means the first was a label inside the figure, not an option.
+      if (firstOptionLine === -1 || cells[0]!.label === 'A') {
+        firstOptionLine = index
+        options = []
+      }
+      open = cells.map((cell, position) => {
+        const option = {
+          label: cell.label,
+          text: line.slice(cell.end, cells[position + 1]?.column).trim(),
+        }
+        options.push(option)
+        return { option, column: cell.column }
+      })
       continue
     }
 
@@ -152,25 +248,27 @@ function splitOptions(block: string): { stem: string; options: ParsedOption[] } 
     // question 1 absorbed the next group's heading and its whole 2000-character
     // passage.
     if (line.trim().length === 0) {
-      continuationIndent = -1
+      open = []
       continue
     }
-    if (continuationIndent === -1) continue
+    if (open.length === 0) continue
 
-    // A shared-stimulus heading is never part of an option.
-    if (/RESPONDA\s+(?:LAS\s+)?PREGUNTAS?/i.test(line)) {
-      continuationIndent = -1
+    // A shared-stimulus heading or the page footer is never part of an option.
+    if (/RESPONDA\s+(?:LAS\s+)?PREGUNTAS?/i.test(line) || isNoise(line)) {
+      open = []
       continue
     }
 
     const indent = line.length - line.trimStart().length
-    if (indent < continuationIndent - 2) {
-      continuationIndent = -1
+    if (indent < open[0]!.column + 1) {
+      open = []
       continue
     }
 
-    const last = options[options.length - 1]
-    if (last != null) last.text = `${last.text} ${line.trim()}`.trim()
+    open.forEach((cell, position) => {
+      const piece = line.slice(position === 0 ? 0 : cell.column, open[position + 1]?.column).trim()
+      if (piece.length > 0) cell.option.text = `${cell.option.text} ${piece}`.trim()
+    })
   }
 
   const stemLines = (firstOptionLine === -1 ? lines : lines.slice(0, firstOptionLine))
@@ -323,7 +421,7 @@ export function parseBooklet(text: string): ParsedQuestion[] {
       const betweenLines = between.split('\n')
       let lastOptionLine = -1
       for (let line = 0; line < betweenLines.length; line += 1) {
-        if (/^\s{2,}[A-H]\.\s/.test(betweenLines[line] ?? '')) lastOptionLine = line
+        if (/^\s*[A-H]\.(?:\s|$)/.test(betweenLines[line] ?? '')) lastOptionLine = line
       }
       const cleaned = cleanStimulus(betweenLines.slice(lastOptionLine + 1).join('\n'))
       // A short fragment here is leftover furniture, not a passage.
@@ -340,9 +438,12 @@ export function parseBooklet(text: string): ParsedQuestion[] {
       contextMarkdown,
       contextKey,
       options,
-      correctOption: answer?.option,
+      correctOption: inlineAnswer(block) ?? answer?.option,
       level: answer?.level,
-      needsArtwork: referencesArtwork(`${contextMarkdown ?? ''}\n${stem}`),
+      // A blank option is a drawing the text layer cannot carry.
+      needsArtwork:
+        referencesArtwork(`${contextMarkdown ?? ''}\n${stem}`)
+        || options.some((option) => option.text.length === 0),
     })
   }
 
@@ -358,6 +459,19 @@ export function usableQuestions(questions: ParsedQuestion[]): ParsedQuestion[] {
   return questions.filter(
     (question) =>
       !question.needsArtwork
+      && question.correctOption != null
+      && question.options.some((option) => option.label === question.correctOption),
+  )
+}
+
+/**
+ * Questions that lean on a figure but have a printed key. They are not dropped:
+ * a person reads them against the crop, in the audit queue.
+ */
+export function figureQuestions(questions: ParsedQuestion[]): ParsedQuestion[] {
+  return questions.filter(
+    (question) =>
+      question.needsArtwork
       && question.correctOption != null
       && question.options.some((option) => option.label === question.correctOption),
   )

@@ -1,5 +1,6 @@
 import type { QueryCtx } from './_generated/server'
-import type { Doc } from './_generated/dataModel'
+import type { Doc, Id } from './_generated/dataModel'
+import { listAccountOrganizations } from './schools'
 import type { QuestionEligibilityPool } from './sessionKinds'
 import { SUBJECT_IDS } from './taxonomy'
 
@@ -14,22 +15,43 @@ import { SUBJECT_IDS } from './taxonomy'
  * questions than a session can actually select.
  */
 
-/** A question is usable only if it has a scored answer key and full taxonomy. */
+export type BankTier = 'icfes' | 'original'
+export const ALL_BANK_TIERS: BankTier[] = ['icfes', 'original']
+
+/**
+ * Which of the question bank's tiers a student may draw from (G1): a paying
+ * school only ever gets original items; everyone else may also see the ICFES
+ * ones. Any paying school wins, whatever else the account belongs to.
+ */
+export async function bankTiersForStudent(ctx: Pick<QueryCtx, 'db'>, studentId: Id<'students'>): Promise<BankTier[]> {
+  const organizations = await listAccountOrganizations(ctx, studentId)
+  return organizations.some(({ organization }) => organization.plan === 'school') ? ['original'] : ALL_BANK_TIERS
+}
+
+/** The bank tiers a school may be shown (G1): a paying school, original items only. */
+export const bankTiersForOrg = (organization: Pick<Doc<'organizations'>, 'plan'>): BankTier[] =>
+  organization.plan === 'school' ? ['original'] : ALL_BANK_TIERS
+
+export const inBankTier = (question: Doc<'questions'>, tiers: BankTier[]) => tiers.includes(question.bankTier ?? 'icfes')
+
+/** A question is usable only if it has a scored answer key and full taxonomy, and was not voided. */
 export function hasUsableMetadata(question: Doc<'questions'>) {
   return (
-    question.answerCorrectOption != null
+    question.voidedAt == null
+    && question.answerCorrectOption != null
     && question.subjectId != null
     && question.categoryId != null
     && question.primarySubtopicId != null
   )
 }
 
-/** Whether a question's eligibility tier is one the caller is drawing from. */
+/** Whether a stored question is still one the caller may draw: its eligibility tier and its bank tier. */
 export function isInEligibilityPool(
   question: Doc<'questions'>,
   pools: QuestionEligibilityPool[],
+  tiers: BankTier[],
 ) {
-  return question.eligibility != null && (pools as string[]).includes(question.eligibility)
+  return question.eligibility != null && (pools as string[]).includes(question.eligibility) && inBankTier(question, tiers)
 }
 
 /** Every usable question for a subject across the given eligibility pools. */
@@ -37,6 +59,7 @@ export async function collectUsableQuestionsBySubject(
   ctx: QueryCtx,
   subjectId: string,
   pools: QuestionEligibilityPool[],
+  tiers: BankTier[],
 ): Promise<Doc<'questions'>[]> {
   const pooled: Doc<'questions'>[] = []
   for (const pool of pools) {
@@ -48,7 +71,7 @@ export async function collectUsableQuestionsBySubject(
       .collect()
     pooled.push(...rows)
   }
-  return pooled.filter(hasUsableMetadata)
+  return pooled.filter((question) => hasUsableMetadata(question) && inBankTier(question, tiers))
 }
 
 /**
@@ -61,9 +84,10 @@ export async function collectUsableQuestionsBySubject(
 export async function collectUsableQuestions(
   ctx: QueryCtx,
   pools: QuestionEligibilityPool[],
+  tiers: BankTier[],
 ): Promise<Doc<'questions'>[]> {
   const bySubject = await Promise.all(
-    SUBJECT_IDS.map((subjectId) => collectUsableQuestionsBySubject(ctx, subjectId, pools)),
+    SUBJECT_IDS.map((subjectId) => collectUsableQuestionsBySubject(ctx, subjectId, pools, tiers)),
   )
   return bySubject.flat()
 }
@@ -129,6 +153,7 @@ export async function collectUsableQuestionsBySubtopic(
   ctx: QueryCtx,
   subtopicId: string,
   pools: QuestionEligibilityPool[],
+  tiers: BankTier[],
 ): Promise<Doc<'questions'>[]> {
   const pooled: Doc<'questions'>[] = []
   for (const pool of pools) {
@@ -140,5 +165,5 @@ export async function collectUsableQuestionsBySubtopic(
       .collect()
     pooled.push(...rows)
   }
-  return pooled.filter(hasUsableMetadata)
+  return pooled.filter((question) => hasUsableMetadata(question) && inBankTier(question, tiers))
 }

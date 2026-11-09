@@ -4,7 +4,7 @@ import { query } from './_generated/server'
 import { assertIsStudent } from './auth'
 import { LEVELLED_SUBJECT_IDS, MIN_ATTEMPTS_FOR_LEVEL, getLevelForScore } from './levels'
 import { areaScore } from './progress'
-import { collectUsableQuestionsBySubject } from './questionPool'
+import { bankTiersForStudent, collectUsableQuestionsBySubject } from './questionPool'
 import type { QuestionEligibilityPool } from './sessionKinds'
 
 /**
@@ -40,7 +40,7 @@ export const getLearningPath = query({
     // One indexed scan per eligibility pool for this subject, bucketed by
     // subtopic in memory — the same shape `syllabus.ts` uses, rather than a
     // third scan pattern over the same table.
-    const usable = await collectUsableQuestionsBySubject(ctx, subject.id, ELIGIBILITY_POOLS)
+    const usable = await collectUsableQuestionsBySubject(ctx, subject.id, ELIGIBILITY_POOLS, await bankTiersForStudent(ctx, args.studentId))
     const questionCountBySubtopic = new Map<string, number>()
     for (const question of usable) {
       if (question.primarySubtopicId == null) continue

@@ -9,6 +9,12 @@ describe('questionSource', () => {
     })
   })
 
+  test('an upload already named after ICFES is not credited twice', () => {
+    expect(questionSource({ slug: 'icfes-cn', fileName: 'ICFES · Ciencias Naturales (práctica)' }).label).toBe(
+      'ICFES · Ciencias Naturales (práctica)',
+    )
+  })
+
   test('a question written with AI says so', () => {
     expect(questionSource({ slug: 'ai-generated', fileName: 'ai-generated' }).kind).toBe('aprendo')
   })

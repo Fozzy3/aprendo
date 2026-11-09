@@ -12,7 +12,8 @@ cut out the question.
 "Pregunta N" heading. That is the cut line: a question runs from its own heading
 to the next one, and across a page break when it has to.
 
-Output: one PNG per question, plus an index mapping question number to file.
+Output: one PNG per question, the full page of each question (for the audit to
+show beside it), and `<stem>.index.json` mapping questions to files and pages.
 
     python3 icfes-crop-questions.py <pdf> <outdir>
 """
@@ -252,10 +253,19 @@ def main() -> int:
             target = groups
 
         image.save(outdir / name, optimize=True)
-        record.update({"width": image.width, "height": image.height})
+        # Page and y let the audit show a question beside its source page.
+        record.update({
+            "width": image.width, "height": image.height,
+            "page": current["page"], "y": current["y"],
+        })
         target.append(record)
 
-    print(json.dumps({"pdf": pdf.name, "questions": questions, "groups": groups}))
+    for page in sorted({record["page"] for record in questions}):
+        cache[page].save(outdir / f"{pdf.stem}-p{page:03d}.png", optimize=True)
+
+    index = {"pdf": pdf.name, "questions": questions, "groups": groups}
+    (outdir / f"{pdf.stem}.index.json").write_text(json.dumps(index))
+    print(json.dumps(index))
     return 0
 
 

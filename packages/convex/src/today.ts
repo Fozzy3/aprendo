@@ -9,9 +9,11 @@ import { LEVELLED_SUBJECT_IDS, MIN_ATTEMPTS_FOR_LEVEL, getLevelForScore } from '
 import { careerWeights } from './careers'
 import { isReviewDue } from './mastery'
 import { areaScore } from './progress'
-import { collectUsableQuestionsBySubject } from './questionPool'
+import { bankTiersForStudent, collectUsableQuestionsBySubject } from './questionPool'
 import { settledAttempts } from './sessionIntegrity'
+import { loadLiveExamSeal } from './sessions'
 import { SESSION_KIND_CONFIG } from './sessionKinds'
+import { MEDAL_LABELS, type MedalId, buildStickerAlbum, earnedXp, firstWeekPath, streakFrom } from './rewards'
 import { buildStudyPlan } from './studyPlan'
 import { DEFAULT_WEEKLY_GOAL_MINUTES, weeklyStudyMinutes } from './studyTime'
 
@@ -63,21 +65,8 @@ export const getTodayDashboard = query({
     const now = Date.now()
     const today = colombiaDayNumber(now)
 
-    // A streak is unbroken if today or yesterday has activity; count back from
-    // whichever the most recent active anchor is.
-    let streakDays = 0
-    const anchor = activeDays.has(today)
-      ? today
-      : activeDays.has(today - 1)
-        ? today - 1
-        : null
-    if (anchor != null) {
-      let cursor = anchor
-      while (activeDays.has(cursor)) {
-        streakDays += 1
-        cursor -= 1
-      }
-    }
+    // Shields replay deterministically; see `rewards.streakFrom`.
+    const { streakDays, shields } = streakFrom(activeDays, today)
 
     // The calendar week (Monday to Sunday), not the last seven days: it is the
     // week the coach summarizes, so "esta semana" means the same thing in both.
@@ -183,21 +172,26 @@ export const getTodayDashboard = query({
     // Every subtopic a topic session can serve, asked or not (one indexed scan
     // per area and pool, as the Temario counts them).
     const launchableSubtopics = new Map<string, string>()
+    const [tiers, isFree] = await Promise.all([bankTiersForStudent(ctx, args.studentId), loadLiveExamSeal(ctx, args.studentId)])
     await Promise.all(
       LEVELLED_SUBJECT_IDS.map(async (subjectId) => {
-        const usable = await collectUsableQuestionsBySubject(ctx, subjectId, SESSION_KIND_CONFIG.topic.eligibilityPools)
-        for (const question of usable) {
+        const usable = await collectUsableQuestionsBySubject(ctx, subjectId, SESSION_KIND_CONFIG.topic.eligibilityPools, tiers)
+        for (const question of usable.filter(isFree)) {
           if (question.primarySubtopicId != null) launchableSubtopics.set(question.primarySubtopicId, subjectId)
         }
       }),
     )
 
+    const completedToday = sessions.filter((session) =>
+      session.status === 'completed' && session.completedAt != null && colombiaDayNumber(session.completedAt) === today)
+
     const plan = buildStudyPlan({
       today,
       examDay: student?.examDate == null ? null : colombiaDayNumber(student.examDate),
       areas,
+      // A topic the plan names has to launch: nothing it can no longer serve.
       subtopics: subtopicAggregates.flatMap((aggregate) =>
-        aggregate.subtopicId == null
+        aggregate.subtopicId == null || !launchableSubtopics.has(aggregate.subtopicId)
           ? []
           : [{
               subtopicId: aggregate.subtopicId,
@@ -210,6 +204,7 @@ export const getTodayDashboard = query({
       ),
       launchableSubtopics: [...launchableSubtopics].map(([subtopicId, subjectId]) => ({ subtopicId, subjectId })),
       reviewDueCount,
+      answeredToday: completedToday.reduce((sum, session) => sum + (session.summary?.answeredCount ?? 0), 0),
       simulacroSittings: sessions.flatMap((session) =>
         session.kind === 'simulacro' && session.status === 'completed' && session.simulacroSessionNumber != null
           ? [{
@@ -224,6 +219,16 @@ export const getTodayDashboard = query({
 
     return {
       streakDays,
+      shields,
+      xp: {
+        today: earnedXp(sessions, (completedAt) => colombiaDayNumber(completedAt) === today),
+        thisWeek: earnedXp(sessions, (completedAt) => colombiaWeekIndex(completedAt) === thisWeek),
+      },
+      firstWeek: firstWeekPath(
+        sessions.flatMap((session) => (session.status === 'completed' && session.completedAt != null ? [colombiaDayNumber(session.completedAt)] : [])),
+        today,
+        student?.weeklyGoalMinutes != null,
+      ),
       practicedToday: activeDays.has(today),
       activeDaysThisWeek,
       examDate: student?.examDate ?? null,
@@ -261,5 +266,31 @@ export const getTodayDashboard = query({
       },
       plan,
     }
+  },
+})
+
+/**
+ * The sticker album of Yo: one sticker per subtopic, earned from the mastery
+ * levels already on the aggregates, plus the special stickers (medals) kept in
+ * `sessions.reward`. No new table (see `rewards.buildStickerAlbum`).
+ */
+export const getStickerAlbum = query({
+  args: {
+    studentId: v.id('students'),
+  },
+  handler: async (ctx, args) => {
+    await assertIsStudent(ctx, args.studentId)
+    const [aggregates, sessions] = await Promise.all([
+      ctx.db.query('learnerSubtopicAggregates').withIndex('by_studentId', (q) => q.eq('studentId', args.studentId)).collect(),
+      ctx.db.query('sessions').withIndex('by_studentId', (q) => q.eq('studentId', args.studentId)).collect(),
+    ])
+    const medals = sessions
+      .flatMap((session) => (session.reward?.medals ?? []).map((id) => ({
+        id,
+        label: MEDAL_LABELS[id as MedalId] ?? id,
+        earnedAt: session.completedAt ?? session.startedAt,
+      })))
+      .sort((a, b) => a.earnedAt - b.earnedAt)
+    return { ...buildStickerAlbum(aggregates), medals }
   },
 })

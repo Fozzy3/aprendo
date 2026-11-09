@@ -10,6 +10,7 @@ import { ConvexError, v } from 'convex/values'
 import { mutation, query, type MutationCtx, type QueryCtx } from './_generated/server'
 import type { Doc, Id } from './_generated/dataModel'
 import { getMembership, requireAuthenticatedStudentId, requireOrgRole, requirePlatformAdmin } from './auth'
+import { SCHOOL_GRADES } from './taxonomy'
 import { organizationPlanValidator } from './validators'
 
 // No 0/O or 1/I: the code is read off a board and typed on a phone.
@@ -312,6 +313,11 @@ export const removeMember = mutation({
         .withIndex('by_orgId_accountId', (q) => q.eq('orgId', membership.orgId).eq('accountId', membership.accountId))
         .collect(),
     )
+    if (membership.role === 'student') {
+      for (const { _id: classGroupId } of await ctx.db.query('classGroups').withIndex('by_orgId', (q) => q.eq('orgId', membership.orgId)).collect()) {
+        await scrubClassRosters(ctx, classGroupId, (studentId) => studentId !== membership.accountId)
+      }
+    }
     await ctx.db.delete('memberships', membership._id)
   },
 })
@@ -320,15 +326,39 @@ export const createClassGroup = mutation({
   args: { orgId: v.id('organizations'), name: v.string(), grade: v.string() },
   handler: async (ctx, args) => {
     await requireOrgRole(ctx, args.orgId, ['org_admin'])
+    if (!SCHOOL_GRADES.includes(args.grade)) throw new ConvexError('El grado debe estar entre 6 y 11.')
     return ctx.db.insert('classGroups', {
       orgId: args.orgId,
       name: cleanName(args.name, 'El nombre del curso'),
-      grade: cleanName(args.grade, 'El grado'),
+      grade: args.grade,
       inviteCode: await newInviteCode(ctx),
       createdAt: Date.now(),
     })
   },
 })
+
+/**
+ * Takes ids off what one class assigned: its duels, assignments and cycles keep
+ * going without them. Erasure finds a class by its school, so an id left here
+ * outlives the membership that would have found it.
+ */
+export async function scrubClassRosters(ctx: MutationCtx, classGroupId: Id<'classGroups'>, keep: (studentId: Id<'students'>) => boolean) {
+  for (const duel of await ctx.db.query('classDuels').withIndex('by_classGroupId', (q) => q.eq('classGroupId', classGroupId)).collect()) {
+    if (duel.teams.some((team) => !team.studentIds.every(keep))) {
+      await ctx.db.patch('classDuels', duel._id, { teams: duel.teams.map((team) => ({ ...team, studentIds: team.studentIds.filter(keep) })) })
+    }
+  }
+  for (const assignment of await ctx.db.query('assignments').withIndex('by_classGroupId', (q) => q.eq('classGroupId', classGroupId)).collect()) {
+    if (assignment.studentIds != null && !assignment.studentIds.every(keep)) {
+      await ctx.db.patch('assignments', assignment._id, { studentIds: assignment.studentIds.filter(keep) })
+    }
+  }
+  for (const cycle of await ctx.db.query('classCycles').withIndex('by_classGroupId', (q) => q.eq('classGroupId', classGroupId)).collect()) {
+    if (cycle.groups.some((group) => !group.studentIds.every(keep))) {
+      await ctx.db.patch('classCycles', cycle._id, { groups: cycle.groups.map((group) => ({ ...group, studentIds: group.studentIds.filter(keep) })) })
+    }
+  }
+}
 
 async function requireClassGroupAdmin(ctx: MutationCtx, classGroupId: Id<'classGroups'>) {
   const classGroup = await ctx.db.get('classGroups', classGroupId)
@@ -349,6 +379,7 @@ export const deleteClassGroup = mutation({
         .withIndex('by_classGroupId_role', (q) => q.eq('classGroupId', args.classGroupId))
         .collect(),
     )
+    await scrubClassRosters(ctx, args.classGroupId, () => false)
     await ctx.db.delete('classGroups', args.classGroupId)
   },
 })
@@ -447,6 +478,7 @@ export const joinClassGroup = mutation({
         role: 'student',
         joinedAt: Date.now(),
       })
+      if (SCHOOL_GRADES.includes(classGroup.grade)) await ctx.db.patch('students', accountId, { grade: Number(classGroup.grade) })
     }
     return { orgId: classGroup.orgId, classGroupName: classGroup.name, schoolName: organization.name }
   },

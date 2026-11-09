@@ -36,7 +36,7 @@ async function classWithStudent() {
         pdfUploadId, sequence: position, questionNumber: position + 1, bodyMarkdown: 'q',
         options: [{ label: 'A', bodyMarkdown: 'a' }, { label: 'B', bodyMarkdown: 'b' }], createdAt: 0,
         subjectId: 'matematicas', categoryId: 'matematicas.functions_variation', primarySubtopicId: SUBTOPIC,
-        answerCorrectOption: 'A', eligibility: 'practice_only',
+        answerCorrectOption: 'A', eligibility: 'practice_only', bankTier: 'original', // a paying school draws only originals (G1)
       })
     }
   })
@@ -112,6 +112,24 @@ describe('assignments, edge cases', () => {
       })
     })
     expect(await profe.as.query(api.teacher.getClassCompetencias, { classGroupId })).toEqual([])
+  })
+})
+
+describe('who may write to a class', () => {
+  test('the class report tells the page whether to offer write controls', async () => {
+    const { t, profe, rector, orgId, classGroupId } = await classWithStudent()
+    const otra = await signUp(t, 'otra@colegio.co')
+    await rector.as.mutation(api.schools.addTeacher, { orgId, email: 'otra@colegio.co' })
+    expect((await profe.as.query(api.teacher.getClassOverview, { classGroupId })).canWrite).toBe(true)
+    expect((await rector.as.query(api.teacher.getClassOverview, { classGroupId })).canWrite).toBe(true)
+    expect((await otra.as.query(api.teacher.getClassOverview, { classGroupId })).canWrite).toBe(false)
+  })
+
+  test('the guided signal of a student reaches their teachers, not other students', async () => {
+    const { t, profe, ana } = await classWithStudent()
+    expect(await profe.as.query(api.teacher.getStudentGuidedSignal, { studentId: ana.studentId })).toEqual({ guidedCount: 0, revealedCount: 0 })
+    const beto = await signUp(t, 'beto@x.co')
+    await expect(beto.as.query(api.teacher.getStudentGuidedSignal, { studentId: ana.studentId })).rejects.toThrow()
   })
 })
 

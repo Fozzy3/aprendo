@@ -25,8 +25,10 @@ export type ReportItem = {
   subtopicId: string | null
   /** The official ICFES competencia, when the question is tagged with one (F35). */
   competencia?: string | null
-  /** Null when left blank — scored as wrong, like ICFES scores it. */
+  /** Null when left blank — scored as wrong, like ICFES scores it — or when its grade is still sealed. */
   isCorrect: boolean | null
+  /** Tells a sealed answer from a blank, which `isCorrect` alone cannot. */
+  answered?: boolean
   confidence?: ConfidenceLevel
   flagged: boolean
   timeMs: number | null

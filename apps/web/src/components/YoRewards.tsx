@@ -30,7 +30,9 @@ export function YoRewards({
   const isOptedOut = leagueStatus === 'opted_out'
 
   return (
-    <>
+    <section className="ruled-section" aria-labelledby="yo-rewards-title">
+      <h2 id="yo-rewards-title" className="section-title">Logros</h2>
+      {medals.length === 0 ? <p className="page-lede">Tus medallas aparecen aquí cuando las ganes.</p> : null}
       {medals.length > 0 ? (
         <ul className="yo-album" aria-label="Tus medallas">
           {medals.map((medal) => (
@@ -44,7 +46,7 @@ export function YoRewards({
 
       {student != null ? (
         <details className="yo-more">
-          <summary>Editar mi lámina y mi apodo</summary>
+          <summary>Editar mi avatar y mi apodo</summary>
           <AvatarEditor studentId={studentId} avatar={student.avatar ?? null} nickname={student.nickname ?? null} />
         </details>
       ) : null}
@@ -61,6 +63,6 @@ export function YoRewards({
           </button>
         </section>
       ) : null}
-    </>
+    </section>
   )
 }

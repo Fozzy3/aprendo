@@ -1,4 +1,4 @@
-import { ChevronRight, Volume2 } from 'lucide-react'
+import { ArrowDown, ChevronRight, Volume2 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { canSpeak, speak, stopSpeaking } from '../lib/speech.ts'
 import { MarkdownBlock } from './MarkdownBlock.tsx'
@@ -22,6 +22,7 @@ export function LessonSteps({ steps }: { steps: Step[] }) {
 
   return (
     <section className="lesson-step" aria-label={`Paso ${index + 1} de ${steps.length}`}>
+      <p className="lesson-step-count">Paso {index + 1} de {steps.length}</p>
       <div className="lesson-beads" aria-hidden>
         {steps.map((item, position) => (
           <i key={item.predict} className={position <= index ? 'is-done' : undefined} />
@@ -52,7 +53,12 @@ export function LessonSteps({ steps }: { steps: Step[] }) {
             Siguiente
             <ChevronRight size={18} aria-hidden />
           </button>
-        ) : null}
+        ) : (
+          <a href="#practica" className="btn-secondary no-underline">
+            Practicar este tema
+            <ArrowDown size={18} aria-hidden />
+          </a>
+        )}
       </div>
     </section>
   )

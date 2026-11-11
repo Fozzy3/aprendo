@@ -1,7 +1,7 @@
 import { Link, createFileRoute } from '@tanstack/react-router'
 import { SESSION_KIND_CONFIG } from '@aprendo/convex/sessionKinds'
 import { ArrowRight, BookOpen, House, Trophy, UserRound, X } from 'lucide-react'
-import type { CSSProperties, ReactNode } from 'react'
+import type { CSSProperties } from 'react'
 import { Wordmark } from '../components/BrandMark.tsx'
 import { PublicFooter } from '../components/PublicPage.tsx'
 import { ThemeToggle } from '../components/ThemeToggle.tsx'
@@ -128,13 +128,13 @@ function LandingPage() {
                 intento, no antes.
               </p>
               <p className="landing-copy">
-                Cada tema que domina es una lámina de su álbum. Las láminas cuentan dominio; los puntos y la
-                racha cuentan esfuerzo. Nada de eso cambia su nivel.
+                Cada día abre con un siguiente paso y el porqué, y cada tema muestra su nivel, de Sin empezar
+                a Dominado. Los puntos y la racha cuentan esfuerzo y nunca cambian ese nivel.
               </p>
             </div>
             <figure className="ui-figure">
               <div className="ui-phones">
-                <AlbumFragment />
+                <TodayFragment />
                 <GuidedFragment />
               </div>
               <figcaption>Ejemplo de la aplicación del estudiante en un teléfono, con datos ficticios.</figcaption>
@@ -393,52 +393,40 @@ function CycleFragment() {
   )
 }
 
-/** The sticker glyphs of `.impeccable/mocks/decision/album.html`. */
-const GLYPHS: Record<string, ReactNode> = {
-  frac: <path fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" d="M5 12h14M12 5v.01M12 19v.01" />,
-  tri: <path fill="currentColor" d="M12 4 22 20H2z" />,
-  sq: <rect x="4" y="4" width="16" height="16" rx="2" fill="currentColor" />,
-  pi: <path fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" d="M4 8c2-2 4-2 8-2h8M9 6c0 5-1 10-3 13M16 6c-1 6-1 13 3 13" />,
-}
-
-const STICKERS = [
-  { n: 1, tone: 'c1', glyph: 'frac' },
-  { n: 2, tone: 'c3', glyph: 'tri' },
-  { n: 3, tone: 'c2', glyph: 'sq' },
-  { n: 4, tone: 'c4', glyph: 'pi' },
-  { n: 5, tone: 'c3', glyph: 'sq' },
-  { n: 6, tone: 'next', glyph: 'frac' },
-  { n: 7, tone: 'e', glyph: null },
-  { n: 8, tone: 'e', glyph: null },
+const AREAS = [
+  { label: 'Matemáticas', color: 'var(--subject-matematicas)', level: 'Nivel 2', done: 3, total: 8 },
+  { label: 'Lectura crítica', color: 'var(--subject-lectura_critica)', level: 'Nivel 3', done: 4, total: 6 },
 ]
 
-function Glyph({ name }: { name: string }) {
-  return <svg viewBox="0 0 24 24">{GLYPHS[name]}</svg>
-}
-
-/** The student's Hoy, composed like the Álbum mock, for the one area with 8 topics. */
-function AlbumFragment() {
+/** The student's Hoy: the next step and why, then the areas in words. */
+function TodayFragment() {
   return (
-    <div data-ui role="img" aria-label="Ejemplo de la pantalla Hoy: álbum de Matemáticas con 5 de 8 láminas y un botón para la que falta." className="ui-phone">
-      <div className="ui-album-page">
-        <p className="ui-album-name">Matemáticas</p>
-        <p className="ui-album-count">5 de 8 láminas · racha de 6 días</p>
-        <div className="ui-album-grid">
-          {STICKERS.map((sticker) => (
-            <div key={sticker.n} className={`ui-sticker ${sticker.tone}`}>
-              {sticker.n}
-              {sticker.glyph != null ? <Glyph name={sticker.glyph} /> : null}
+    <div
+      data-ui
+      role="img"
+      aria-label="Ejemplo de la pantalla Hoy: el siguiente paso, Practica Geometría plana, con el porqué y un botón para empezar, y el avance de cada área."
+      className="ui-phone"
+    >
+      <div className="ui-today">
+        <p className="ui-today-title">Hola, Valentina</p>
+        <p className="ui-today-status"><span>Racha de 6 días</span><span>40 XP hoy</span></p>
+        <p className="ui-today-h">Tu siguiente paso</p>
+        <div className="ui-today-next">
+          <b>Practica Geometría plana</b>
+          <span>Es donde más puntos del global puedes ganar.</span>
+          <small>Matemáticas · 10 min</small>
+          <em>Empezar</em>
+        </div>
+        <p className="ui-today-h">Tus áreas</p>
+        <div className="ui-today-areas">
+          {AREAS.map((area) => (
+            <div key={area.label} style={{ '--area': area.color } as CSSProperties}>
+              <span className="ui-today-area-top"><b>{area.label}</b>{area.level}</span>
+              <i><i style={{ width: `${(area.done / area.total) * 100}%` }} /></i>
+              <small>{area.done} de {area.total} temas en Competente o más</small>
             </div>
           ))}
         </div>
-        <div className="ui-album-go">
-          Te falta Geometría plana
-          <small>Consíguela · 5 preguntas · 5 min</small>
-        </div>
-      </div>
-      <div className="ui-album-task">
-        <b>Tiquete de lectura</b>
-        <span>De tu profe · vence mañana</span>
       </div>
       <div className="ui-album-tabs">
         <span className="is-active"><House aria-hidden />Hoy</span>
@@ -468,7 +456,7 @@ function GuidedFragment() {
           <i />
           <i />
         </span>
-        <span className="ui-guide-slot">6</span>
+        <span className="ui-guide-slot">3/5</span>
       </div>
       <div className="ui-guide-sheet">
         <p className="ui-guide-q">Una receta usa 3 tazas de harina por cada 2 de azúcar. Con 12 tazas de harina, ¿cuántas de azúcar necesitas?</p>

@@ -25,6 +25,38 @@ export function taskSessionArgs(action: Extract<StudyTaskAction, { type: 'sessio
 }
 
 /**
+ * Where a plan task goes on the tap. Timed sessions (nivelación, simulacro)
+ * start behind an intro that lives on the screen that chooses them.
+ */
+export function taskTarget(task: { kind: string; action: StudyTaskAction }):
+  | { type: 'lesson'; subtopicId: string }
+  | { type: 'link'; to: '/diagnostic' | '/practice' }
+  | { type: 'launch'; args: ReturnType<typeof taskSessionArgs> } {
+  const { action } = task
+  if (action.type === 'lesson') return { type: 'lesson', subtopicId: action.subtopicId }
+  if (action.kind === 'nivelacion') return { type: 'link', to: '/diagnostic' }
+  if (action.kind === 'simulacro') return { type: 'link', to: '/practice' }
+  return { type: 'launch', args: taskSessionArgs(action) }
+}
+
+/**
+ * Hoy's areas: topics at Competente or above out of the area's topics (the
+ * album counts them), with the ICFES level once there is evidence for one.
+ */
+export function areaRows(
+  album: { subjects: { subjectId: string; label: string; earnedCount: number; stickers: unknown[] }[] },
+  subjects: { subjectId: string; level: { placement: { band: { labelEs: string } } | null } }[] | undefined,
+) {
+  return album.subjects.map((subject) => ({
+    subjectId: subject.subjectId,
+    label: subject.label,
+    done: subject.earnedCount,
+    total: subject.stickers.length,
+    level: subjects?.find((item) => item.subjectId === subject.subjectId)?.level.placement?.band.labelEs ?? null,
+  }))
+}
+
+/**
  * What `TimedSessionIntro` shows before a timed task's clock starts, or null
  * for untimed practice, which starts on the tap.
  */

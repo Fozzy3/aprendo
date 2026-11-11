@@ -186,7 +186,7 @@ const pathData = {
     subjectLabel: 'Matemáticas',
     level: { hasEnoughEvidence: false, attemptsNeeded: 8, score: null, placement: null },
     nodes: [
-      { subtopicId: 'a', label: 'Fracciones', categoryId: 'n', categoryLabel: 'Números', questionCount: 5, hasLesson: true },
+      { subtopicId: 'a', label: 'Fracciones', categoryId: 'n', categoryLabel: 'Números', questionCount: 5, hasLesson: true, attemptCount: 12, accuracy: 0.75 },
       { subtopicId: 'b', label: 'Proporciones', categoryId: 'n', categoryLabel: 'Números', questionCount: 5, hasLesson: false },
     ],
   },
@@ -354,13 +354,21 @@ describe('/diagnostic', () => {
 })
 
 describe('/path, Aprende', () => {
-  it('paints the area as a full field and counts its stickers', async () => {
+  it('heads the area in its colour and counts topics in words', async () => {
     seedAprende()
     await render('../routes/path.tsx')
-    const field = container.querySelector<HTMLElement>('.aprende-field')!
-    expect(field.style.getPropertyValue('--field')).toBe('var(--subject-matematicas)')
+    const head = container.querySelector<HTMLElement>('.aprende-head')!
+    expect(head.style.getPropertyValue('--area')).toBe('var(--subject-matematicas)')
     expect(container.querySelector('h1')?.textContent).toBe('Matemáticas')
-    expect(field.textContent).toContain('1 de 2 láminas')
+    expect(head.textContent).toContain('1 de 2 temas en Competente o más')
+    expect(head.textContent).toContain('Te faltan 8 preguntas')
+  })
+
+  it('opens on the area Hoy linked to', async () => {
+    seedAprende()
+    const { LearningPathPage } = await import('../components/LearningPathPage.tsx')
+    await act(async () => root.render(<LearningPathPage studentId="s1" initialSubjectId="ingles" />))
+    expect(container.querySelector('[aria-pressed="true"]')?.textContent).toBe('Inglés')
   })
 
   it('has one primary action, on the plan’s pick, and it starts that topic', async () => {
@@ -385,8 +393,10 @@ describe('/path, Aprende', () => {
     await render('../routes/path.tsx')
     expect(container.textContent).toContain('Números')
     expect(hrefs('.aprende-topic a')).toEqual(['/lesson/$subtopicId', '/lesson/$subtopicId'])
-    expect(container.querySelectorAll('.aprende-slot')).toHaveLength(2)
+    expect(container.querySelector('.aprende-slot')).toBeNull()
+    expect(container.querySelector('.aprende-topic.is-current')?.textContent).toContain('Siguiente')
     expect(hrefs('a')).not.toContain('/syllabus')
+    expect(container.textContent).toContain('12 respondidas · 75 % de acierto')
   })
 
   it('starts any topic from its own row', async () => {
@@ -401,6 +411,108 @@ describe('/path, Aprende', () => {
       subjectId: 'matematicas',
       subtopicId: 'a',
     })
+  })
+})
+
+function seedHoy(tasks: object[] = [
+  {
+    id: 'practice:b', kind: 'practice', title: 'Practica Proporciones', minutes: 10,
+    reason: 'Proporciones (Matemáticas) es donde más puntos del global puedes ganar.',
+    action: { type: 'session', kind: 'topic', subtopicId: 'matematicas.number_proportionality.ratios_proportions_percent' },
+  },
+  {
+    id: 'lesson:a', kind: 'lesson', title: 'Lección: Fracciones', minutes: 5, reason: 'Primero la idea.',
+    action: { type: 'lesson', subtopicId: 'a' },
+  },
+  {
+    id: 'simulacro', kind: 'simulacro', title: 'Simulacro · Sesión 1', minutes: 270, reason: 'Tu punto de partida.',
+    action: { type: 'session', kind: 'simulacro', simulacroSessionNumber: 1 },
+  },
+]) {
+  state.queries['today:getTodayDashboard'] = {
+    isPending: false,
+    data: {
+      plan: {
+        tasks,
+        nextSubtopics: [],
+        hero: { questionCount: 5, minutes: 5, action: { type: 'session', kind: 'recommended' }, missionComplete: false },
+      },
+      streakDays: 4, shields: 1, xp: { today: 30, thisWeek: 120 }, firstWeek: { active: false }, examPlan: null,
+    },
+  }
+  state.queries['today:getStickerAlbum'] = {
+    isPending: false,
+    data: {
+      subjects: [
+        { subjectId: 'matematicas', label: 'Matemáticas', earnedCount: 1, stickers: [{}, {}, {}] },
+        { subjectId: 'ingles', label: 'Inglés', earnedCount: 0, stickers: [{}] },
+      ],
+    },
+  }
+  state.queries['path:listPathSubjects'] = {
+    isPending: false,
+    data: [{ subjectId: 'matematicas', level: { placement: { band: { labelEs: 'Nivel 2' } } } }],
+  }
+  state.queries['sessions:getActiveSession'] = { isPending: false, data: null }
+}
+
+describe('/today, Hoy', () => {
+  it('leads with the plan’s next step and says why', async () => {
+    seedHoy()
+    await render('../routes/today.tsx')
+    const next = container.querySelector('[aria-labelledby="hoy-next-title"]')!
+    expect(next.textContent).toContain('Practica Proporciones')
+    expect(next.textContent).toContain('donde más puntos del global puedes ganar')
+    expect(container.querySelectorAll('.btn-primary')).toHaveLength(1)
+  })
+
+  it('starts the next step on the yellow button', async () => {
+    seedHoy()
+    state.mutation.mockResolvedValue('new-session')
+    await render('../routes/today.tsx')
+    await act(async () => (container.querySelector('.btn-primary') as HTMLButtonElement).click())
+    expect(state.mutation).toHaveBeenCalledWith({
+      studentId: 's1',
+      kind: 'topic',
+      subtopicId: 'matematicas.number_proportionality.ratios_proportions_percent',
+    })
+    expect(state.navigate).toHaveBeenCalledWith({ to: '/practice/$sessionId', params: { sessionId: 'new-session' } })
+  })
+
+  it('lists the rest of the day, each going where it starts', async () => {
+    seedHoy()
+    await render('../routes/today.tsx')
+    const rest = container.querySelector('[aria-labelledby="hoy-rest-title"]')!
+    expect(rest.textContent).toContain('Lección: Fracciones')
+    expect(rest.textContent).toContain('Primero la idea.')
+    expect([...rest.querySelectorAll('a')].map((link) => link.getAttribute('href'))).toEqual(['/lesson/$subtopicId', '/practice'])
+  })
+
+  it('names every area with its topics done and its ICFES level, no stickers', async () => {
+    seedHoy()
+    await render('../routes/today.tsx')
+    const areas = container.querySelector('[aria-labelledby="hoy-areas-title"]')!
+    expect(areas.textContent).toContain('Matemáticas')
+    expect(areas.textContent).toContain('1 de 3 temas')
+    expect(areas.textContent).toContain('Nivel 2')
+    expect(areas.textContent).toContain('Sin nivel aún')
+    expect(container.querySelector('.sticker')).toBeNull()
+  })
+
+  it('offers the short practice when the plan has nothing listed', async () => {
+    seedHoy([])
+    await render('../routes/today.tsx')
+    expect(container.querySelector('[aria-labelledby="hoy-next-title"]')?.textContent).toContain('Práctica recomendada')
+    expect(container.querySelector('[aria-labelledby="hoy-rest-title"]')).toBeNull()
+  })
+
+  it('puts an open session first', async () => {
+    seedHoy()
+    state.queries['sessions:getActiveSession'] = { isPending: false, data: { _id: 'open1', kind: 'topic', questionCount: 10 } }
+    await render('../routes/today.tsx')
+    const next = container.querySelector('[aria-labelledby="hoy-next-title"]')!
+    expect(next.textContent).toContain('Sigue donde ibas')
+    expect(next.querySelector('a.btn-primary')?.getAttribute('href')).toBe('/practice/$sessionId')
   })
 })
 
@@ -430,11 +542,11 @@ function seedYo() {
 }
 
 describe('/progress, Yo', () => {
-  it('leads with the student and their stickers', async () => {
+  it('leads with the student and their topics in words', async () => {
     seedYo()
     await render('../routes/progress.tsx')
     expect(container.querySelector('h1')?.textContent).toBe('Ana Ruiz')
-    expect(container.querySelector('.yo-cover')?.textContent).toContain('2 láminas')
+    expect(container.querySelector('.yo-cover')?.textContent).toContain('2 temas en Competente o más')
     expect(container.querySelector('.student-tabbar [aria-current="page"]')?.textContent).toBe('Yo')
   })
 

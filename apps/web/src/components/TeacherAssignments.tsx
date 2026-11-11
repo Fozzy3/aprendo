@@ -10,8 +10,8 @@ import { dueLabel } from '../lib/today-display.ts'
 const KIND_LABEL = { practica: 'Práctica', tiquete: 'Tiquete', prueba: 'Prueba' } as const
 
 /**
- * "De tu profe": what the student's teachers assigned (F40), a white strip under
- * the album. Nothing renders without an assignment.
+ * "De tu profe": what the student's teachers assigned (F40), a list on Hoy.
+ * Nothing renders without an assignment.
  */
 export function TeacherAssignments({ studentId }: { studentId: string }) {
   const navigate = useNavigate()
@@ -27,7 +27,8 @@ export function TeacherAssignments({ studentId }: { studentId: string }) {
   const now = Date.now()
 
   return (
-    <section className="tasks" aria-label="De tu profe">
+    <section className="tasks" aria-labelledby="hoy-teacher-title">
+      <h2 id="hoy-teacher-title" className="hoy-section-title">De tu profe</h2>
       <ul className="tasks-list">
         {assignments.data.map((assignment) => (
           <li key={assignment.assignmentId}>

@@ -57,7 +57,7 @@ import { PageLoader } from './FullScreenLoader.tsx'
 import { stopSpeaking } from '../lib/speech.ts'
 import { confirmDialog } from './ConfirmDialog.tsx'
 import { GuidedPath } from './GuidedPath.tsx'
-import { stickerFor } from '../lib/album-view.ts'
+import { getSubtopicLabel } from '@aprendo/convex/taxonomy'
 import { beadStates, guideQueryArgs, isSettled, optionMark, solveMoment, type GuideView, type OptionMark } from '../lib/solve-view.ts'
 import { getSubjectTheme } from '../lib/subject-theme.ts'
 
@@ -698,8 +698,7 @@ export function SessionSolve({ sessionId, onExit, onCompleted }: SessionSolvePro
       ? 'Entregando…'
       : 'Entregar'
   const beads = beadStates(views.map((item) => item.selectedOption != null), currentIndex)
-  // Practice shows the sticker at stake; an exam, just where the student is.
-  const slot = immediate ? stickerFor(current.question.primarySubtopicId)?.number : currentIndex + 1
+  const topic = current.question.primarySubtopicId == null ? null : getSubtopicLabel(current.question.primarySubtopicId)
   const allAnswered = answeredCount === questions.length
   const finishNow = () => {
     if (!isFinishing && isOpen) void finishSession(false)
@@ -742,9 +741,9 @@ export function SessionSolve({ sessionId, onExit, onCompleted }: SessionSolvePro
           </button>
         ) : null}
 
-        {slot != null ? (
-          <div className={`solve-slot${view.flagged ? ' is-marked' : ''}`} aria-hidden>{slot}</div>
-        ) : null}
+        <div className={`solve-count${view.flagged ? ' is-marked' : ''}`} aria-hidden>
+          {currentIndex + 1}/{questions.length}
+        </div>
 
         <button
           type="button"
@@ -832,7 +831,7 @@ export function SessionSolve({ sessionId, onExit, onCompleted }: SessionSolvePro
                 ) : (
                   <MarkdownBlock markdown={current.question.bodyMarkdown} />
                 )}
-                <p className="question-source">{current.source.label}</p>
+                <p className="question-source">{topic != null ? `${topic} · ` : ''}{current.source.label}</p>
               </article>
 
               <div className="solve-options" role="group" aria-label="Opciones de respuesta">

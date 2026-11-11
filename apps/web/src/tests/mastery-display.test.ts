@@ -1,9 +1,13 @@
 import { describe, expect, it } from 'vitest'
-import { closingLine } from '../lib/mastery-display'
+import { closingLine, topicStats } from '../lib/mastery-display'
 
 describe('closingLine', () => {
   it('names the step up when the level moved', () => {
-    expect(closingLine({ from: 'intentado', to: 'familiar' })).toEqual({ moved: 'up', text: 'Intentado → Familiar' })
+    expect(closingLine({ from: 'intentado', to: 'familiar' })).toEqual({
+      moved: 'up',
+      text: 'Intentado → Familiar. Para Competente: una práctica perfecta de 4 o más preguntas, sin pedir ayuda al tutor.',
+    })
+    expect(closingLine({ from: 'competente', to: 'dominado' }).text).toBe('Competente → Dominado. Es el nivel más alto: el repaso y los retos lo mantienen.')
   })
 
   it('says what is missing when it did not', () => {
@@ -126,5 +130,16 @@ describe('resolvePathStates', () => {
   it('marks competente and dominado as mastered, and skips empty subtopics', () => {
     expect(resolvePathStates([node('a', 'dominado'), node('b', 'sin_empezar', 0), node('c', 'competente'), node('d', 'sin_empezar')], []))
       .toEqual(['mastered', 'empty', 'mastered', 'current'])
+  })
+})
+
+describe('topicStats', () => {
+  it('says nothing before the first answer', () => {
+    expect(topicStats({ attemptCount: 0, accuracy: null })).toBeNull()
+  })
+
+  it('counts answers and rounds the accuracy', () => {
+    expect(topicStats({ attemptCount: 1, accuracy: 1 })).toBe('1 respondida · 100 % de acierto')
+    expect(topicStats({ attemptCount: 12, accuracy: 0.666 })).toBe('12 respondidas · 67 % de acierto')
   })
 })

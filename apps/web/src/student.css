@@ -1,12 +1,22 @@
-/* Álbum: the student look. Everything here is scoped to html[data-look='student']
-   and to screens, so teacher, school, staff and every printed report keep the
-   notebook in styles.css. Loaded after styles.css. */
-@import url("https://fonts.googleapis.com/css2?family=Anton&family=Figtree:wght@500;600;700;800&display=swap");
+/* Plan de estudio: the student look. Everything here is scoped to
+   html[data-look='student'] and to screens, so teacher, school, staff and every
+   printed report keep the notebook in styles.css. Loaded after styles.css.
+   One family, Figtree, at 400-800: weight and size carry the hierarchy. */
+@import url("https://fonts.googleapis.com/css2?family=Figtree:wght@400..800&display=swap");
 
 @media screen {
   :root[data-look='student'] {
     --font-sans: "Figtree", ui-sans-serif, system-ui, sans-serif;
-    --font-display: "Anton", "Arial Narrow", sans-serif;
+    --font-display: var(--font-sans);
+
+    /* One type scale for every student screen. */
+    --text-xs: 0.8125rem;
+    --text-sm: 0.875rem;
+    --text-base: 1rem;
+    --text-md: 1.125rem;
+    --text-lg: 1.375rem;
+    --text-xl: 1.75rem;
+    --text-2xl: 2.25rem;
 
     --paper: #ffffff;
     --rule: #d6e5dd;
@@ -48,13 +58,13 @@
     --warn: var(--graphite);
     --warn-soft: rgba(75, 95, 87, 0.12);
 
-    /* The one primary action, and the sticker waiting to be earned. */
+    /* The one primary action per screen, and the "next" mark. */
     --sticker: #ffd23f;
     --sticker-hover: #ffdb66;
-    --sticker-edge: #c79a12;
     --on-sticker: #10231c;
+    --on-danger: #ffffff;
 
-    /* A full field of colour per area: white text reads at 4.5:1 or better. */
+    /* One colour per area, for its header, marks and bars: white text reads at 4.5:1 or better. */
     --subject-lectura_critica: #c2342a;
     --subject-matematicas: #097d52;
     --subject-ciencias_naturales: #0a6fb0;
@@ -119,19 +129,49 @@
     --border: rgba(233, 243, 238, 0.14);
     --border-strong: rgba(233, 243, 238, 0.28);
     --border-accent: rgba(98, 210, 162, 0.45);
+
+    --on-danger: #06140e;
+    --cover-accent: #ffd23f;
+    --shadow-md: 0 4px 14px rgba(0, 0, 0, 0.4);
+    --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.5);
+  }
+
+  html[data-look='student'] body {
+    font-family: var(--font-sans);
+    font-weight: 400;
+  }
+
+  html[data-look='student'] ::selection {
+    background: color-mix(in srgb, var(--sticker) 55%, transparent);
+    color: var(--text-primary);
   }
 
   html[data-look='student'] h1,
-  html[data-look='student'] h2 {
-    font-weight: 400;
-    letter-spacing: 0.004em;
-  }
-
-  /* Anton is for names and numbers; a small heading reads better in Figtree. */
+  html[data-look='student'] h2,
   html[data-look='student'] h3 {
     font-family: var(--font-sans);
-    font-weight: 800;
     letter-spacing: 0;
+  }
+
+  html[data-look='student'] h1 {
+    font-weight: 800;
+  }
+
+  html[data-look='student'] h2,
+  html[data-look='student'] h3 {
+    font-weight: 700;
+  }
+
+  html[data-look='student'] .page-title {
+    font-size: var(--text-xl);
+    font-weight: 800;
+    line-height: 1.15;
+  }
+
+  html[data-look='student'] .section-title {
+    font-size: var(--text-md);
+    font-weight: 700;
+    line-height: 1.3;
   }
 
   /* No notebook on the student side. */
@@ -158,18 +198,19 @@
     font-size: 16px;
   }
 
+  /* Buttons are flat: a press is a small scale, never a fake 3D edge. */
   html[data-look='student'] .btn-primary,
   html[data-look='student'] .btn-secondary {
     min-height: 3rem;
-    padding: 0.625rem 1.5rem;
-    font-size: 1rem;
-    font-weight: 800;
+    padding: 0.625rem 1.25rem;
+    font-size: var(--text-base);
+    font-weight: 700;
     border-radius: var(--radius-md);
+    box-shadow: none;
     user-select: none;
     -webkit-user-select: none;
     transition:
       transform 100ms var(--ease-out-strong),
-      box-shadow 100ms var(--ease-out-strong),
       background-color 140ms ease,
       border-color 140ms ease;
   }
@@ -178,63 +219,64 @@
     background: var(--sticker);
     color: var(--on-sticker);
     border: 0;
-    box-shadow: 0 4px 0 var(--sticker-edge);
   }
 
   html[data-look='student'] .btn-secondary {
     background: var(--bg-card);
-    border: 2px solid var(--border-strong);
-    box-shadow: 0 3px 0 var(--border-strong);
+    border: 1px solid var(--border-strong);
+    color: var(--text-primary);
   }
 
-  html[data-look='student'] .btn-primary:active,
-  html[data-look='student'] .btn-secondary:active {
-    transform: translateY(3px);
-    box-shadow: 0 1px 0 var(--sticker-edge);
+  html[data-look='student'] .btn-primary:active:not(:disabled),
+  html[data-look='student'] .btn-secondary:active:not(:disabled) {
+    transform: scale(0.97);
+  }
+
+  html[data-look='student'] .btn-primary:active:not(:disabled) {
     background: var(--sticker-hover);
     color: var(--on-sticker);
   }
 
-  html[data-look='student'] .btn-secondary:active {
+  html[data-look='student'] .btn-secondary:active:not(:disabled) {
     background: var(--bg-card-hover);
-    box-shadow: 0 0 0 var(--border-strong);
-    color: var(--text-primary);
   }
 
   html[data-look='student'] .btn-primary.btn-danger {
     background: var(--danger);
-    color: #fff;
-    box-shadow: 0 4px 0 color-mix(in srgb, var(--danger) 70%, #000);
+    color: var(--on-danger);
   }
 
   @media (hover: hover) and (pointer: fine) {
-    html[data-look='student'] .btn-primary:hover {
+    html[data-look='student'] .btn-primary:hover:not(:disabled) {
       background: var(--sticker-hover);
       color: var(--on-sticker);
     }
-    html[data-look='student'] .btn-primary.btn-danger:hover {
-      background: var(--danger);
-      color: #fff;
+    html[data-look='student'] .btn-secondary:hover:not(:disabled) {
+      background: var(--bg-card-hover);
     }
-    html[data-look='student'] .option-card:hover {
+    html[data-look='student'] .btn-primary.btn-danger:hover:not(:disabled) {
+      background: var(--danger);
+      color: var(--on-danger);
+    }
+    html[data-look='student'] .option-card:not(.review-option):hover:not(:disabled) {
       border-color: var(--brand);
     }
   }
 
   html[data-look='student'] .option-card {
     min-height: 3.5rem;
-    border: 2px solid var(--border-strong);
+    border: 2px solid var(--border);
     border-radius: var(--radius-md);
-    box-shadow: 0 3px 0 var(--border);
-    font-weight: 600;
+    box-shadow: none;
+    font-weight: 500;
     transition:
       transform 100ms var(--ease-out-strong),
       border-color 140ms ease,
       background-color 140ms ease;
   }
 
-  html[data-look='student'] .option-card:active {
-    transform: translateY(2px);
+  html[data-look='student'] .option-card:not(.review-option):active:not(:disabled) {
+    transform: scale(0.97);
   }
 
   html[data-look='student'] .option-card.is-selected {
@@ -243,12 +285,10 @@
 
   html[data-look='student'] .option-card.is-incorrect {
     border-color: var(--danger);
-    box-shadow: 0 3px 0 var(--danger);
   }
 
   html[data-look='student'] .option-card.is-correct {
     border-color: var(--success);
-    box-shadow: 0 3px 0 var(--success);
   }
 
   html[data-look='student'] .option-label {
@@ -256,9 +296,9 @@
     border-radius: var(--radius-sm);
     background: var(--bg-inset);
     color: var(--accent-text);
-    font-family: var(--font-display);
-    font-weight: 400;
-    font-size: 1.15rem;
+    font-family: var(--font-sans);
+    font-weight: 800;
+    font-size: var(--text-base);
   }
 
   html[data-look='student'] .option-card.is-selected .option-label {
@@ -270,7 +310,7 @@
   html[data-look='student'] .option-card.is-incorrect .option-label {
     border: 0;
     background: var(--danger);
-    color: #fff;
+    color: var(--on-danger);
   }
 
   html[data-look='student'] .option-card.is-correct .option-label {
@@ -281,8 +321,12 @@
 
   html[data-look='student'] .student-tabbar-item {
     border-top: 0;
-    font-size: 0.75rem;
+    font-size: var(--text-xs);
     font-weight: 700;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
+    transition: transform 100ms var(--ease-out-strong);
   }
 
   html[data-look='student'] .student-tabbar-item.is-active {
@@ -299,15 +343,8 @@
     font-weight: 700;
   }
 
-  html[data-look='student'] .student-tabbar-item {
-    user-select: none;
-    -webkit-user-select: none;
-    -webkit-touch-callout: none;
-    transition: transform 100ms var(--ease-out-strong);
-  }
-
   html[data-look='student'] .student-tabbar-item:active {
-    transform: scale(0.96);
+    transform: scale(0.97);
   }
 
   html[data-look='student'] .student-topnav-item.is-active svg,
@@ -337,7 +374,420 @@
     }
   }
 
-  /* Aprende: a full field of the area's colour, then its numbered slots. */
+  /* The level is the thesis: on student screens its word reads at body weight. */
+  html[data-look='student'] .mastery-badge {
+    color: var(--text-primary);
+    font-size: var(--text-sm);
+    font-weight: 600;
+  }
+
+  /* ── Shared surfaces: a white list on the desk, rows split by hairlines ── */
+  .plan-list,
+  .tasks-list,
+  .area-list,
+  .aprende-list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    background: var(--bg-card);
+    overflow: hidden;
+  }
+
+  .plan-list > li + li,
+  .tasks-list > li + li,
+  .area-list > li + li,
+  .aprende-list > li + li {
+    border-top: 1px solid var(--border);
+  }
+
+  .plan-row,
+  .task {
+    display: flex;
+    align-items: center;
+    gap: 0.875rem;
+    width: 100%;
+    min-height: 4rem;
+    padding: 0.875rem 1rem;
+    border: 0;
+    background: transparent;
+    color: var(--text-primary);
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+    touch-action: manipulation;
+    transition: background-color 140ms ease;
+  }
+
+  .plan-row > svg:last-child,
+  .task > svg {
+    flex: none;
+    margin-left: auto;
+    color: var(--text-tertiary);
+  }
+
+  .plan-row:active:not(:disabled),
+  .task:active:not(:disabled) {
+    background: var(--bg-inset);
+  }
+
+  .plan-row:disabled,
+  .task:disabled {
+    cursor: default;
+    opacity: 0.6;
+  }
+
+  .plan-row-icon {
+    display: grid;
+    flex: none;
+    place-items: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 10px;
+    background: var(--accent-soft);
+    color: var(--accent-text);
+  }
+
+  .plan-row-text,
+  .task-text {
+    display: grid;
+    gap: 0.125rem;
+    min-width: 0;
+  }
+
+  .plan-row-text > b,
+  .task-text > b {
+    font-size: var(--text-base);
+    font-weight: 700;
+    line-height: 1.3;
+    text-wrap: pretty;
+  }
+
+  .plan-row-text > span:not(.task-meta),
+  .task-text > span {
+    color: var(--text-secondary);
+    font-size: var(--text-sm);
+    line-height: 1.4;
+    text-wrap: pretty;
+  }
+
+  .task-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.25rem 0.75rem;
+    margin-top: 0.125rem;
+    color: var(--text-tertiary);
+    font-size: var(--text-xs);
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .task-area {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+  }
+
+  .task-area::before,
+  .area-row-name::before,
+  .aprende-area::before {
+    content: "";
+    flex: none;
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 50%;
+    background: var(--area);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .plan-row:hover:not(:disabled),
+    .task:hover:not(:disabled),
+    .area-row:hover,
+    .aprende-topic-main:hover .aprende-topic-label {
+      background-color: var(--bg-card-hover);
+    }
+    .aprende-topic-main:hover .aprende-topic-label {
+      background-color: transparent;
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+    .aprende-topic-go:hover:not(:disabled),
+    .aprende-area:hover:not([aria-pressed='true']) {
+      background: var(--bg-card-hover);
+    }
+  }
+
+  html[data-look='student'] .hoy-section-title,
+  html[data-look='student'] .reward-section-title {
+    margin: 0 0 0.625rem;
+    color: var(--text-primary);
+    font-size: var(--text-md);
+    font-weight: 700;
+    line-height: 1.3;
+  }
+
+  /* ── Hoy: the next step and why, the rest of the day, the areas ─────── */
+  .hoy {
+    display: grid;
+    gap: 1.5rem;
+    width: min(100%, 68rem);
+    margin-inline: auto;
+  }
+
+  .hoy-head {
+    display: grid;
+    gap: 0.75rem;
+  }
+
+  html[data-look='student'] .hoy-title {
+    margin: 0;
+    font-size: var(--text-xl);
+    font-weight: 800;
+    line-height: 1.15;
+    overflow-wrap: anywhere;
+  }
+
+  .hoy-status {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  /* Facts, not controls: plain icon and text, nothing that looks tappable. */
+  .hoy-status {
+    gap: 0.375rem 1.125rem;
+  }
+
+  .hoy-status > li {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    color: var(--text-secondary);
+    font-size: var(--text-sm);
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .hoy-status > li.is-done {
+    color: var(--success-text);
+  }
+
+  .hoy-grid,
+  .hoy-main,
+  .hoy-side {
+    display: grid;
+    gap: 1.5rem;
+    align-content: start;
+    min-width: 0;
+  }
+
+  @media (min-width: 781px) {
+    .hoy-grid {
+      grid-template-columns: minmax(0, 1fr) 22rem;
+      align-items: start;
+    }
+  }
+
+  .hoy-side > .plan-row {
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    background: var(--bg-card);
+  }
+
+  .hoy-reason {
+    margin: 0;
+    color: var(--text-secondary);
+  }
+
+  .next {
+    display: grid;
+    gap: 0.75rem;
+  }
+
+  .next .hoy-section-title {
+    margin-bottom: 0;
+  }
+
+  .next-card {
+    display: grid;
+    gap: 0.5rem;
+    padding: 1.25rem;
+    border-radius: var(--radius-lg);
+    background: var(--cover);
+    color: #fff;
+  }
+
+  .next-title {
+    margin: 0;
+    font-size: var(--text-lg);
+    font-weight: 800;
+    line-height: 1.2;
+    text-wrap: balance;
+  }
+
+  .next-reason {
+    margin: 0;
+    max-width: 60ch;
+    color: rgba(255, 255, 255, 0.9);
+    font-size: var(--text-base);
+    line-height: 1.45;
+    text-wrap: pretty;
+  }
+
+  .next-card .task-meta {
+    color: rgba(255, 255, 255, 0.85);
+  }
+
+  .next-card .task-area::before {
+    background: #fff;
+  }
+
+  html[data-look='student'] .next-go {
+    width: 100%;
+    margin-top: 0.75rem;
+    min-height: 3.25rem;
+    font-size: var(--text-md);
+  }
+
+  @media (min-width: 781px) {
+    html[data-look='student'] .next-go {
+      justify-self: start;
+      width: auto;
+      min-width: 14rem;
+    }
+  }
+
+  .area-row {
+    display: grid;
+    gap: 0.375rem;
+    padding: 0.875rem 1rem;
+    color: var(--text-primary);
+    text-decoration: none;
+    transition: background-color 140ms ease;
+  }
+
+  .area-row:active {
+    background: var(--bg-inset);
+  }
+
+  .area-row-top {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.75rem;
+  }
+
+  .area-row-name {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 700;
+  }
+
+  .area-row-level {
+    flex: none;
+    color: var(--text-secondary);
+    font-size: var(--text-xs);
+    font-weight: 700;
+  }
+
+  .area-bar,
+  .aprende-bar {
+    display: block;
+    height: 6px;
+    border-radius: 3px;
+    background: var(--bg-inset);
+    overflow: hidden;
+  }
+
+  .area-bar > span,
+  .aprende-bar > span {
+    display: block;
+    height: 100%;
+    border-radius: inherit;
+    background: var(--area);
+  }
+
+  .area-row-count {
+    color: var(--text-tertiary);
+    font-size: var(--text-xs);
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* "De tu profe", and the first week, on Hoy. */
+  .tasks {
+    display: grid;
+  }
+
+  .first-week {
+    display: grid;
+    gap: 0.625rem;
+    padding: 1rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    background: var(--bg-card);
+  }
+
+  .first-week-commit {
+    display: grid;
+    gap: 0.375rem;
+  }
+
+  html[data-look='student'] .first-week-title {
+    margin: 0;
+    font-size: var(--text-base);
+    font-weight: 700;
+  }
+
+  .first-week-note {
+    margin: 0;
+    color: var(--text-secondary);
+    font-size: var(--text-sm);
+  }
+
+  .first-week-choices {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.5rem;
+    margin-top: 0.25rem;
+  }
+
+  .first-week-days {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    gap: 0.375rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .first-week-day {
+    display: grid;
+    place-items: center;
+    height: 2.75rem;
+    border-radius: var(--radius-sm);
+    background: var(--bg-inset);
+    color: var(--text-secondary);
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .first-week-day.is-done {
+    background: var(--brand);
+    color: var(--paper);
+  }
+
+  .first-week-day.is-today {
+    background: var(--sticker);
+    color: var(--on-sticker);
+  }
+
+  /* ── Aprende: the area's topics, each with its level and evidence ───── */
   .aprende {
     display: grid;
     gap: 1rem;
@@ -360,113 +810,110 @@
     display: none;
   }
 
-  @media (min-width: 781px) {
-    .aprende-areas {
-      flex-wrap: wrap;
-      overflow-x: visible;
-    }
-  }
-
   .aprende-area {
+    display: inline-flex;
     flex: none;
+    align-items: center;
+    gap: 0.5rem;
     min-height: 2.75rem;
     padding: 0 1rem;
-    border: 0;
+    border: 1px solid var(--border-strong);
     border-radius: var(--radius-pill);
-    background: var(--field);
-    color: #fff;
-    font-family: inherit;
-    font-size: 0.9375rem;
-    font-weight: 800;
+    background: var(--bg-card);
+    color: var(--text-primary);
+    font: inherit;
+    font-size: var(--text-sm);
+    font-weight: 700;
     cursor: pointer;
     scroll-snap-align: start;
     touch-action: manipulation;
     user-select: none;
     -webkit-user-select: none;
-    transition: transform 100ms var(--ease-out-strong), box-shadow 140ms ease;
+    transition: background-color 140ms ease, color 140ms ease;
   }
 
   .aprende-area[aria-pressed='true'] {
-    box-shadow: 0 0 0 2px var(--desk), 0 0 0 4px var(--field);
+    border-color: var(--area);
+    background: var(--area);
+    color: #fff;
   }
 
-  .aprende-area:active {
-    transform: scale(0.96);
+  .aprende-area[aria-pressed='true']::before {
+    background: #fff;
   }
 
-  .aprende-field {
+  .aprende-head {
     display: grid;
+    gap: 0.625rem;
     padding: 1.25rem;
     border-radius: var(--radius-lg);
-    background: var(--field);
+    background: var(--area);
     color: #fff;
+  }
+
+  .aprende-head-top {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem 1rem;
   }
 
   html[data-look='student'] .aprende-name {
     margin: 0;
     color: #fff;
-    font-size: clamp(2.75rem, 13vw, 3.75rem);
-    line-height: 1;
+    font-size: var(--text-xl);
+    font-weight: 800;
+    line-height: 1.15;
     text-wrap: balance;
   }
 
+  .aprende-level {
+    padding: 0.25rem 0.75rem;
+    border-radius: var(--radius-pill);
+    background: rgba(255, 255, 255, 0.2);
+    font-size: var(--text-sm);
+    font-weight: 700;
+    white-space: nowrap;
+  }
+
+  .aprende-head .aprende-bar {
+    height: 8px;
+    border-radius: 4px;
+    background: rgba(0, 0, 0, 0.22);
+  }
+
+  .aprende-head .aprende-bar > span {
+    background: #fff;
+  }
+
   .aprende-count {
-    margin: 0.5rem 0 1rem;
-    color: #fff;
+    margin: 0;
     font-weight: 700;
     font-variant-numeric: tabular-nums;
   }
 
-  html[data-look='student'] .aprende-go {
-    display: flex;
-    flex-direction: column;
-    gap: 0.25rem;
-    width: 100%;
-    min-height: 4.25rem;
-    padding: 0.75rem 1rem;
-    border-radius: var(--radius-lg);
+  .aprende-note {
+    margin: 0;
+    max-width: 65ch;
+    color: rgba(255, 255, 255, 0.9);
+    font-size: var(--text-sm);
+    line-height: 1.45;
+    text-wrap: pretty;
   }
 
-  .aprende-go > span {
-    font-family: var(--font-display);
-    font-size: 1.5rem;
-    font-weight: 400;
-    line-height: 1.1;
+  html[data-look='student'] .aprende-go {
+    width: 100%;
+    margin-top: 0.5rem;
+    min-height: 3.25rem;
     text-wrap: balance;
   }
 
-  .aprende-go > small {
-    font-size: 0.875rem;
-    font-weight: 700;
-  }
-
-  .aprende-more {
-    margin-top: 0.5rem;
-  }
-
-  .aprende-more > summary {
-    display: flex;
-    align-items: center;
-    min-height: 2.75rem;
-    color: #fff;
-    font-weight: 700;
-    cursor: pointer;
-  }
-
-  .aprende-more-body {
-    display: grid;
-    gap: 0.75rem;
-    padding: 0.875rem;
-    border-radius: var(--radius-md);
-    background: var(--bg-card);
-    color: var(--text-primary);
-  }
-
-  .aprende-more-body > p {
-    margin: 0;
-    max-width: 65ch;
-    font-size: 0.9375rem;
-    text-wrap: pretty;
+  @media (min-width: 781px) {
+    html[data-look='student'] .aprende-go {
+      justify-self: start;
+      width: auto;
+    }
   }
 
   .aprende-topics {
@@ -474,78 +921,55 @@
     gap: 1.25rem;
   }
 
-  html[data-look='student'] .aprende-category {
-    margin: 0 0 0.5rem;
-    color: var(--text-secondary);
-    font-family: var(--font-sans);
-    font-size: 0.875rem;
-    font-weight: 800;
-  }
-
-  .aprende-list {
-    display: grid;
-    gap: 0.375rem;
-    margin: 0;
-    padding: 0;
-    list-style: none;
-  }
-
-  .aprende-topic {
-    display: grid;
-    grid-template-columns: auto minmax(0, 1fr) auto;
+  .aprende-more > summary {
+    display: flex;
     align-items: center;
-    gap: 0.75rem;
-    padding: 0.5rem 0.625rem;
+    min-height: 2.75rem;
+    color: var(--accent-text);
+    font-weight: 700;
+    cursor: pointer;
+  }
+
+  .aprende-more > :not(summary) {
+    padding: 0.875rem 1rem;
     border-radius: var(--radius-md);
     background: var(--bg-card);
   }
 
-  .aprende-slot {
-    display: grid;
-    place-items: center;
-    width: 2.75rem;
-    height: 3.125rem;
-    border-radius: 9px;
-    background: var(--bg-inset);
-    box-shadow: inset 0 0 0 2px var(--border-strong);
+  html[data-look='student'] .aprende-category {
+    margin: 0 0 0.5rem;
     color: var(--text-secondary);
-    font-family: var(--font-display);
-    font-size: 1.3rem;
-    font-variant-numeric: tabular-nums;
+    font-size: var(--text-sm);
+    font-weight: 700;
   }
 
-  .aprende-topic.is-mastered .aprende-slot {
-    background: var(--field);
-    box-shadow: none;
-    color: #fff;
+  .aprende-topic {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
   }
 
-  .aprende-topic.is-shiny .aprende-slot {
-    background: linear-gradient(135deg, var(--sticker), #fff3b8 45%, var(--sticker) 75%);
-    box-shadow: inset 0 0 0 2px var(--sticker-edge);
-    color: var(--on-sticker);
-  }
-
-  /* The next sticker, as on Hoy: lifted and tilted. */
-  .aprende-topic.is-current .aprende-slot {
-    background: #fff;
-    box-shadow: 0 0 0 3px var(--sticker), 0 6px 12px rgba(16, 35, 28, 0.22);
-    color: #10231c;
-    transform: rotate(-4deg);
+  .aprende-topic.is-current {
+    background: color-mix(in srgb, var(--sticker) 16%, var(--bg-card));
   }
 
   .aprende-topic-main {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 0.25rem 0.625rem;
+    display: grid;
+    gap: 0.375rem;
     min-height: 2.75rem;
     color: var(--text-primary);
     text-decoration: none;
   }
 
   .aprende-topic-label {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.25rem 0.5rem;
     font-weight: 700;
+    line-height: 1.3;
     text-wrap: pretty;
   }
 
@@ -553,22 +977,46 @@
     color: var(--text-tertiary);
   }
 
+  .aprende-tag {
+    padding: 0.125rem 0.5rem;
+    border-radius: var(--radius-pill);
+    background: var(--sticker);
+    color: var(--on-sticker);
+    font-size: var(--text-xs);
+    font-weight: 800;
+  }
+
+  .aprende-topic-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.25rem 0.875rem;
+    color: var(--text-tertiary);
+    font-size: var(--text-xs);
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Quiet on every row: the level is what the row is about. */
   .aprende-topic-go {
-    display: grid;
-    place-items: center;
-    width: 2.75rem;
-    height: 2.75rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    min-height: 2.75rem;
+    padding: 0 0.625rem;
     border: 0;
     border-radius: var(--radius-md);
-    background: var(--bg-inset);
+    background: transparent;
     color: var(--accent-text);
+    font: inherit;
+    font-size: var(--text-sm);
+    font-weight: 700;
     cursor: pointer;
     touch-action: manipulation;
     transition: transform 100ms var(--ease-out-strong), background-color 140ms ease;
   }
 
   .aprende-topic-go:active:not(:disabled) {
-    transform: scale(0.94);
+    transform: scale(0.97);
   }
 
   .aprende-topic-go:disabled {
@@ -578,11 +1026,11 @@
 
   .aprende-topic-empty {
     color: var(--text-tertiary);
-    font-size: 0.8125rem;
+    font-size: var(--text-xs);
     white-space: nowrap;
   }
 
-  /* Retos: three challenges, one of them the primary action. */
+  /* ── Retos: three challenges, one of them the primary action ────────── */
   .retos {
     display: grid;
     gap: 1rem;
@@ -590,7 +1038,8 @@
     margin-inline: auto;
   }
 
-  .retos .page-title {
+  .retos .page-title,
+  .retos .page-lede {
     margin: 0;
   }
 
@@ -612,12 +1061,11 @@
     align-items: center;
     gap: 0.875rem;
     width: 100%;
-    min-height: 5.25rem;
+    min-height: 5rem;
     padding: 0.875rem 1rem;
-    border: 2px solid var(--border-strong);
+    border: 1px solid var(--border);
     border-radius: var(--radius-lg);
     background: var(--bg-card);
-    box-shadow: 0 3px 0 var(--border-strong);
     color: var(--text-primary);
     font: inherit;
     text-align: left;
@@ -625,25 +1073,21 @@
     touch-action: manipulation;
     user-select: none;
     -webkit-user-select: none;
-    transition: transform 100ms var(--ease-out-strong), box-shadow 100ms var(--ease-out-strong), background-color 140ms ease;
+    transition: transform 100ms var(--ease-out-strong), background-color 140ms ease;
   }
 
   .reto-tile.is-primary {
     border-color: transparent;
     background: var(--sticker);
-    box-shadow: 0 4px 0 var(--sticker-edge);
     color: var(--on-sticker);
   }
 
   .reto-tile:active:not(:disabled) {
-    transform: translateY(3px);
-    box-shadow: 0 0 0 var(--border-strong);
+    transform: scale(0.97);
   }
 
   .reto-tile:disabled {
-    border-color: transparent;
     background: var(--bg-inset);
-    box-shadow: none;
     color: var(--text-tertiary);
     cursor: default;
   }
@@ -652,21 +1096,21 @@
     display: grid;
     flex: none;
     place-items: center;
-    width: 3rem;
-    height: 3rem;
-    border-radius: var(--radius-md);
-    background: var(--cover);
-    color: #fff;
+    width: 2.75rem;
+    height: 2.75rem;
+    border-radius: 10px;
+    background: var(--accent-soft);
+    color: var(--accent-text);
   }
 
   .reto-tile.is-primary .reto-tile-icon {
-    background: var(--on-sticker);
-    color: var(--sticker);
+    background: rgba(16, 35, 28, 0.1);
+    color: var(--on-sticker);
   }
 
   .reto-tile:disabled .reto-tile-icon {
-    background: var(--border-strong);
-    color: var(--paper);
+    background: var(--border);
+    color: var(--text-tertiary);
   }
 
   .reto-tile-text {
@@ -678,14 +1122,15 @@
   }
 
   .reto-tile-name {
-    font-family: var(--font-display);
-    font-size: 1.75rem;
-    line-height: 1.05;
+    font-size: var(--text-md);
+    font-weight: 800;
+    line-height: 1.25;
   }
 
   .reto-tile-note {
-    font-size: 0.9375rem;
-    font-weight: 600;
+    font-size: var(--text-sm);
+    font-weight: 500;
+    line-height: 1.4;
     text-wrap: pretty;
   }
 
@@ -693,11 +1138,38 @@
     flex: none;
   }
 
-  /* Yo: the student's own page, on one sheet. */
+  /* "Arma tu práctica" sits in the same list, so it wears the same card. */
+  .retos-list > li > .ruled-row {
+    min-height: 5rem;
+    padding: 0.875rem 1rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    background: var(--bg-card);
+  }
+
+  .retos-list .builder {
+    margin-top: 0.5rem;
+    padding: 1rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    background: var(--bg-card);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .reto-tile:hover:not(:disabled):not(.is-primary) {
+      background: var(--bg-card-hover);
+    }
+    .reto-tile.is-primary:hover:not(:disabled) {
+      background: var(--sticker-hover);
+    }
+  }
+
+  /* ── Yo: the student's own page, on one sheet ───────────────────────── */
   .yo {
     width: min(100%, 46rem);
     margin-inline: auto;
     padding-bottom: 1.25rem;
+    border: 1px solid var(--border);
     border-radius: var(--radius-lg);
     background: var(--paper);
     overflow: hidden;
@@ -711,47 +1183,41 @@
     display: flex;
     align-items: center;
     gap: 1rem;
-    padding: 1.5rem 1.25rem;
+    padding: 1.25rem;
     background: var(--cover);
     color: #fff;
   }
 
-  /* F55 puts the student's sticker portrait in this slot. */
   .yo-portrait {
-    display: grid;
     flex: none;
-    place-items: center;
-    width: 4.5rem;
-    height: 5.5rem;
-    border-radius: 12px;
+    width: 4rem;
+    height: 4rem;
+    border-radius: var(--radius-md);
     background: var(--sticker);
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.25);
-    color: var(--on-sticker);
-    font-family: var(--font-display);
-    font-size: 2.75rem;
-    line-height: 1;
-    transform: rotate(-3deg);
+    overflow: hidden;
   }
 
   html[data-look='student'] .yo-name {
     margin: 0;
     color: #fff;
-    font-size: clamp(2rem, 9vw, 3rem);
-    line-height: 1.02;
+    font-size: var(--text-xl);
+    font-weight: 800;
+    line-height: 1.15;
     overflow-wrap: anywhere;
     text-wrap: balance;
   }
 
   .yo-count {
-    margin: 0.375rem 0 0;
-    color: #fff;
-    font-weight: 700;
+    margin: 0.25rem 0 0;
+    color: rgba(255, 255, 255, 0.9);
+    font-size: var(--text-sm);
+    font-weight: 600;
     font-variant-numeric: tabular-nums;
   }
 
   .yo-more {
     padding: 0.75rem 0;
-    border-top: 1px solid var(--border-strong);
+    border-top: 1px solid var(--border);
   }
 
   .yo-more > summary {
@@ -778,377 +1244,6 @@
   .cuenta .page-lede {
     margin-bottom: 1rem;
     overflow-wrap: anywhere;
-  }
-
-  /* ── Stickers: the album's one object ─────────────────────────────── */
-  .album-grid,
-  .reward-page {
-    display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 9px;
-    margin: 0;
-    padding: 0;
-    list-style: none;
-  }
-
-  .album-grid {
-    grid-auto-rows: clamp(5.5rem, 19dvh, 9.5rem);
-  }
-
-  .album-grid > li.is-next {
-    position: relative;
-    z-index: 1;
-  }
-
-  .album-slot {
-    display: block;
-    height: 100%;
-    border-radius: 10px;
-    text-decoration: none;
-    touch-action: manipulation;
-    user-select: none;
-    -webkit-user-select: none;
-    -webkit-touch-callout: none;
-  }
-
-  .sticker {
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    height: 100%;
-    padding: 7px 8px;
-    border-radius: 10px;
-    background: #fff;
-    color: #10231c;
-    font-family: var(--font-display);
-    font-size: 22px;
-    line-height: 1;
-    font-variant-numeric: tabular-nums;
-    transition: transform 100ms var(--ease-out-strong);
-  }
-
-  .sticker.tone-0 { background: #ffd23f; }
-  .sticker.tone-1 { background: #8fe3ff; }
-  .sticker.tone-2 { background: #ff8a5c; }
-  .sticker.tone-3 { background: #fff; }
-
-  .sticker-glyph {
-    flex: none;
-    align-self: flex-end;
-    width: 34px;
-    height: 34px;
-  }
-
-  .sticker.is-empty {
-    background: color-mix(in srgb, var(--field) 88%, #000);
-    color: color-mix(in srgb, var(--field) 16%, #fff);
-    outline: 2px solid color-mix(in srgb, var(--field) 70%, #fff);
-    outline-offset: -2px;
-  }
-
-  .sticker.is-next {
-    background: #fff;
-    outline: 4px solid var(--sticker);
-    box-shadow: 0 10px 18px rgba(0, 0, 0, 0.28);
-    transform: rotate(-4deg) scale(1.08);
-  }
-
-  .sticker.is-next .sticker-glyph {
-    color: #d7361f;
-  }
-
-  .sticker.is-shiny {
-    background: linear-gradient(135deg, #ffd23f, #fff3b8 45%, #ffd23f 75%);
-    box-shadow: inset 0 0 0 2px #c79a12;
-  }
-
-  .sticker-spark {
-    position: absolute;
-    top: 6px;
-    right: 6px;
-  }
-
-  .album-slot:active .sticker {
-    transform: scale(0.96);
-  }
-
-  .album-slot:active .sticker.is-next {
-    transform: rotate(-4deg) scale(1.03);
-  }
-
-  .album-slot:focus-visible {
-    outline: 3px solid #fff;
-    outline-offset: 2px;
-  }
-
-  /* ── Hoy ───────────────────────────────────────────────────────────── */
-  .hoy-field {
-    display: flex;
-    flex-direction: column;
-    padding: calc(20px + env(safe-area-inset-top, 0px)) 20px 18px;
-    background: var(--field);
-    color: #fff;
-  }
-
-  html[data-look='student'] .hoy-field > .duel-banner {
-    margin-bottom: 16px;
-    text-decoration: none;
-  }
-
-  html[data-look='student'] .hoy-area {
-    margin: 0;
-    color: #fff;
-    font-size: clamp(2.75rem, 13vw, 3.25rem);
-    line-height: 1;
-    letter-spacing: 0.005em;
-    text-wrap: balance;
-  }
-
-  .hoy-count {
-    margin: 8px 0 16px;
-    color: #fff;
-    font-size: 1rem;
-    font-weight: 700;
-    line-height: 1.25;
-    font-variant-numeric: tabular-nums;
-  }
-
-  .hoy-stats {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 2px 14px;
-    margin: 14px 0 0;
-    color: #fff;
-    font-size: 0.9375rem;
-    font-weight: 700;
-    font-variant-numeric: tabular-nums;
-  }
-
-  .hoy-shields {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    margin-left: auto;
-  }
-
-  html[data-look='student'] .hoy-go {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 5px;
-    width: 100%;
-    margin-top: auto;
-    padding: 14px;
-    border-radius: 14px;
-    box-shadow: 0 5px 0 var(--sticker-edge);
-  }
-
-  .hoy-go,
-  .hoy-done {
-    position: relative;
-    margin-top: 18px;
-  }
-
-  .hoy-go > span {
-    font-family: var(--font-display);
-    font-size: 29px;
-    font-weight: 400;
-    line-height: 1.05;
-    text-align: center;
-    text-wrap: balance;
-  }
-
-  .hoy-go > small {
-    font-size: 14px;
-    font-weight: 700;
-    line-height: 1;
-  }
-
-  .hoy-done {
-    display: grid;
-    gap: 10px;
-    padding: 14px;
-    border-radius: 14px;
-    background: color-mix(in srgb, var(--field) 88%, #000);
-  }
-
-  .hoy-done-title {
-    margin: 0;
-    color: var(--sticker);
-    font-family: var(--font-display);
-    font-size: 29px;
-    line-height: 1.05;
-    text-align: center;
-  }
-
-  .hoy-more {
-    min-height: 44px;
-    padding: 8px 14px;
-    border: 2px solid rgba(255, 255, 255, 0.6);
-    border-radius: 12px;
-    background: transparent;
-    color: #fff;
-    font: inherit;
-    font-weight: 800;
-    cursor: pointer;
-    touch-action: manipulation;
-    transition: transform 100ms var(--ease-out-strong), background-color 140ms ease;
-  }
-
-  .hoy-more:active:not(:disabled) {
-    transform: scale(0.97);
-    background: rgba(255, 255, 255, 0.14);
-  }
-
-  .hoy-launch-error {
-    margin: 12px 0 0;
-    padding: 10px 12px;
-    border-radius: var(--radius-md);
-    background: #fff;
-    color: #a31d10;
-    font-weight: 700;
-  }
-
-  .hoy-side {
-    background: var(--paper);
-  }
-
-  .hoy-error {
-    display: grid;
-    gap: 0.75rem;
-    justify-items: start;
-    padding: 1.5rem 1.25rem;
-    border-radius: var(--radius-lg);
-    background: var(--paper);
-  }
-
-  .tasks-list {
-    margin: 0;
-    padding: 0;
-    list-style: none;
-  }
-
-  .tasks-list > li + li {
-    border-top: 1px solid var(--rule);
-  }
-
-  .task {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    width: 100%;
-    min-height: 44px;
-    padding: 14px 20px;
-    border: 0;
-    background: transparent;
-    color: var(--text-primary);
-    font: inherit;
-    text-align: left;
-    cursor: pointer;
-    touch-action: manipulation;
-    transition: background-color 140ms ease;
-  }
-
-  .task > svg {
-    flex: none;
-    margin-left: auto;
-    color: var(--text-tertiary);
-  }
-
-  .task:active:not(:disabled) {
-    background: var(--bg-inset);
-  }
-
-  .task-text {
-    display: grid;
-    gap: 2px;
-    min-width: 0;
-  }
-
-  .task-text b {
-    font-size: 1rem;
-    font-weight: 800;
-    text-wrap: pretty;
-  }
-
-  .task-text span {
-    color: var(--text-secondary);
-    font-size: 0.875rem;
-  }
-
-  @media (hover: hover) and (pointer: fine) {
-    .task:hover:not(:disabled) {
-      background: var(--bg-card-hover);
-    }
-    .hoy-more:hover:not(:disabled) {
-      background: rgba(255, 255, 255, 0.14);
-    }
-  }
-
-  /* The first week: seven numbered days, none of them ever "missed". */
-  .first-week {
-    display: grid;
-    gap: 10px;
-    padding: 14px 20px;
-    border-top: 1px solid var(--rule);
-  }
-
-  .first-week-commit {
-    display: grid;
-    gap: 6px;
-  }
-
-  html[data-look='student'] .first-week-title {
-    margin: 0;
-    font-family: var(--font-sans);
-    font-size: 1rem;
-    font-weight: 800;
-  }
-
-  .first-week-note {
-    margin: 0;
-    color: var(--text-secondary);
-    font-size: 0.875rem;
-  }
-
-  .first-week-choices {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 8px;
-    margin-top: 4px;
-  }
-
-  .first-week-days {
-    display: grid;
-    grid-template-columns: repeat(7, minmax(0, 1fr));
-    gap: 6px;
-    margin: 0;
-    padding: 0;
-    list-style: none;
-  }
-
-  .first-week-day {
-    display: grid;
-    place-items: center;
-    height: 44px;
-    border-radius: 9px;
-    background: var(--bg-inset);
-    color: var(--text-secondary);
-    font-family: var(--font-display);
-    font-size: 1.125rem;
-    font-variant-numeric: tabular-nums;
-  }
-
-  .first-week-day.is-done {
-    background: var(--brand);
-    color: var(--paper);
-  }
-
-  .first-week-day.is-today {
-    background: var(--sticker);
-    color: var(--on-sticker);
   }
 
   /* ── Solve: a green bar, a white sheet, one thing at the bottom ────── */
@@ -1182,7 +1277,7 @@
   }
 
   .solve-bar-btn:active {
-    transform: scale(0.94);
+    transform: scale(0.97);
     background: rgba(255, 255, 255, 0.16);
   }
 
@@ -1235,7 +1330,7 @@
     border: 0;
     background: rgba(255, 255, 255, 0.14);
     color: #fff;
-    font-size: 0.9375rem;
+    font-size: var(--text-sm);
   }
 
   html[data-look='student'] .solve-bar .solve-clock.is-low {
@@ -1243,23 +1338,21 @@
     color: #a31d10;
   }
 
-  .solve-slot {
+  /* Where the student is, "3/10"; a marked question gets a yellow ring. */
+  .solve-count {
     flex: none;
-    min-width: 38px;
-    height: 46px;
-    padding-inline: 4px;
-    border-radius: 7px;
-    box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--field) 50%, #fff);
+    min-width: 3rem;
+    padding: 0.375rem 0.5rem;
+    border-radius: var(--radius-sm);
     color: #fff;
-    font-family: var(--font-display);
-    font-size: 21px;
-    line-height: 46px;
+    font-size: var(--text-sm);
+    font-weight: 700;
     text-align: center;
     font-variant-numeric: tabular-nums;
   }
 
-  .solve-slot.is-marked {
-    box-shadow: inset 0 0 0 3px var(--sticker);
+  .solve-count.is-marked {
+    box-shadow: inset 0 0 0 2px var(--sticker);
   }
 
   html[data-look='student'] .solve-main {
@@ -1284,22 +1377,22 @@
   }
 
   html[data-look='student'] .solve-question .markdown-body {
-    font-size: calc(1.3125rem * var(--solve-text-scale));
-    font-weight: 600;
-    line-height: 1.32;
+    font-size: calc(1.25rem * var(--solve-text-scale));
+    font-weight: 500;
+    line-height: 1.4;
     text-wrap: pretty;
   }
 
   html[data-look='student'] .solve-question.is-long .markdown-body {
     font-size: calc(1.0625rem * var(--solve-text-scale));
-    font-weight: 500;
-    line-height: 1.5;
+    font-weight: 400;
+    line-height: 1.55;
   }
 
   html[data-look='student'] .question-source {
     margin-top: 10px;
     color: var(--text-tertiary);
-    font-size: 0.75rem;
+    font-size: var(--text-xs);
   }
 
   .solve-pace {
@@ -1308,7 +1401,7 @@
     gap: 6px;
     margin: 0 0 12px;
     color: var(--text-secondary);
-    font-size: 0.8125rem;
+    font-size: var(--text-xs);
     font-weight: 700;
   }
 
@@ -1350,7 +1443,8 @@
     border-radius: 7px;
     background: var(--bg-card);
     color: var(--accent-text);
-    font-size: 21px;
+    font-size: var(--text-md);
+    font-weight: 800;
     line-height: 1;
   }
 
@@ -1467,7 +1561,7 @@
     border: 2px solid var(--border-strong);
     border-radius: var(--radius-md);
     color: var(--text-primary);
-    font-size: 0.9375rem;
+    font-size: var(--text-sm);
     font-weight: 700;
     user-select: none;
     -webkit-user-select: none;
@@ -1477,7 +1571,7 @@
   html[data-look='student'] .solve-nav-btn:active:not(:disabled),
   html[data-look='student'] .solve-map-toggle:active,
   html[data-look='student'] .solve-flag-btn:active:not(:disabled) {
-    transform: scale(0.96);
+    transform: scale(0.97);
   }
 
   .solve-skip {
@@ -1489,9 +1583,8 @@
     min-width: 0;
     justify-content: center;
     min-height: 52px;
-    font-family: var(--font-display);
-    font-size: 1.375rem;
-    font-weight: 400;
+    font-size: var(--text-md);
+    font-weight: 700;
   }
 
   .solve-more-row {
@@ -1547,7 +1640,7 @@
   /* The guided path: near-black, under the question, asking. */
   .ask {
     padding: 20px 20px calc(24px + env(safe-area-inset-bottom, 0px));
-    background: #10231c;
+    background: var(--on-sticker);
     color: #fff;
   }
 
@@ -1567,10 +1660,10 @@
     display: flex;
     justify-content: space-between;
     margin: 0;
-    color: #ffd23f;
-    font-size: 15px;
-    font-weight: 700;
-    line-height: 1;
+    color: rgba(255, 255, 255, 0.72);
+    font-size: var(--text-sm);
+    font-weight: 600;
+    line-height: 1.2;
   }
 
   .ask-count {
@@ -1581,11 +1674,9 @@
   html[data-look='student'] .ask-prompt {
     margin: 0 0 4px;
     color: #fff;
-    font-family: var(--font-display);
-    font-size: clamp(1.625rem, 8vw, 2rem);
-    font-weight: 400;
-    line-height: 1.05;
-    letter-spacing: 0.005em;
+    font-size: var(--text-lg);
+    font-weight: 700;
+    line-height: 1.3;
     text-wrap: balance;
     outline: none;
   }
@@ -1624,12 +1715,12 @@
     min-height: 44px;
     padding: 13px 15px;
     border: 0;
-    border-radius: 11px;
+    border-radius: var(--radius-md);
     background: #fff;
-    color: #10231c;
+    color: var(--on-sticker);
     font: inherit;
-    font-size: 1rem;
-    font-weight: 700;
+    font-size: var(--text-base);
+    font-weight: 600;
     line-height: 1.25;
     text-align: left;
     text-wrap: pretty;
@@ -1642,7 +1733,7 @@
 
   .ask-chip:active:not(:disabled) {
     transform: scale(0.97);
-    background: #ffd23f;
+    background: var(--sticker);
   }
 
   .ask-chip:disabled {
@@ -1653,7 +1744,7 @@
   .ask-chip:focus-visible,
   .ask-link:focus-visible,
   .ask-go:focus-visible {
-    outline: 2px solid #ffd23f;
+    outline: 2px solid var(--sticker);
     outline-offset: 2px;
   }
 
@@ -1671,7 +1762,7 @@
     background: none;
     color: #fff;
     font: inherit;
-    font-size: 0.9375rem;
+    font-size: var(--text-sm);
     font-weight: 700;
     text-decoration: underline;
     text-underline-offset: 3px;
@@ -1682,20 +1773,19 @@
   .ask-go {
     min-height: 52px;
     border: 0;
-    border-radius: 14px;
-    background: #ffd23f;
-    box-shadow: 0 5px 0 #c79a12;
-    color: #10231c;
-    font-family: var(--font-display);
-    font-size: 1.5rem;
+    border-radius: var(--radius-md);
+    background: var(--sticker);
+    color: var(--on-sticker);
+    font: inherit;
+    font-size: var(--text-md);
+    font-weight: 700;
     cursor: pointer;
     touch-action: manipulation;
-    transition: transform 100ms var(--ease-out-strong), box-shadow 100ms var(--ease-out-strong);
+    transition: transform 100ms var(--ease-out-strong);
   }
 
   .ask-go:active {
-    transform: translateY(4px);
-    box-shadow: 0 1px 0 #c79a12;
+    transform: scale(0.97);
   }
 
   .ask-review {
@@ -1735,14 +1825,14 @@
     margin: 0;
     padding: 0;
     background: none;
-    font-size: 1.75rem;
+    font-size: var(--text-lg);
     line-height: 1.1;
     outline: none;
   }
 
   html[data-look='student'] .answer-verdict strong {
-    font-family: var(--font-display);
-    font-weight: 400;
+    font-size: inherit;
+    font-weight: 800;
   }
 
   .verdict-reveal {
@@ -1761,117 +1851,132 @@
     width: 100%;
     min-height: 52px;
     justify-content: center;
-    font-family: var(--font-display);
-    font-size: 1.375rem;
-    font-weight: 400;
+    font-size: var(--text-md);
+    font-weight: 700;
   }
 
-  /* ── Reward ────────────────────────────────────────────────────────── */
+  /* ── Reward: the score, how each topic moved, then what was earned ── */
   .reward {
     display: grid;
     align-content: start;
-    gap: 1rem;
-    padding: calc(1.5rem + env(safe-area-inset-top, 0px)) 1.25rem 1.5rem;
-    background: var(--field);
-    color: #fff;
+    gap: 1.25rem;
+    width: min(100%, 40rem);
+    margin-inline: auto;
+    padding: 1.5rem 1.25rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    background: var(--paper);
   }
 
-  .reward-xp {
+  html[data-look='student'] .reward-title {
     margin: 0;
-    color: #ffd23f;
-    font-family: var(--font-display);
-    font-size: clamp(4.5rem, 22vw, 6.5rem);
-    line-height: 0.95;
+    color: var(--text-primary);
+    font-size: var(--text-xl);
+    font-weight: 800;
+    line-height: 1.2;
+    text-wrap: balance;
     font-variant-numeric: tabular-nums;
   }
 
-  .reward-streak {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    margin: 0;
-    font-size: 1.0625rem;
-    font-weight: 800;
-  }
-
-  .reward-page {
-    grid-auto-rows: 6.5rem;
-  }
-
-  .reward-page > .is-landing {
-    position: relative;
-    z-index: 1;
-  }
-
-  .reward-landed {
-    margin: 0.625rem 0 0;
-    font-weight: 800;
-    text-wrap: balance;
-  }
-
-  .reward-sheet {
-    display: grid;
-    gap: 0.75rem;
-    padding: 1rem 1.125rem;
-    border-radius: var(--radius-lg);
-    background: var(--paper);
-    color: var(--text-primary);
-  }
-
-  .reward-medal {
-    display: flex;
-    align-items: center;
-    gap: 0.625rem;
-    margin: 0;
-    font-weight: 800;
-  }
-
-  .reward-medal-icon {
-    display: grid;
-    flex: none;
-    place-items: center;
-    width: 2.25rem;
-    height: 2.25rem;
-    border-radius: 9px;
-    background: var(--sticker);
-    color: var(--on-sticker);
+  .reward-lede {
+    margin: -0.5rem 0 0;
+    color: var(--text-secondary);
+    font-size: var(--text-md);
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
   }
 
   .reward-changes {
     display: grid;
-    gap: 0.625rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    border-top: 1px solid var(--border);
+  }
+
+  .reward-change {
+    display: grid;
+    gap: 0.25rem;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .reward-change.is-up {
+    margin-inline: -0.75rem;
+    padding-inline: 0.75rem;
+    border-radius: var(--radius-sm);
+    background: var(--success-soft);
+  }
+
+  .reward-change-name {
+    font-size: var(--text-md);
+    font-weight: 700;
+    text-wrap: pretty;
+  }
+
+  .reward-change-level {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .reward-up,
+  .reward-down {
+    padding: 0.125rem 0.5rem;
+    border-radius: var(--radius-pill);
+    font-size: var(--text-xs);
+    font-weight: 800;
+  }
+
+  .reward-up {
+    background: var(--success);
+    color: var(--paper);
+  }
+
+  .reward-down {
+    background: var(--bg-inset);
+    color: var(--text-secondary);
+  }
+
+  .reward-change-note {
+    color: var(--text-secondary);
+    font-size: var(--text-sm);
+    line-height: 1.4;
+    text-wrap: pretty;
+  }
+
+  /* The one authored moment: a topic that went up settles in, once. */
+  .reward-change.is-up.is-fresh {
+    animation: level-up 520ms var(--ease-out-strong) 250ms backwards;
+  }
+
+  @keyframes level-up {
+    from {
+      background: color-mix(in srgb, var(--sticker) 55%, var(--paper));
+    }
+  }
+
+  .reward-gains {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
     margin: 0;
     padding: 0;
     list-style: none;
   }
 
-  .reward-change {
-    display: flex;
-    align-items: flex-start;
-    gap: 0.625rem;
+  .reward-gains {
+    gap: 0.375rem 1.125rem;
   }
 
-  .reward-change > span:last-child {
-    display: grid;
-    min-width: 0;
-  }
-
-  .reward-change b {
-    font-weight: 800;
-    text-wrap: pretty;
-  }
-
-  .reward-change b + span {
+  .reward-gains > li {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
     color: var(--text-secondary);
-    font-size: 0.875rem;
-  }
-
-  .reward-score {
-    margin: 0;
-    padding-top: 0.75rem;
-    border-top: 1px solid var(--rule);
-    color: var(--text-secondary);
-    font-weight: 700;
+    font-size: var(--text-sm);
+    font-weight: 600;
     font-variant-numeric: tabular-nums;
   }
 
@@ -1883,19 +1988,16 @@
   html[data-look='student'] .reward-go {
     justify-content: center;
     width: 100%;
-    min-height: 56px;
-    border-radius: 14px;
-    box-shadow: 0 5px 0 var(--sticker-edge);
-    font-family: var(--font-display);
-    font-size: 1.625rem;
-    font-weight: 400;
+    min-height: 3.25rem;
+    font-size: var(--text-md);
+    font-weight: 700;
   }
 
   .reward-link {
     display: grid;
     place-items: center;
     min-height: 44px;
-    color: #fff;
+    color: var(--accent-text);
     font-weight: 700;
     text-decoration: underline;
     text-underline-offset: 3px;
@@ -1906,6 +2008,7 @@
     width: min(100%, 44rem);
     margin-inline: auto;
     padding-bottom: 1.25rem;
+    border: 1px solid var(--border);
     border-radius: var(--radius-lg);
     background: var(--paper);
     overflow: hidden;
@@ -1919,8 +2022,21 @@
     display: grid;
     gap: 0.5rem;
     padding: 1rem 1.25rem 1.25rem;
-    background: var(--field);
+    background: var(--area);
     color: #fff;
+  }
+
+  .lesson-level {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+    margin-block: 1rem 0;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border);
+    color: var(--text-secondary);
+    font-size: var(--text-sm);
+    font-weight: 600;
   }
 
   .lesson-back {
@@ -1935,8 +2051,9 @@
   html[data-look='student'] .lesson-name {
     margin: 0;
     color: #fff;
-    font-size: clamp(2.25rem, 10vw, 3rem);
-    line-height: 1.02;
+    font-size: var(--text-xl);
+    font-weight: 800;
+    line-height: 1.15;
     text-wrap: balance;
   }
 
@@ -1944,6 +2061,14 @@
     display: grid;
     gap: 0.875rem;
     padding-block: 1.25rem;
+  }
+
+  .lesson-step-count {
+    margin: 0;
+    color: var(--text-secondary);
+    font-size: var(--text-sm);
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
   }
 
   .lesson-beads {
@@ -1959,13 +2084,13 @@
   }
 
   .lesson-beads i.is-done {
-    background: var(--field);
+    background: var(--area);
   }
 
   html[data-look='student'] .lesson-predict .markdown-body {
-    font-size: 1.3125rem;
-    font-weight: 700;
-    line-height: 1.3;
+    font-size: var(--text-md);
+    font-weight: 600;
+    line-height: 1.45;
     text-wrap: pretty;
   }
 
@@ -2000,14 +2125,14 @@
   }
 
   .lesson-listen:active {
-    transform: scale(0.96);
+    transform: scale(0.97);
   }
 
   /* ── Avatar and league ─────────────────────────────────────────────── */
   .avatar-sticker {
     display: block;
     overflow: hidden;
-    border-radius: 9px;
+    border-radius: var(--radius-sm);
     background: var(--sticker);
   }
 
@@ -2029,8 +2154,7 @@
 
   .avatar-editor-preview {
     width: 6rem;
-    height: 7.25rem;
-    transform: rotate(-3deg);
+    height: 6rem;
   }
 
   .avatar-part {
@@ -2058,7 +2182,7 @@
     background: transparent;
     color: var(--text-primary);
     font: inherit;
-    font-size: 0.9375rem;
+    font-size: var(--text-sm);
     font-weight: 700;
     cursor: pointer;
     touch-action: manipulation;
@@ -2066,7 +2190,7 @@
   }
 
   .avatar-part-option:active {
-    transform: scale(0.96);
+    transform: scale(0.97);
   }
 
   .avatar-part-option[aria-pressed='true'] {
@@ -2119,14 +2243,14 @@
 
   html[data-look='student'] .league-title {
     margin: 0;
-    font-size: 1.5rem;
+    font-size: var(--text-lg);
     line-height: 1.1;
   }
 
   .league-note {
     margin: 0;
     color: var(--text-secondary);
-    font-size: 0.875rem;
+    font-size: var(--text-sm);
     font-weight: 600;
     font-variant-numeric: tabular-nums;
   }
@@ -2155,10 +2279,10 @@
   }
 
   .league-rank {
-    font-family: var(--font-display);
-    font-size: 1.125rem;
+    font-size: var(--text-base);
     text-align: center;
     font-variant-numeric: tabular-nums;
+    font-weight: 800;
   }
 
   .league-avatar {
@@ -2180,7 +2304,7 @@
   }
 
   .league-gap {
-    font-size: 0.9375rem;
+    font-size: var(--text-sm);
     font-weight: 700;
     font-variant-numeric: tabular-nums;
   }
@@ -2200,8 +2324,19 @@
     padding: 0 0.75rem 0 0.375rem;
     border-radius: var(--radius-pill);
     background: var(--bg-inset);
-    font-size: 0.9375rem;
+    font-size: var(--text-sm);
     font-weight: 700;
+  }
+
+  .reward-medal-icon {
+    display: grid;
+    flex: none;
+    place-items: center;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+    background: var(--sticker);
+    color: var(--on-sticker);
   }
 
   .yo-medal .reward-medal-icon {
@@ -2210,141 +2345,59 @@
     border-radius: 50%;
   }
 
-  /* Phone: Hoy and the reward run edge to edge, with no header above them. */
-  @media (max-width: 780px) {
-    .student-shell:has(.hoy) > .student-topbar,
-    .student-shell:has(.reward) > .student-topbar {
-      display: none;
-    }
-
-    .student-shell:has(.hoy) > .student-shell-main,
-    .student-shell:has(.reward) > .student-shell-main {
-      width: 100%;
-      padding: 0 0 calc(4rem + env(safe-area-inset-bottom, 0px));
-    }
-
-    .hoy {
-      display: flex;
-      flex-direction: column;
-      min-height: calc(100dvh - 4rem - env(safe-area-inset-bottom, 0px));
-    }
-
-    .hoy-field {
-      flex: 1;
-    }
-
-    .reward {
-      min-height: calc(100dvh - 4rem - env(safe-area-inset-bottom, 0px));
-    }
-
-    .lesson {
-      border-radius: 0;
-    }
-  }
-
-  /* Desktop: the page beside what else is on today. */
   @media (min-width: 781px) {
-    .hoy {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) 22rem;
-      gap: 1.25rem;
-      align-items: start;
-    }
-
-    .hoy-field {
-      min-height: min(40rem, calc(100dvh - 8rem));
-      padding: 2rem;
-      border-radius: var(--radius-lg);
-    }
-
-    .album-grid {
-      grid-template-columns: repeat(6, minmax(0, 1fr));
-      grid-auto-rows: 9rem;
-    }
-
-    .sticker-glyph {
-      width: 40px;
-      height: 40px;
-    }
-
-    html[data-look='student'] .hoy-go {
-      align-self: start;
-      width: auto;
-      min-width: 24rem;
-      padding-inline: 2.5rem;
-    }
-
-    .hoy-side {
-      border-radius: var(--radius-lg);
-      overflow: hidden;
-    }
-
-    .hoy-side:empty {
-      display: none;
-    }
-
-    .reward {
-      width: min(100%, 40rem);
-      margin-inline: auto;
-      padding: 2rem;
-      border-radius: var(--radius-lg);
-    }
-
     .solve-bar {
       padding-inline: 1.25rem;
     }
-  }
 
-  @media (prefers-reduced-motion: reduce) {
-    html[data-look='student'] .student-tabbar-item:active,
-    .aprende-area:active,
-    .aprende-topic-go:active:not(:disabled),
-    .reto-tile:active:not(:disabled) {
-      transform: none;
+    .reward {
+      padding: 2rem;
     }
   }
 
-  @media (prefers-reduced-motion: reduce) {
-    .sticker,
-    .solve-bar-btn,
-    .ask-chip,
-    .ask-go,
-    .hoy-more,
-    .lesson-listen,
-    .avatar-part-option {
-      transition: background-color 140ms ease;
-    }
-    .album-slot:active .sticker,
-    .solve-bar-btn:active,
-    .ask-chip:active:not(:disabled),
-    .ask-go:active,
-    .hoy-more:active:not(:disabled),
-    .lesson-listen:active,
-    .avatar-part-option:active,
-    html[data-look='student'] .solve-nav-btn:active:not(:disabled),
-    html[data-look='student'] .solve-map-toggle:active,
-    html[data-look='student'] .solve-flag-btn:active:not(:disabled) {
-      transform: none;
-    }
-    .album-slot:active .sticker.is-next {
-      transform: rotate(-4deg) scale(1.08);
-    }
-    html[data-look='student'] .option-card.solve-option.is-incorrect,
-    html[data-look='student'] .option-card.solve-option.is-correct .option-label {
-      animation: none;
+  /* Phone: a 16px gutter on every tab screen; solve and review keep the full width. */
+  @media (max-width: 780px) {
+    html[data-look='student'] .student-shell:not(.is-immersive) > .student-shell-main {
+      width: calc(100% - 2rem);
+      padding-top: 1.25rem;
     }
   }
 
+  /* No press scale and no level-up flash under reduced motion; colour still changes. */
   @media (prefers-reduced-motion: reduce) {
     html[data-look='student'] .btn-primary,
     html[data-look='student'] .btn-secondary,
-    html[data-look='student'] .option-card {
+    html[data-look='student'] .option-card,
+    html[data-look='student'] .student-tabbar-item,
+    .aprende-topic-go,
+    .reto-tile,
+    .solve-bar-btn,
+    .ask-chip,
+    .ask-go,
+    .lesson-listen,
+    .avatar-part-option {
       transition: background-color 140ms ease, border-color 140ms ease;
     }
     html[data-look='student'] .btn-primary:active,
     html[data-look='student'] .btn-secondary:active,
-    html[data-look='student'] .option-card:active {
+    html[data-look='student'] .option-card:active,
+    html[data-look='student'] .student-tabbar-item:active,
+    html[data-look='student'] .solve-nav-btn:active:not(:disabled),
+    html[data-look='student'] .solve-map-toggle:active,
+    html[data-look='student'] .solve-flag-btn:active:not(:disabled),
+    .aprende-topic-go:active:not(:disabled),
+    .reto-tile:active:not(:disabled),
+    .solve-bar-btn:active,
+    .ask-chip:active:not(:disabled),
+    .ask-go:active,
+    .lesson-listen:active,
+    .avatar-part-option:active {
       transform: none;
+    }
+    html[data-look='student'] .option-card.solve-option.is-incorrect,
+    html[data-look='student'] .option-card.solve-option.is-correct .option-label,
+    .reward-change.is-up.is-fresh {
+      animation: none;
     }
   }
 }
@@ -2359,17 +2412,16 @@
     border-radius: var(--radius-md);
     background: var(--sticker);
     color: var(--on-sticker);
-    box-shadow: 0 4px 0 var(--sticker-edge);
-    transition: transform 140ms var(--ease-out-strong);
+    transition: transform 100ms var(--ease-out-strong);
   }
 
   html[data-look='student'] .duel-banner:active {
-    transform: scale(0.96);
+    transform: scale(0.97);
   }
 
   html[data-look='student'] .duel-banner-go {
-    font-family: var(--font-display);
-    font-size: 1.25rem;
+    font-size: var(--text-base);
+    font-weight: 800;
   }
 
   html[data-look='student'] .duel-page {
@@ -2400,15 +2452,15 @@
   }
 
   html[data-look='student'] .duel-top-name {
-    font-size: 0.9375rem;
+    font-size: var(--text-sm);
     font-weight: 700;
   }
 
   html[data-look='student'] .duel-top-score {
-    font-family: var(--font-display);
-    font-size: 2.75rem;
+    font-size: var(--text-2xl);
     line-height: 1.05;
     font-variant-numeric: tabular-nums;
+    font-weight: 800;
   }
 
   html[data-look='student'] .duel-sheet {
@@ -2424,10 +2476,10 @@
 
   html[data-look='student'] .duel-title {
     margin: 0;
-    font-family: var(--font-display);
-    font-size: 2.75rem;
-    line-height: 1.05;
+    font-size: var(--text-xl);
+    line-height: 1.15;
     text-wrap: balance;
+    font-weight: 800;
   }
 
   html[data-look='student'] .duel-progress {
@@ -2435,13 +2487,13 @@
     justify-content: space-between;
     margin: 0;
     color: var(--text-secondary);
-    font-size: 0.9375rem;
+    font-size: var(--text-sm);
     font-weight: 700;
     font-variant-numeric: tabular-nums;
   }
 
   html[data-look='student'] .duel-question {
-    font-size: 1.25rem;
+    font-size: var(--text-lg);
     font-weight: 600;
     line-height: 1.32;
     text-wrap: pretty;
@@ -2454,7 +2506,7 @@
 
   html[data-look='student'] .duel-feedback {
     margin: 0;
-    font-size: 1.125rem;
+    font-size: var(--text-md);
     font-weight: 800;
   }
 }

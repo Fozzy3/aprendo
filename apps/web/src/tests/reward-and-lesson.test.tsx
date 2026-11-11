@@ -58,12 +58,29 @@ function renderReward(reward: typeof REWARD | null) {
 }
 
 describe('RewardScreen', () => {
-  it('reads XP, streak, medal, mastery, and the score last', () => {
+  it('reads the score first, then how each topic moved, then XP, streak and medal', () => {
     renderReward(REWARD)
     const text = container.textContent ?? ''
-    const order = ['50', 'días', 'Primera sesión', 'Funciones y gráficas', '3 de 5'].map((piece) => text.indexOf(piece))
+    const order = ['3 de 5', 'Tus temas', '50 XP', 'días', 'Primera sesión'].map((piece) => text.indexOf(piece))
     expect(order.every((position) => position >= 0)).toBe(true)
     expect(order).toEqual([...order].sort((a, b) => a - b))
+    expect(container.querySelector('.sticker')).toBeNull()
+  })
+
+  it('heads with the topic that went up when one did', () => {
+    renderReward(REWARD)
+    expect(container.querySelector('h1')?.textContent).toBe('Subiste a Familiar en Funciones y gráficas')
+  })
+
+  it('heads with the score when nothing went up', () => {
+    act(() =>
+      root.render(
+        <RewardScreen studentId="s" subjectId={null} reward={null} changes={[]} correctCount={3} questionCount={5} isFresh={false}>
+          <button type="button">Seguir</button>
+        </RewardScreen>,
+      ),
+    )
+    expect(container.querySelector('h1')?.textContent).toBe('3 de 5 correctas')
   })
 
   it('shows no XP on an old session without a reward', () => {
@@ -127,10 +144,15 @@ describe('LessonSteps', () => {
     expect(speech.stopSpeaking).toHaveBeenCalled()
   })
 
-  it('has no "Siguiente" on the last step', () => {
+  it('names the step it is on', () => {
+    expect(container.textContent).toContain('Paso 1 de 2')
+  })
+
+  it('has no "Siguiente" on the last step, and points to practice instead', () => {
     click('Ver por qué')
     click('Siguiente')
     click('Ver por qué')
     expect(button('Siguiente')).toBeUndefined()
+    expect(container.querySelector('a[href="#practica"]')?.textContent).toContain('Practicar este tema')
   })
 })

@@ -8,7 +8,9 @@ import { EmptyState } from './EmptyState.tsx'
 import { LessonSteps } from './LessonSteps.tsx'
 import { MarkdownBlock } from './MarkdownBlock.tsx'
 import { buildDemoDocument } from '../lib/demo-document.ts'
-import { conceptLessonQuery } from '../lib/student-queries.ts'
+import { conceptLessonQuery, studentProgressQuery } from '../lib/student-queries.ts'
+import { levelFor, masteryLevelMap } from '../lib/mastery-display.ts'
+import { MasteryBadge } from './MasteryBadge.tsx'
 import { getSubjectIdForSubtopic, getSubjectLabel, getSubtopicLabel } from '@aprendo/convex/taxonomy'
 import { useResolvedTheme } from '../lib/use-resolved-theme.ts'
 import { readConvexError } from '../lib/convex-error.ts'
@@ -29,6 +31,7 @@ export function LessonPage({ subtopicId, studentId }: { subtopicId: string; stud
   const theme = useResolvedTheme()
   const subjectId = getSubjectIdForSubtopic(subtopicId)
   const lessonQuery = useQuery({ ...conceptLessonQuery(subtopicId), enabled: subjectId != null })
+  const progress = useQuery(studentProgressQuery(studentId))
 
   const requestLesson = useConvexMutation(api.lessons.requestConceptLesson)
   const requestMutation = useMutation({ mutationFn: async () => requestLesson({ subtopicId }) })
@@ -62,7 +65,7 @@ export function LessonPage({ subtopicId, studentId }: { subtopicId: string; stud
       <EmptyState
         title="Este tema no existe"
         action={
-          <Link to="/path" className="btn-primary no-underline">
+          <Link to="/path" className="btn-secondary no-underline">
             Volver a tu ruta
           </Link>
         }
@@ -85,13 +88,18 @@ export function LessonPage({ subtopicId, studentId }: { subtopicId: string; stud
 
   // A Read surface: one column at reading width, sections opened by a rule.
   return (
-    <article className="lesson fade-in" style={{ '--field': getSubjectTheme(subjectId).color } as CSSProperties}>
+    <article className="lesson fade-in" style={{ '--area': getSubjectTheme(subjectId).color } as CSSProperties}>
       <header className="lesson-cover">
-        <Link to="/path" className="lesson-back no-underline">
+        <Link to="/path" search={{ area: subjectId }} className="lesson-back no-underline">
           <ArrowLeft size={18} aria-hidden /> {getSubjectLabel(subjectId)}
         </Link>
         <h1 className="lesson-name">{getSubtopicLabel(subtopicId)}</h1>
       </header>
+      {progress.data != null ? (
+        <p className="lesson-level">
+          Tu nivel en este tema: <MasteryBadge level={levelFor(masteryLevelMap(progress.data.subtopicMastery), subtopicId)} />
+        </p>
+      ) : null}
 
       {isFailed ? (
         <section className="ruled-section">
@@ -160,7 +168,7 @@ export function LessonPage({ subtopicId, studentId }: { subtopicId: string; stud
       )}
 
       {/* Practice — always available, independent of lesson state */}
-      <section className="ruled-section" aria-labelledby="lesson-practice-title">
+      <section id="practica" className="ruled-section" aria-labelledby="lesson-practice-title">
         <h2 id="lesson-practice-title" className="section-title">Practica este tema</h2>
         <div className="flex flex-wrap items-center justify-between gap-3">
           <p className="m-0 text-sm text-[var(--text-secondary)]">Pon a prueba este tema con preguntas reales.</p>
@@ -168,7 +176,7 @@ export function LessonPage({ subtopicId, studentId }: { subtopicId: string; stud
             type="button"
             disabled={practiceMutation.isPending}
             onClick={() => practiceMutation.mutate()}
-            className="btn-primary shrink-0"
+            className="btn-secondary shrink-0"
           >
             <Play size={16} aria-hidden />
             {practiceMutation.isPending ? 'Preparando…' : 'Practicar este tema'}

@@ -87,8 +87,15 @@ export function closingLine(change: { from: MasteryLevel; to: MasteryLevel }): {
   if (change.from === change.to) {
     return { moved: 'same', text: `Sigue en ${MASTERY_LEVEL_LABELS[change.to]}. ${NEXT_STEP[change.to]}` }
   }
-  return {
-    moved: rank(change.to) > rank(change.from) ? 'up' : 'down',
-    text: `${MASTERY_LEVEL_LABELS[change.from]} → ${MASTERY_LEVEL_LABELS[change.to]}`,
-  }
+  const step = `${MASTERY_LEVEL_LABELS[change.from]} → ${MASTERY_LEVEL_LABELS[change.to]}`
+  return rank(change.to) > rank(change.from)
+    ? { moved: 'up', text: `${step}. ${NEXT_STEP[change.to]}` }
+    : { moved: 'down', text: step }
+}
+
+/** A topic's evidence in one line, or nothing before the first answer. */
+export function topicStats(node: { attemptCount: number; accuracy: number | null }): string | null {
+  if (node.attemptCount === 0 || node.accuracy == null) return null
+  const answers = `${node.attemptCount} ${node.attemptCount === 1 ? 'respondida' : 'respondidas'}`
+  return `${answers} · ${Math.round(node.accuracy * 100)} % de acierto`
 }

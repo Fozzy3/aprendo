@@ -41,10 +41,13 @@ issue school licenses. A dense, functional surface.
 
 ## Personality
 
-**Two registers, one honest product.** Student screens are young and credible:
-a sticker album you fill by mastering topics (Álbum, chosen 2026-11-08, see
-`plans/reconstruccion-estudiante-y-banco.md`). Teacher, school, staff and printed
-screens stay institutional and exact, because a rector buys those.
+**Two registers, one honest product.** Student screens are young, clear and
+credible: a study plan that says what to do now and why, and every topic named
+with its level (Plan de estudio, 2026-11-10; it replaced the 2026-11-08 sticker
+album, which the owner found decorative and unclear). The bar is the category
+standard played straight: Khan Academy's mastery clarity, Brilliant's calm.
+Teacher, school, staff and printed screens stay institutional and exact, because
+a rector buys those.
 
 - Speaks Spanish, with accents, addressing the student as *tú* and the school
   as *usted*.
@@ -52,8 +55,8 @@ screens stay institutional and exact, because a rector buys those.
   it says so instead of inventing a number.
 - Teaches by asking. A wrong answer opens a question, not the solution; the
   answer comes after the student has tried.
-- Rewards effort and mastery separately: XP and leagues count effort, stickers
-  count mastery. Neither ever moves a learning metric.
+- Rewards effort and mastery separately: XP, streak and leagues count effort,
+  topic levels count mastery. Effort never moves a learning metric.
 - Few words. One action per screen, a headline of at most 8 words, at most 25
   words before the action.
 
@@ -62,7 +65,10 @@ screens stay institutional and exact, because a rector buys those.
 - **The generic blue LMS with cards** (Canvas, Moodle).
 - **The corporate KPI dashboard.** No hero metrics, no KPI tiles.
 - **A printed test pasted on a screen.** No scanned stems when text will do.
-- **Childish teacher or school screens.** The album stays on the student side.
+- **Childish teacher or school screens.** Gamification stays on the student side.
+- **Decoration that looks interactive.** No tilted or lifted cards, no fake 3D
+  press edges, no numbered slots without a name. A student must never wonder
+  whether something moves or what a mark means.
 - **Duolingo's guilt loop.** Nothing shames a student for a missed day; a broken
   streak offers a fresh start, and there are no guilt notifications.
 - **Public results.** Leagues show effort, neighbours only, by nickname; a

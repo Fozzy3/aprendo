@@ -15,6 +15,7 @@ import {
   masteryLevelMap,
   resolvePathStates,
   scopeMastery,
+  topicStats,
   type PathState,
 } from '../lib/mastery-display.ts'
 import { EmptyState } from './EmptyState.tsx'
@@ -31,17 +32,18 @@ type PathNode = {
   categoryLabel: string
   questionCount: number
   hasLesson: boolean
+  attemptCount: number
+  accuracy: number | null
   level: MasteryLevel
 }
 
 /**
- * Aprende: one full field of the area's colour, the one topic to do next, and
- * below it every topic of the area as a numbered sticker slot (the temario
- * lives here now). Everything that needs a sentence waits behind "Ver más".
+ * Aprende: the area's topics, each with its level and its evidence, and the one
+ * topic the plan picks next. The level rules sit behind one disclosure.
  */
-export function LearningPathPage({ studentId }: { studentId: string }) {
+export function LearningPathPage({ studentId, initialSubjectId = null }: { studentId: string; initialSubjectId?: string | null }) {
   const navigate = useNavigate()
-  const [pickedSubjectId, setSubjectId] = useState<string | null>(null)
+  const [pickedSubjectId, setSubjectId] = useState<string | null>(initialSubjectId)
   const progress = useQuery(studentProgressQuery(studentId))
   // The plan's picks are the one compass (F33): Aprende opens on their area and marks them.
   const today = useQuery(todayDashboardQuery(studentId))
@@ -68,7 +70,7 @@ export function LearningPathPage({ studentId }: { studentId: string }) {
   const placement = path.data?.level.hasEnoughEvidence === true ? path.data.level.placement : null
 
   return (
-    <div className="aprende fade-in">
+    <div className="aprende fade-in" style={{ '--area': theme.color } as CSSProperties}>
       <nav className="aprende-areas" aria-label="Área">
         {(subjects.data ?? []).map((subject) => (
           <button
@@ -76,7 +78,7 @@ export function LearningPathPage({ studentId }: { studentId: string }) {
             type="button"
             className="aprende-area"
             aria-pressed={subject.subjectId === subjectId}
-            style={{ '--field': getSubjectTheme(subject.subjectId).color } as CSSProperties}
+            style={{ '--area': getSubjectTheme(subject.subjectId).color } as CSSProperties}
             onClick={() => setSubjectId(subject.subjectId)}
           >
             {subject.label}
@@ -84,14 +86,20 @@ export function LearningPathPage({ studentId }: { studentId: string }) {
         ))}
       </nav>
 
-      <section className="aprende-field" aria-labelledby="aprende-title" style={{ '--field': theme.color } as CSSProperties}>
-        <h1 id="aprende-title" className="aprende-name">{theme.label}</h1>
+      <section className="aprende-head" aria-labelledby="aprende-title" style={{ '--area': theme.color } as CSSProperties}>
+        <div className="aprende-head-top">
+          <h1 id="aprende-title" className="aprende-name">{theme.label}</h1>
+          <span className="aprende-level">{placement?.band.labelEs ?? 'Sin nivel aún'}</span>
+        </div>
         {mastery != null ? (
-          <p className="aprende-count">
-            {mastery.competenteOrAbove} de {mastery.subtopicCount} láminas
-            {placement != null ? ` · ${placement.band.labelEs}` : ''}
-          </p>
+          <>
+            <span className="aprende-bar" aria-hidden>
+              <span style={{ width: `${mastery.subtopicCount === 0 ? 0 : (mastery.competenteOrAbove / mastery.subtopicCount) * 100}%` }} />
+            </span>
+            <p className="aprende-count">{mastery.competenteOrAbove} de {mastery.subtopicCount} temas en Competente o más</p>
+          </>
         ) : null}
+        {path.data != null ? <LevelNote level={path.data.level} /> : null}
 
         {nextTopic != null ? (
           <button
@@ -100,19 +108,10 @@ export function LearningPathPage({ studentId }: { studentId: string }) {
             disabled={startTopic.isPending}
             onClick={() => startTopic.mutate(nextTopic.subtopicId)}
           >
-            <span>{startTopic.isPending && startTopic.variables === nextTopic.subtopicId ? 'Preparando…' : `Practicar ${nextTopic.label}`}</span>
-            <small>{TOPIC_QUESTIONS} preguntas</small>
+            {startTopic.isPending && startTopic.variables === nextTopic.subtopicId
+              ? 'Preparando…'
+              : `Practicar ${nextTopic.label} · ${TOPIC_QUESTIONS} preguntas`}
           </button>
-        ) : null}
-
-        {path.data != null ? (
-          <details className="aprende-more">
-            <summary>Ver más</summary>
-            <div className="aprende-more-body">
-              <LevelNote level={path.data.level} />
-              <MasteryLegend />
-            </div>
-          </details>
         ) : null}
       </section>
 
@@ -127,24 +126,24 @@ export function LearningPathPage({ studentId }: { studentId: string }) {
       ) : nodes.length === 0 ? (
         <EmptyState title="Esta área aún no tiene temas">Prueba con otra mientras tanto.</EmptyState>
       ) : (
-        <section className="aprende-topics" aria-label="Temas" style={{ '--field': theme.color } as CSSProperties}>
+        <section className="aprende-topics" aria-label="Temas">
+          <details className="aprende-more">
+            <summary>¿Cómo se sube de nivel en un tema?</summary>
+            <MasteryLegend />
+          </details>
           {byCategory(nodes).map((group) => (
             <div key={group.categoryId}>
               <h2 className="aprende-category">{group.categoryLabel}</h2>
               <ol className="aprende-list">
-                {group.nodes.map((node) => {
-                  const index = nodes.indexOf(node)
-                  return (
-                    <TopicRow
-                      key={node.subtopicId}
-                      node={node}
-                      number={index + 1}
-                      state={states[index] ?? 'available'}
-                      disabled={startTopic.isPending}
-                      onPractice={() => startTopic.mutate(node.subtopicId)}
-                    />
-                  )
-                })}
+                {group.nodes.map((node) => (
+                  <TopicRow
+                    key={node.subtopicId}
+                    node={node}
+                    state={states[nodes.indexOf(node)] ?? 'available'}
+                    disabled={startTopic.isPending}
+                    onPractice={() => startTopic.mutate(node.subtopicId)}
+                  />
+                ))}
               </ol>
             </div>
           ))}
@@ -185,10 +184,10 @@ type SubjectLevel = {
 function LevelNote({ level }: { level: SubjectLevel }) {
   const placement = level.hasEnoughEvidence ? level.placement : null
   if (placement == null) {
-    return <p>Te faltan {level.attemptsNeeded} preguntas en esta área para calcular tu nivel ICFES.</p>
+    return <p className="aprende-note">Te faltan {level.attemptsNeeded} preguntas en esta área para calcular tu nivel ICFES.</p>
   }
   return (
-    <p>
+    <p className="aprende-note">
       {placement.band.descriptorEs}
       {placement.nextBand != null && placement.pointsToNextBand != null
         ? ` Te faltan ${placement.pointsToNextBand} puntos para ${placement.nextBand.labelEs}.`
@@ -197,31 +196,30 @@ function LevelNote({ level }: { level: SubjectLevel }) {
   )
 }
 
-/** A numbered slot: a sticker once earned (competente up), shiny at dominado. */
+/** A topic: its name, level and evidence (opens the lesson), and its practice button. */
 function TopicRow({
   node,
-  number,
   state,
   disabled,
   onPractice,
 }: {
   node: PathNode
-  number: number
   state: PathState
   disabled: boolean
   onPractice: () => void
 }) {
+  const stats = topicStats(node)
   return (
-    <li
-      className={`aprende-topic is-${state}${node.level === 'dominado' ? ' is-shiny' : ''}`}
-      aria-current={state === 'current' ? 'step' : undefined}
-    >
-      <span className="aprende-slot" aria-hidden>
-        {number}
-      </span>
+    <li className={`aprende-topic is-${state}`} aria-current={state === 'current' ? 'step' : undefined}>
       <Link to="/lesson/$subtopicId" params={{ subtopicId: node.subtopicId }} className="aprende-topic-main">
-        <span className="aprende-topic-label">{node.label}</span>
-        <MasteryBadge level={node.level} />
+        <span className="aprende-topic-label">
+          {node.label}
+          {state === 'current' ? <span className="aprende-tag">Siguiente</span> : null}
+        </span>
+        <span className="aprende-topic-meta">
+          <MasteryBadge level={node.level} />
+          {stats != null ? <span>{stats}</span> : null}
+        </span>
       </Link>
       {node.questionCount > 0 ? (
         <button
@@ -231,7 +229,8 @@ function TopicRow({
           aria-label={`Practicar ${node.label}`}
           onClick={onPractice}
         >
-          <Play size={18} aria-hidden />
+          <Play size={16} aria-hidden />
+          <span aria-hidden>Practicar</span>
         </button>
       ) : (
         <span className="aprende-topic-empty">Sin preguntas</span>

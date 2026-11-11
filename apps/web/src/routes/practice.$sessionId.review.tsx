@@ -309,14 +309,14 @@ function ReviewPage() {
           sealedNote={isSealed ? 'Tus resultados llegan cuando cierre la prueba.' : undefined}
         >
           {isSealed ? (
-            <Link to="/today" className="btn-primary reward-go no-underline">Seguir</Link>
+            <Link to="/today" className="btn-primary reward-go no-underline">Ver lo que sigue</Link>
           ) : opensOnResult ? (
             <button type="button" className="btn-primary reward-go" onClick={() => setRewardDone(true)}>
               Ver mi resultado
             </button>
           ) : (
             <>
-              <Link to="/today" className="btn-primary reward-go no-underline">Seguir</Link>
+              <Link to="/today" className="btn-primary reward-go no-underline">Ver lo que sigue</Link>
               <Link
                 to="/practice/$sessionId/review"
                 params={{ sessionId }}

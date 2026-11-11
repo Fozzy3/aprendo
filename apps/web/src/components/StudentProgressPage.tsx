@@ -87,9 +87,9 @@ function TrendChart({ points }: { points: Array<{ weekStartMs: number; accuracy:
 const STICKER_LEVELS: ReadonlySet<string> = new Set(MASTERY_LEVELS.slice(MASTERY_LEVELS.indexOf('competente')))
 
 /**
- * Yo: the student's own page. Their sticker count on top, their levels, career
- * and exam date, the study calendar and every session (the old Historial), and
- * at the bottom the account, the theme and Salir, the place phones reach them.
+ * Yo: the student's own page. Their score and levels first, then career, exam
+ * date, study time, the calendar and every session (the old Historial), then
+ * medals and avatar, and at the bottom the account, the theme and Salir.
  */
 export function StudentProgressPage({ session }: { session: ActiveStudentSession }) {
   const { studentId } = session
@@ -111,13 +111,15 @@ export function StudentProgressPage({ session }: { session: ActiveStudentSession
 
   const cover = (
     <header className="yo-cover">
-      <div className="yo-portrait avatar-sticker" aria-hidden>
+      <div className="yo-portrait" aria-hidden>
         <AvatarPortrait avatar={student.data?.avatar} />
       </div>
       <div className="min-w-0">
         <h1 className="yo-name">{session.name ?? 'Yo'}</h1>
         <p className="yo-count">
-          {album.data != null ? `${album.data.earnedCount} de ${album.data.total} láminas` : `${stickers} ${stickers === 1 ? 'lámina' : 'láminas'}`}
+          {album.data != null
+            ? `${album.data.earnedCount} de ${album.data.total} temas en Competente o más`
+            : `${stickers} ${stickers === 1 ? 'tema' : 'temas'} en Competente o más`}
           {streak > 0 ? ` · racha de ${streak} ${streak === 1 ? 'día' : 'días'}` : ''}
         </p>
       </div>
@@ -154,8 +156,6 @@ export function StudentProgressPage({ session }: { session: ActiveStudentSession
   return (
     <div className="yo fade-in">
       {cover}
-
-      <YoRewards studentId={studentId} student={student.data} medals={album.data?.medals ?? []} />
 
       <GlobalScoreCard studentId={studentId} data={progress.globalScore} />
 
@@ -209,6 +209,8 @@ export function StudentProgressPage({ session }: { session: ActiveStudentSession
       {todayQuery.data != null ? <WeeklyCoach studentId={studentId} activeDaysThisWeek={todayQuery.data.activeDaysThisWeek} /> : null}
 
       <StudyHistory studentId={studentId} />
+
+      <YoRewards studentId={studentId} student={student.data} medals={album.data?.medals ?? []} />
 
       <YoSettings />
     </div>

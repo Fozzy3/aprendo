@@ -1,39 +1,39 @@
 ---
 name: Aprendo
-description: ICFES Saber 11 preparation. Álbum on student screens, Cuaderno cuadriculado everywhere else.
+description: ICFES Saber 11 preparation. Plan de estudio on student screens, Cuaderno cuadriculado everywhere else.
 colors:
-  album-pitch: "#097d52"
-  album-pitch-deep: "#076a45"
-  album-green-ink: "#08704a"
-  album-sticker: "#ffd23f"
-  album-sticker-hover: "#ffdb66"
-  album-sticker-edge: "#c79a12"
-  album-tone-sky: "#8fe3ff"
-  album-tone-coral: "#ff8a5c"
-  album-next-mark: "#d7361f"
-  album-ink: "#10231c"
-  album-text-secondary: "#3c5148"
-  album-text-tertiary: "#52665d"
-  album-graphite: "#4b5f57"
-  album-paper: "#ffffff"
-  album-desk: "#eef5f1"
-  album-inset: "#eaf2ee"
-  album-rule: "#d6e5dd"
-  album-red: "#c8321f"
-  album-red-text: "#a31d10"
-  album-red-soft: "#ffe6e2"
-  album-area-lectura: "#c2342a"
-  album-area-matematicas: "#097d52"
-  album-area-ciencias: "#0a6fb0"
-  album-area-sociales: "#b4540a"
-  album-area-ingles: "#b3257a"
-  album-dark-paper: "#12201a"
-  album-dark-card: "#17281f"
-  album-dark-desk: "#0b1511"
-  album-dark-ink: "#e9f3ee"
-  album-dark-cover: "#0a5f40"
-  album-dark-brand: "#62d2a2"
-  album-dark-red: "#f0796a"
+  plan-pitch: "#097d52"
+  plan-pitch-deep: "#076a45"
+  plan-green-ink: "#08704a"
+  plan-success-text: "#075f3f"
+  plan-sticker: "#ffd23f"
+  plan-sticker-hover: "#ffdb66"
+  plan-ink: "#10231c"
+  plan-text-secondary: "#3c5148"
+  plan-text-tertiary: "#52665d"
+  plan-graphite: "#4b5f57"
+  plan-paper: "#ffffff"
+  plan-card-hover: "#f4f9f6"
+  plan-desk: "#eef5f1"
+  plan-inset: "#eaf2ee"
+  plan-rule: "#d6e5dd"
+  plan-hairline: "rgba(16, 35, 28, 0.13)"
+  plan-hairline-strong: "rgba(16, 35, 28, 0.24)"
+  plan-red: "#c8321f"
+  plan-red-text: "#a31d10"
+  plan-red-soft: "#ffe6e2"
+  plan-area-lectura: "#c2342a"
+  plan-area-matematicas: "#097d52"
+  plan-area-ciencias: "#0a6fb0"
+  plan-area-sociales: "#b4540a"
+  plan-area-ingles: "#b3257a"
+  plan-dark-paper: "#12201a"
+  plan-dark-card: "#17281f"
+  plan-dark-desk: "#0b1511"
+  plan-dark-ink: "#e9f3ee"
+  plan-dark-cover: "#0a5f40"
+  plan-dark-brand: "#62d2a2"
+  plan-dark-red: "#f0796a"
   notebook-paper: "#fbfcfe"
   notebook-rule: "#c9d8ea"
   notebook-ink: "#16233f"
@@ -43,45 +43,44 @@ colors:
   notebook-pen: "#1d4f91"
   notebook-desk: "#e6edf6"
 typography:
-  album-hero:
-    fontFamily: "Anton, Arial Narrow, sans-serif"
-    fontSize: "clamp(2.75rem, 13vw, 3.25rem)"
-    fontWeight: 400
-    lineHeight: 1
-    letterSpacing: "0.005em"
-  album-numeral:
-    fontFamily: "Anton, Arial Narrow, sans-serif"
-    fontSize: "clamp(4.5rem, 22vw, 6.5rem)"
-    fontWeight: 400
-    lineHeight: 0.95
-  album-headline:
-    fontFamily: "Anton, Arial Narrow, sans-serif"
-    fontSize: "clamp(1.625rem, 8vw, 2rem)"
-    fontWeight: 400
-    lineHeight: 1.05
-    letterSpacing: "0.005em"
-  album-button:
-    fontFamily: "Anton, Arial Narrow, sans-serif"
-    fontSize: "29px"
-    fontWeight: 400
-    lineHeight: 1.05
-  album-sticker-number:
-    fontFamily: "Anton, Arial Narrow, sans-serif"
-    fontSize: "22px"
-    fontWeight: 400
-    lineHeight: 1
-  album-question:
+  plan-score:
     fontFamily: "Figtree, ui-sans-serif, system-ui, sans-serif"
-    fontSize: "1.3125rem"
-    fontWeight: 600
-    lineHeight: 1.32
-  album-title:
+    fontSize: "2.25rem"
+    fontWeight: 800
+    lineHeight: 1.05
+    fontFeature: "tnum"
+  plan-title:
+    fontFamily: "Figtree, ui-sans-serif, system-ui, sans-serif"
+    fontSize: "1.75rem"
+    fontWeight: 800
+    lineHeight: 1.15
+  plan-headline:
+    fontFamily: "Figtree, ui-sans-serif, system-ui, sans-serif"
+    fontSize: "1.375rem"
+    fontWeight: 800
+    lineHeight: 1.2
+  plan-section:
+    fontFamily: "Figtree, ui-sans-serif, system-ui, sans-serif"
+    fontSize: "1.125rem"
+    fontWeight: 700
+    lineHeight: 1.3
+  plan-question:
+    fontFamily: "Figtree, ui-sans-serif, system-ui, sans-serif"
+    fontSize: "1.25rem"
+    fontWeight: 500
+    lineHeight: 1.4
+  plan-body:
     fontFamily: "Figtree, ui-sans-serif, system-ui, sans-serif"
     fontSize: "1rem"
-    fontWeight: 800
-  album-label:
+    fontWeight: 400
+  plan-support:
     fontFamily: "Figtree, ui-sans-serif, system-ui, sans-serif"
-    fontSize: "0.75rem"
+    fontSize: "0.875rem"
+    fontWeight: 600
+    lineHeight: 1.4
+  plan-meta:
+    fontFamily: "Figtree, ui-sans-serif, system-ui, sans-serif"
+    fontSize: "0.8125rem"
     fontWeight: 700
   notebook-display:
     fontFamily: "Source Serif 4, Georgia, serif"
@@ -90,59 +89,72 @@ typography:
     fontFamily: "Public Sans, ui-sans-serif, system-ui, sans-serif"
     fontWeight: 400
 rounded:
-  album-sm: "8px"
-  album-sticker: "10px"
-  album-md: "12px"
-  album-hero: "14px"
-  album-lg: "16px"
-  album-xl: "20px"
-  album-pill: "999px"
+  plan-sm: "8px"
+  plan-md: "12px"
+  plan-lg: "16px"
+  plan-pill: "999px"
   notebook-sm: "2px"
   notebook-md: "3px"
   notebook-lg: "4px"
 spacing:
-  album-grid-gap: "9px"
-  album-page: "20px"
-  album-touch: "44px"
+  plan-gutter: "16px"
+  plan-card: "20px"
+  plan-stack: "24px"
+  plan-touch: "44px"
+  plan-row: "64px"
   notebook-cell: "20px"
 components:
-  album-button-primary:
-    backgroundColor: "{colors.album-sticker}"
-    textColor: "{colors.album-ink}"
-    rounded: "{rounded.album-md}"
-    padding: "0.625rem 1.5rem"
+  plan-button-primary:
+    backgroundColor: "{colors.plan-sticker}"
+    textColor: "{colors.plan-ink}"
+    typography: "{typography.plan-body}"
+    rounded: "{rounded.plan-md}"
+    padding: "0.625rem 1.25rem"
     height: "3rem"
-  album-button-primary-hover:
-    backgroundColor: "{colors.album-sticker-hover}"
-    textColor: "{colors.album-ink}"
-  album-button-hero:
-    backgroundColor: "{colors.album-sticker}"
-    textColor: "{colors.album-ink}"
-    typography: "{typography.album-button}"
-    rounded: "{rounded.album-hero}"
-    padding: "14px"
-  album-button-secondary:
-    backgroundColor: "{colors.album-paper}"
-    textColor: "{colors.album-ink}"
-    rounded: "{rounded.album-md}"
-    padding: "0.625rem 1.5rem"
+  plan-button-primary-hover:
+    backgroundColor: "{colors.plan-sticker-hover}"
+    textColor: "{colors.plan-ink}"
+  plan-button-secondary:
+    backgroundColor: "{colors.plan-paper}"
+    textColor: "{colors.plan-ink}"
+    rounded: "{rounded.plan-md}"
+    padding: "0.625rem 1.25rem"
     height: "3rem"
-  album-sticker-next:
-    backgroundColor: "{colors.album-paper}"
-    textColor: "{colors.album-ink}"
-    typography: "{typography.album-sticker-number}"
-    rounded: "{rounded.album-sticker}"
-    padding: "7px 8px"
-  album-solve-option:
-    backgroundColor: "{colors.album-desk}"
-    textColor: "{colors.album-ink}"
-    rounded: "{rounded.album-md}"
+  plan-button-secondary-hover:
+    backgroundColor: "{colors.plan-card-hover}"
+  plan-next-card:
+    backgroundColor: "{colors.plan-pitch}"
+    textColor: "{colors.plan-paper}"
+    rounded: "{rounded.plan-lg}"
+    padding: "20px"
+  plan-list-row:
+    backgroundColor: "{colors.plan-paper}"
+    textColor: "{colors.plan-ink}"
+    rounded: "{rounded.plan-lg}"
+    padding: "0.875rem 1rem"
+    height: "{spacing.plan-row}"
+  plan-next-tag:
+    backgroundColor: "{colors.plan-sticker}"
+    textColor: "{colors.plan-ink}"
+    typography: "{typography.plan-meta}"
+    rounded: "{rounded.plan-pill}"
+    padding: "0.125rem 0.5rem"
+  plan-area-chip:
+    backgroundColor: "{colors.plan-paper}"
+    textColor: "{colors.plan-ink}"
+    rounded: "{rounded.plan-pill}"
+    padding: "0 1rem"
+    height: "2.75rem"
+  plan-solve-option:
+    backgroundColor: "{colors.plan-desk}"
+    textColor: "{colors.plan-ink}"
+    rounded: "{rounded.plan-md}"
     padding: "12px 14px"
     height: "56px"
-  album-ask-chip:
-    backgroundColor: "{colors.album-paper}"
-    textColor: "{colors.album-ink}"
-    rounded: "11px"
+  plan-ask-chip:
+    backgroundColor: "{colors.plan-paper}"
+    textColor: "{colors.plan-ink}"
+    rounded: "{rounded.plan-md}"
     padding: "13px 15px"
   notebook-button-primary:
     backgroundColor: "{colors.notebook-pen}"
@@ -152,7 +164,7 @@ components:
 
 # Aprendo — DESIGN.md
 
-> Two systems coexist, chosen per route by `lib/student-look.ts`, which sets `data-look` on `<html>`. Student screens (Hoy, Aprende, Retos, Yo, lessons, practice, placement, duel, `/join`, `/cuenta`) use **Álbum**, the second half of this file. Teacher, school, staff, public and print use **Cuaderno cuadriculado**, the first half. Passages in the notebook half that mention students (solve and review, button sizes) predate Álbum; on a student's screen, Álbum governs.
+> Two systems coexist, chosen per route by `lib/student-look.ts`, which sets `data-look` on `<html>`. Student screens (Hoy, Aprende, Retos, Yo, lessons, practice, placement, duel, `/join`, `/cuenta`) use **Plan de estudio**, the second half of this file; it replaced Álbum on 2026-11-10. Teacher, school, staff, public and print use **Cuaderno cuadriculado**, the first half. Passages in the notebook half that mention students (solve and review, button sizes) predate the student look; on a student's screen, Plan de estudio governs.
 
 # Cuaderno cuadriculado: teacher, school, staff, public and print
 
@@ -311,155 +323,148 @@ Changing the tokens or fonts means changing both and bumping `PROMPT_VERSION`.
 
 ---
 
-# Álbum: student screens
+# Plan de estudio: student screens
 
-Implementation: `apps/web/src/student.css`, scoped to `html[data-look='student']` and to `@media screen`, so a printed student report stays on the notebook. Components the Álbum does not restyle inherit structure from `styles.css` with these tokens swapped in. Where this section and the CSS disagree, the CSS is what ships.
+Implementation: `apps/web/src/student.css`, scoped to `html[data-look='student']` and to `@media screen`, so a printed student report stays on the notebook. Components it does not restyle inherit structure from `styles.css` with these tokens swapped in. Where this section and the CSS disagree, the CSS is what ships.
 
 ## Overview
 
-**Creative North Star: "The Sticker You Were Missing"**
+**Creative North Star: "Plan de estudio"**
 
-Every topic mastered is a numbered slot filled on an area's page. Progress is a page filling up, not a percentage and not a winding lesson path. The screen is a full field of the area's colour, white sheets for work, near-black green ink, and one yellow button that goes and gets the next sticker.
+Every screen answers three things in words: what to do now, why, and how each topic is going. Hoy is a plan, not a game board: a green card with the next step and its reason, one yellow button, then the rest of the day and the five areas with their level and bar. Aprende lists every topic of an area with its level and accuracy. Progress is named, never a numbered slot.
 
-Density is low and the phone comes first: one thing to do, large names and numbers, thumb-sized targets. The register is young and credible, for students of 15 and 16 in short sessions and mixed light.
+Density is low and the phone comes first: white cards on a pale green desk, one family of type, flat controls that answer a press with a small scale. The register is calm and credible, for students of 15 to 17 in short sessions and mixed light. It replaced the Álbum (sticker album) on 2026-11-10 because the metaphor read as unclear and decorative.
 
-**Review status.** This section records what the code ships. The student surface has not yet been reviewed rendered against live data, so empty, long-label and full-album states are unconfirmed on screen, and values here may move after that review. The 33 subtopic sticker pictures are simple provisional SVG glyphs.
+**Review status.** This section records what the code ships. Signed-in screens were reviewed from component renders with fictional data, not live data; solve, review and Yo were not captured. Empty, long-label and real-volume states are unconfirmed on screen, and values may move after a live review.
 
 **Key Characteristics:**
-- Full fields of per-area colour with white type.
-- Numbered slots, on a four-column page on the phone and six on desktop.
-- Yellow means the thing to go and get.
-- Anton for names and numbers, Figtree for everything read.
-- A physical press on the primary button, and one authored landing.
+- White cards on a pale green desk, 1px hairlines, 16px corners.
+- Pitch green for the next-step card and the cover bars; one colour per area for its header band, dot and bar.
+- Sticker yellow for the one primary action and the "Siguiente" tag.
+- Figtree alone, 400 to 800, on seven type steps.
+- Flat controls; a press is scale 0.97. One authored moment: the level-up flash on the reward.
 
 ## Colors
 
-Saturated fields, white sheets, and one yellow that does the pulling. Dark mode turns the sheets to deep green and keeps the fields and the yellow.
+A quiet green-white page with two saturated voices: pitch green for "this is your plan" and yellow for "do this".
 
 ### Primary
-- **Pitch Green** (#097d52): the default field, the cover bars, links and accents. Hover deepens to Pitch Green Deep (#076a45). Text-sized green on a sheet uses Green Ink (#08704a).
-- **Sticker Yellow** (#ffd23f): the primary action, the next sticker's outline, done progress beads, and what is the student's own (their row in the league, a chosen avatar part). Hover lifts to #ffdb66; its press edge is #c79a12.
+- **Pitch Green** (#097d52): the next-step card on Hoy, the Yo cover, the duel bar, links and accents. Hover deepens to Pitch Green Deep (#076a45). Text-sized green on white uses Green Ink (#08704a); success text is #075f3f.
+- **Sticker Yellow** (#ffd23f): the primary action (hover and press #ffdb66) and the "Siguiente" tag on the current topic. It also marks, without being pressable: a 16% tint on the current topic row, done progress beads in solve, today in the first week, the hint panel at 30%, and what is the student's own (their league row, portrait ground, medal icons, a chosen avatar part).
 
 ### Secondary
-Area fields, set on the page as `--field`. White text on each measures 4.98:1 or better.
+Area colours, set on an element as `--area` (in solve, `--field`). White text on each reads at 4.5:1 or better. They do not change in dark mode.
 - **Lectura Red** (#c2342a), **Matemáticas Green** (#097d52), **Ciencias Blue** (#0a6fb0), **Sociales Amber** (#b4540a), **Inglés Magenta** (#b3257a).
-
-### Tertiary
-- **Sky** (#8fe3ff) and **Coral** (#ff8a5c): earned sticker tones, cycling with yellow and white by sticker number. Tone carries no meaning.
-- **Next Mark** (#d7361f): the picture on the next sticker only.
 
 ### Neutral
 - **Green Black** (#10231c): text, the text on yellow, and the guided-question panel.
-- **Secondary and Tertiary Text** (#3c5148, #52665d): supporting lines and quiet labels.
-- **Paper** (#ffffff): work sheets and cards. **Desk** (#eef5f1): the page behind sheets and resting answer options. **Inset** (#eaf2ee): empty wells. **Rule** (#d6e5dd): the few hairlines left.
+- **Secondary and Tertiary Text** (#3c5148, #52665d): reasons and supporting lines; meta, counts, empty topics.
+- **Paper** (#ffffff): cards, sheets, the solve page. **Card Hover** (#f4f9f6). **Desk** (#eef5f1): the page behind cards and resting answer options. **Inset** (#eaf2ee): bar tracks, pressed rows, idle day cells.
+- **Hairline** (rgba(16, 35, 28, 0.13)): card edges and row dividers. **Strong Hairline** (rgba(16, 35, 28, 0.24)): secondary buttons, area chips. **Rule** (#d6e5dd): the solve footer and verdict tops.
 - **Correction Red** (#c8321f), with text #a31d10 on soft #ffe6e2: a wrong answer and errors.
-- **Dark:** paper #12201a, card #17281f, desk #0b1511, ink #e9f3ee, cover #0a5f40, green accent #62d2a2, red #f0796a. Area fields do not change.
+- **Dark:** paper #12201a, card #17281f, desk #0b1511, ink #e9f3ee, cover #0a5f40, green accent #62d2a2, red #f0796a; hairlines turn to ink at 14% and 28%. Yellow and area colours do not change.
 
 ### Named Rules
-**The Field Rule.** An area owns the whole field in its colour, and every word on a field is white. A new area colour must hold 4.5:1 against white.
+**The One Yellow Rule.** One yellow control per screen: the primary action. Every other yellow is a mark that is never pressed.
 
-**The Earned Colour Rule.** A filled sticker means earned, and nothing else fills a slot. An empty slot shows only its number, on a darker shade of the field.
+**The Area Rule.** An area's colour appears in three places only: the header band, the dot before its name, and its bar. Words on a band are white. A new area colour must hold 4.5:1 against white.
 
 ## Typography
 
-**Display Font:** Anton (with Arial Narrow, sans-serif)
-**Body Font:** Figtree (with ui-sans-serif, system-ui, sans-serif)
+**Body Font:** Figtree (with ui-sans-serif, system-ui, sans-serif), loaded 400 to 800.
 
-**Character:** A loud poster condensed for names and numbers, against a friendly geometric sans that does the reading.
+**Character:** One friendly geometric sans; weight and size carry the hierarchy, so names, numbers and sentences read as one voice.
 
 ### Hierarchy
-- **Numeral** (400, clamp(4.5rem, 22vw, 6.5rem), 0.95): XP on the reward screen.
-- **Hero** (400, clamp(2.75rem, 13vw, 3.25rem), 1): the area name on a field. Lesson and Aprende names sit close to it.
-- **Headline** (400, clamp(1.625rem, 8vw, 2rem), 1.05): the guided question.
-- **Button** (400, 29px on Hoy, 1.375rem to 1.625rem elsewhere, 1.05): the primary action's name.
-- **Sticker Number** (400, 22px, 1): slots and option letters at nearby sizes, all tabular.
-- **Question** (Figtree 600, 1.3125rem, 1.32): a short stem, dropping to 500 at 1.0625rem and 1.5 when long; both follow the student's text-size setting.
-- **Title** (Figtree 800, 1rem): small headings and task names. Every `h3` is Figtree.
-- **Label** (Figtree 700, 0.75rem): tab labels. Supporting lines are 0.875rem to 0.9375rem at 600 or 700.
+- **Score** (800, 2.25rem, 1.05, tabular): the duel scoreboard only.
+- **Title** (800, 1.75rem, 1.15): the page title, "Hola, <name>", the area name on its band, the lesson and Yo names, the reward score.
+- **Headline** (800, 1.375rem, 1.2): the next step's title, the guided prompt (700), the verdict, the league title.
+- **Section** (700, 1.125rem, 1.3): section titles ("Tu siguiente paso", "Tus áreas"), reto names (800), topic names on the reward, the primary button on Hoy, solve and reward.
+- **Question** (500, 1.25rem, 1.4): a short stem; a long one drops to 400 at 1.0625rem and 1.55. Both follow the student's text-size setting. Options are 700 at 1.0625rem.
+- **Body** (400, 1rem): reasons and prose, within 60 to 65ch. List-row titles and button labels are 700 at this size.
+- **Support** (600, 0.875rem, 1.4): status facts, notes, the MasteryBadge word, row subtitles.
+- **Meta** (700, 0.8125rem): tab labels, task area and minutes, the "Siguiente" tag (800), area level.
 
-Figtree loads from 500 up, so a 400 request renders at 500. Prose stays within 65ch. Counts use tabular figures.
+The seven steps are tokens (`--text-xs` 0.8125rem to `--text-2xl` 2.25rem); the question size is the one size outside them. Counts and scores use tabular figures. Text wraps with `balance` on titles and `pretty` on prose.
 
 ### Named Rules
-**The Names and Numbers Rule.** Anton sets names, numbers and the words on the main button, always at 400. Anything read as a sentence is Figtree.
+**The One Family Rule.** Figtree sets everything on a student screen, at 400 to 800. Hierarchy comes from the seven steps and weight, never from a second face, tracking or uppercase.
 
 ## Layout
 
-Phone first, with one breakpoint at 780/781px. On the phone, Hoy and the reward run edge to edge with no top bar, above four tabs (Hoy, Aprende, Retos, Yo). The album page is four columns with a 9px gap and rows of clamp(5.5rem, 19dvh, 9.5rem), so the page fills the field.
+Phone first, one breakpoint at 780/781px. On the phone, tab screens sit in a 16px gutter with 20px above, over four tabs (Hoy, Aprende, Retos, Yo); solve and review run edge to edge.
 
-From 781px the album is six columns with 9rem rows, Hoy gains a 22rem side column, and the reward becomes a centred 40rem card. Reading and working columns cap at 44rem. Solve is a field bar, a white sheet, and a bottom dock capped at 62dvh. Safe-area insets are respected at every screen edge.
+Hoy is one column on the phone and, from 781px, a main column beside a 22rem side column (first week, "Tus áreas", join), capped at 68rem. Aprende, Retos and lessons cap at 44rem, Yo at 46rem, the reward card and Cuenta at 40rem. The primary button is full width on the phone and starts at the left, at least 14rem, on desktop.
 
-Interactive targets are at least 44px, and inputs are 16px so iOS does not zoom.
+Rhythm: 24px between sections on Hoy, 16px on Aprende and Retos, 20px inside cards. List rows are at least 64px, reto tiles 80px. Solve is a field-coloured bar, a white sheet of 44rem, and a bottom dock capped at 62dvh. Safe-area insets are respected at every screen edge. Interactive targets are at least 44px, and inputs are 16px so iOS does not zoom.
 
 ## Elevation & Depth
 
-Flat fields and sheets, with depth used for two things: an object you can press, and the sticker you are after.
+Flat. Depth comes from a white card on the desk and a 1px hairline, not from shadows.
 
 ### Shadow Vocabulary
-- **Press Edge** (`box-shadow: 0 4px 0 #c79a12`, `0 5px 0` on hero buttons): the solid lower edge of a primary button. It collapses as the button travels down 3px to 4px.
-- **Next Lift** (`box-shadow: 0 10px 18px rgba(0,0,0,0.28)`): the next sticker only. The student's portrait carries a smaller lift.
-- **Float** (`--shadow-md`, `--shadow-lg`, green-tinted): menus, dialogs and sheets.
+- **Float** (`--shadow-md: 0 4px 14px rgba(16,35,28,0.12)`, `--shadow-lg: 0 12px 32px rgba(16,35,28,0.18)`): menus, dialogs and sheets only.
+- **Ring** (`box-shadow: inset 0 0 0 2px`): a state, not depth. The selected, wrong or correct answer option in ink, red or green; a marked question's count in yellow.
 
 ### Named Rules
-**The Press Edge Rule.** The solid edge belongs to the primary action, in a darker shade of that button's own colour. It is a key you push, chosen with the world, never a decorative offset.
-
-**The Next One Rule.** Only the next sticker lifts and tilts (-4deg). The student's own portrait may tilt (-3deg). Nothing else leans.
+**The Flat Press Rule.** Nothing rests on a shadow and nothing leans. A press is `scale(0.97)` at 100ms `cubic-bezier(0.23, 1, 0.32, 1)`, never a 3D edge or an offset shadow.
 
 ## Shapes
 
-Soft and object-like, in contrast to the notebook's near-square corners: 8px small, 12px controls, 16px sheets and fields on desktop, 10px stickers, 14px hero buttons, full pills for area filters, avatar options and medals. Slots are taller than wide, like a real sticker. A shiny sticker alone carries a 135deg gold gradient and a 2px inner edge.
+Soft and plain: 16px cards, lists, bands and sheets; 12px buttons, answer options and chips; 8px small cells and option letters; 10px row icons; full pills for area chips, the "Siguiente" tag, level-change tags and medals. Bars are 6px tall (8px on a band) with 3px ends. Lists are one rounded card with rows split by hairlines, not a stack of cards.
 
 ## Components
 
 ### Buttons
-Tactile: pressed, not hovered.
-- **Shape:** gently rounded (12px), 3rem tall, Figtree 800.
-- **Primary:** Sticker Yellow with Green Black text and the Press Edge. One per screen.
-- **Hero:** full-width on the phone, Anton topic name over a Figtree line of questions and minutes.
-- **Secondary:** card surface with a 2px strong border.
-- **Danger:** Correction Red with white text and an edge in its own darker shade.
-- **Hover / Focus:** hover only on fine pointers; on touch the same look comes from `:active`. Other controls press at scale 0.94 to 0.97.
+Flat and direct.
+- **Shape:** 12px, at least 3rem (3.25rem on Hoy and the reward, 52px in solve), Figtree 700.
+- **Primary:** Sticker Yellow with Green Black text, no border, no shadow. One per screen.
+- **Secondary:** card surface with a 1px strong hairline; hover and press to Card Hover.
+- **Danger:** Correction Red with white text.
+- **Hover / Focus:** hover only on fine pointers; on touch the same look comes from `:active`. Every press scales to 0.97.
 
-### Sticker
-- **Earned:** tone by number, number top left, picture bottom right.
-- **Empty:** the number on a darker field shade with a 2px inner outline.
-- **Next:** white, 4px yellow outline, picture in Next Mark, Next Lift, tilted and scaled 1.08. It already shows its picture before it is earned.
-- **Shiny:** gold gradient with a spark icon.
-- **Slot behaviour:** each slot links to its lesson and announces number, topic and state.
+### Lists and rows
+- **List:** one white card, 1px hairline, 16px corners; rows divided by hairlines.
+- **Row:** a 40px soft-green icon tile, a 700 title, a secondary line, meta (area dot and minutes), a chevron. Press to Inset.
+
+### Next-step card
+Pitch Green, 16px, 20px padding: the task title (Headline), its reason, area and minutes in white, then the yellow primary.
+
+### Area band and area rows
+- **Band (Aprende, lesson cover):** the area colour, white Title, a level pill at 20% white, a white bar on a 22% black track, and the count.
+- **Area row (Hoy):** dot, name, level word, a 6px bar in the area colour, "n de m temas en Competente o más".
+- **Area chips:** pills with the area dot; the chosen one fills with its area colour and white text.
+
+### Topic row and MasteryBadge
+Each topic shows its name, its MasteryBadge (a four-bar signal meter and the level word at 600), and its evidence (accuracy) when there is any. The current topic carries the "Siguiente" tag and a light yellow tint. The row's action is a quiet green text button; the level is what the row is about.
 
 ### Answer Options
-- **Style:** Desk background, no border, 12px corners, at least 56px, Figtree 700. The letter sits in a 32px Anton tile.
-- **Selected:** paper with a 2px inner ink ring; the letter tile inverts.
-- **Wrong / Correct:** soft red or green with a 2px inner ring; wrong shakes for 260ms, the correct letter pops for 240ms.
-- **Eliminated:** 2px line-through at 60% opacity.
+Desk background, no border, 12px corners, at least 56px, Figtree 700, the letter in a 32px white tile. Selected: paper with a 2px ink ring, the tile inverts. Wrong and correct: soft red or green with a 2px ring; wrong shakes 260ms, the correct letter pops 240ms. Eliminated: 2px line-through at 60%.
 
-### Guided Question
-Near-black panel under the question after a wrong answer. Anton prompt, full-width white chips (11px corners) that flash yellow on press, underlined text links. Never shows the correct option.
+### Guided question
+A Green Black panel under the question after a wrong answer: a Headline prompt, full-width white chips (12px) that turn yellow on press, underlined links, and a yellow "go". Never shows the correct option.
 
 ### Navigation
-Four tabs with icons, 0.75rem labels at 700; the active tab takes Green Ink and a 22% icon fill. In solve, a field-coloured bar holds progress beads (yellow done, white current), or one continuous track past 15 questions, and the number slot.
+Four tabs with icons, 0.8125rem labels at 700; the active tab takes Green Ink and a 22% icon fill. In solve, a bar in the area colour holds the back button, progress beads (yellow done, white current; one track past 15 questions), the clock and the "3/10" count.
 
 ### Reward
-Field-coloured close: XP numeral, streak, the area's page with the new sticker landing, then a white sheet of medals, topic changes and the score last.
+A white card: the score as a Title, the topics that moved (each with its MasteryBadge, a green "Subiste" or grey "Bajó" pill and a note), then what was earned as plain facts, then the yellow primary.
 
-**The One Landing Rule.** The sticker dropping into its slot (spring, 0.7s, after 0.8s) is the only celebration, and it plays once on a fresh close. Under reduced motion it fades, and the XP count-up shows its number at once.
-
-### League
-A card of neighbouring rows: rank, avatar, nickname, XP gap. The student's row is Sticker Yellow. Other students show a gap, never a score.
-
-### Portrait
-A layered SVG avatar on a yellow sticker, used as the Yo cover and at small size in the league.
+**The One Moment Rule.** A topic that went up on a fresh close settles in once: its row flashes from 55% yellow to soft green (520ms, after 250ms). It is the only celebration. Under reduced motion it does not play, and no press scales; colour changes stay.
 
 ## Do's and Don'ts
 
 ### Do:
-- **Do** set every student screen through the Álbum tokens, and add new student routes to `lib/student-look.ts`.
-- **Do** give each screen one yellow primary action.
-- **Do** use 100ms strong ease-out for presses and 140ms for colour, and remove transforms under reduced motion.
-- **Do** write the next step as a name ("Te falta Proporciones") with its cost in questions and minutes.
+- **Do** set every student screen through these tokens, and add new student routes to `lib/student-look.ts`.
+- **Do** give each screen one yellow primary action, and write the next step as a name with its reason, area and minutes.
+- **Do** show every topic in a topic list with its MasteryBadge.
+- **Do** use the area colour only as band, dot and bar, through `--area`.
+- **Do** use 100ms strong ease-out for presses and 140ms for colour, and remove transforms and the level-up flash under reduced motion.
 
 ### Don't:
-- **Don't** bring the Álbum to teacher, school, staff, public or printed screens.
-- **Don't** bring the notebook's ruling or red margin to student screens; the sheet background is removed on purpose.
-- **Don't** draw student progress as percentage dashboards or a winding path; it is slots on a page.
-- **Don't** copy the kicker lines above a heading or the neutral press edges on secondary controls, tiles and non-solve options. They ship today and are not part of this system.
-- **Don't** hardcode the yellow, its edge or the ink where a token exists.
+- **Don't** show a numbered slot, sticker or tile without a name; progress is written in words.
+- **Don't** make decoration look interactive: status facts on Hoy are plain icon and text, never pills or buttons.
+- **Don't** add a second yellow control to a screen, or tilts, 3D press edges or resting shadows.
+- **Don't** bring the notebook's ruling or red margin to student screens, or this look to teacher, school, staff, public or printed screens.
+- **Don't** add a label line above a heading; the heading speaks.
+- **Don't** hardcode the yellow, the ink or the area colours where a token exists.

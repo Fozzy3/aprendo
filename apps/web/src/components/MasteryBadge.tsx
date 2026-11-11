@@ -37,7 +37,7 @@ function LevelMeter({ level }: { level: MasteryLevel }) {
 /** The level written beside its meter: a label, not a tag. */
 export function MasteryBadge({ level }: { level: MasteryLevel }) {
   return (
-    <span className="inline-flex shrink-0 items-center gap-1.5 text-xs text-[var(--text-secondary)]">
+    <span className="mastery-badge inline-flex shrink-0 items-center gap-1.5 text-xs text-[var(--text-secondary)]">
       <LevelMeter level={level} />
       {MASTERY_LEVEL_LABELS[level]}
     </span>

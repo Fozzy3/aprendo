@@ -15,7 +15,7 @@ function TodayRoutePage() {
 
   return (
     <StudentAppShell session={guard.session} activeSection="today">
-      <TodayPage studentId={guard.session.studentId} />
+      <TodayPage studentId={guard.session.studentId} name={guard.session.name} />
     </StudentAppShell>
   )
 }

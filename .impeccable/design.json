@@ -1,12 +1,12 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-11-09T04:27:32.083864+00:00",
+  "generatedAt": "2026-11-11T03:08:49.666164+00:00",
   "title": "Design System: Aprendo",
   "extensions": {
     "colorMeta": {
-      "album-pitch": {
+      "plan-pitch": {
         "role": "primary",
-        "displayName": "Álbum Pitch",
+        "displayName": "Pitch Green",
         "canonical": "#097d52",
         "tonalRamp": [
           "#001600",
@@ -19,9 +19,9 @@
           "#a7ffd4"
         ]
       },
-      "album-pitch-deep": {
+      "plan-pitch-deep": {
         "role": "primary",
-        "displayName": "Álbum Pitch Deep",
+        "displayName": "Pitch Green Deep",
         "canonical": "#076a45",
         "tonalRamp": [
           "#001500",
@@ -34,9 +34,9 @@
           "#b0ffd7"
         ]
       },
-      "album-green-ink": {
+      "plan-green-ink": {
         "role": "primary",
-        "displayName": "Álbum Green Ink",
+        "displayName": "Green Ink",
         "canonical": "#08704a",
         "tonalRamp": [
           "#001500",
@@ -49,9 +49,24 @@
           "#adffd7"
         ]
       },
-      "album-sticker": {
+      "plan-success-text": {
         "role": "primary",
-        "displayName": "Álbum Sticker",
+        "displayName": "Success Text",
+        "canonical": "#075f3f",
+        "tonalRamp": [
+          "#001501",
+          "#003215",
+          "#005032",
+          "#247150",
+          "#499470",
+          "#6db792",
+          "#91dcb6",
+          "#b6ffdb"
+        ]
+      },
+      "plan-sticker": {
+        "role": "primary",
+        "displayName": "Sticker Yellow",
         "canonical": "#ffd23f",
         "tonalRamp": [
           "#1e0100",
@@ -64,9 +79,9 @@
           "#ffeb83"
         ]
       },
-      "album-sticker-hover": {
+      "plan-sticker-hover": {
         "role": "primary",
-        "displayName": "Álbum Sticker Hover",
+        "displayName": "Sticker Yellow Hover",
         "canonical": "#ffdb66",
         "tonalRamp": [
           "#1e0200",
@@ -79,69 +94,9 @@
           "#ffec83"
         ]
       },
-      "album-sticker-edge": {
-        "role": "primary",
-        "displayName": "Álbum Sticker Edge",
-        "canonical": "#c79a12",
-        "tonalRamp": [
-          "#200000",
-          "#3f1a00",
-          "#5f3900",
-          "#815a00",
-          "#a47c00",
-          "#c89f33",
-          "#eec35c",
-          "#ffe983"
-        ]
-      },
-      "album-tone-sky": {
-        "role": "tertiary",
-        "displayName": "Álbum Tone Sky",
-        "canonical": "#8fe3ff",
-        "tonalRamp": [
-          "#000f25",
-          "#002d43",
-          "#004c63",
-          "#016c85",
-          "#388ea8",
-          "#5eb2cd",
-          "#83d7f3",
-          "#a9fdff"
-        ]
-      },
-      "album-tone-coral": {
-        "role": "tertiary",
-        "displayName": "Álbum Tone Coral",
-        "canonical": "#ff8a5c",
-        "tonalRamp": [
-          "#2f0000",
-          "#520000",
-          "#771f00",
-          "#9c421b",
-          "#c2643f",
-          "#e98762",
-          "#ffac85",
-          "#ffd1a9"
-        ]
-      },
-      "album-next-mark": {
-        "role": "tertiary",
-        "displayName": "Álbum Next Mark",
-        "canonical": "#d7361f",
-        "tonalRamp": [
-          "#300000",
-          "#540000",
-          "#781b0d",
-          "#9d3f2f",
-          "#c46150",
-          "#eb8471",
-          "#ffa894",
-          "#ffcdb8"
-        ]
-      },
-      "album-ink": {
+      "plan-ink": {
         "role": "neutral",
-        "displayName": "Álbum Ink",
+        "displayName": "Green Black",
         "canonical": "#10231c",
         "tonalRamp": [
           "#010f09",
@@ -154,9 +109,9 @@
           "#ddf5eb"
         ]
       },
-      "album-text-secondary": {
+      "plan-text-secondary": {
         "role": "neutral",
-        "displayName": "Álbum Text Secondary",
+        "displayName": "Secondary Text",
         "canonical": "#3c5148",
         "tonalRamp": [
           "#000f08",
@@ -169,9 +124,9 @@
           "#dcf5ea"
         ]
       },
-      "album-text-tertiary": {
+      "plan-text-tertiary": {
         "role": "neutral",
-        "displayName": "Álbum Text Tertiary",
+        "displayName": "Tertiary Text",
         "canonical": "#52665d",
         "tonalRamp": [
           "#010f08",
@@ -184,9 +139,9 @@
           "#def5ea"
         ]
       },
-      "album-graphite": {
+      "plan-graphite": {
         "role": "neutral",
-        "displayName": "Álbum Graphite",
+        "displayName": "Graphite",
         "canonical": "#4b5f57",
         "tonalRamp": [
           "#010f09",
@@ -199,9 +154,9 @@
           "#def5eb"
         ]
       },
-      "album-paper": {
+      "plan-paper": {
         "role": "neutral",
-        "displayName": "Álbum Paper",
+        "displayName": "Paper",
         "canonical": "#ffffff",
         "tonalRamp": [
           "#0b0b0b",
@@ -214,9 +169,24 @@
           "#eeeeee"
         ]
       },
-      "album-desk": {
+      "plan-card-hover": {
         "role": "neutral",
-        "displayName": "Álbum Desk",
+        "displayName": "Card Hover",
+        "canonical": "#f4f9f6",
+        "tonalRamp": [
+          "#090c0a",
+          "#222624",
+          "#3f4341",
+          "#5e6260",
+          "#7f8481",
+          "#a2a6a3",
+          "#c6cac8",
+          "#ebf0ed"
+        ]
+      },
+      "plan-desk": {
+        "role": "neutral",
+        "displayName": "Desk",
         "canonical": "#eef5f1",
         "tonalRamp": [
           "#080c0a",
@@ -229,9 +199,9 @@
           "#e9f0ec"
         ]
       },
-      "album-inset": {
+      "plan-inset": {
         "role": "neutral",
-        "displayName": "Álbum Inset",
+        "displayName": "Inset",
         "canonical": "#eaf2ee",
         "tonalRamp": [
           "#070d0a",
@@ -244,9 +214,9 @@
           "#e9f1ed"
         ]
       },
-      "album-rule": {
+      "plan-rule": {
         "role": "neutral",
-        "displayName": "Álbum Rule",
+        "displayName": "Rule",
         "canonical": "#d6e5dd",
         "tonalRamp": [
           "#040e09",
@@ -259,9 +229,39 @@
           "#e4f3eb"
         ]
       },
-      "album-red": {
+      "plan-hairline": {
         "role": "neutral",
-        "displayName": "Álbum Red",
+        "displayName": "Hairline",
+        "canonical": "rgba(16, 35, 28, 0.13)",
+        "tonalRamp": [
+          "#010f09",
+          "#162a22",
+          "#33473f",
+          "#52675e",
+          "#72887f",
+          "#94aba2",
+          "#b8d0c6",
+          "#ddf5eb"
+        ]
+      },
+      "plan-hairline-strong": {
+        "role": "neutral",
+        "displayName": "Strong Hairline",
+        "canonical": "rgba(16, 35, 28, 0.24)",
+        "tonalRamp": [
+          "#010f09",
+          "#162a22",
+          "#33473f",
+          "#52675e",
+          "#72887f",
+          "#94aba2",
+          "#b8d0c6",
+          "#ddf5eb"
+        ]
+      },
+      "plan-red": {
+        "role": "neutral",
+        "displayName": "Correction Red",
         "canonical": "#c8321f",
         "tonalRamp": [
           "#300000",
@@ -274,9 +274,9 @@
           "#ffcdb9"
         ]
       },
-      "album-red-text": {
+      "plan-red-text": {
         "role": "neutral",
-        "displayName": "Álbum Red Text",
+        "displayName": "Correction Red Text",
         "canonical": "#a31d10",
         "tonalRamp": [
           "#300000",
@@ -289,9 +289,9 @@
           "#ffcdba"
         ]
       },
-      "album-red-soft": {
+      "plan-red-soft": {
         "role": "neutral",
-        "displayName": "Álbum Red Soft",
+        "displayName": "Correction Red Soft",
         "canonical": "#ffe6e2",
         "tonalRamp": [
           "#150705",
@@ -304,9 +304,9 @@
           "#ffe8e4"
         ]
       },
-      "album-area-lectura": {
+      "plan-area-lectura": {
         "role": "secondary",
-        "displayName": "Álbum Area Lectura",
+        "displayName": "Lectura Red",
         "canonical": "#c2342a",
         "tonalRamp": [
           "#300000",
@@ -319,9 +319,9 @@
           "#ffcdbd"
         ]
       },
-      "album-area-matematicas": {
+      "plan-area-matematicas": {
         "role": "secondary",
-        "displayName": "Álbum Area Matematicas",
+        "displayName": "Matemáticas Green",
         "canonical": "#097d52",
         "tonalRamp": [
           "#001600",
@@ -334,9 +334,9 @@
           "#a7ffd4"
         ]
       },
-      "album-area-ciencias": {
+      "plan-area-ciencias": {
         "role": "secondary",
-        "displayName": "Álbum Area Ciencias",
+        "displayName": "Ciencias Blue",
         "canonical": "#0a6fb0",
         "tonalRamp": [
           "#00003d",
@@ -349,9 +349,9 @@
           "#a2f7ff"
         ]
       },
-      "album-area-sociales": {
+      "plan-area-sociales": {
         "role": "secondary",
-        "displayName": "Álbum Area Sociales",
+        "displayName": "Sociales Amber",
         "canonical": "#b4540a",
         "tonalRamp": [
           "#2e0000",
@@ -364,9 +364,9 @@
           "#ffd49f"
         ]
       },
-      "album-area-ingles": {
+      "plan-area-ingles": {
         "role": "secondary",
-        "displayName": "Álbum Area Ingles",
+        "displayName": "Inglés Magenta",
         "canonical": "#b3257a",
         "tonalRamp": [
           "#2a0013",
@@ -379,9 +379,9 @@
           "#ffcafc"
         ]
       },
-      "album-dark-paper": {
+      "plan-dark-paper": {
         "role": "neutral",
-        "displayName": "Álbum Dark Paper",
+        "displayName": "Dark Paper",
         "canonical": "#12201a",
         "tonalRamp": [
           "#030e09",
@@ -394,9 +394,9 @@
           "#e1f4eb"
         ]
       },
-      "album-dark-card": {
+      "plan-dark-card": {
         "role": "neutral",
-        "displayName": "Álbum Dark Card",
+        "displayName": "Dark Card",
         "canonical": "#17281f",
         "tonalRamp": [
           "#020f07",
@@ -409,9 +409,9 @@
           "#dff5e8"
         ]
       },
-      "album-dark-desk": {
+      "plan-dark-desk": {
         "role": "neutral",
-        "displayName": "Álbum Dark Desk",
+        "displayName": "Dark Desk",
         "canonical": "#0b1511",
         "tonalRamp": [
           "#050d0a",
@@ -424,9 +424,9 @@
           "#e4f2ec"
         ]
       },
-      "album-dark-ink": {
+      "plan-dark-ink": {
         "role": "neutral",
-        "displayName": "Álbum Dark Ink",
+        "displayName": "Dark Ink",
         "canonical": "#e9f3ee",
         "tonalRamp": [
           "#070d0a",
@@ -439,9 +439,9 @@
           "#e7f1ec"
         ]
       },
-      "album-dark-cover": {
-        "role": "neutral",
-        "displayName": "Álbum Dark Cover",
+      "plan-dark-cover": {
+        "role": "primary",
+        "displayName": "Dark Cover",
         "canonical": "#0a5f40",
         "tonalRamp": [
           "#001501",
@@ -454,9 +454,9 @@
           "#b7ffdc"
         ]
       },
-      "album-dark-brand": {
-        "role": "neutral",
-        "displayName": "Álbum Dark Brand",
+      "plan-dark-brand": {
+        "role": "primary",
+        "displayName": "Dark Green Accent",
         "canonical": "#62d2a2",
         "tonalRamp": [
           "#001700",
@@ -469,9 +469,9 @@
           "#9affd7"
         ]
       },
-      "album-dark-red": {
+      "plan-dark-red": {
         "role": "neutral",
-        "displayName": "Álbum Dark Red",
+        "displayName": "Dark Correction Red",
         "canonical": "#f0796a",
         "tonalRamp": [
           "#300000",
@@ -606,37 +606,37 @@
       }
     },
     "typographyMeta": {
-      "album-hero": {
-        "displayName": "Álbum Hero",
-        "purpose": "Area name on a field."
+      "plan-score": {
+        "displayName": "Score",
+        "purpose": "The duel scoreboard only."
       },
-      "album-numeral": {
-        "displayName": "Álbum Numeral",
-        "purpose": "XP on the reward screen."
+      "plan-title": {
+        "displayName": "Title",
+        "purpose": "Page title, greeting, area band name, lesson and Yo names, reward score."
       },
-      "album-headline": {
-        "displayName": "Álbum Headline",
-        "purpose": "The guided question."
+      "plan-headline": {
+        "displayName": "Headline",
+        "purpose": "Next-step title, guided prompt, verdict, league title."
       },
-      "album-button": {
-        "displayName": "Álbum Button",
-        "purpose": "Name of the primary action."
+      "plan-section": {
+        "displayName": "Section",
+        "purpose": "Section titles, reto names, primary button on Hoy, solve and reward."
       },
-      "album-sticker-number": {
-        "displayName": "Álbum Sticker Number",
-        "purpose": "Slot numbers."
+      "plan-question": {
+        "displayName": "Question",
+        "purpose": "A short question stem, scaled by the student text-size setting."
       },
-      "album-question": {
-        "displayName": "Álbum Question",
-        "purpose": "Short question stem."
+      "plan-body": {
+        "displayName": "Body",
+        "purpose": "Reasons and prose; row titles and button labels at 700."
       },
-      "album-title": {
-        "displayName": "Álbum Title",
-        "purpose": "Small headings and task names."
+      "plan-support": {
+        "displayName": "Support",
+        "purpose": "Status facts, notes, the MasteryBadge word, row subtitles."
       },
-      "album-label": {
-        "displayName": "Álbum Label",
-        "purpose": "Tab labels."
+      "plan-meta": {
+        "displayName": "Meta",
+        "purpose": "Tab labels, task area and minutes, the Siguiente tag, area level."
       },
       "notebook-display": {
         "displayName": "Cuaderno Display",
@@ -649,24 +649,19 @@
     },
     "shadows": [
       {
-        "name": "album-press-edge",
-        "value": "0 4px 0 #c79a12",
-        "purpose": "Lower edge of a primary button; 0 5px 0 on hero buttons."
-      },
-      {
-        "name": "album-next-lift",
-        "value": "0 10px 18px rgba(0,0,0,0.28)",
-        "purpose": "The next sticker only."
-      },
-      {
-        "name": "album-float-md",
+        "name": "plan-float-md",
         "value": "0 4px 14px rgba(16,35,28,0.12)",
-        "purpose": "Menus."
+        "purpose": "Menus only; dark 0 4px 14px rgba(0,0,0,0.4)."
       },
       {
-        "name": "album-float-lg",
+        "name": "plan-float-lg",
         "value": "0 12px 32px rgba(16,35,28,0.18)",
-        "purpose": "Dialogs and sheets."
+        "purpose": "Dialogs and sheets only; dark 0 12px 32px rgba(0,0,0,0.5)."
+      },
+      {
+        "name": "plan-ring",
+        "value": "inset 0 0 0 2px <state colour>",
+        "purpose": "State, not depth: selected, wrong or correct option; a marked question count in yellow."
       },
       {
         "name": "notebook-float-md",
@@ -681,86 +676,106 @@
     ],
     "motion": [
       {
-        "name": "album-ease-out-strong",
+        "name": "plan-ease-out-strong",
         "value": "cubic-bezier(0.23, 1, 0.32, 1)",
-        "purpose": "Presses, at 100ms."
+        "purpose": "Presses at 100ms, scale(0.97)."
       },
       {
-        "name": "album-colour",
+        "name": "plan-colour",
         "value": "140ms ease",
-        "purpose": "Colour and border changes."
+        "purpose": "Background and border changes."
       },
       {
-        "name": "album-landing",
-        "value": "spring, duration 0.7s, bounce 0.3, delay 0.8s",
-        "purpose": "The sticker landing on a fresh reward."
+        "name": "plan-level-up",
+        "value": "520ms cubic-bezier(0.23, 1, 0.32, 1) 250ms backwards",
+        "purpose": "A topic that went up on a fresh reward: flash from 55% yellow to soft green. The one celebration."
       },
       {
-        "name": "album-wrong",
+        "name": "plan-wrong",
         "value": "260ms shake",
-        "purpose": "A wrong answer."
+        "purpose": "A wrong answer option."
       },
       {
-        "name": "album-correct",
+        "name": "plan-correct",
         "value": "240ms pop",
-        "purpose": "The correct letter."
+        "purpose": "The correct option letter."
+      },
+      {
+        "name": "plan-reduced-motion",
+        "value": "prefers-reduced-motion: reduce",
+        "purpose": "Removes press scale, shake, pop and the level-up flash; colour changes stay."
       }
     ],
     "breakpoints": [
       {
-        "name": "album-desktop",
+        "name": "plan-desktop",
         "value": "781px"
       }
     ]
   },
   "components": [
     {
-      "name": "Álbum Primary Button",
+      "name": "Primary Button",
       "kind": "button",
-      "refersTo": "album-button-primary",
-      "description": "The one yellow action on a student screen.",
-      "html": "<button class=\"ds-primary\">Empezar</button>",
-      "css": ".ds-primary{font-family:Figtree,sans-serif;min-height:3rem;padding:.625rem 1.5rem;font-size:1rem;font-weight:800;background:#ffd23f;color:#10231c;border:0;border-radius:12px;box-shadow:0 4px 0 #c79a12;cursor:pointer;transition:transform 100ms cubic-bezier(.23,1,.32,1),box-shadow 100ms cubic-bezier(.23,1,.32,1),background-color 140ms ease}.ds-primary:hover{background:#ffdb66}.ds-primary:focus-visible{outline:2px solid #097d52;outline-offset:3px}.ds-primary:active{transform:translateY(3px);box-shadow:0 1px 0 #c79a12;background:#ffdb66}"
+      "refersTo": "plan-button-primary",
+      "description": "The one yellow action per screen.",
+      "html": "<button class=\"ds-btn-primary\">Empezar</button>",
+      "css": ".ds-btn-primary{font-family:Figtree,ui-sans-serif,system-ui,sans-serif;min-height:3rem;padding:.625rem 1.25rem;font-size:1rem;font-weight:700;background:#ffd23f;color:#10231c;border:0;border-radius:12px;cursor:pointer;transition:transform 100ms cubic-bezier(0.23,1,0.32,1),background-color 140ms ease;}.ds-btn-primary:hover{background:#ffdb66}.ds-btn-primary:active{transform:scale(0.97);background:#ffdb66}.ds-btn-primary:focus-visible{outline:2px solid #097d52;outline-offset:2px}"
     },
     {
-      "name": "Álbum Hero Button",
+      "name": "Secondary Button",
       "kind": "button",
-      "refersTo": "album-button-hero",
-      "description": "Names the missing sticker and its cost on Hoy.",
-      "html": "<button class=\"ds-hero\"><span>Te falta Proporciones</span><small>Consíguela · 5 preguntas · 5 min</small></button>",
-      "css": ".ds-hero{display:flex;flex-direction:column;align-items:center;gap:5px;width:100%;padding:14px;border:0;border-radius:14px;background:#ffd23f;color:#10231c;box-shadow:0 5px 0 #c79a12;cursor:pointer;transition:transform 100ms cubic-bezier(.23,1,.32,1),box-shadow 100ms cubic-bezier(.23,1,.32,1)}.ds-hero span{font-family:Anton,\"Arial Narrow\",sans-serif;font-weight:400;font-size:29px;line-height:1.05}.ds-hero small{font-family:Figtree,sans-serif;font-size:14px;font-weight:700}.ds-hero:hover{background:#ffdb66}.ds-hero:focus-visible{outline:2px solid #097d52;outline-offset:3px}.ds-hero:active{transform:translateY(3px);box-shadow:0 1px 0 #c79a12}"
+      "refersTo": "plan-button-secondary",
+      "description": "Card surface with a strong hairline.",
+      "html": "<button class=\"ds-btn-secondary\">Ver temas</button>",
+      "css": ".ds-btn-secondary{font-family:Figtree,ui-sans-serif,system-ui,sans-serif;min-height:3rem;padding:.625rem 1.25rem;font-size:1rem;font-weight:700;background:#fff;color:#10231c;border:1px solid rgba(16,35,28,0.24);border-radius:12px;cursor:pointer;transition:transform 100ms cubic-bezier(0.23,1,0.32,1),background-color 140ms ease;}.ds-btn-secondary:hover{background:#f4f9f6}.ds-btn-secondary:active{transform:scale(0.97);background:#f4f9f6}.ds-btn-secondary:focus-visible{outline:2px solid #097d52;outline-offset:2px}"
     },
     {
-      "name": "Álbum Secondary Button",
-      "kind": "button",
-      "refersTo": "album-button-secondary",
-      "description": "Any action that is not the one primary.",
-      "html": "<button class=\"ds-secondary\">Ver más</button>",
-      "css": ".ds-secondary{font-family:Figtree,sans-serif;min-height:3rem;padding:.625rem 1.5rem;font-size:1rem;font-weight:800;background:#fff;color:#10231c;border:2px solid rgba(16,35,28,.24);border-radius:12px;cursor:pointer;transition:background-color 140ms ease}.ds-secondary:hover{background:#f4f9f6}.ds-secondary:focus-visible{outline:2px solid #097d52;outline-offset:2px}.ds-secondary:active{background:#f4f9f6}"
+      "name": "Next-step Card",
+      "kind": "card",
+      "refersTo": "plan-next-card",
+      "description": "Hoy: the next step, why, area and minutes, and the yellow button.",
+      "html": "<div class=\"ds-next\"><p class=\"ds-next-t\">Proporciones</p><p class=\"ds-next-r\">Fallaste 3 de 5 la semana pasada; es el tema que más pesa en Matemáticas.</p><span class=\"ds-next-m\"><i></i>Matemáticas · 12 min</span><button class=\"ds-next-go\">Empezar</button></div>",
+      "css": ".ds-next{font-family:Figtree,ui-sans-serif,system-ui,sans-serif;display:grid;gap:.5rem;padding:1.25rem;border-radius:16px;background:#097d52;color:#fff}.ds-next-t{margin:0;font-size:1.375rem;font-weight:800;line-height:1.2}.ds-next-r{margin:0;max-width:60ch;color:rgba(255,255,255,.9);line-height:1.45}.ds-next-m{display:inline-flex;align-items:center;gap:.375rem;font-size:.8125rem;font-weight:600;color:rgba(255,255,255,.85)}.ds-next-m i{width:.5rem;height:.5rem;border-radius:50%;background:#fff}.ds-next-go{font-family:Figtree,ui-sans-serif,system-ui,sans-serif;margin-top:.75rem;min-height:3.25rem;font-size:1.125rem;font-weight:700;background:#ffd23f;color:#10231c;border:0;border-radius:12px;cursor:pointer;transition:transform 100ms cubic-bezier(0.23,1,0.32,1),background-color 140ms ease;}.ds-next-go:hover{background:#ffdb66}.ds-next-go:active{transform:scale(0.97)}.ds-next-go:focus-visible{outline:2px solid #fff;outline-offset:2px}"
     },
     {
-      "name": "Sticker Slots",
+      "name": "Topic Row",
       "kind": "custom",
-      "refersTo": "album-sticker-next",
-      "description": "Earned, next and empty slots on an area field.",
-      "html": "<div class=\"ds-page\"><div class=\"ds-s ds-earned\">12</div><div class=\"ds-s ds-next\">13</div><div class=\"ds-s ds-empty\">14</div></div>",
-      "css": ".ds-page{display:grid;grid-template-columns:repeat(3,76px);gap:9px;padding:20px;background:#097d52}.ds-s{height:96px;padding:7px 8px;border-radius:10px;font-family:Anton,\"Arial Narrow\",sans-serif;font-weight:400;font-size:22px;line-height:1;color:#10231c;font-variant-numeric:tabular-nums;transition:transform 100ms cubic-bezier(.23,1,.32,1)}.ds-earned{background:#ffd23f}.ds-next{background:#fff;outline:4px solid #ffd23f;box-shadow:0 10px 18px rgba(0,0,0,.28);transform:rotate(-4deg) scale(1.08)}.ds-empty{background:#086e48;color:#d7ebe2;outline:2px solid #53a486;outline-offset:-2px}.ds-earned:hover,.ds-empty:hover{transform:scale(.96)}"
+      "refersTo": "plan-list-row",
+      "description": "Aprende: a topic with its MasteryBadge and evidence; the current one carries the Siguiente tag.",
+      "html": "<ul class=\"ds-list\"><li class=\"ds-topic is-current\"><span class=\"ds-topic-l\">Proporciones <span class=\"ds-tag\">Siguiente</span></span><span class=\"ds-meta\"><span class=\"ds-badge\"><b></b><b></b><s></s><s></s>Familiar</span>7 de 10 bien</span></li><li class=\"ds-topic\"><span class=\"ds-topic-l\">Probabilidad</span><span class=\"ds-meta\"><span class=\"ds-badge\"><b></b><s></s><s></s><s></s>Intentado</span>2 de 5 bien</span></li></ul>",
+      "css": ".ds-list{font-family:Figtree,ui-sans-serif,system-ui,sans-serif;margin:0;padding:0;list-style:none;border:1px solid rgba(16,35,28,0.13);border-radius:16px;background:#fff;overflow:hidden;color:#10231c}.ds-topic{display:grid;gap:.375rem;padding:.75rem 1rem;min-height:2.75rem}.ds-topic+.ds-topic{border-top:1px solid rgba(16,35,28,0.13)}.ds-topic.is-current{background:color-mix(in srgb,#ffd23f 16%,#fff)}.ds-topic-l{display:flex;gap:.5rem;align-items:center;font-weight:700}.ds-tag{padding:.125rem .5rem;border-radius:999px;background:#ffd23f;color:#10231c;font-size:.8125rem;font-weight:800}.ds-meta{display:flex;gap:.875rem;align-items:center;color:#52665d;font-size:.8125rem;font-variant-numeric:tabular-nums}.ds-badge{display:inline-flex;align-items:flex-end;gap:2px;color:#10231c;font-size:.875rem;font-weight:600}.ds-badge b,.ds-badge s{display:inline-block;width:3px;height:6px;background:#097d52}.ds-badge s{background:rgba(16,35,28,0.24)}.ds-badge :nth-child(4){margin-right:.375rem}"
+    },
+    {
+      "name": "Area Band",
+      "kind": "custom",
+      "description": "Aprende and lesson cover: the area colour as a header band with level and bar.",
+      "html": "<section class=\"ds-band\"><div class=\"ds-band-top\"><h2>Matemáticas</h2><span class=\"ds-lvl\">Nivel 2</span></div><span class=\"ds-bar\"><span style=\"width:40%\"></span></span><p>4 de 10 temas en Competente o más</p></section>",
+      "css": ".ds-band{font-family:Figtree,ui-sans-serif,system-ui,sans-serif;display:grid;gap:.625rem;padding:1.25rem;border-radius:16px;background:#097d52;color:#fff}.ds-band-top{display:flex;justify-content:space-between;align-items:center;gap:1rem}.ds-band h2{margin:0;font-size:1.75rem;font-weight:800;line-height:1.15}.ds-lvl{padding:.25rem .75rem;border-radius:999px;background:rgba(255,255,255,.2);font-size:.875rem;font-weight:700}.ds-bar{display:block;height:8px;border-radius:4px;background:rgba(0,0,0,.22);overflow:hidden}.ds-bar span{display:block;height:100%;background:#fff}.ds-band p{margin:0;font-weight:700;font-variant-numeric:tabular-nums}"
+    },
+    {
+      "name": "Area Chip",
+      "kind": "chip",
+      "refersTo": "plan-area-chip",
+      "description": "Area picker on Aprende; the chosen chip fills with its area colour.",
+      "html": "<div class=\"ds-chips\"><button class=\"ds-chip\" aria-pressed=\"true\" style=\"--area:#0a6fb0\">Ciencias</button><button class=\"ds-chip\" aria-pressed=\"false\" style=\"--area:#c2342a\">Lectura</button></div>",
+      "css": ".ds-chips{display:flex;gap:.5rem}.ds-chip{font-family:Figtree,ui-sans-serif,system-ui,sans-serif;display:inline-flex;align-items:center;gap:.5rem;min-height:2.75rem;padding:0 1rem;border:1px solid rgba(16,35,28,0.24);border-radius:999px;background:#fff;color:#10231c;font-size:.875rem;font-weight:700;cursor:pointer;transition:background-color 140ms ease}.ds-chip::before{content:\"\";width:.5rem;height:.5rem;border-radius:50%;background:var(--area)}.ds-chip:hover{background:#f4f9f6}.ds-chip[aria-pressed=\"true\"]{border-color:var(--area);background:var(--area);color:#fff}.ds-chip[aria-pressed=\"true\"]::before{background:#fff}.ds-chip:focus-visible{outline:2px solid #097d52;outline-offset:2px}"
     },
     {
       "name": "Answer Option",
-      "kind": "card",
-      "refersTo": "album-solve-option",
-      "description": "A resting answer in solve, letter tile and text.",
-      "html": "<button class=\"ds-opt\"><em>A</em>Tres cuartos</button>",
-      "css": ".ds-opt{display:flex;align-items:center;gap:14px;width:320px;min-height:56px;padding:12px 14px;border:0;border-radius:12px;background:#eef5f1;color:#10231c;font-family:Figtree,sans-serif;font-size:1.0625rem;font-weight:700;text-align:left;cursor:pointer;transition:transform 100ms cubic-bezier(.23,1,.32,1)}.ds-opt em{display:grid;place-items:center;width:32px;height:32px;border-radius:7px;background:#fff;color:#08704a;font-family:Anton,\"Arial Narrow\",sans-serif;font-weight:400;font-style:normal;font-size:21px}.ds-opt:hover{box-shadow:inset 0 0 0 2px #097d52}.ds-opt:focus-visible{outline:2px solid #097d52;outline-offset:2px}.ds-opt:active{transform:translateY(2px)}"
+      "kind": "custom",
+      "refersTo": "plan-solve-option",
+      "description": "Solve: a desk-coloured option; selected gets a 2px ink ring.",
+      "html": "<div class=\"ds-opts\"><button class=\"ds-opt\"><span class=\"ds-let\">A</span>12 cm</button><button class=\"ds-opt is-selected\"><span class=\"ds-let\">B</span>18 cm</button></div>",
+      "css": ".ds-opts{display:grid;gap:9px}.ds-opt{font-family:Figtree,ui-sans-serif,system-ui,sans-serif;display:flex;align-items:center;gap:14px;min-height:56px;padding:12px 14px;border:0;border-radius:12px;background:#eef5f1;color:#10231c;font-size:1.0625rem;font-weight:700;text-align:left;cursor:pointer;transition:transform 100ms cubic-bezier(0.23,1,0.32,1),background-color 140ms ease;}.ds-opt:active{transform:scale(0.97)}.ds-opt:focus-visible{outline:2px solid #097d52;outline-offset:2px}.ds-let{display:grid;place-items:center;width:32px;height:32px;border-radius:7px;background:#fff;color:#08704a;font-size:1.125rem;font-weight:800}.ds-opt.is-selected{background:#fff;box-shadow:inset 0 0 0 2px #10231c}.ds-opt.is-selected .ds-let{background:#10231c;color:#fff}"
     },
     {
       "name": "Guided Chip",
       "kind": "chip",
-      "refersTo": "album-ask-chip",
-      "description": "A tap answer in the guided question panel.",
-      "html": "<div class=\"ds-ask\"><button class=\"ds-chip\">Sumé los denominadores</button></div>",
-      "css": ".ds-ask{padding:20px;background:#10231c}.ds-chip{width:320px;min-height:44px;padding:13px 15px;border:0;border-radius:11px;background:#fff;color:#10231c;font-family:Figtree,sans-serif;font-size:1rem;font-weight:700;text-align:left;cursor:pointer;transition:transform 100ms cubic-bezier(.23,1,.32,1),background-color 140ms ease}.ds-chip:hover{background:#ffdb66}.ds-chip:focus-visible{outline:2px solid #ffd23f;outline-offset:2px}.ds-chip:active{transform:scale(.97);background:#ffd23f}"
+      "refersTo": "plan-ask-chip",
+      "description": "Guided path after a wrong answer: white chips on Green Black that turn yellow on press.",
+      "html": "<div class=\"ds-ask\"><p class=\"ds-ask-p\">¿Qué pasa con el total si duplicas una parte?</p><button class=\"ds-ask-chip\">También se duplica</button></div>",
+      "css": ".ds-ask{font-family:Figtree,ui-sans-serif,system-ui,sans-serif;display:grid;gap:8px;padding:20px;background:#10231c;color:#fff}.ds-ask-p{margin:0 0 4px;font-size:1.375rem;font-weight:700;line-height:1.3}.ds-ask-chip{font-family:Figtree,ui-sans-serif,system-ui,sans-serif;width:100%;min-height:44px;padding:13px 15px;border:0;border-radius:12px;background:#fff;color:#10231c;font-size:1rem;font-weight:600;text-align:left;cursor:pointer;transition:transform 100ms cubic-bezier(0.23,1,0.32,1),background-color 140ms ease;}.ds-ask-chip:active{transform:scale(0.97);background:#ffd23f}.ds-ask-chip:focus-visible{outline:2px solid #ffd23f;outline-offset:2px}"
     },
     {
       "name": "Cuaderno Primary Button",
@@ -772,59 +787,56 @@
     }
   ],
   "narrative": {
-    "northStar": "The Sticker You Were Missing",
-    "overview": "Every topic mastered is a numbered slot filled on an area's page. Progress is a page filling up, not a percentage and not a winding lesson path. The screen is a full field of the area's colour, white sheets for work, near-black green ink, and one yellow button that goes and gets the next sticker.\n\nDensity is low and the phone comes first: one thing to do, large names and numbers, thumb-sized targets. The register is young and credible, for students of 15 and 16 in short sessions and mixed light.\n\n**Review status.** This section records what the code ships. The student surface has not yet been reviewed rendered against live data, so empty, long-label and full-album states are unconfirmed on screen, and values here may move after that review. The 33 subtopic sticker pictures are simple provisional SVG glyphs.",
+    "northStar": "Plan de estudio",
+    "overview": "Every screen answers three things in words: what to do now, why, and how each topic is going. Hoy is a plan, not a game board: a green card with the next step and its reason, one yellow button, then the rest of the day and the five areas with their level and bar. Aprende lists every topic of an area with its level and accuracy. Progress is named, never a numbered slot.\n\nDensity is low and the phone comes first: white cards on a pale green desk, one family of type, flat controls that answer a press with a small scale. The register is calm and credible, for students of 15 to 17 in short sessions and mixed light. It replaced the Álbum (sticker album) on 2026-11-10 because the metaphor read as unclear and decorative.\n\n**Review status.** This section records what the code ships. Signed-in screens were reviewed from component renders with fictional data, not live data; solve, review and Yo were not captured. Empty, long-label and real-volume states are unconfirmed on screen, and values may move after a live review.",
     "keyCharacteristics": [
-      "Full fields of per-area colour with white type.",
-      "Numbered slots, on a four-column page on the phone and six on desktop.",
-      "Yellow means the thing to go and get.",
-      "Anton for names and numbers, Figtree for everything read.",
-      "A physical press on the primary button, and one authored landing."
+      "White cards on a pale green desk, 1px hairlines, 16px corners.",
+      "Pitch green for the next-step card and the cover bars; one colour per area for its header band, dot and bar.",
+      "Sticker yellow for the one primary action and the \"Siguiente\" tag.",
+      "Figtree alone, 400 to 800, on seven type steps.",
+      "Flat controls; a press is scale 0.97. One authored moment: the level-up flash on the reward."
     ],
     "rules": [
       {
-        "name": "The Field Rule",
-        "body": "An area owns the whole field in its colour, and every word on a field is white. A new area colour must hold 4.5:1 against white.",
+        "name": "The One Yellow Rule",
+        "body": "One yellow control per screen: the primary action. Every other yellow is a mark that is never pressed.",
         "section": "colors"
       },
       {
-        "name": "The Earned Colour Rule",
-        "body": "A filled sticker means earned, and nothing else fills a slot. An empty slot shows only its number, on a darker shade of the field.",
+        "name": "The Area Rule",
+        "body": "An area's colour appears in three places only: the header band, the dot before its name, and its bar. Words on a band are white. A new area colour must hold 4.5:1 against white.",
         "section": "colors"
       },
       {
-        "name": "The Names and Numbers Rule",
-        "body": "Anton sets names, numbers and the words on the main button, always at 400. Anything read as a sentence is Figtree.",
+        "name": "The One Family Rule",
+        "body": "Figtree sets everything on a student screen, at 400 to 800. Hierarchy comes from the seven steps and weight, never from a second face, tracking or uppercase.",
         "section": "typography"
       },
       {
-        "name": "The Press Edge Rule",
-        "body": "The solid edge belongs to the primary action, in a darker shade of that button's own colour. It is a key you push, chosen with the world, never a decorative offset.",
+        "name": "The Flat Press Rule",
+        "body": "Nothing rests on a shadow and nothing leans. A press is `scale(0.97)` at 100ms `cubic-bezier(0.23, 1, 0.32, 1)`, never a 3D edge or an offset shadow.",
         "section": "elevation"
       },
       {
-        "name": "The Next One Rule",
-        "body": "Only the next sticker lifts and tilts (-4deg). The student's own portrait may tilt (-3deg). Nothing else leans.",
-        "section": "elevation"
-      },
-      {
-        "name": "The One Landing Rule",
-        "body": "The sticker dropping into its slot (spring, 0.7s, after 0.8s) is the only celebration, and it plays once on a fresh close. Under reduced motion it fades, and the XP count-up shows its number at once.",
+        "name": "The One Moment Rule",
+        "body": "A topic that went up on a fresh close settles in once: its row flashes from 55% yellow to soft green (520ms, after 250ms). It is the only celebration. Under reduced motion it does not play, and no press scales; colour changes stay.",
         "section": "components"
       }
     ],
     "dos": [
-      "Do set every student screen through the Álbum tokens, and add new student routes to `lib/student-look.ts`.",
-      "Do give each screen one yellow primary action.",
-      "Do use 100ms strong ease-out for presses and 140ms for colour, and remove transforms under reduced motion.",
-      "Do write the next step as a name (\"Te falta Proporciones\") with its cost in questions and minutes."
+      "Do set every student screen through these tokens, and add new student routes to `lib/student-look.ts`.",
+      "Do give each screen one yellow primary action, and write the next step as a name with its reason, area and minutes.",
+      "Do show every topic in a topic list with its MasteryBadge.",
+      "Do use the area colour only as band, dot and bar, through `--area`.",
+      "Do use 100ms strong ease-out for presses and 140ms for colour, and remove transforms and the level-up flash under reduced motion."
     ],
     "donts": [
-      "Don't bring the Álbum to teacher, school, staff, public or printed screens.",
-      "Don't bring the notebook's ruling or red margin to student screens; the sheet background is removed on purpose.",
-      "Don't draw student progress as percentage dashboards or a winding path; it is slots on a page.",
-      "Don't copy the kicker lines above a heading or the neutral press edges on secondary controls, tiles and non-solve options. They ship today and are not part of this system.",
-      "Don't hardcode the yellow, its edge or the ink where a token exists."
+      "Don't show a numbered slot, sticker or tile without a name; progress is written in words.",
+      "Don't make decoration look interactive: status facts on Hoy are plain icon and text, never pills or buttons.",
+      "Don't add a second yellow control to a screen, or tilts, 3D press edges or resting shadows.",
+      "Don't bring the notebook's ruling or red margin to student screens, or this look to teacher, school, staff, public or printed screens.",
+      "Don't add a label line above a heading; the heading speaks.",
+      "Don't hardcode the yellow, the ink or the area colours where a token exists."
     ]
   }
 }

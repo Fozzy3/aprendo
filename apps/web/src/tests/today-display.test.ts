@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { dueLabel, hoursToGoalMinutes, targetGapLines, taskSessionArgs, timedIntro } from '../lib/today-display'
+import { areaRows, dueLabel, hoursToGoalMinutes, targetGapLines, taskSessionArgs, taskTarget, timedIntro } from '../lib/today-display'
 
 describe('dueLabel', () => {
   const monday = new Date(2026, 10, 9, 10).getTime()
@@ -141,5 +141,50 @@ describe('targetGapLines', () => {
 
   it('returns null without an estimate', () => {
     expect(targetGapLines({ ...base, estimate: null }, 60)).toBeNull()
+  })
+})
+
+describe('taskTarget', () => {
+  const task = (kind: string, action: object) => ({ kind, action }) as Parameters<typeof taskTarget>[0]
+
+  it('opens a lesson task on its lesson', () => {
+    expect(taskTarget(task('lesson', { type: 'lesson', subtopicId: 'x' }))).toEqual({ type: 'lesson', subtopicId: 'x' })
+  })
+
+  // Timed sessions start behind an intro, which lives where they are chosen.
+  it('sends a nivelación to the placement screen and a simulacro to Retos', () => {
+    expect(taskTarget(task('nivelacion', { type: 'session', kind: 'nivelacion', subjectId: 'ingles' }))).toEqual({ type: 'link', to: '/diagnostic' })
+    expect(taskTarget(task('simulacro', { type: 'session', kind: 'simulacro', simulacroSessionNumber: 1 }))).toEqual({ type: 'link', to: '/practice' })
+  })
+
+  it('starts any other session on the tap', () => {
+    expect(taskTarget(task('practice', { type: 'session', kind: 'topic', subtopicId: 'x' }))).toEqual({
+      type: 'launch',
+      args: { kind: 'topic', subtopicId: 'x' },
+    })
+  })
+})
+
+describe('areaRows', () => {
+  const album = {
+    subjects: [
+      { subjectId: 'matematicas', label: 'Matemáticas', earnedCount: 2, stickers: [{}, {}, {}, {}] },
+      { subjectId: 'ingles', label: 'Inglés', earnedCount: 0, stickers: [{}, {}] },
+    ],
+  }
+  const subjects = [
+    { subjectId: 'ingles', level: { placement: { band: { labelEs: 'A2' } } } },
+    { subjectId: 'matematicas', level: { placement: null } },
+  ]
+
+  it('counts topics at Competente or above, in the album order, with the area level', () => {
+    expect(areaRows(album, subjects)).toEqual([
+      { subjectId: 'matematicas', label: 'Matemáticas', done: 2, total: 4, level: null },
+      { subjectId: 'ingles', label: 'Inglés', done: 0, total: 2, level: 'A2' },
+    ])
+  })
+
+  it('still lists the areas while the levels load', () => {
+    expect(areaRows(album, undefined).map((row) => row.level)).toEqual([null, null])
   })
 })

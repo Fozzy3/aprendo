@@ -189,8 +189,7 @@ function PracticeHubPage() {
     <StudentAppShell session={session} activeSection="practice">
       <div className="retos fade-in">
         <h1 className="page-title">Retos</h1>
-
-        <LeagueStrip studentId={session.studentId} />
+        <p className="page-lede">Repasa lo que toca, mide tu nivel o ensaya el examen con reloj.</p>
 
         {(pendingSecondSitting != null && sittingTwo != null) || inProgress.length > 0 ? (
           <section className="ruled-section" aria-labelledby="hub-resume-title">
@@ -412,6 +411,8 @@ function PracticeHubPage() {
             </p>
           ) : null}
         </section>
+
+        <LeagueStrip studentId={session.studentId} />
       </div>
     </StudentAppShell>
   )
@@ -423,12 +424,19 @@ function tileNote(kind: SessionKind, repasoDue: number | null, retoLocked: boole
   if (kind === 'repaso') {
     if (repasoDue === 0) return 'Nada por repasar hoy.'
     const questions = repasoDue != null ? Math.min(repasoDue * 2, getConfiguredQuestionCount(config)) : getConfiguredQuestionCount(config)
-    return `${questions} preguntas de lo que toca hoy.`
+    return repasoDue == null
+      ? `${questions} preguntas de lo que toca hoy.`
+      : `${repasoDue} ${repasoDue === 1 ? 'tema toca' : 'temas tocan'} repaso: ${questions} preguntas nuevas.`
   }
   if (kind === 'reto') {
-    return retoLocked ? 'Se abre cuando practiques 3 temas.' : `${getConfiguredQuestionCount(config)} preguntas. Sube o baja de nivel.`
+    return retoLocked
+      ? 'Se abre cuando practiques 3 temas.'
+      : `${getConfiguredQuestionCount(config)} preguntas de temas que ya practicaste. Sube o baja de nivel.`
   }
-  return 'Como el examen real, con reloj.'
+  const sittings = config.simulacroSessions ?? []
+  return sittings.length === 0
+    ? 'Como el examen real, con reloj.'
+    : `Como el examen real: ${sittings.length} sesiones con reloj, ${sittings.map((sitting) => `${getSimulacroSessionQuestionCount(sitting)} preguntas en ${formatTimeLimit(sitting.timeLimitMs)}`).join(' y ')}.`
 }
 
 /** A launch line: a `.ruled-row` that is a button. */

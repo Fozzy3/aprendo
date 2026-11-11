@@ -2613,77 +2613,193 @@ pre code {
   }
 }
 
-/* ─── First-run welcome ─── */
-.welcome {
+/* ─── First-run welcome and the diagnostic intro: one card on the desk ─── */
+.welcome,
+.diagnostic-intro > .timed-intro {
   display: grid;
-  gap: 1rem;
-  max-width: 34rem;
+  gap: 1.25rem;
+  max-width: 36rem;
+  margin-inline: auto;
+  padding: clamp(1.25rem, 4vw, 2rem);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--bg-card);
 }
-
 
 .welcome h1:focus {
   outline: none;
 }
 
-.welcome-points {
+/* Where the student is in the welcome: filled segments, never a number alone. */
+.welcome-progress {
   display: grid;
-  gap: 1rem;
-  margin: 0.5rem 0 0;
+  grid-auto-columns: minmax(0, 1fr);
+  grid-auto-flow: column;
+  gap: 0.375rem;
+}
+
+.welcome-progress span {
+  height: 6px;
+  border-radius: 3px;
+  background: var(--bg-inset);
+  transition: background-color 200ms ease;
+}
+
+.welcome-progress span.is-done {
+  background: var(--brand);
+}
+
+/* The five areas of the exam, named, each with its dot. */
+.welcome-areas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 0;
   padding: 0;
   list-style: none;
 }
 
-.welcome-points li {
+.welcome-areas li {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 2.5rem;
+  padding: 0 0.875rem;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-pill, 999px);
+  font-size: var(--text-sm, 0.875rem);
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+/* How it works: a numbered path, because the order is the point. */
+.welcome-steps {
   display: grid;
-  grid-template-columns: auto 1fr;
-  align-items: start;
-  gap: 0.8rem;
-  font-size: 1rem;
+  gap: 1.25rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: welcome-step;
+}
+
+.welcome-steps li {
+  position: relative;
+  display: grid;
+  gap: 0.25rem;
+  padding-left: 3.25rem;
+  counter-increment: welcome-step;
   line-height: 1.5;
   color: var(--text-secondary);
 }
 
-.welcome-points svg {
-  margin-top: 0.15rem;
-  color: var(--brand);
+.welcome-steps li::before {
+  content: counter(welcome-step);
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: grid;
+  width: 2.25rem;
+  height: 2.25rem;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--brand);
+  color: var(--text-inverted);
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
 }
 
-.welcome-points strong {
-  display: block;
+.welcome-steps li:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  top: 2.5rem;
+  bottom: -1rem;
+  left: calc(1.125rem - 1px);
+  width: 2px;
+  border-radius: 1px;
+  background: var(--border);
+}
+
+.welcome-steps strong {
+  font-size: var(--text-md, 1.125rem);
   font-weight: 700;
   color: var(--text-primary);
 }
 
 .welcome-footer {
   display: flex;
-  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
-  margin-top: 1rem;
-  padding-top: 1rem;
+  padding-top: 1.25rem;
   border-top: 1px solid var(--border);
 }
 
-.welcome-dots {
-  display: flex;
-  gap: 0.4rem;
+.timed-intro-lede {
+  margin: 0;
+  line-height: 1.5;
+  color: var(--text-secondary);
+  text-wrap: pretty;
+}
+
+/* After the diagnostic: every area on one 0-100 bar, weakest first. */
+.diagnostic-result-areas {
+  display: grid;
   margin: 0;
   padding: 0;
   list-style: none;
 }
 
-.welcome-dots span {
-  width: 0.5rem;
-  height: 0.5rem;
-  border-radius: var(--radius-sm);
-  background: var(--border-strong);
-  transition: background-color 140ms ease;
+.diagnostic-result-areas li {
+  display: grid;
+  grid-template-columns: minmax(8rem, 11rem) minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 1rem;
+  min-height: 3.5rem;
+  border-bottom: 1px solid var(--border);
 }
 
-.welcome-dots span.is-current {
-  width: 1.5rem;
-  background: var(--brand);
+.diagnostic-result-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.diagnostic-result-bar {
+  height: 8px;
+  overflow: hidden;
+  border-radius: 4px;
+  background: var(--bg-inset);
+}
+
+.diagnostic-result-bar span {
+  display: block;
+  height: 100%;
+  border-radius: 4px;
+  background: var(--subject-color);
+}
+
+.diagnostic-result-level {
+  display: grid;
+  justify-items: end;
+  font-size: var(--text-sm, 0.875rem);
+}
+
+.diagnostic-result-level small {
+  color: var(--text-tertiary);
+}
+
+@media (max-width: 30rem) {
+  .diagnostic-result-areas li {
+    grid-template-columns: minmax(0, 1fr) auto;
+    padding-block: 0.75rem;
+  }
+
+  .diagnostic-result-bar {
+    grid-column: 1 / -1;
+    grid-row: 2;
+  }
 }
 
 /* ─── Markdown rendering ─── */
@@ -3650,8 +3766,73 @@ pre code {
    between sections, no cards, no illustration.
    =========================================================================== */
 .landing {
+  /* The public face wears the brand red; the panels it shows keep the notebook. */
+  --brand: #b3132f;
+  --brand-hover: #8f0f26;
+  --accent: #b3132f;
+  --accent-hover: #8f0f26;
+  --accent-text: #a8172f;
+  --accent-soft: rgba(179, 19, 47, 0.08);
+  --desk: #f8f1f2;
+  --landing-red: #b3132f;
   min-height: 100vh;
   background: var(--bg);
+}
+
+:root.dark .landing {
+  --brand: #ff8597;
+  --brand-hover: #ffa3b1;
+  --accent: #ff8597;
+  --accent-hover: #ffa3b1;
+  --accent-text: #ffa3b1;
+  --accent-soft: rgba(255, 133, 151, 0.12);
+  --desk: #170d10;
+  --landing-red: #7d1024;
+}
+
+/* The red cover. Tokens re-mapped to white, as on the app's top bar, so the
+   wordmark, the toggle and the buttons need no styles of their own. */
+.landing-cover {
+  --ink: #ffffff;
+  --margin: #ffc2cc;
+  --rule-strong: rgba(255, 255, 255, 0.45);
+  --text-primary: #ffffff;
+  --text-secondary: rgba(255, 255, 255, 0.86);
+  --text-tertiary: rgba(255, 255, 255, 0.72);
+  --border: rgba(255, 255, 255, 0.22);
+  --border-strong: rgba(255, 255, 255, 0.55);
+  --bg-inset: rgba(255, 255, 255, 0.12);
+  --bg-card: rgba(255, 255, 255, 0.08);
+  --bg-card-hover: rgba(255, 255, 255, 0.16);
+  --accent: #ffffff;
+  background: var(--landing-red);
+  color: var(--text-primary);
+}
+
+.landing-cover ::selection {
+  background: #ffffff;
+  color: var(--landing-red);
+}
+
+.landing-cover .btn-primary,
+.landing-contact .btn-primary {
+  border-color: #ffffff;
+  background: #ffffff;
+  color: #8f0f26;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .landing-cover .btn-primary:hover,
+  .landing-contact .btn-primary:hover {
+    border-color: #ffe4e8;
+    background: #ffe4e8;
+    color: #8f0f26;
+  }
+}
+
+.landing-cover .btn-primary:active {
+  background: #ffe4e8;
+  color: #8f0f26;
 }
 
 .landing-bar {
@@ -3681,13 +3862,16 @@ pre code {
 .landing-hero {
   width: min(72rem, calc(100% - 2rem));
   margin-inline: auto;
-  padding: clamp(2.5rem, 6vw, 4.5rem) 0 clamp(3rem, 6vw, 5rem);
+  /* Room for the class sheet that lies across the cover's lower edge. */
+  padding: clamp(3rem, 7vw, 6rem) 0 clamp(7rem, 14vw, 11rem);
 }
 
 .landing-title {
+  max-width: 14ch;
   margin: 0;
   font-family: var(--font-display);
-  font-size: clamp(2.15rem, 0.9rem + 4.4vw, 5rem);
+  font-size: clamp(2.5rem, 0.9rem + 5.4vw, 5.75rem);
+  text-wrap: balance;
   font-weight: 600;
   line-height: 1.02;
   letter-spacing: -0.03em;
@@ -3706,8 +3890,62 @@ pre code {
   margin-top: 0;
 }
 
-.landing-hero > .ui-figure {
-  margin-top: clamp(2rem, 4vw, 3rem);
+.landing-sheet {
+  position: relative;
+  width: min(72rem, calc(100% - 2rem));
+  margin: calc(-1 * clamp(5rem, 10vw, 8rem)) auto 0;
+}
+
+.landing-sheet + .landing-section {
+  border-top: 0;
+}
+
+/* It floats over the cover's edge, so here a shadow is depth, not decoration. */
+.landing-sheet .ruled-page {
+  background: var(--paper);
+  box-shadow: 0 24px 48px -12px rgba(60, 8, 18, 0.28);
+}
+
+/* How a student starts: three steps, each led by the number it is about. */
+.landing-steps {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0 clamp(1.5rem, 4vw, 3rem);
+  margin: 2.5rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.landing-steps li {
+  padding-top: 1.25rem;
+  border-top: 2px solid var(--brand);
+}
+
+.landing-step-figure {
+  display: block;
+  font-family: var(--font-display);
+  font-size: clamp(3rem, 2rem + 3vw, 4.5rem);
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: -0.03em;
+  color: var(--accent-text);
+  font-variant-numeric: lining-nums tabular-nums;
+}
+
+.landing-steps h3 {
+  margin: 1rem 0 0;
+  font-family: var(--font-display);
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.landing-steps p {
+  max-width: 34ch;
+  margin: 0.5rem 0 0;
+  line-height: 1.6;
+  color: var(--text-secondary);
+  text-wrap: pretty;
 }
 
 .landing-lede {
@@ -3822,7 +4060,7 @@ pre code {
 }
 
 .landing-contact {
-  background: var(--cover);
+  background: var(--landing-red);
 }
 
 .landing-contact-inner {
@@ -3836,19 +4074,7 @@ pre code {
 }
 
 .landing-contact .landing-copy {
-  color: #dfe6f1;
-}
-
-.landing-contact .btn-primary {
-  background: #ffffff;
-  color: #16233f;
-}
-
-@media (hover: hover) and (pointer: fine) {
-  .landing-contact .btn-primary:hover {
-    background: #dfe6f1;
-    color: #16233f;
-  }
+  color: #ffe4e8;
 }
 
 /* Interface fragments: the product itself, every one captioned as an example. */
@@ -3903,8 +4129,8 @@ pre code {
   overflow: hidden;
   border-radius: 1.25rem;
   background: #ffffff;
-  box-shadow: 0 14px 34px rgb(16 35 28 / 0.18);
-  color: #10231c;
+  box-shadow: 0 14px 34px rgb(60 8 18 / 0.18);
+  color: #24141a;
   font-family: "Figtree", ui-sans-serif, system-ui, sans-serif;
   font-weight: 500;
   line-height: 1.25;
@@ -3916,7 +4142,7 @@ pre code {
   flex-direction: column;
   gap: 0.55rem;
   padding: 1rem;
-  background: #eef5f1;
+  background: #f8f1f2;
 }
 
 .ui-today-title {
@@ -3933,10 +4159,10 @@ pre code {
 
 .ui-today-status span {
   padding: 0.2rem 0.55rem;
-  border: 1px solid #d6e5dd;
+  border: 1px solid #ecdcdf;
   border-radius: 999px;
   background: #ffffff;
-  color: #3c5148;
+  color: #54404a;
   font-size: 0.7rem;
   font-weight: 600;
 }
@@ -3953,7 +4179,7 @@ pre code {
   gap: 0.3rem;
   padding: 0.85rem;
   border-radius: 0.8rem;
-  background: #097d52;
+  background: #b3132f;
   color: #ffffff;
 }
 
@@ -3977,8 +4203,8 @@ pre code {
   margin-top: 0.35rem;
   padding: 0.55rem;
   border-radius: 0.6rem;
-  background: #ffd23f;
-  color: #10231c;
+  background: #ffffff;
+  color: #b3132f;
   font-size: 0.85rem;
   font-style: normal;
   font-weight: 700;
@@ -3989,7 +4215,7 @@ pre code {
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  border: 1px solid #d6e5dd;
+  border: 1px solid #ecdcdf;
   border-radius: 0.8rem;
   background: #ffffff;
 }
@@ -4002,19 +4228,19 @@ pre code {
 }
 
 .ui-today-areas > div + div {
-  border-top: 1px solid #d6e5dd;
+  border-top: 1px solid #ecdcdf;
 }
 
 .ui-today-area-top {
   display: flex;
   justify-content: space-between;
-  color: #3c5148;
+  color: #54404a;
   font-size: 0.7rem;
   font-weight: 700;
 }
 
 .ui-today-area-top b {
-  color: #10231c;
+  color: #24141a;
   font-size: 0.8rem;
 }
 
@@ -4023,7 +4249,7 @@ pre code {
   height: 0.3rem;
   overflow: hidden;
   border-radius: 0.15rem;
-  background: #eaf2ee;
+  background: #f3e8ea;
 }
 
 .ui-today-areas i i {
@@ -4032,7 +4258,7 @@ pre code {
 }
 
 .ui-today-areas small {
-  color: #52665d;
+  color: #6b555c;
   font-size: 0.66rem;
 }
 
@@ -4040,7 +4266,7 @@ pre code {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   padding: 0.5rem 0.3rem 0.7rem;
-  border-top: 1px solid #dfe7e3;
+  border-top: 1px solid #f0e2e4;
 }
 
 .ui-album-tabs span {
@@ -4050,11 +4276,11 @@ pre code {
   gap: 0.1rem;
   font-size: 0.66rem;
   font-weight: 700;
-  color: #52665d;
+  color: #6b555c;
 }
 
 .ui-album-tabs span.is-active {
-  color: #0b8a5b;
+  color: #c41e3a;
 }
 
 .ui-album-tabs svg {
@@ -4090,7 +4316,7 @@ pre code {
   background: #097049;
 }
 
-.ui-guide-beads i.done { background: #ffd23f; }
+.ui-guide-beads i.done { background: #ffd3db; }
 .ui-guide-beads i.current { background: #ffffff; }
 
 .ui-guide-slot {
@@ -4123,7 +4349,7 @@ pre code {
   margin-bottom: 0.45rem;
   padding: 0.55rem 0.7rem;
   border-radius: 0.6rem;
-  background: #eef4f1;
+  background: #f8f1f2;
   font-size: 0.95rem;
   font-weight: 500;
 }
@@ -4134,7 +4360,7 @@ pre code {
   flex: none;
   border-radius: 0.35rem;
   background: #ffffff;
-  color: #0b8a5b;
+  color: #24141a;
   font-size: 0.85rem;
   font-style: normal;
   font-weight: 800;
@@ -4161,7 +4387,7 @@ pre code {
 
 .ui-guide-ask {
   padding: 1rem 1rem 1.25rem;
-  background: #10231c;
+  background: #2a1218;
   color: #ffffff;
 }
 
@@ -4185,7 +4411,7 @@ pre code {
   padding: 0.6rem 0.7rem;
   border-radius: 0.55rem;
   background: #ffffff;
-  color: #10231c;
+  color: #2a1218;
   font-size: 0.82rem;
   font-weight: 700;
 }
@@ -4205,6 +4431,11 @@ pre code {
 
   .landing-terms > div {
     grid-template-columns: minmax(0, 1fr);
+  }
+
+  .landing-steps {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 2rem;
   }
 }
 
@@ -5817,16 +6048,16 @@ html:has(.is-immersive) {
   }
 }
 
-/* The welcome dots change instantly, not inside the crossfade. */
-.welcome-dots {
-  view-transition-name: welcome-dots;
+/* The welcome progress changes instantly, not inside the crossfade. */
+.welcome-progress {
+  view-transition-name: welcome-progress;
 }
 
-::view-transition-old(welcome-dots) {
+::view-transition-old(welcome-progress) {
   display: none;
 }
 
-::view-transition-new(welcome-dots) {
+::view-transition-new(welcome-progress) {
   animation: none;
 }
 

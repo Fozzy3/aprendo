@@ -456,6 +456,21 @@ function buildGlobalScore(
  * Every surface that shows an area level (Progreso, Hoy, Ruta) goes through
  * this, so the same area never lands in two different bands.
  */
+export function placedSubjectIds(
+  sessions: { kind: string; status: string; subjectId?: string; summary?: { subjectScores?: { subjectId: string }[] } }[],
+): Set<string> {
+  const placed = new Set<string>()
+  for (const session of sessions) {
+    if (session.status !== 'completed') continue
+    if (session.kind === 'nivelacion' && session.subjectId != null) placed.add(session.subjectId)
+    // The general diagnostic is the entry point: it measures every area at once.
+    if (session.kind === 'diagnostic') {
+      for (const score of session.summary?.subjectScores ?? []) placed.add(score.subjectId)
+    }
+  }
+  return placed
+}
+
 export function areaScore(
   subjectId: string,
   accuracy: number,
@@ -536,7 +551,7 @@ export function buildSubjectLevels(
       subjectId,
       attemptCount,
       hasEnoughEvidence,
-      isPlaced: placementBySubjectId.has(subjectId),
+      isPlaced: placementBySubjectId.has(subjectId) || diagnosticBySubjectId.has(subjectId),
       currentScore,
       isCalibrated: scored?.isCalibrated ?? false,
       baselineScore,

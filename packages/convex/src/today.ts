@@ -8,7 +8,7 @@ import { estimateGlobalScore, weeklyGlobalEstimates } from './globalScore'
 import { LEVELLED_SUBJECT_IDS, MIN_ATTEMPTS_FOR_LEVEL, getLevelForScore } from './levels'
 import { careerWeights } from './careers'
 import { isReviewDue } from './mastery'
-import { areaScore } from './progress'
+import { areaScore, placedSubjectIds } from './progress'
 import { bankTiersForStudent, collectUsableQuestionsBySubject } from './questionPool'
 import { settledAttempts } from './sessionIntegrity'
 import { loadLiveExamSeal } from './sessions'
@@ -106,11 +106,7 @@ export const getTodayDashboard = query({
     }
 
     // Areas scored exactly as Progreso scores them (`areaScore`).
-    const placedSubjectIds = new Set(
-      sessions
-        .filter((session) => session.kind === 'nivelacion' && session.status === 'completed')
-        .map((session) => session.subjectId),
-    )
+    const placed = placedSubjectIds(sessions)
     const areas = LEVELLED_SUBJECT_IDS.map((subjectId) => {
       const aggregate = subjectAggregates.find((item) => item.subjectId === subjectId)
       const attemptCount = aggregate?.attemptCount ?? 0
@@ -119,7 +115,7 @@ export const getTodayDashboard = query({
         score: aggregate == null ? null : areaScore(subjectId, aggregate.accuracy, student).score,
         attemptCount,
         hasEnoughEvidence: attemptCount >= MIN_ATTEMPTS_FOR_LEVEL,
-        isPlaced: placedSubjectIds.has(subjectId),
+        isPlaced: placed.has(subjectId),
       }
     })
     const estimate = estimateGlobalScore(

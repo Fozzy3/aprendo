@@ -7,6 +7,7 @@ import { MAX_GLOBAL_SCORE } from './globalScore'
 import { MAX_WEEKLY_GOAL_MINUTES, MIN_WEEKLY_GOAL_MINUTES, isValidWeeklyGoal } from './studyTime'
 import { isValidAvatar, nicknameFrom } from './rewards'
 import { scrubClassRosters } from './schools'
+import { placedSubjectIds as placedSubjectIdsOf } from './progress'
 
 export const getStudent = query({
   args: {
@@ -205,14 +206,7 @@ async function computeStudentAppState(ctx: QueryCtx, studentId: Id<'students'>) 
     ...(!isStaff || memberships.some((membership) => membership.role === 'student') ? ['student' as const] : []),
   ]
 
-  const placedSubjectIds = [
-    ...new Set(
-      nivelacionSessions
-        .filter((session) => session.status === 'completed')
-        .map((session) => session.subjectId)
-        .filter((subjectId): subjectId is string => subjectId != null),
-    ),
-  ]
+  const placedSubjectIds = [...placedSubjectIdsOf([...diagnosticSessions, ...nivelacionSessions])]
 
   return {
     studentId: student._id,

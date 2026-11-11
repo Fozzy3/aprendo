@@ -2,37 +2,41 @@
 name: Aprendo
 description: ICFES Saber 11 preparation. Plan de estudio on student screens, Cuaderno cuadriculado everywhere else.
 colors:
-  plan-pitch: "#097d52"
-  plan-pitch-deep: "#076a45"
+  plan-cover: "#b3132f"
+  plan-brand: "#c41e3a"
+  plan-brand-deep: "#a3172f"
+  plan-action: "#d91e3c"
+  plan-action-hover: "#bd1631"
+  plan-mark: "#ffd3db"
+  plan-panel: "#2a1218"
   plan-green-ink: "#08704a"
   plan-success-text: "#075f3f"
-  plan-sticker: "#ffd23f"
-  plan-sticker-hover: "#ffdb66"
-  plan-ink: "#10231c"
-  plan-text-secondary: "#3c5148"
-  plan-text-tertiary: "#52665d"
-  plan-graphite: "#4b5f57"
+  plan-ink: "#24141a"
+  plan-text-secondary: "#54404a"
+  plan-text-tertiary: "#6b555c"
+  plan-graphite: "#5e4a4f"
   plan-paper: "#ffffff"
-  plan-card-hover: "#f4f9f6"
-  plan-desk: "#eef5f1"
-  plan-inset: "#eaf2ee"
-  plan-rule: "#d6e5dd"
-  plan-hairline: "rgba(16, 35, 28, 0.13)"
-  plan-hairline-strong: "rgba(16, 35, 28, 0.24)"
+  plan-card-hover: "#fcf6f7"
+  plan-desk: "#f8f1f2"
+  plan-inset: "#f3e8ea"
+  plan-rule: "#ecdcdf"
+  plan-hairline: "rgba(36, 20, 26, 0.12)"
+  plan-hairline-strong: "rgba(36, 20, 26, 0.24)"
   plan-red: "#c8321f"
   plan-red-text: "#a31d10"
   plan-red-soft: "#ffe6e2"
-  plan-area-lectura: "#c2342a"
+  plan-area-lectura: "#6d3fc0"
   plan-area-matematicas: "#097d52"
   plan-area-ciencias: "#0a6fb0"
   plan-area-sociales: "#b4540a"
   plan-area-ingles: "#b3257a"
-  plan-dark-paper: "#12201a"
-  plan-dark-card: "#17281f"
-  plan-dark-desk: "#0b1511"
-  plan-dark-ink: "#e9f3ee"
-  plan-dark-cover: "#0a5f40"
-  plan-dark-brand: "#62d2a2"
+  plan-dark-paper: "#1c1215"
+  plan-dark-card: "#24171b"
+  plan-dark-desk: "#130b0e"
+  plan-dark-ink: "#f6eced"
+  plan-dark-cover: "#8a1328"
+  plan-dark-brand: "#ff8597"
+  plan-dark-action: "#ff6b81"
   plan-dark-red: "#f0796a"
   notebook-paper: "#fbfcfe"
   notebook-rule: "#c9d8ea"
@@ -105,15 +109,15 @@ spacing:
   notebook-cell: "20px"
 components:
   plan-button-primary:
-    backgroundColor: "{colors.plan-sticker}"
-    textColor: "{colors.plan-ink}"
+    backgroundColor: "{colors.plan-action}"
+    textColor: "{colors.plan-paper}"
     typography: "{typography.plan-body}"
     rounded: "{rounded.plan-md}"
     padding: "0.625rem 1.25rem"
     height: "3rem"
   plan-button-primary-hover:
-    backgroundColor: "{colors.plan-sticker-hover}"
-    textColor: "{colors.plan-ink}"
+    backgroundColor: "{colors.plan-action-hover}"
+    textColor: "{colors.plan-paper}"
   plan-button-secondary:
     backgroundColor: "{colors.plan-paper}"
     textColor: "{colors.plan-ink}"
@@ -123,7 +127,7 @@ components:
   plan-button-secondary-hover:
     backgroundColor: "{colors.plan-card-hover}"
   plan-next-card:
-    backgroundColor: "{colors.plan-pitch}"
+    backgroundColor: "{colors.plan-cover}"
     textColor: "{colors.plan-paper}"
     rounded: "{rounded.plan-lg}"
     padding: "20px"
@@ -134,7 +138,7 @@ components:
     padding: "0.875rem 1rem"
     height: "{spacing.plan-row}"
   plan-next-tag:
-    backgroundColor: "{colors.plan-sticker}"
+    backgroundColor: "{colors.plan-mark}"
     textColor: "{colors.plan-ink}"
     typography: "{typography.plan-meta}"
     rounded: "{rounded.plan-pill}"
@@ -210,6 +214,7 @@ identity.
 - The error red and the teacher's red are **one token**: the same gesture of
   correction.
 - There is no gold, no violet and no gradient anywhere.
+- **The landing is the exception** (2026-11-11): it wears the brand red (`.landing` re-maps `--brand`/`--accent` to #b3132f). A full-bleed red cover holds the bar, the promise and both CTAs (white primary on red); the class sheet lies across the cover's lower edge with a float shadow; the contact band closes in the same red. The panels it shows stay on the notebook.
 - **Frame:** the top bar is the navy cover; inside it the colour tokens are re-mapped to white (`.student-topbar`), so nothing in it needs its own cover styles. Every page is a sheet (`.ruled-page`, `.page-sheet`: paper, 1px rule border) on the blue desk, so the screen is never a white void.
 - Inside an area's page (`--subject-color` on the page), the active tab and the level bars take that area's ink.
 - **Areas** keep a small inked dot (`.subject-dot`): identical lightness and
@@ -329,45 +334,48 @@ Implementation: `apps/web/src/student.css`, scoped to `html[data-look='student']
 
 ## Overview
 
+**Palette change (2026-11-11):** the owner moved the brand to red. Green pitch and sticker yellow are gone: red cover and action, rose marks, warm neutrals. Matemáticas stays green and correct stays green; Lectura moved from red to violet so no area reads as the brand.
+
 **Creative North Star: "Plan de estudio"**
 
-Every screen answers three things in words: what to do now, why, and how each topic is going. Hoy is a plan, not a game board: a green card with the next step and its reason, one yellow button, then the rest of the day and the five areas with their level and bar. Aprende lists every topic of an area with its level and accuracy. Progress is named, never a numbered slot.
+Every screen answers three things in words: what to do now, why, and how each topic is going. Hoy is a plan, not a game board: a red card with the next step and its reason, one white button, then the rest of the day and the five areas with their level and bar. Aprende lists every topic of an area with its level and accuracy. Progress is named, never a numbered slot.
 
-Density is low and the phone comes first: white cards on a pale green desk, one family of type, flat controls that answer a press with a small scale. The register is calm and credible, for students of 15 to 17 in short sessions and mixed light. It replaced the Álbum (sticker album) on 2026-11-10 because the metaphor read as unclear and decorative.
+Density is low and the phone comes first: white cards on a pale warm desk, one family of type, flat controls that answer a press with a small scale. The register is calm and credible, for students of 15 to 17 in short sessions and mixed light. It replaced the Álbum (sticker album) on 2026-11-10 because the metaphor read as unclear and decorative.
 
 **Review status.** This section records what the code ships. Signed-in screens were reviewed from component renders with fictional data, not live data; solve, review and Yo were not captured. Empty, long-label and real-volume states are unconfirmed on screen, and values may move after a live review.
 
 **Key Characteristics:**
 - White cards on a pale green desk, 1px hairlines, 16px corners.
-- Pitch green for the next-step card and the cover bars; one colour per area for its header band, dot and bar.
-- Sticker yellow for the one primary action and the "Siguiente" tag.
+- Brand red for the next-step card and the cover bars; one colour per area for its header band, dot and bar.
+- Action red (white text) for the one primary action; on a red surface the action turns white with red text. Rose marks for what is never pressed.
 - Figtree alone, 400 to 800, on seven type steps.
 - Flat controls; a press is scale 0.97. One authored moment: the level-up flash on the reward.
 
 ## Colors
 
-A quiet green-white page with two saturated voices: pitch green for "this is your plan" and yellow for "do this".
+A quiet warm-white page with one saturated voice: red, for "this is your plan" and "do this".
 
 ### Primary
-- **Pitch Green** (#097d52): the next-step card on Hoy, the Yo cover, the duel bar, links and accents. Hover deepens to Pitch Green Deep (#076a45). Text-sized green on white uses Green Ink (#08704a); success text is #075f3f.
-- **Sticker Yellow** (#ffd23f): the primary action (hover and press #ffdb66) and the "Siguiente" tag on the current topic. It also marks, without being pressable: a 16% tint on the current topic row, done progress beads in solve, today in the first week, the hint panel at 30%, and what is the student's own (their league row, portrait ground, medal icons, a chosen avatar part).
+- **Cover Red** (#b3132f): the next-step card, the Yo cover, the top bars, the duel bar. White text at 6.9:1.
+- **Brand Red** (#c41e3a, hover #a3172f): links, accents, focus, the welcome progress and step numerals. Text-sized red on white is #a8172f.
+- **Action Red** (#d91e3c, hover #bd1631, white text at 5:1): the one primary action (`--sticker`). On a red surface (`.next-card`) the action re-maps to white with Cover Red text.
+- **Rose Mark** (#ffd3db, ink text; token `--mark`): what is marked but never pressed: the current topic tint and "Siguiente" tag, done progress beads, today in the first week, the hint panel, the student's own league row, portrait ground, medals, avatar parts, the level-up flash.
 
 ### Secondary
 Area colours, set on an element as `--area` (in solve, `--field`). White text on each reads at 4.5:1 or better. They do not change in dark mode.
-- **Lectura Red** (#c2342a), **Matemáticas Green** (#097d52), **Ciencias Blue** (#0a6fb0), **Sociales Amber** (#b4540a), **Inglés Magenta** (#b3257a).
+- **Lectura Violet** (#6d3fc0), **Matemáticas Green** (#097d52), **Ciencias Blue** (#0a6fb0), **Sociales Amber** (#b4540a), **Inglés Magenta** (#b3257a).
 
 ### Neutral
-- **Green Black** (#10231c): text, the text on yellow, and the guided-question panel.
-- **Secondary and Tertiary Text** (#3c5148, #52665d): reasons and supporting lines; meta, counts, empty topics.
-- **Paper** (#ffffff): cards, sheets, the solve page. **Card Hover** (#f4f9f6). **Desk** (#eef5f1): the page behind cards and resting answer options. **Inset** (#eaf2ee): bar tracks, pressed rows, idle day cells.
-- **Hairline** (rgba(16, 35, 28, 0.13)): card edges and row dividers. **Strong Hairline** (rgba(16, 35, 28, 0.24)): secondary buttons, area chips. **Rule** (#d6e5dd): the solve footer and verdict tops.
-- **Correction Red** (#c8321f), with text #a31d10 on soft #ffe6e2: a wrong answer and errors.
-- **Dark:** paper #12201a, card #17281f, desk #0b1511, ink #e9f3ee, cover #0a5f40, green accent #62d2a2, red #f0796a; hairlines turn to ink at 14% and 28%. Yellow and area colours do not change.
+- **Warm Black** (#24141a): text and ink. **Panel** (#2a1218): the guided-question panel.
+- **Secondary and Tertiary Text** (#54404a, #6b555c).
+- **Paper** (#ffffff), **Card Hover** (#fcf6f7), **Desk** (#f8f1f2), **Inset** (#f3e8ea), **Rule** (#ecdcdf); hairlines rgba(36, 20, 26, 0.12) and 0.24.
+- **Correct** stays green ink (#08704a). **Correction** stays vermilion (#c8321f, text #a31d10 on #ffe6e2), warmer than the brand crimson; a wrong answer always carries its × and ring, never colour alone.
+- **Dark:** paper #1c1215, card #24171b, desk #130b0e, ink #f6eced, cover #8a1328, brand #ff8597, action #ff6b81 with dark text, mark #6b2433.
 
 ### Named Rules
-**The One Yellow Rule.** One yellow control per screen: the primary action. Every other yellow is a mark that is never pressed.
+**The One Red Action Rule.** One filled red control per screen: the primary action. On a red surface it turns white. Every rose is a mark that is never pressed.
 
-**The Area Rule.** An area's colour appears in three places only: the header band, the dot before its name, and its bar. Words on a band are white. A new area colour must hold 4.5:1 against white.
+**The Area Rule.** An area's colour appears in three places only: the header band, the dot before its name, and its bar. Words on a band are white. A new area colour must hold 4.5:1 against white, and none may read as the brand red.
 
 ## Typography
 
@@ -404,7 +412,7 @@ Flat. Depth comes from a white card on the desk and a 1px hairline, not from sha
 
 ### Shadow Vocabulary
 - **Float** (`--shadow-md: 0 4px 14px rgba(16,35,28,0.12)`, `--shadow-lg: 0 12px 32px rgba(16,35,28,0.18)`): menus, dialogs and sheets only.
-- **Ring** (`box-shadow: inset 0 0 0 2px`): a state, not depth. The selected, wrong or correct answer option in ink, red or green; a marked question's count in yellow.
+- **Ring** (`box-shadow: inset 0 0 0 2px`): a state, not depth. The selected, wrong or correct answer option in ink, red or green; a marked question's count in rose.
 
 ### Named Rules
 **The Flat Press Rule.** Nothing rests on a shadow and nothing leans. A press is `scale(0.97)` at 100ms `cubic-bezier(0.23, 1, 0.32, 1)`, never a 3D edge or an offset shadow.
@@ -418,7 +426,7 @@ Soft and plain: 16px cards, lists, bands and sheets; 12px buttons, answer option
 ### Buttons
 Flat and direct.
 - **Shape:** 12px, at least 3rem (3.25rem on Hoy and the reward, 52px in solve), Figtree 700.
-- **Primary:** Sticker Yellow with Green Black text, no border, no shadow. One per screen.
+- **Primary:** Action Red with white text, no border, no shadow. One per screen; white with red text on a red surface.
 - **Secondary:** card surface with a 1px strong hairline; hover and press to Card Hover.
 - **Danger:** Correction Red with white text.
 - **Hover / Focus:** hover only on fine pointers; on touch the same look comes from `:active`. Every press scales to 0.97.
@@ -428,7 +436,7 @@ Flat and direct.
 - **Row:** a 40px soft-green icon tile, a 700 title, a secondary line, meta (area dot and minutes), a chevron. Press to Inset.
 
 ### Next-step card
-Pitch Green, 16px, 20px padding: the task title (Headline), its reason, area and minutes in white, then the yellow primary.
+Cover Red, 16px, 20px padding: the task title (Headline), its reason, area and minutes in white, then the white primary.
 
 ### Area band and area rows
 - **Band (Aprende, lesson cover):** the area colour, white Title, a level pill at 20% white, a white bar on a 22% black track, and the count.
@@ -436,27 +444,27 @@ Pitch Green, 16px, 20px padding: the task title (Headline), its reason, area and
 - **Area chips:** pills with the area dot; the chosen one fills with its area colour and white text.
 
 ### Topic row and MasteryBadge
-Each topic shows its name, its MasteryBadge (a four-bar signal meter and the level word at 600), and its evidence (accuracy) when there is any. The current topic carries the "Siguiente" tag and a light yellow tint. The row's action is a quiet green text button; the level is what the row is about.
+Each topic shows its name, its MasteryBadge (a four-bar signal meter and the level word at 600), and its evidence (accuracy) when there is any. The current topic carries the "Siguiente" tag and a light rose tint. The row's action is a quiet red text button; the level is what the row is about.
 
 ### Answer Options
 Desk background, no border, 12px corners, at least 56px, Figtree 700, the letter in a 32px white tile. Selected: paper with a 2px ink ring, the tile inverts. Wrong and correct: soft red or green with a 2px ring; wrong shakes 260ms, the correct letter pops 240ms. Eliminated: 2px line-through at 60%.
 
 ### Guided question
-A Green Black panel under the question after a wrong answer: a Headline prompt, full-width white chips (12px) that turn yellow on press, underlined links, and a yellow "go". Never shows the correct option.
+A Panel (#2a1218) under the question after a wrong answer: a Headline prompt, full-width white chips (12px) that turn rose on press, underlined links, and a red "go". Never shows the correct option.
 
 ### Navigation
-Four tabs with icons, 0.8125rem labels at 700; the active tab takes Green Ink and a 22% icon fill. In solve, a bar in the area colour holds the back button, progress beads (yellow done, white current; one track past 15 questions), the clock and the "3/10" count.
+Four tabs with icons, 0.8125rem labels at 700; the active tab takes the brand red and a 22% icon fill. In solve, a bar in the area colour holds the back button, progress beads (rose done, white current; one track past 15 questions), the clock and the "3/10" count.
 
 ### Reward
-A white card: the score as a Title, the topics that moved (each with its MasteryBadge, a green "Subiste" or grey "Bajó" pill and a note), then what was earned as plain facts, then the yellow primary.
+A white card: the score as a Title, the topics that moved (each with its MasteryBadge, a green "Subiste" or grey "Bajó" pill and a note), then what was earned as plain facts, then the red primary.
 
-**The One Moment Rule.** A topic that went up on a fresh close settles in once: its row flashes from 55% yellow to soft green (520ms, after 250ms). It is the only celebration. Under reduced motion it does not play, and no press scales; colour changes stay.
+**The One Moment Rule.** A topic that went up on a fresh close settles in once: its row flashes from 55% rose to soft green (520ms, after 250ms). It is the only celebration. Under reduced motion it does not play, and no press scales; colour changes stay.
 
 ## Do's and Don'ts
 
 ### Do:
 - **Do** set every student screen through these tokens, and add new student routes to `lib/student-look.ts`.
-- **Do** give each screen one yellow primary action, and write the next step as a name with its reason, area and minutes.
+- **Do** give each screen one red primary action, and write the next step as a name with its reason, area and minutes.
 - **Do** show every topic in a topic list with its MasteryBadge.
 - **Do** use the area colour only as band, dot and bar, through `--area`.
 - **Do** use 100ms strong ease-out for presses and 140ms for colour, and remove transforms and the level-up flash under reduced motion.
@@ -464,7 +472,11 @@ A white card: the score as a Title, the topics that moved (each with its Mastery
 ### Don't:
 - **Don't** show a numbered slot, sticker or tile without a name; progress is written in words.
 - **Don't** make decoration look interactive: status facts on Hoy are plain icon and text, never pills or buttons.
-- **Don't** add a second yellow control to a screen, or tilts, 3D press edges or resting shadows.
+- **Don't** add a second red control to a screen, or tilts, 3D press edges or resting shadows.
 - **Don't** bring the notebook's ruling or red margin to student screens, or this look to teacher, school, staff, public or printed screens.
 - **Don't** add a label line above a heading; the heading speaks.
-- **Don't** hardcode the yellow, the ink or the area colours where a token exists.
+- **Don't** hardcode the red, the ink or the area colours where a token exists.
+
+## Onboarding (2026-11-11)
+
+Placement is one general diagnostic (20 questions, 4 per area, 40 min), not one nivelación per area. The welcome is a white card on the desk: a red segmented progress bar on top, the five areas as named chips, the flow as three numbered steps joined by a hairline, then the first-week commitment. The diagnostic intro is the same card (`.diagnostic-intro > .timed-intro`) with the areas listed under its facts. The result lists every area on one bar, weakest first, marked preliminary.

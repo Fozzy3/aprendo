@@ -8,7 +8,7 @@ import { Welcome } from '../components/Welcome'
 vi.mock('lucide-react', () => {
   const Icon = () => null
   return Object.fromEntries(
-    ['ArrowRight', 'Gauge', 'MessageCircleQuestion', 'Sun', 'Target', 'Timer', 'TrendingUp']
+    ['ArrowRight']
       .map((name) => [name, Icon]),
   )
 })
@@ -39,14 +39,15 @@ const click = (name: string) => {
 }
 
 describe('Welcome', () => {
-  it('walks the steps and hands off to the nivelación on the last one', () => {
-    expect(heading()).toContain('Bienvenido a Aprendo')
+  it('shows the five areas, then the flow, and hands off to the diagnostic', () => {
+    expect(heading()).toContain('Te damos la bienvenida')
+    expect(container.querySelectorAll('.welcome-areas li')).toHaveLength(5)
     click('Siguiente')
     expect(heading()).toContain('Así funciona')
-    click('Siguiente')
-    expect(heading()).toContain('Lo que vas a lograr')
+    expect(container.querySelector('.welcome-steps li')?.textContent).toContain('20 preguntas de las cinco áreas')
+    expect(container.querySelector('[role="img"]')?.getAttribute('aria-label')).toBe('Paso 2 de 2')
     expect(onDone).not.toHaveBeenCalled()
-    click('Empezar mi nivelación')
+    click('Empezar mi diagnóstico')
     expect(onDone).toHaveBeenCalledOnce()
   })
 

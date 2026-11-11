@@ -1239,8 +1239,8 @@ export const listSessions = query({
     return sessions
       .filter((session) => args.kind == null || session.kind === args.kind)
       // The diagnostic gate is an onboarding step, not part of the practice
-      // history students browse.
-      .filter((session) => session.kind !== 'diagnostic')
+      // history students browse — unless asked for by kind (resuming it).
+      .filter((session) => args.kind != null || session.kind !== 'diagnostic')
       .sort((a, b) => b.startedAt - a.startedAt)
       .slice(0, args.limit ?? 50)
       .map((session) => sealSessionResults(session))

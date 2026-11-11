@@ -115,7 +115,7 @@ function RootComponent() {
           <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
           <HeadContent />
           {/* Matches the top bar: Álbum green for students, the navy cover for the rest. */}
-          <meta name="theme-color" content={look === 'student' ? '#097d52' : '#16233f'} />
+          <meta name="theme-color" content={look === 'student' ? '#b3132f' : '#16233f'} />
         </head>
         <body className="font-sans antialiased">
           <Outlet />

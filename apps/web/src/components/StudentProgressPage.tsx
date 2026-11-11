@@ -135,11 +135,11 @@ export function StudentProgressPage({ session }: { session: ActiveStudentSession
           title="Todavía no puedo medir nada"
           action={
             <Link to="/diagnostic" className="btn-primary no-underline">
-              Nivelar un área
+              Hacer el diagnóstico
             </Link>
           }
         >
-          Nivélate en un área y desde ahí sigo cuánto avanzas.
+          Haz el diagnóstico y desde ahí sigo cuánto avanzas.
         </EmptyState>
         <YoSettings />
       </div>
@@ -164,7 +164,7 @@ export function StudentProgressPage({ session }: { session: ActiveStudentSession
           <h2 id="progress-areas-title" className="section-title">Tus áreas</h2>
           {overallDelta != null ? (
             <span className="section-meta">
-              Desde tu nivelación: <Delta delta={overallDelta} />
+              Desde tu diagnóstico: <Delta delta={overallDelta} />
             </span>
           ) : null}
         </div>
@@ -172,7 +172,7 @@ export function StudentProgressPage({ session }: { session: ActiveStudentSession
           rows={progress.subjectLevels.map(areaChartRow)}
           emptyAction={() => (
             <Link to="/diagnostic" className="area-chart-action">
-              Nivelarme
+              Hacer el diagnóstico
             </Link>
           )}
         />
@@ -237,7 +237,7 @@ function YoSettings() {
         </li>
         <li>
           <Link to="/diagnostic" className="ruled-row no-underline">
-            <span className="ruled-row-main font-semibold">Nivelar otra área</span>
+            <span className="ruled-row-main font-semibold">Repetir el diagnóstico</span>
             <ChevronRight size={18} aria-hidden />
           </Link>
         </li>

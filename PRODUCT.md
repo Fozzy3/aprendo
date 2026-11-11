@@ -83,7 +83,9 @@ a rector buys those.
 2. **The grid is a state, not wallpaper.** The ruling shows only where the
    student works (solving, reviewing) and on the sheets that frame sign-in.
 3. **Red is the margin's ink.** Mistakes, risk and the teacher's judgment share
-   one red; correct is green ink; tentative is pencil grey.
+   one red; correct is green ink; tentative is pencil grey. On student screens and
+   the landing, red is also the brand (2026-11-11): a mistake keeps the warmer
+   vermilion and always carries its × mark, never colour alone.
 4. **A school sees a student only through its memberships.** Learner data stays
    the student's; a teacher reads it and never writes it.
 5. **Every number the student will believe carries its source in a JSON

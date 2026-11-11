@@ -117,11 +117,12 @@ export const SESSION_KIND_CONFIG: Record<SessionKind, SessionKindConfig> = {
   diagnostic: {
     kind: 'diagnostic',
     labelEs: 'Diagnóstico inicial',
-    taglineEs: 'Medimos tu punto de partida en las cinco áreas.',
+    taglineEs: '20 preguntas de las cinco áreas: tu punto de partida.',
     strategy: 'balanced_by_subject',
+    // 4 per area × 5 areas = 20, at nivelación's pace of 2 min per question.
     questionsPerSubject: 4,
     eligibilityPools: ['diagnostic'],
-    timeLimitMs: null,
+    timeLimitMs: 40 * MINUTE_MS,
     tutorInSolve: false,
     requiresDiagnostic: false,
     launchableFromHub: false,

@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 import { act, type ComponentType, type ReactNode } from 'react'
 import { createRoot, type Root } from 'react-dom/client'
-import { SESSION_KIND_CONFIG } from '@aprendo/convex/sessionKinds'
+import { SESSION_KIND_CONFIG, getConfiguredQuestionCount } from '@aprendo/convex/sessionKinds'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 // Same setup as staff-routes.test.tsx: dependencies with hooks are replaced by
@@ -104,9 +104,10 @@ function expectPublicChrome() {
 }
 
 describe('/', () => {
-  it('states the placement length from the real constant', async () => {
+  it('states the general diagnostic length from the real constant', async () => {
     await render('../routes/index.tsx')
-    expect(container.textContent).toContain(`${SESSION_KIND_CONFIG.nivelacion.totalQuestions} preguntas sin ayuda`)
+    expect(container.textContent).toContain(`${getConfiguredQuestionCount(SESSION_KIND_CONFIG.diagnostic)} preguntas de las cinco áreas`)
+    expect(container.textContent).not.toContain('Nivelación por área')
     expect(container.textContent).not.toMatch(/quince/i)
   })
 

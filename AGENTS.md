@@ -68,7 +68,7 @@ Student/admin web application.
 Current routes:
 
 - `/` landing, `/login`, `/app` (post-login router to the student's default route)
-- `/diagnostic` placement (nivelación) by area
+- `/diagnostic` general diagnostic (20 questions, 4 per area, 40 min) that places every area at once; per-area nivelación is legacy
 - Student tabs: `/today` (Hoy), `/path` (Aprende; `/syllabus` redirects here), `/practice` (Retos), `/progress` (Yo; `/history` redirects here); `/lesson/$subtopicId`
 - `/practice/$sessionId` solve with the Socratic guided path, `/practice/$sessionId/review` reward and review, `/duelo/$id` live class duel
 - `/join` join a class with its code, `/cuenta` account, data export and deletion

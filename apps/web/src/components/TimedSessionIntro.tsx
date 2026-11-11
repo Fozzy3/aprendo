@@ -1,5 +1,5 @@
 import { BotOff, Flag, Hourglass, ListChecks, Play } from 'lucide-react'
-import { useEffect, useId, useRef, useState, type CSSProperties } from 'react'
+import { useEffect, useId, useRef, useState, type CSSProperties, type ReactNode } from 'react'
 import { getSubjectLabel } from '@aprendo/convex/taxonomy'
 import { AREA_STRATEGY, GENERAL_STRATEGY } from '../lib/exam-strategy.ts'
 import { formatTimeLimit } from '../lib/session-display.ts'
@@ -28,6 +28,7 @@ export function TimedSessionIntro({
   onStart,
   onCancel,
   strategySubjectIds,
+  children,
 }: {
   title: string
   subjectColor?: string
@@ -40,6 +41,8 @@ export function TimedSessionIntro({
   onCancel: () => void
   /** A simulacro shows the exam strategy for these areas before its clock starts (F35). */
   strategySubjectIds?: string[]
+  /** What the session covers, shown under its facts. */
+  children?: ReactNode
 }) {
   const titleId = useId()
   const titleRef = useRef<HTMLHeadingElement>(null)
@@ -83,6 +86,8 @@ export function TimedSessionIntro({
           <Hourglass size={16} aria-hidden /> {formatTimeLimit(timeLimitMs)}
         </span>
       </p>
+
+      {children}
 
       <ul className="timed-intro-rules">
         <li>

@@ -8,6 +8,6 @@
   ],
   "start_url": "/app",
   "display": "standalone",
-  "theme_color": "#097d52",
-  "background_color": "#097d52"
+  "theme_color": "#b3132f",
+  "background_color": "#b3132f"
 }

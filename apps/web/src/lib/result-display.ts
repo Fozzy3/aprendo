@@ -4,10 +4,10 @@ import { getSubjectLabel } from '@aprendo/convex/taxonomy'
 
 /**
  * The kinds that open on a result screen before the per-question review: the
- * two moments a student finds out where they stand.
+ * moments a student finds out where they stand.
  */
 export function hasResultScreen(kind: SessionKind): boolean {
-  return kind === 'nivelacion' || kind === 'simulacro'
+  return kind === 'diagnostic' || kind === 'nivelacion' || kind === 'simulacro'
 }
 
 /** A question time as the exam clock reads it: "2:15". */
@@ -125,4 +125,14 @@ export function simulacroGapMessage(report: {
     ? labels[0]
     : `${labels.slice(0, -1).join(', ')} ni ${labels[labels.length - 1]}`
   return `Este simulacro no incluyó ${list}, así que no hay puntaje global de 0 a 500.`
+}
+
+/** The general diagnostic's areas on the 0-100 scale, weakest first: where to start leads. */
+export function diagnosticAreas(scores: { subjectId: string; correctCount: number; questionCount: number }[]) {
+  return scores
+    .map((area) => {
+      const score = estimatedScoreFromAccuracy(area.questionCount === 0 ? 0 : area.correctCount / area.questionCount)
+      return { ...area, score, level: getLevelForScore(area.subjectId, score) }
+    })
+    .sort((a, b) => a.score - b.score)
 }

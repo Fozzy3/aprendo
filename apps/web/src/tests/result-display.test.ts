@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import {
   celebrationFor,
+  diagnosticAreas,
   formatClock,
   formatSignedPoints,
   hasResultScreen,
@@ -10,12 +11,12 @@ import {
 } from '../lib/result-display'
 
 describe('hasResultScreen', () => {
-  it('opens nivelación and simulacro on their result, everything else on the questions', () => {
+  it('opens the diagnostic, nivelación and simulacro on their result, everything else on the questions', () => {
+    expect(hasResultScreen('diagnostic')).toBe(true)
     expect(hasResultScreen('nivelacion')).toBe(true)
     expect(hasResultScreen('simulacro')).toBe(true)
     expect(hasResultScreen('topic')).toBe(false)
     expect(hasResultScreen('repaso')).toBe(false)
-    expect(hasResultScreen('diagnostic')).toBe(false)
   })
 })
 
@@ -131,5 +132,21 @@ describe('simulacroGapMessage', () => {
 
   it('says nothing when the exam is whole', () => {
     expect(simulacroGapMessage({ missingSessionNumbers: [], missingSubjectIds: [] })).toBeNull()
+  })
+})
+
+describe('diagnosticAreas', () => {
+  it('scores each area on 0-100 and lists the weakest first', () => {
+    const areas = diagnosticAreas([
+      { subjectId: 'matematicas', correctCount: 3, questionCount: 4 },
+      { subjectId: 'ingles', correctCount: 1, questionCount: 4 },
+      { subjectId: 'lectura_critica', correctCount: 0, questionCount: 0 },
+    ])
+    expect(areas.map((area) => [area.subjectId, area.score])).toEqual([
+      ['lectura_critica', 0],
+      ['ingles', 25],
+      ['matematicas', 75],
+    ])
+    expect(areas[2]?.level).not.toBeNull()
   })
 })

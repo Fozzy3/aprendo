@@ -96,7 +96,9 @@ vi.mock('../components/Welcome.tsx', () => ({ Welcome: () => <div>bienvenida</di
 vi.mock('../components/PracticeBuilder.tsx', () => ({
   PracticeBuilder: ({ expanded }: { expanded: boolean }) => <div data-testid="builder" data-expanded={String(expanded)} />,
 }))
-vi.mock('../components/TimedSessionIntro.tsx', () => ({ TimedSessionIntro: () => <div>intro</div> }))
+vi.mock('../components/TimedSessionIntro.tsx', () => ({
+  TimedSessionIntro: ({ children }: { children?: ReactNode }) => <div>intro{children}</div>,
+}))
 vi.mock('../components/GlobalScoreCard.tsx', () => ({ GlobalScoreCard: () => null }))
 vi.mock('../components/CareerPicker.tsx', () => ({ CareerCard: () => <div>carrera</div> }))
 vi.mock('../components/ExamCountdown.tsx', () => ({
@@ -351,6 +353,14 @@ describe('/diagnostic', () => {
     await render('../routes/diagnostic.tsx')
     expect(container.querySelector('.student-tabbar')).not.toBeNull()
   })
+
+  it('offers one general diagnostic of the five areas, not an area picker', async () => {
+    state.queries['students:getStudentAppState'] = appState({ hasPlacement: false })
+    await render('../routes/diagnostic.tsx')
+    expect(container.querySelectorAll('.welcome-areas li')).toHaveLength(5)
+    expect(container.textContent).not.toContain('Elige un área')
+    expect(container.querySelectorAll('.ruled-list button')).toHaveLength(0)
+  })
 })
 
 describe('/path, Aprende', () => {
@@ -575,7 +585,7 @@ describe('/progress, Yo', () => {
     seedYo()
     state.queries['progress:getStudentProgress'] = { isPending: false, data: { snapshot: null, subtopicMastery: [] } }
     await render('../routes/progress.tsx')
-    expect(container.textContent).toContain('Nivelar un área')
+    expect(container.textContent).toContain('Hacer el diagnóstico')
     expect(container.querySelector('[aria-labelledby="yo-settings-title"]')?.textContent).toContain('Salir')
   })
 })

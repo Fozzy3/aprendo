@@ -1,5 +1,5 @@
 import { Link, createFileRoute } from '@tanstack/react-router'
-import { SESSION_KIND_CONFIG } from '@aprendo/convex/sessionKinds'
+import { SESSION_KIND_CONFIG, getConfiguredQuestionCount } from '@aprendo/convex/sessionKinds'
 import { ArrowRight, BookOpen, House, Trophy, UserRound, X } from 'lucide-react'
 import type { CSSProperties } from 'react'
 import { Wordmark } from '../components/BrandMark.tsx'
@@ -37,7 +37,8 @@ export const Route = createFileRoute('/')({
   component: LandingPage,
 })
 
-const PLACEMENT_QUESTIONS = SESSION_KIND_CONFIG.nivelacion.totalQuestions
+const DIAGNOSTIC_QUESTIONS = getConfiguredQuestionCount(SESSION_KIND_CONFIG.diagnostic)
+const DIAGNOSTIC_MINUTES = (SESSION_KIND_CONFIG.diagnostic.timeLimitMs ?? 0) / 60_000
 
 /**
  * The landing, written for the person who decides whether a school buys: what
@@ -52,17 +53,17 @@ function LandingPage() {
 
   return (
     <div className="landing">
-      <header className="landing-bar">
-        <Wordmark subtitle="Saber 11" />
-        <div className="landing-bar-actions">
-          <ThemeToggle />
-          <Link to={isSignedIn ? '/app' : '/login'} className="btn-ghost no-underline">
-            {isSignedIn ? 'Ir a mi cuenta' : 'Entrar'}
-          </Link>
-        </div>
-      </header>
-
-      <main>
+      {/* The red cover: bar, promise and the two ways in. The class sheet lies across its edge. */}
+      <div className="landing-cover">
+        <header className="landing-bar">
+          <Wordmark subtitle="Saber 11" />
+          <div className="landing-bar-actions">
+            <ThemeToggle />
+            <Link to={isSignedIn ? '/app' : '/login'} className="btn-ghost no-underline">
+              {isSignedIn ? 'Ir a mi cuenta' : 'Entrar'}
+            </Link>
+          </div>
+        </header>
         <section className="landing-hero fade-in">
           <h1 className="landing-title">Saber 11: sepa qué enseñar cada semana</h1>
           <div className="landing-hero-lead">
@@ -77,7 +78,45 @@ function LandingPage() {
               </Link>
             </div>
           </div>
+        </section>
+      </div>
+
+      <main>
+        <div className="landing-sheet">
           <ClassReportFragment />
+        </div>
+
+        <section className="landing-section" aria-labelledby="start-title">
+          <h2 id="start-title" className="landing-h2">Así empieza cada estudiante</h2>
+          <p className="landing-copy">
+            Un solo diagnóstico, el primer día, y desde ahí un plan que se ajusta con cada respuesta.
+          </p>
+          <ol className="landing-steps">
+            <li>
+              <span className="landing-step-figure">{DIAGNOSTIC_QUESTIONS}</span>
+              <h3>Diagnóstico general</h3>
+              <p>
+                {DIAGNOSTIC_QUESTIONS} preguntas de las cinco áreas, sin tutor y con {DIAGNOSTIC_MINUTES} minutos de
+                reloj, como en el examen.
+              </p>
+            </li>
+            <li>
+              <span className="landing-step-figure">5</span>
+              <h3>Un nivel por área</h3>
+              <p>
+                Cada área queda en los niveles de desempeño que reporta el ICFES, marcada como preliminar hasta que
+                la práctica la confirme.
+              </p>
+            </li>
+            <li>
+              <span className="landing-step-figure">1</span>
+              <h3>Un paso para hoy</h3>
+              <p>
+                Cada día abre con la siguiente lección o práctica y su porqué, empezando donde el estudiante más
+                puede subir.
+              </p>
+            </li>
+          </ol>
         </section>
 
         <section className="landing-section" aria-labelledby="measures-title">
@@ -88,13 +127,6 @@ function LandingPage() {
           </p>
           <dl className="landing-terms">
             <div>
-              <dt>Nivelación por área</dt>
-              <dd>
-                {PLACEMENT_QUESTIONS} preguntas sin ayuda ubican al estudiante en los niveles de desempeño que
-                reporta el ICFES. Sin un mínimo de respuestas no se afirma ningún nivel.
-              </dd>
-            </div>
-            <div>
               <dt>Puntaje global estimado</dt>
               <dd>
                 De 0 a 500, siempre con su rango probable, y solo cuando las cinco áreas tienen evidencia.
@@ -102,10 +134,10 @@ function LandingPage() {
               </dd>
             </div>
             <div>
-              <dt>Plan de cada día</dt>
+              <dt>Simulacros con reloj</dt>
               <dd>
-                Lecciones, práctica y repasos según lo que el estudiante más necesita, hasta la fecha de su
-                examen. Simulacros cronometrados como la prueba real.
+                Las dos sesiones de la prueba real, cronometradas. Con ambas, el puntaje global de 0 a 500 de
+                ese simulacro.
               </dd>
             </div>
             <div>
@@ -215,7 +247,7 @@ function LandingPage() {
             <p className="landing-copy">
               {CONTACT_EMAIL != null
                 ? 'Escríbanos con el nombre del colegio y cuántos estudiantes de grado 11 tienen. Le respondemos con una propuesta para su colegio.'
-                : 'Cree una cuenta y presente una nivelación como lo haría un estudiante.'}
+                : 'Cree una cuenta y presente el diagnóstico como lo haría un estudiante.'}
             </p>
             <div className="landing-cta">
               <ContactCta label={CONTACT_EMAIL ?? ''} />
@@ -393,9 +425,10 @@ function CycleFragment() {
   )
 }
 
+// The student app's own area colours, whatever the page's theme.
 const AREAS = [
-  { label: 'Matemáticas', color: 'var(--subject-matematicas)', level: 'Nivel 2', done: 3, total: 8 },
-  { label: 'Lectura crítica', color: 'var(--subject-lectura_critica)', level: 'Nivel 3', done: 4, total: 6 },
+  { label: 'Matemáticas', color: '#097d52', level: 'Nivel 2', done: 3, total: 8 },
+  { label: 'Lectura crítica', color: '#6d3fc0', level: 'Nivel 3', done: 4, total: 6 },
 ]
 
 /** The student's Hoy: the next step and why, then the areas in words. */

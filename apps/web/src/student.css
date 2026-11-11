@@ -19,35 +19,36 @@
     --text-2xl: 2.25rem;
 
     --paper: #ffffff;
-    --rule: #d6e5dd;
-    --rule-strong: #b6cfc2;
-    --ink: #10231c;
-    --graphite: #4b5f57;
+    --rule: #ecdcdf;
+    --rule-strong: #d9bfc4;
+    --ink: #24141a;
+    --graphite: #5e4a4f;
     --margin: #c8321f;
     --green-ink: #08704a;
 
-    --cover: #097d52;
-    --cover-accent: #ffd23f;
-    --desk: #eef5f1;
+    /* Rojo: the brand. Cover bars and the next-step card. */
+    --cover: #b3132f;
+    --cover-accent: #ffffff;
+    --desk: #f8f1f2;
 
     --bg: var(--paper);
     --bg-card: #ffffff;
-    --bg-card-hover: #f4f9f6;
-    --bg-inset: #eaf2ee;
+    --bg-card-hover: #fcf6f7;
+    --bg-inset: #f3e8ea;
     --bg-elevated: #ffffff;
 
     --text-primary: var(--ink);
-    --text-secondary: #3c5148;
-    --text-tertiary: #52665d;
+    --text-secondary: #54404a;
+    --text-tertiary: #6b555c;
     --text-inverted: #ffffff;
 
-    --brand: #097d52;
-    --brand-hover: #076a45;
-    --accent: #097d52;
-    --accent-soft: rgba(9, 125, 82, 0.1);
-    --accent-medium: rgba(9, 125, 82, 0.22);
-    --accent-hover: #076a45;
-    --accent-text: #08704a;
+    --brand: #c41e3a;
+    --brand-hover: #a3172f;
+    --accent: #c41e3a;
+    --accent-soft: rgba(196, 30, 58, 0.08);
+    --accent-medium: rgba(196, 30, 58, 0.2);
+    --accent-hover: #a3172f;
+    --accent-text: #a8172f;
 
     --success: #08704a;
     --success-soft: rgba(9, 125, 82, 0.12);
@@ -58,26 +59,32 @@
     --warn: var(--graphite);
     --warn-soft: rgba(75, 95, 87, 0.12);
 
-    /* The one primary action per screen, and the "next" mark. */
-    --sticker: #ffd23f;
-    --sticker-hover: #ffdb66;
-    --on-sticker: #10231c;
+    /* The one primary action per screen (red; white on a red surface). */
+    --sticker: #d91e3c;
+    --sticker-hover: #bd1631;
+    --on-sticker: #ffffff;
+    /* Marks that are never pressed: the current topic, done beads, what is yours. */
+    --mark: #ffd3db;
+    --on-mark: var(--ink);
+    /* The guided-question panel. */
+    --panel: #2a1218;
     --on-danger: #ffffff;
 
-    /* One colour per area, for its header, marks and bars: white text reads at 4.5:1 or better. */
-    --subject-lectura_critica: #c2342a;
+    /* One colour per area, for its header, marks and bars: white text reads at 4.5:1 or better.
+       Lectura left red for violet when red became the brand. */
+    --subject-lectura_critica: #6d3fc0;
     --subject-matematicas: #097d52;
     --subject-ciencias_naturales: #0a6fb0;
     --subject-sociales_ciudadanas: #b4540a;
     --subject-ingles: #b3257a;
 
-    --border: rgba(16, 35, 28, 0.13);
-    --border-strong: rgba(16, 35, 28, 0.24);
-    --border-accent: rgba(9, 125, 82, 0.4);
+    --border: rgba(36, 20, 26, 0.12);
+    --border-strong: rgba(36, 20, 26, 0.24);
+    --border-accent: rgba(196, 30, 58, 0.4);
     --border-hard: var(--ink);
 
-    --shadow-md: 0 4px 14px rgba(16, 35, 28, 0.12);
-    --shadow-lg: 0 12px 32px rgba(16, 35, 28, 0.18);
+    --shadow-md: 0 4px 14px rgba(36, 20, 26, 0.12);
+    --shadow-lg: 0 12px 32px rgba(36, 20, 26, 0.18);
 
     --radius-sm: 8px;
     --radius-md: 12px;
@@ -92,33 +99,39 @@
 
   /* After the light block, and more specific than `:root.dark` in styles.css. */
   :root.dark[data-look='student'] {
-    --paper: #12201a;
-    --rule: #26382f;
-    --rule-strong: #3a5145;
-    --ink: #e9f3ee;
-    --graphite: #a9bdb3;
+    --paper: #1c1215;
+    --rule: #3a262b;
+    --rule-strong: #54383f;
+    --ink: #f6eced;
+    --graphite: #c2aeb3;
     --margin: #f0796a;
     --green-ink: #62d2a2;
 
-    --cover: #0a5f40;
-    --desk: #0b1511;
+    --cover: #8a1328;
+    --desk: #130b0e;
 
-    --bg-card: #17281f;
-    --bg-card-hover: #1d3227;
-    --bg-inset: #0e1a15;
-    --bg-elevated: #1b2e25;
+    --bg-card: #24171b;
+    --bg-card-hover: #2d1d22;
+    --bg-inset: #170e11;
+    --bg-elevated: #2a1b20;
 
-    --text-secondary: #bdd0c6;
-    --text-tertiary: #a3b8ad;
-    --text-inverted: #06140e;
+    --text-secondary: #d9c5ca;
+    --text-tertiary: #bfa8ae;
+    --text-inverted: #1a070c;
 
-    --brand: #62d2a2;
-    --brand-hover: #7fdeb5;
-    --accent: #62d2a2;
-    --accent-soft: rgba(98, 210, 162, 0.13);
-    --accent-medium: rgba(98, 210, 162, 0.26);
-    --accent-hover: #7fdeb5;
-    --accent-text: #7fdeb5;
+    --brand: #ff8597;
+    --brand-hover: #ffa3b1;
+    --accent: #ff8597;
+    --accent-soft: rgba(255, 133, 151, 0.13);
+    --accent-medium: rgba(255, 133, 151, 0.26);
+    --accent-hover: #ffa3b1;
+    --accent-text: #ffa3b1;
+
+    --sticker: #ff6b81;
+    --sticker-hover: #ff8597;
+    --on-sticker: #1a070c;
+    --mark: #6b2433;
+    --panel: #0d0608;
 
     --success: #62d2a2;
     --success-soft: rgba(98, 210, 162, 0.14);
@@ -126,12 +139,12 @@
     --danger-soft: rgba(240, 121, 106, 0.16);
     --danger-text: #ff9c8f;
 
-    --border: rgba(233, 243, 238, 0.14);
-    --border-strong: rgba(233, 243, 238, 0.28);
-    --border-accent: rgba(98, 210, 162, 0.45);
+    --border: rgba(246, 236, 237, 0.14);
+    --border-strong: rgba(246, 236, 237, 0.28);
+    --border-accent: rgba(255, 133, 151, 0.45);
 
-    --on-danger: #06140e;
-    --cover-accent: #ffd23f;
+    --on-danger: #1a070c;
+    --cover-accent: #ffffff;
     --shadow-md: 0 4px 14px rgba(0, 0, 0, 0.4);
     --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.5);
   }
@@ -142,7 +155,7 @@
   }
 
   html[data-look='student'] ::selection {
-    background: color-mix(in srgb, var(--sticker) 55%, transparent);
+    background: color-mix(in srgb, var(--mark) 55%, transparent);
     color: var(--text-primary);
   }
 
@@ -613,7 +626,11 @@
     margin-bottom: 0;
   }
 
+  /* On the red card the action turns white: one red action, never red on red. */
   .next-card {
+    --sticker: #ffffff;
+    --sticker-hover: #ffe9ec;
+    --on-sticker: var(--cover);
     display: grid;
     gap: 0.5rem;
     padding: 1.25rem;
@@ -783,8 +800,8 @@
   }
 
   .first-week-day.is-today {
-    background: var(--sticker);
-    color: var(--on-sticker);
+    background: var(--mark);
+    color: var(--on-mark);
   }
 
   /* ── Aprende: the area's topics, each with its level and evidence ───── */
@@ -952,7 +969,7 @@
   }
 
   .aprende-topic.is-current {
-    background: color-mix(in srgb, var(--sticker) 16%, var(--bg-card));
+    background: color-mix(in srgb, var(--mark) 16%, var(--bg-card));
   }
 
   .aprende-topic-main {
@@ -980,8 +997,8 @@
   .aprende-tag {
     padding: 0.125rem 0.5rem;
     border-radius: var(--radius-pill);
-    background: var(--sticker);
-    color: var(--on-sticker);
+    background: var(--mark);
+    color: var(--on-mark);
     font-size: var(--text-xs);
     font-weight: 800;
   }
@@ -1104,7 +1121,7 @@
   }
 
   .reto-tile.is-primary .reto-tile-icon {
-    background: rgba(16, 35, 28, 0.1);
+    background: rgba(36, 20, 26, 0.1);
     color: var(--on-sticker);
   }
 
@@ -1193,7 +1210,7 @@
     width: 4rem;
     height: 4rem;
     border-radius: var(--radius-md);
-    background: var(--sticker);
+    background: var(--mark);
     overflow: hidden;
   }
 
@@ -1302,7 +1319,7 @@
     transition: background-color 140ms ease;
   }
 
-  .beads i.is-done { background: var(--sticker); }
+  .beads i.is-done { background: var(--mark); }
   .beads i.is-current { background: #fff; }
 
   .solve-bar-track {
@@ -1317,7 +1334,7 @@
   .solve-bar-track > span {
     display: block;
     height: 100%;
-    background: var(--sticker);
+    background: var(--mark);
     transform-origin: left;
     transition: transform 200ms var(--ease-out-strong);
   }
@@ -1352,7 +1369,7 @@
   }
 
   .solve-count.is-marked {
-    box-shadow: inset 0 0 0 2px var(--sticker);
+    box-shadow: inset 0 0 0 2px var(--mark);
   }
 
   html[data-look='student'] .solve-main {
@@ -1515,7 +1532,7 @@
     margin: 14px 0 0;
     padding: 12px 14px;
     border-radius: 12px;
-    background: color-mix(in srgb, var(--sticker) 30%, var(--paper));
+    background: color-mix(in srgb, var(--mark) 30%, var(--paper));
     font-weight: 600;
     text-wrap: pretty;
   }
@@ -1640,12 +1657,12 @@
   /* The guided path: near-black, under the question, asking. */
   .ask {
     padding: 20px 20px calc(24px + env(safe-area-inset-bottom, 0px));
-    background: var(--on-sticker);
+    background: var(--panel);
     color: #fff;
   }
 
   :root.dark[data-look='student'] .ask {
-    background: #0b1511;
+    background: var(--panel);
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12);
   }
 
@@ -1717,7 +1734,7 @@
     border: 0;
     border-radius: var(--radius-md);
     background: #fff;
-    color: var(--on-sticker);
+    color: var(--panel);
     font: inherit;
     font-size: var(--text-base);
     font-weight: 600;
@@ -1733,7 +1750,7 @@
 
   .ask-chip:active:not(:disabled) {
     transform: scale(0.97);
-    background: var(--sticker);
+    background: var(--mark);
   }
 
   .ask-chip:disabled {
@@ -1744,7 +1761,7 @@
   .ask-chip:focus-visible,
   .ask-link:focus-visible,
   .ask-go:focus-visible {
-    outline: 2px solid var(--sticker);
+    outline: 2px solid var(--mark);
     outline-offset: 2px;
   }
 
@@ -1953,7 +1970,7 @@
 
   @keyframes level-up {
     from {
-      background: color-mix(in srgb, var(--sticker) 55%, var(--paper));
+      background: color-mix(in srgb, var(--mark) 55%, var(--paper));
     }
   }
 
@@ -2133,7 +2150,7 @@
     display: block;
     overflow: hidden;
     border-radius: var(--radius-sm);
-    background: var(--sticker);
+    background: var(--mark);
   }
 
   .avatar-portrait {
@@ -2195,8 +2212,8 @@
 
   .avatar-part-option[aria-pressed='true'] {
     border-color: transparent;
-    background: var(--sticker);
-    color: var(--on-sticker);
+    background: var(--mark);
+    color: var(--on-mark);
   }
 
   .nickname-picker {
@@ -2274,8 +2291,8 @@
   }
 
   .league-row.is-you {
-    background: var(--sticker);
-    color: var(--on-sticker);
+    background: var(--mark);
+    color: var(--on-mark);
   }
 
   .league-rank {
@@ -2335,8 +2352,8 @@
     width: 2rem;
     height: 2rem;
     border-radius: 50%;
-    background: var(--sticker);
-    color: var(--on-sticker);
+    background: var(--mark);
+    color: var(--on-mark);
   }
 
   .yo-medal .reward-medal-icon {
@@ -2410,8 +2427,8 @@
     gap: 0.75rem;
     padding: 0.875rem 1rem;
     border-radius: var(--radius-md);
-    background: var(--sticker);
-    color: var(--on-sticker);
+    background: var(--mark);
+    color: var(--on-mark);
     transition: transform 100ms var(--ease-out-strong);
   }
 

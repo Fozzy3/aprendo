@@ -19,6 +19,7 @@ import {
 import { api } from '@aprendo/convex/api'
 import { MIN_STATS_SAMPLE } from '@aprendo/convex/answerStats'
 import { MarkdownBlock } from '../components/MarkdownBlock.tsx'
+import { DiagnosticResult } from '../components/DiagnosticResult.tsx'
 import { NivelacionResult } from '../components/NivelacionResult.tsx'
 import { QuestionReportForm } from '../components/QuestionReportForm.tsx'
 import { SharedStimulus } from '../components/SharedStimulus.tsx'
@@ -335,7 +336,9 @@ function ReviewPage() {
   if (opensOnResult && pregunta == null && sessionDoc.status === 'completed') {
     return (
       <StudentAppShell session={session} activeSection="practice">
-        {sessionDoc.kind === 'nivelacion' ? (
+        {sessionDoc.kind === 'diagnostic' ? (
+          <DiagnosticResult session={sessionDoc} studentId={session.studentId} />
+        ) : sessionDoc.kind === 'nivelacion' ? (
           <NivelacionResult session={sessionDoc} studentId={session.studentId} />
         ) : (
           <SimulacroReport sessionId={sessionDoc._id} studentId={session.studentId} />

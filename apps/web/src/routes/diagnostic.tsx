@@ -1,7 +1,6 @@
 import { useConvexMutation } from '@convex-dev/react-query'
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
-import { Check, ChevronRight } from 'lucide-react'
 import { useEffect, useState, type CSSProperties } from 'react'
 import { api } from '@aprendo/convex/api'
 import { SESSION_KIND_CONFIG, getConfiguredQuestionCount } from '@aprendo/convex/sessionKinds'
@@ -11,10 +10,9 @@ import { TimedSessionIntro } from '../components/TimedSessionIntro.tsx'
 import { Welcome } from '../components/Welcome.tsx'
 import { findResumableSession } from '../lib/resume-session.ts'
 import { readStored, writeStored } from '../lib/solve-state.ts'
-import { formatTimeLimit } from '../lib/session-display.ts'
 import { sessionHistoryQuery, studentAppStateQuery } from '../lib/student-queries.ts'
 import { useCurrentStudent } from '../lib/student-session.ts'
-import { getAllSubjectThemes, getSubjectTheme } from '../lib/subject-theme.ts'
+import { getAllSubjectThemes } from '../lib/subject-theme.ts'
 import { FullScreenLoader } from '../components/FullScreenLoader.tsx'
 import { readConvexError } from '../lib/convex-error.ts'
 
@@ -22,51 +20,36 @@ export const Route = createFileRoute('/diagnostic')({
   component: PlacementPage,
 })
 
-const NIVELACION = SESSION_KIND_CONFIG.nivelacion
-// ponytail: per-browser flag; a student on a new device sees the welcome again until their first nivelación.
+const DIAGNOSTIC = SESSION_KIND_CONFIG.diagnostic
+// ponytail: per-browser flag; a student on a new device sees the welcome again until their first diagnostic.
 const WELCOME_SEEN_KEY = 'aprendo:welcome-seen'
 
 /**
- * Placement ("Nivelación"), the app's entry point.
- *
- * Replaces the old single 20-question diagnostic: the student levels one ICFES
- * area at a time, and the first completed area unlocks the rest of the app. The
- * page stays reachable afterwards so the remaining four areas can be levelled
- * whenever the student wants — which is why it does not redirect away once
- * placement exists.
+ * The general diagnostic, the app's entry point: 20 questions from the five
+ * areas, without help. Completing it places every area at once and unlocks
+ * the app. Placed students can come back and sit it again.
  */
 function PlacementPage() {
   const navigate = useNavigate()
   const { session, isReady } = useCurrentStudent()
   const [sessionId, setSessionId] = useState<string | null>(null)
-  // The area tapped but not started yet: the intro step sits between the two,
-  // because starting is what sets the clock running.
-  const [pendingSubjectId, setPendingSubjectId] = useState<string | null>(null)
   const [hasSeenWelcome, setHasSeenWelcome] = useState(() => readStored(WELCOME_SEEN_KEY) != null)
 
   const appStateQuery = useQuery({
     ...studentAppStateQuery(session?.studentId),
     enabled: isReady && session != null,
   })
-  // createSession hands back an unfinished nivelación instead of a new one, so
-  // tapping that area resumes it: the intro's full clock would be wrong for it.
-  const nivelacionesQuery = useQuery({
-    ...sessionHistoryQuery(session?.studentId, { kind: 'nivelacion' }),
+  // createSession hands back an unfinished diagnostic instead of a new one, so
+  // the intro's full clock would be wrong for it: resume it directly.
+  const diagnosticsQuery = useQuery({
+    ...sessionHistoryQuery(session?.studentId, { kind: 'diagnostic' }),
     enabled: isReady && session != null,
   })
 
   const createSession = useConvexMutation(api.sessions.createSession)
   const createMutation = useMutation({
-    mutationFn: async (subjectId: string) =>
-      createSession({
-        studentId: session?.studentId as never,
-        kind: 'nivelacion',
-        subjectId,
-      }),
-    onSuccess: (createdId) => {
-      setSessionId(createdId)
-      setPendingSubjectId(null)
-    },
+    mutationFn: async () => createSession({ studentId: session?.studentId as never, kind: 'diagnostic' }),
+    onSuccess: setSessionId,
   })
 
   useEffect(() => {
@@ -75,17 +58,12 @@ function PlacementPage() {
     }
   }, [isReady, navigate, session])
 
-  if (!isReady || session == null || appStateQuery.isPending || nivelacionesQuery.isPending) {
-    return (
-      <FullScreenLoader />
-    )
+  if (!isReady || session == null || appStateQuery.isPending || diagnosticsQuery.isPending) {
+    return <FullScreenLoader />
   }
 
-  const placedSubjectIds = appStateQuery.data?.placedSubjectIds ?? []
   const hasAnyPlacement = appStateQuery.data?.hasPlacement ?? false
-  const pendingSubject = pendingSubjectId != null ? getSubjectTheme(pendingSubjectId) : null
-  const findUnfinished = (subjectId: string) =>
-    findResumableSession(nivelacionesQuery.data ?? [], { kind: 'nivelacion', subjectId }, Date.now())
+  const unfinished = findResumableSession(diagnosticsQuery.data ?? [], { kind: 'diagnostic' }, Date.now())
 
   return (
     <StudentAppShell
@@ -95,101 +73,72 @@ function PlacementPage() {
       hideTabs={!hasAnyPlacement}
       topBarSupplement={<div className="student-pill">Sin tutor · medimos tu nivel</div>}
     >
-        {sessionId != null ? (
-          <SessionSolve
-            sessionId={sessionId}
-            onExit={() => setSessionId(null)}
-            onCompleted={(completedId) =>
-              navigate({ to: '/practice/$sessionId/review', params: { sessionId: completedId } })
-            }
+      {sessionId != null ? (
+        <SessionSolve
+          sessionId={sessionId}
+          onExit={() => setSessionId(null)}
+          onCompleted={(completedId) =>
+            navigate({ to: '/practice/$sessionId/review', params: { sessionId: completedId } })
+          }
+        />
+      ) : !hasAnyPlacement && !hasSeenWelcome ? (
+        <div className="diagnostic-intro">
+          <Welcome
+            studentId={session.studentId}
+            onDone={() => {
+              writeStored(WELCOME_SEEN_KEY, '1')
+              setHasSeenWelcome(true)
+            }}
           />
-        ) : !hasAnyPlacement && !hasSeenWelcome ? (
-          <div className="diagnostic-intro">
-            <Welcome
-              studentId={session.studentId}
-              onDone={() => {
-                writeStored(WELCOME_SEEN_KEY, '1')
-                setHasSeenWelcome(true)
-              }}
-            />
-          </div>
-        ) : pendingSubject != null ? (
-          <div className="diagnostic-intro">
+        </div>
+      ) : (
+        <div className="diagnostic-intro">
+          {unfinished != null ? (
+            <section className="timed-intro fade-in">
+              <h2 className="timed-intro-title">Tienes un diagnóstico en curso</h2>
+              <p className="timed-intro-facts">El reloj siguió corriendo. Sigue donde ibas.</p>
+              <div className="timed-intro-actions">
+                <button type="button" className="btn-primary" onClick={() => setSessionId(unfinished._id)}>
+                  Continuar
+                </button>
+              </div>
+            </section>
+          ) : (
             <TimedSessionIntro
-              title={`${NIVELACION.labelEs} de ${pendingSubject.label}`}
-              subjectColor={pendingSubject.color}
-              questionCount={getConfiguredQuestionCount(NIVELACION)}
-              timeLimitMs={NIVELACION.timeLimitMs ?? 0}
+              title={DIAGNOSTIC.labelEs}
+              questionCount={getConfiguredQuestionCount(DIAGNOSTIC)}
+              timeLimitMs={DIAGNOSTIC.timeLimitMs ?? 0}
               isStarting={createMutation.isPending}
               error={
                 createMutation.error != null
-                  ? readConvexError(createMutation.error, 'No pudimos iniciar la nivelación.')
+                  ? readConvexError(createMutation.error, 'No pudimos iniciar el diagnóstico.')
                   : null
               }
-              cancelLabel="Elegir otra área"
-              onStart={() => createMutation.mutate(pendingSubject.id)}
+              cancelLabel={hasAnyPlacement ? 'Volver a Hoy' : 'Ver la bienvenida'}
+              onStart={() => createMutation.mutate()}
               onCancel={() => {
                 createMutation.reset()
-                setPendingSubjectId(null)
+                if (hasAnyPlacement) void navigate({ to: '/today' })
+                else setHasSeenWelcome(false)
               }}
-            />
-          </div>
-        ) : (
-          <div className="diagnostic-intro fade-in">
-            <header className="ruled-page-head">
-              <h1 className="page-title">
-                {hasAnyPlacement ? 'Nivela otra área' : '¿En qué nivel estás?'}
-              </h1>
-              <p className="page-lede">
+            >
+              <p className="timed-intro-lede">
                 {hasAnyPlacement
-                  ? 'Ya conoces tu nivel en al menos un área. Nivela las demás cuando quieras.'
-                  : `Elige un área y responde ${NIVELACION.totalQuestions} preguntas sin ayuda. Con eso ubicamos tu nivel ICFES y armamos tu ruta. Puedes nivelar las demás áreas después.`}
+                  ? 'Repítelo cuando quieras medir de nuevo tu punto de partida.'
+                  : 'Preguntas de las cinco áreas, sin ayuda. Con ellas ubicamos tu nivel y armamos tu plan.'}
               </p>
-            </header>
-
-            <ul className="ruled-list">
-              {getAllSubjectThemes().map((subject) => {
-                const isPlaced = placedSubjectIds.includes(subject.id)
-                const isUnfinished = findUnfinished(subject.id) != null
-                return (
-                  <li key={subject.id}>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        const unfinished = findUnfinished(subject.id)
-                        if (unfinished != null) setSessionId(unfinished._id)
-                        else setPendingSubjectId(subject.id)
-                      }}
-                      className="ruled-row w-full cursor-pointer border-x-0 border-t-0 bg-transparent text-left hover:bg-[var(--bg-inset)]"
-                    >
-                      {/* The area's colour lives in its dot and nowhere else. */}
-                      <span
-                        aria-hidden="true"
-                        className="subject-dot"
-                        style={{ '--subject-color': subject.color } as CSSProperties}
-                      />
-                      <span className="ruled-row-main">
-                        <span className="font-semibold">{subject.label}</span>
-                        <span className="ruled-row-note">
-                          {isUnfinished
-                            ? 'En curso · toca para continuar'
-                            : `${NIVELACION.totalQuestions} preguntas · ${formatTimeLimit(NIVELACION.timeLimitMs)}`}
-                        </span>
-                      </span>
-                      {isPlaced && (
-                        <span className="chip-success chip" title="Ya nivelaste esta área">
-                          <Check size={12} aria-hidden /> Nivelada
-                        </span>
-                      )}
-                      <ChevronRight size={16} aria-hidden className="shrink-0 text-[var(--text-tertiary)]" />
-                    </button>
+              <ul className="welcome-areas" aria-label="Áreas del diagnóstico">
+                {getAllSubjectThemes().map((subject) => (
+                  <li key={subject.id} style={{ '--subject-color': subject.color } as CSSProperties}>
+                    <span aria-hidden="true" className="subject-dot" />
+                    {subject.label}
                   </li>
-                )
-              })}
-            </ul>
-
-          </div>
-        )}
+                ))}
+              </ul>
+            </TimedSessionIntro>
+          )}
+        </div>
+      )}
     </StudentAppShell>
   )
 }

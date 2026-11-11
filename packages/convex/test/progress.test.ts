@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { summarizeTrends } from '../src/progress'
+import { placedSubjectIds, summarizeTrends } from '../src/progress'
 
 const WEEK = 7 * 24 * 60 * 60 * 1000
 const NOW = Date.UTC(2026, 9, 8, 17)
@@ -66,5 +66,26 @@ describe('summarizeTrends', () => {
     expect(trends.totalAttempts).toBe(3)
     expect(trends.activeDays).toBe(2)
     expect(trends.firstActivityAt).toBe(NOW - WEEK)
+  })
+})
+
+describe('placedSubjectIds', () => {
+  const scored = (subjectId: string) => ({ subjectId, correctCount: 1, answeredCount: 4, questionCount: 4, score: 25 })
+
+  test('a completed general diagnostic places every area it scored', () => {
+    const placed = placedSubjectIds([
+      { kind: 'diagnostic', status: 'completed', summary: { subjectScores: [scored('matematicas'), scored('ingles')] } },
+    ])
+    expect([...placed].sort()).toEqual(['ingles', 'matematicas'])
+  })
+
+  test('a nivelación places its one area; unfinished sessions place nothing', () => {
+    const placed = placedSubjectIds([
+      { kind: 'nivelacion', status: 'completed', subjectId: 'lectura_critica' },
+      { kind: 'nivelacion', status: 'abandoned', subjectId: 'ingles' },
+      { kind: 'diagnostic', status: 'in_progress', summary: { subjectScores: [scored('matematicas')] } },
+      { kind: 'topic', status: 'completed', subjectId: 'ciencias_naturales' },
+    ])
+    expect([...placed]).toEqual(['lectura_critica'])
   })
 })

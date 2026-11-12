@@ -41,11 +41,11 @@ describe('sendEmail', () => {
 })
 
 describe('emailVerificationRequired', () => {
-  test('stays open only in local development, where neither a key nor a site is set', () => {
+  test('is on only when a Resend key can actually send the email', () => {
     expect(emailVerificationRequired({})).toBe(false)
     expect(emailVerificationRequired({ RESEND_API_KEY: 're_123' })).toBe(true)
-    // A production site missing its key fails closed instead of letting any email in.
-    expect(emailVerificationRequired({ SITE_URL: 'https://aprendo.co' })).toBe(true)
+    // Owner decision (2026-11-11): the pilot runs without email, so a site without a key stays open.
+    expect(emailVerificationRequired({ SITE_URL: 'https://aprendo.co' })).toBe(false)
   })
 
   test('the owner can switch it off on purpose, even with a key and a site', () => {

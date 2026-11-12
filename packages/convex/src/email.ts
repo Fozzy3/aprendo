@@ -29,7 +29,8 @@ interface EmailTransport {
  */
 export function emailVerificationRequired(env: { RESEND_API_KEY?: string; SITE_URL?: string; EMAIL_VERIFICATION?: string }) {
   if (env.EMAIL_VERIFICATION === 'off') return false
-  return env.RESEND_API_KEY != null || env.SITE_URL != null
+  // ponytail: open sign-up without a key (pilot runs without email); set RESEND_API_KEY to require verification.
+  return env.RESEND_API_KEY != null
 }
 
 export const defaultTransport = (): EmailTransport => ({

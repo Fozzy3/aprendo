@@ -94,8 +94,7 @@ export const createAuth = (ctx: GenericCtx<DataModel>) =>
     baseURL: siteUrl,
     trustedOrigins,
     database: authComponent.adapter(ctx),
-    // Verification is required once a mail provider or a real site is
-    // configured (`emailVerificationRequired`); only local development stays open.
+    // Verification is required only once a Resend key is set (`emailVerificationRequired`).
     emailAndPassword: {
       enabled: true,
       requireEmailVerification: emailEnabled,

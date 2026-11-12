@@ -1,5 +1,6 @@
 import { convexQuery } from '@convex-dev/react-query'
 import { useQuery } from '@tanstack/react-query'
+import { useMemo } from 'react'
 import { api } from '@aprendo/convex/api'
 import type { Id } from '@aprendo/convex/dataModel'
 import { authClient } from './auth-client.ts'
@@ -17,10 +18,16 @@ export function useCurrentStudent() {
   // session this query never answers and only the session read can settle it.
   const signedOut = !auth.isPending && auth.error == null && auth.data == null
 
-  const session: ActiveStudentSession | null =
-    signedOut || result.data == null
-      ? null
-      : { studentId: result.data._id, email: result.data.email, name: result.data.name }
+  // Memoized on its fields: effects list `session` as a dependency, and a fresh
+  // object every render re-ran them forever (the student guard's `navigate`).
+  const student = signedOut ? null : result.data
+  const studentId = student?._id
+  const email = student?.email
+  const name = student?.name
+  const session = useMemo<ActiveStudentSession | null>(
+    () => (studentId == null ? null : { studentId, email: email as string, name: name ?? null }),
+    [studentId, email, name],
+  )
 
   return {
     session,

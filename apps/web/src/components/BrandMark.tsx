@@ -20,7 +20,7 @@ export function BrandMark({ size = 18, className }: BrandMarkProps) {
     >
       <rect x="1" y="1" width="18" height="18" stroke="var(--ink)" strokeWidth="1.5" />
       <path d="M1 7h18M1 13h18M13 1v18" stroke="var(--rule-strong)" strokeWidth="1" />
-      <path d="M7 1v18" stroke="var(--margin)" strokeWidth="1.5" />
+      <path className="brand-mark-rule" d="M7 1v18" stroke="var(--margin)" strokeWidth="1.5" />
     </svg>
   )
 }

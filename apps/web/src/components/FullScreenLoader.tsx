@@ -21,7 +21,7 @@ export function FullScreenLoader({
 }) {
   return (
     <div className="route-loader" role="status" aria-live="polite">
-      <BrandMark size={28} />
+      <BrandMark size={36} className="route-loader-mark" />
       <p className="route-loader-text">{message}</p>
     </div>
   )

@@ -4465,6 +4465,46 @@ pre code {
   font-weight: 700;
 }
 
+/* The guided question inside a phone: the student's screen is the phone. */
+.lp-phone {
+  position: relative;
+  padding: 10px;
+  border-radius: 40px;
+  background: #1c1a1f;
+  box-shadow: 0 28px 50px -28px rgba(28, 26, 31, 0.5);
+}
+
+.lp-phone::before {
+  content: "";
+  position: absolute;
+  top: 19px;
+  left: 50%;
+  z-index: 1;
+  width: 4.5rem;
+  height: 1.1rem;
+  translate: -50% 0;
+  border-radius: 999px;
+  background: #1c1a1f;
+}
+
+:root.dark .lp-phone {
+  background: #0c0b0e;
+  box-shadow: 0 0 0 1px var(--lp-line), 0 28px 50px -28px rgba(0, 0, 0, 0.8);
+}
+
+:root.dark .lp-phone::before {
+  background: #0c0b0e;
+}
+
+.lp-phone .lp-guide-ui {
+  border: 0;
+  border-radius: 30px;
+}
+
+.lp-phone .lp-guide-bar {
+  padding-top: 2.1rem;
+}
+
 /* What counts: four terms on one white sheet, two by two. */
 .lp-terms {
   display: grid;
@@ -4621,6 +4661,23 @@ pre code {
   color: var(--lp-text-2);
 }
 
+.lp-teacher-bar {
+  display: block;
+  height: 6px;
+  overflow: hidden;
+  border-radius: 3px;
+  background: var(--lp-track);
+}
+
+.lp-teacher-bar > i {
+  display: block;
+  width: var(--share);
+  height: 100%;
+  border-radius: 3px;
+  background: var(--lp-bar);
+  transform-origin: left;
+}
+
 /* ─── Motion: the hero enters once; the goal bar fills ─── */
 @media (prefers-reduced-motion: no-preference) {
   .lp-hero-text > *,
@@ -4635,6 +4692,120 @@ pre code {
   .lp-app-goal > i > i {
     animation: lp-fill 700ms var(--lp-ease) 650ms backwards;
   }
+
+  /* The Hoy screen settles after the page: week ticks land one by one, then
+     the area bars grow. Always plays on load; the hero is above the fold. */
+  .lp-app-week .done i,
+  .lp-app-week .today i {
+    animation: lp-pop 420ms var(--lp-ease) backwards;
+  }
+
+  .lp-app-week span:nth-child(1) i { animation-delay: 900ms; }
+  .lp-app-week span:nth-child(2) i { animation-delay: 1000ms; }
+  .lp-app-week span:nth-child(3) i { animation-delay: 1100ms; }
+  .lp-app-week span:nth-child(4) i { animation-delay: 1300ms; }
+
+  .lp-app-areas > div > b > b {
+    transform-origin: left;
+    animation: lp-fill 800ms var(--lp-ease) backwards;
+  }
+
+  .lp-app-areas > div:nth-child(1) > b > b { animation-delay: 800ms; }
+  .lp-app-areas > div:nth-child(2) > b > b { animation-delay: 880ms; }
+  .lp-app-areas > div:nth-child(3) > b > b { animation-delay: 960ms; }
+  .lp-app-areas > div:nth-child(4) > b > b { animation-delay: 1040ms; }
+  .lp-app-areas > div:nth-child(5) > b > b { animation-delay: 1120ms; }
+
+  /* Below the fold: `useReveal` arms a block (hidden), then lets it in. */
+  [data-reveal] {
+    transition:
+      opacity 600ms var(--lp-ease),
+      transform 600ms var(--lp-ease);
+  }
+
+  [data-reveal='armed'] {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  .lp-steps li:nth-child(2),
+  .lp-terms > div:nth-child(2) { transition-delay: 90ms; }
+  .lp-steps li:nth-child(3),
+  .lp-terms > div:nth-child(3) { transition-delay: 180ms; }
+  .lp-terms > div:nth-child(4) { transition-delay: 270ms; }
+
+  /* The guided question plays once it is on screen: the answer is picked, it
+     turns wrong, the tutor asks, and the three replies arrive. */
+  .lp-guide-beads .current,
+  .lp-guide-opts .is-wrong,
+  .lp-guide-opts .is-wrong em,
+  .lp-guide-opts .is-wrong svg,
+  .lp-guide-ask,
+  .lp-guide-ask span {
+    transition:
+      opacity 420ms var(--lp-ease),
+      transform 420ms var(--lp-ease),
+      background-color 280ms ease,
+      box-shadow 280ms ease,
+      color 280ms ease;
+  }
+
+  .lp-guide-beads .current,
+  .lp-guide-opts .is-wrong,
+  .lp-guide-opts .is-wrong em,
+  .lp-guide-opts .is-wrong svg { transition-delay: 800ms; }
+
+  .lp-guide-ask { transition-delay: 1300ms; }
+  .lp-guide-ask span:nth-of-type(1) { transition-delay: 1650ms; }
+  .lp-guide-ask span:nth-of-type(2) { transition-delay: 1770ms; }
+  .lp-guide-ask span:nth-of-type(3) { transition-delay: 1890ms; }
+
+  [data-reveal='armed'] .lp-guide-beads .current { background: rgba(255, 255, 255, 0.28); }
+
+  [data-reveal='armed'] .lp-guide-opts .is-wrong {
+    background: var(--lp-desk);
+    box-shadow: inset 0 0 0 2px transparent;
+    color: inherit;
+  }
+
+  [data-reveal='armed'] .lp-guide-opts .is-wrong em {
+    background: var(--lp-card);
+    color: inherit;
+  }
+
+  [data-reveal='armed'] .lp-guide-opts .is-wrong svg {
+    opacity: 0;
+    transform: scale(0.4);
+  }
+
+  [data-reveal='armed'] .lp-guide-ask {
+    opacity: 0;
+    transform: translateY(1rem);
+  }
+
+  [data-reveal='armed'] .lp-guide-ask span {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  /* The teacher's panel: the head, then each row, then the share fills. */
+  .lp-teacher-row,
+  .lp-teacher-bar > i {
+    transition:
+      opacity 500ms var(--lp-ease),
+      transform 700ms var(--lp-ease);
+  }
+
+  .lp-teacher-row:nth-of-type(1) { transition-delay: 500ms; }
+  .lp-teacher-row:nth-of-type(2) { transition-delay: 800ms; }
+  .lp-teacher-bar > i { transition-delay: 1000ms; }
+
+  [data-reveal='armed'] .lp-teacher-row {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  [data-reveal='armed'] .lp-teacher-bar > i { transform: scaleX(0); }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -4652,6 +4823,13 @@ pre code {
   from {
     opacity: 0;
     transform: translateY(16px);
+  }
+}
+
+@keyframes lp-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.4);
   }
 }
 
@@ -4807,6 +4985,21 @@ pre code {
   font-size: 0.9rem;
   font-weight: 600;
   color: var(--text-secondary);
+}
+
+/* The margin rule is written across the cell and back: the page being ruled.
+   Transform only, so it stays on the compositor. */
+.route-loader-mark .brand-mark-rule {
+  animation: route-loader-rule 1.4s cubic-bezier(0.65, 0, 0.35, 1) infinite;
+}
+
+@keyframes route-loader-rule {
+  0%, 100% { transform: translateX(0); }
+  50% { transform: translateX(6px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .route-loader-mark .brand-mark-rule { animation: none; }
 }
 
 .page-loader {

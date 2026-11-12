@@ -2,7 +2,7 @@ import { Link, createFileRoute } from '@tanstack/react-router'
 import { SESSION_KIND_CONFIG, getConfiguredQuestionCount } from '@aprendo/convex/sessionKinds'
 import { DAILY_GOAL_OPTIONS } from '@aprendo/convex/studyPlan'
 import { ArrowRight, BookOpen, Check, House, Trophy, UserRound, X } from 'lucide-react'
-import type { CSSProperties } from 'react'
+import { useEffect, type CSSProperties } from 'react'
 import { Wordmark } from '../components/BrandMark.tsx'
 import { PublicFooter } from '../components/PublicPage.tsx'
 import { ThemeToggle } from '../components/ThemeToggle.tsx'
@@ -52,6 +52,7 @@ const GOAL_OPTIONS = `${DAILY_GOAL_OPTIONS.slice(0, -1).join(', ')} o ${DAILY_GO
  * data, captioned as an example.
  */
 function LandingPage() {
+  useReveal()
   const { session, isReady } = useCurrentStudent()
   const isSignedIn = isReady && session != null
 
@@ -92,7 +93,7 @@ function LandingPage() {
         <section className="lp-section" aria-labelledby="start-title">
           <h2 id="start-title" className="lp-h2">Así empiezas</h2>
           <ol className="lp-steps">
-            <li>
+            <li data-reveal>
               <span className="lp-figure">{DIAGNOSTIC_MINUTES} min</span>
               <h3>Un diagnóstico, sin ayuda</h3>
               <p>
@@ -100,7 +101,7 @@ function LandingPage() {
                 sabemos desde dónde arrancas.
               </p>
             </li>
-            <li>
+            <li data-reveal>
               <span className="lp-figure">5 áreas</span>
               <h3>Un nivel en cada una</h3>
               <p>
@@ -108,7 +109,7 @@ function LandingPage() {
                 práctica lo va ajustando.
               </p>
             </li>
-            <li>
+            <li data-reveal>
               <span className="lp-figure">1 paso</span>
               <h3>Lo que toca hoy</h3>
               <p>
@@ -121,7 +122,7 @@ function LandingPage() {
 
         <section className="lp-section lp-guide" aria-labelledby="guide-title">
           <GuidedFragment />
-          <div>
+          <div data-reveal>
             <h2 id="guide-title" className="lp-h2">Si te equivocas, te pregunta</h2>
             <p className="lp-copy">
               Aprendo no te muestra la respuesta de una. Te pregunta qué te llevó a esa opción y te guía con
@@ -141,25 +142,25 @@ function LandingPage() {
             de cada tema solo sube cuando respondes bien.
           </p>
           <dl className="lp-terms">
-            <div>
+            <div data-reveal>
               <dt>Racha y meta diaria</dt>
               <dd>
                 Cada día que practicas suma a tu racha, y un escudo la cuida si un día se te pasa. Si quieres,
                 te escribimos al correo para recordártela.
               </dd>
             </div>
-            <div>
+            <div data-reveal>
               <dt>Nivel por tema</dt>
               <dd>Cada tema va de Sin empezar a Dominado según lo que respondes. Los puntos no lo mueven.</dd>
             </div>
-            <div>
+            <div data-reveal>
               <dt>Puntaje global estimado</dt>
               <dd>
                 De 0 a 500 y con su rango probable, solo cuando las cinco áreas tienen evidencia. Es una
                 estimación, no un resultado oficial.
               </dd>
             </div>
-            <div>
+            <div data-reveal>
               <dt>Simulacros con reloj</dt>
               <dd>Las dos sesiones de la prueba, cronometradas, para que el día del examen nada te tome por sorpresa.</dd>
             </div>
@@ -168,7 +169,7 @@ function LandingPage() {
 
         <section className="lp-band" aria-labelledby="teacher-title">
           <div className="lp-band-inner">
-            <div>
+            <div data-reveal>
               <h2 id="teacher-title" className="lp-h2">Para docentes y colegios</h2>
               <p className="lp-copy">
                 El docente crea su curso y los estudiantes entran con un código. Cada semana ve qué enseñar a
@@ -196,7 +197,7 @@ function LandingPage() {
         </section>
 
         <section className="lp-section lp-split" aria-labelledby="source-title">
-          <div>
+          <div data-reveal>
             <h2 id="source-title" className="lp-h2">De dónde salen las preguntas</h2>
             <p className="lp-copy">
               Practicas con cuadernillos que el ICFES publicó, sin cambiarlos y con su fuente, y con el banco
@@ -208,7 +209,7 @@ function LandingPage() {
               de lo que un colegio paga.
             </p>
           </div>
-          <div>
+          <div data-reveal>
             <h2 className="lp-h2">Tus datos</h2>
             <p className="lp-copy">
               Tu cuenta es tuya: puedes descargar tus datos o borrarla cuando quieras. Si eres menor de edad, te
@@ -222,7 +223,7 @@ function LandingPage() {
           </div>
         </section>
 
-        <section className="lp-close" aria-labelledby="close-title">
+        <section className="lp-close" aria-labelledby="close-title" data-reveal>
           <h2 id="close-title" className="lp-h2">Empieza por el diagnóstico</h2>
           <p className="lp-copy">Son {DIAGNOSTIC_MINUTES} minutos. Al terminar ya tienes tu plan de hoy.</p>
           <div className="lp-cta">
@@ -234,6 +235,35 @@ function LandingPage() {
       <PublicFooter />
     </div>
   )
+}
+
+/**
+ * Scroll-in for everything marked `data-reveal`. Server HTML and no-JS show the
+ * final state; only what starts below the fold is armed (hidden) and then let in,
+ * so nothing flashes and the hero keeps its own CSS entrance. Reduced motion
+ * arms nothing.
+ */
+function useReveal() {
+  useEffect(() => {
+    if (typeof IntersectionObserver === 'undefined') return
+    if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (!entry.isIntersecting) continue
+          ;(entry.target as HTMLElement).dataset.reveal = 'in'
+          io.unobserve(entry.target)
+        }
+      },
+      { rootMargin: '0px 0px -10% 0px' },
+    )
+    for (const el of document.querySelectorAll<HTMLElement>('.landing [data-reveal]')) {
+      if (el.getBoundingClientRect().top < window.innerHeight) continue
+      el.dataset.reveal = 'armed'
+      io.observe(el)
+    }
+    return () => io.disconnect()
+  }, [])
 }
 
 /** The student's way in: sign-up, or back to the app when already signed in. */
@@ -363,7 +393,8 @@ function TodayFragment() {
 /** A wrong answer opens a question: "Todavía no", then why it was chosen. */
 function GuidedFragment() {
   return (
-    <figure className="lp-figure-wrap">
+    <figure className="lp-figure-wrap" data-reveal>
+      <div className="lp-phone">
       <div
         data-ui
         role="img"
@@ -401,6 +432,7 @@ function GuidedFragment() {
           <span>La adiviné</span>
         </div>
       </div>
+      </div>
       <figcaption>Ejemplo de la práctica guiada, con una pregunta de muestra.</figcaption>
     </figure>
   )
@@ -409,7 +441,7 @@ function GuidedFragment() {
 /** The teacher's week, cut down to the topic for the whole class. */
 function TeacherFragment() {
   return (
-    <figure className="lp-figure-wrap">
+    <figure className="lp-figure-wrap" data-reveal>
       <div
         data-ui
         role="img"
@@ -427,6 +459,9 @@ function TeacherFragment() {
             Matemáticas
           </span>
           <b>Razones, proporciones y porcentajes</b>
+          <i className="lp-teacher-bar" style={{ '--share': '62%' } as CSSProperties}>
+            <i />
+          </i>
           <span>18 de 29 están por debajo de Familiar. Clase corta y una votación en parejas.</span>
         </div>
         <p className="lp-app-h">En grupo pequeño</p>

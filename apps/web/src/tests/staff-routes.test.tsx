@@ -41,6 +41,7 @@ vi.mock('@tanstack/react-router', () => ({
   }),
   useNavigate: () => state.navigate,
   useRouter: () => ({ history: { back: vi.fn() } }),
+  useLocation: () => ({ pathname: '/', searchStr: '' }),
 }))
 
 vi.mock('@convex-dev/react-query', () => ({
@@ -81,6 +82,7 @@ vi.mock('@tanstack/react-query', () => ({
   },
 }))
 
+vi.mock('../lib/use-track.ts', () => ({ useTrack: () => () => {} }))
 vi.mock('../lib/use-signed-in.ts', () => ({
   useSignedIn: () => ({ studentId: 's1', email: 'docente@colegio.edu.co', name: 'Ana Ruiz' }),
 }))

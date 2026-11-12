@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import { areaRows, dueLabel, hoursToGoalMinutes, targetGapLines, taskSessionArgs, taskTarget, timedIntro } from '../lib/today-display'
+import type { StudyTaskAction } from '@aprendo/convex/studyPlan'
+import { areaRows, comebackLaunch, dueLabel, hoursToGoalMinutes, targetGapLines, taskSessionArgs, taskTarget, timedIntro } from '../lib/today-display'
 
 describe('dueLabel', () => {
   const monday = new Date(2026, 10, 9, 10).getTime()
@@ -186,5 +187,28 @@ describe('areaRows', () => {
 
   it('still lists the areas while the levels load', () => {
     expect(areaRows(album, undefined).map((row) => row.level)).toEqual([null, null])
+  })
+})
+
+describe('comebackLaunch', () => {
+  const task = (action: StudyTaskAction) => ({ action })
+
+  it('starts with five of the review when something is due', () => {
+    expect(comebackLaunch([
+      task({ type: 'session', kind: 'topic', subtopicId: 'a' }),
+      task({ type: 'session', kind: 'repaso' }),
+    ])).toEqual({ kind: 'repaso', questionLimit: 5 })
+  })
+
+  it('else five questions of the plan’s first topic', () => {
+    expect(comebackLaunch([
+      task({ type: 'lesson', subtopicId: 'b' }),
+      task({ type: 'session', kind: 'topic', subtopicId: 'b' }),
+    ])).toEqual({ kind: 'topic', subtopicId: 'b', questionLimit: 5 })
+  })
+
+  it('never a timed sitting: without a topic, the five of the recommended practice', () => {
+    expect(comebackLaunch([task({ type: 'session', kind: 'simulacro', simulacroSessionNumber: 1 })])).toEqual({ kind: 'recommended' })
+    expect(comebackLaunch([])).toEqual({ kind: 'recommended' })
   })
 })

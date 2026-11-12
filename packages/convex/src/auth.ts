@@ -11,7 +11,7 @@ import { components, internal } from './_generated/api'
 import { query } from './_generated/server'
 import type { QueryCtx } from './_generated/server'
 import type { DataModel, Doc, Id } from './_generated/dataModel'
-import { sendEmail } from './email'
+import { emailVerificationRequired, sendEmail } from './email'
 import { deleteStudentData } from './students'
 
 const siteUrl = process.env.SITE_URL ?? 'http://localhost:3000'
@@ -21,7 +21,7 @@ const trustedOrigins = process.env.SITE_URL
   ? [siteUrl]
   : ['http://localhost:3000', 'http://localhost:3002']
 
-const emailEnabled = process.env.RESEND_API_KEY != null
+const emailEnabled = emailVerificationRequired(process.env)
 
 const authFunctions: AuthFunctions = internal.auth
 
@@ -94,8 +94,8 @@ export const createAuth = (ctx: GenericCtx<DataModel>) =>
     baseURL: siteUrl,
     trustedOrigins,
     database: authComponent.adapter(ctx),
-    // Verification is required once a mail provider is configured; without one
-    // it would lock everyone out, so local development stays open.
+    // Verification is required once a mail provider or a real site is
+    // configured (`emailVerificationRequired`); only local development stays open.
     emailAndPassword: {
       enabled: true,
       requireEmailVerification: emailEnabled,

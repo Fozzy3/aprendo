@@ -6,7 +6,7 @@ import { setupTest, signUp } from './signIn'
 
 // The tutor agent builds its model when the module loads; no test reaches it.
 process.env.OPENROUTER_API_KEY ??= 'test'
-const { GUIDED_PATH_RULE, OFF_TOPIC_REPLY, buildTutorSystemPrompt } = await import('../src/tutor')
+const { GUIDED_PATH_RULE, OFF_TOPIC_REPLY, buildTutorSystemPrompt, wantsDemo } = await import('../src/tutor')
 
 const now = 1_700_000_000_000
 
@@ -164,7 +164,41 @@ describe('review tutor', () => {
 
     expect(chemistry?.demoIdea).toContain('3Dmol')
     expect(english?.demoIdea).toContain('arrastra')
-    expect(buildTutorSystemPrompt(chemistry)).toContain(chemistry!.demoIdea!)
+    expect(buildTutorSystemPrompt(chemistry, { demos: true })).toContain(chemistry!.demoIdea!)
+  })
+
+  test('the demo guide and its idea go only to a message that asks for a demo', async () => {
+    const t = setupTest()
+    const { studentId } = await signUp(t, 'ana@x.co')
+    const { practiceSessionId, questionIds } = await seedReview(t, studentId, ['ciencias_naturales.chemistry_component.chemical_changes_reactions'])
+    const context = await t.query(internal.tutor.getPracticeQuestionContext, { practiceSessionId, studentId, questionId: questionIds[0]! })
+
+    const plain = buildTutorSystemPrompt(context)
+    expect(plain).not.toContain('create_artifact')
+    expect(plain).not.toContain(context!.demoIdea!)
+    const withDemos = buildTutorSystemPrompt(context, { demos: true })
+    expect(withDemos).toContain('create_artifact')
+    // Shorter prompt, faster first word: a budget, the old one was ~13,900 characters.
+    expect(plain.length).toBeLessThan(withDemos.length)
+    expect(buildTutorSystemPrompt(null).length).toBeLessThan(5000)
+  })
+
+  test('wantsDemo: only an explicit ask for something to see or move', () => {
+    for (const ask of ['Muéstramelo en una demo interactiva', 'hazme una simulación', 'quiero verlo en una gráfica interactiva', 'Haz una DEMOSTRACIÓN', 'muéstrame la molécula en 3D']) {
+      expect(wantsDemo(ask)).toBe(true)
+    }
+    for (const ask of ['Dame una pista', 'Explícame la respuesta', '¿Qué debo repasar?', 'Dame un problema similar', '¿Cómo descarto opciones?']) {
+      expect(wantsDemo(ask)).toBe(false)
+    }
+  })
+
+  test('safety, privacy, length and injection rules are in every prompt', () => {
+    for (const prompt of [buildTutorSystemPrompt(null), buildTutorSystemPrompt(null, { demos: true })]) {
+      expect(prompt).toContain('Línea 106')
+      expect(prompt).toContain('123')
+      expect(prompt).toContain('datos personales')
+      expect(prompt).toContain('80 palabras')
+    }
   })
 
   test('keeps the question as data and closes on the scope, with or without a question', async () => {

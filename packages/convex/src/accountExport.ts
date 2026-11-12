@@ -54,6 +54,8 @@ export const exportMyData = query({
       memberships,
       classGroupMembers,
       duelAnswers,
+      events,
+      pilotSurveyResponses,
     ] = await Promise.all([
       ctx.db.query('questionAttempts').withIndex('by_studentId', (q) => q.eq('studentId', studentId)).collect(),
       ctx.db.query('learnerSubjectAggregates').withIndex('by_studentId', (q) => q.eq('studentId', studentId)).collect(),
@@ -66,6 +68,8 @@ export const exportMyData = query({
       ctx.db.query('memberships').withIndex('by_accountId', (q) => q.eq('accountId', studentId)).collect(),
       ctx.db.query('classGroupMembers').withIndex('by_accountId', (q) => q.eq('accountId', studentId)).collect(),
       ctx.db.query('duelAnswers').withIndex('by_studentId', (q) => q.eq('studentId', studentId)).collect(),
+      ctx.db.query('events').withIndex('by_studentId', (q) => q.eq('studentId', studentId)).collect(),
+      ctx.db.query('pilotSurveyResponses').withIndex('by_studentId', (q) => q.eq('studentId', studentId)).collect(),
     ])
 
     const questionAttempts = attempts.map((attempt) => {
@@ -112,6 +116,8 @@ export const exportMyData = query({
       memberships,
       classGroupMembers,
       duelAnswers,
+      events,
+      pilotSurveyResponses,
     }
   },
 })

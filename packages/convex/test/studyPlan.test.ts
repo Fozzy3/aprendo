@@ -95,21 +95,22 @@ describe('buildStudyPlan — placement first', () => {
 })
 
 describe('buildStudyPlan — simulacros', () => {
-  test('baseline simulacro when there has never been one', () => {
+  test('baseline simulacro is offered, but never as the first step: a short practice leads', () => {
     const plan = buildStudyPlan(
-      input({ simulacroSittings: [], reviewDueCount: 4, subtopics: [subtopic('mat_a', 'matematicas', 0.2)] }),
+      input({ simulacroSittings: [], subtopics: [subtopic('mat_a', 'matematicas', 0.2)] }),
     )
-    expect(plan.tasks[0]?.kind).toBe('simulacro')
-    expect(plan.tasks[0]?.action).toEqual({ type: 'session', kind: 'simulacro', simulacroSessionNumber: 1 })
-    expect(plan.tasks[0]?.reason).toContain('punto de partida')
+    expect(plan.tasks[0]?.kind).not.toBe('simulacro')
+    const baseline = plan.tasks.find((task) => task.kind === 'simulacro')
+    expect(baseline?.action).toEqual({ type: 'session', kind: 'simulacro', simulacroSessionNumber: 1 })
+    expect(baseline?.reason).toContain('punto de partida')
   })
 
-  test('a due simulacro does not take the day: the weak block still follows', () => {
+  test('the baseline goes after the daily block, last on the list', () => {
     const plan = buildStudyPlan(
       input({ simulacroSittings: [], reviewDueCount: 4, subtopics: [subtopic('mat_a', 'matematicas', 0.2)] }),
     )
-    expect(kinds(plan)).toEqual(['simulacro', 'lesson', 'practice', 'repaso'])
-    expect(plan.tasks[2]?.action).toEqual({ type: 'session', kind: 'topic', subtopicId: 'mat_a' })
+    expect(kinds(plan)).toEqual(['lesson', 'practice', 'repaso', 'simulacro'])
+    expect(plan.tasks[1]?.action).toEqual({ type: 'session', kind: 'topic', subtopicId: 'mat_a' })
   })
 
   test('Sesión 2 follows Sesión 1, on a later day', () => {
@@ -331,5 +332,25 @@ describe('buildStudyPlan — the last days before the exam', () => {
   test('after the exam the plan ignores the date', () => {
     const plan = buildStudyPlan(input({ ...heavyDay, examDay: TODAY - 1 }))
     expect(plan.tasks[0]?.kind).toBe('nivelacion')
+  })
+})
+
+describe('buildStudyPlan — the daily goal', () => {
+  test('without a goal the mission is five answers', () => {
+    expect(buildStudyPlan(input()).hero.goalQuestions).toBe(5)
+    expect(buildStudyPlan(input({ answeredToday: 5 })).hero.missionComplete).toBe(true)
+  })
+
+  test('the student’s goal sets when the mission is done; the session stays its own length', () => {
+    const short = buildStudyPlan(input({ dailyGoalQuestions: 15, answeredToday: 10 }))
+    expect(short.hero.goalQuestions).toBe(15)
+    expect(short.hero.missionComplete).toBe(false)
+    expect(short.hero.questionCount).toBe(SESSION_KIND_CONFIG.recommended.totalQuestions ?? 5)
+    expect(buildStudyPlan(input({ dailyGoalQuestions: 15, answeredToday: 15 })).hero.missionComplete).toBe(true)
+  })
+
+  test('carries the answers so far, for the meter on Hoy', () => {
+    expect(buildStudyPlan(input({ answeredToday: 3 })).hero.answeredToday).toBe(3)
+    expect(buildStudyPlan(input()).hero.answeredToday).toBe(0)
   })
 })

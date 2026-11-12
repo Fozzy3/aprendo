@@ -146,6 +146,7 @@ export const listOrganizations = query({
           licenseActive: isLicenseActive(organization, now),
           seatsUsed: await countStudents(ctx, organization._id),
           adminEmails,
+          leagueEnabled: organization.leagueEnabled === true,
         }
       }),
     )

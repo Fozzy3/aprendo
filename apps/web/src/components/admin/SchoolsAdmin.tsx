@@ -41,6 +41,7 @@ export function SchoolsAdmin() {
                   <th scope="col">Plan</th>
                   <th scope="col" className="is-number">Cupos</th>
                   <th scope="col">Licencia</th>
+                  <th scope="col">Liga</th>
                   <th scope="col"><span className="sr-only">Acciones</span></th>
                 </tr>
               </thead>
@@ -151,9 +152,14 @@ function LicenseRow({
     licenseEndsAt: number
     licenseActive: boolean
     adminEmails: string[]
+    leagueEnabled: boolean
   }
 }) {
   const updateLicense = useConvexMutation(api.schools.updateOrganizationLicense)
+  const setSchoolLeague = useConvexMutation(api.measurement.setSchoolLeague)
+  const leagueMutation = useMutation({
+    mutationFn: (enabled: boolean) => setSchoolLeague({ orgId: organization._id as never, enabled }),
+  })
   const addOrgAdmin = useConvexMutation(api.schools.addOrgAdmin)
   const [isEditing, setIsEditing] = useState(false)
   const [adminEmail, setAdminEmail] = useState('')
@@ -242,6 +248,7 @@ function LicenseRow({
             </p>
           ) : null}
         </td>
+        <td>{organization.leagueEnabled ? 'Activa' : 'Apagada'}</td>
         <td className="whitespace-nowrap">
           <button type="button" className="btn-primary" disabled={mutation.isPending} onClick={() => mutation.mutate()}>
             Guardar
@@ -265,6 +272,24 @@ function LicenseRow({
       <td className={organization.licenseActive ? undefined : 'text-[var(--danger-text)]'}>
         {organization.licenseActive ? 'Hasta ' : 'Venció el '}
         {new Date(organization.licenseEndsAt).toLocaleDateString('es-CO', { day: 'numeric', month: 'short', year: 'numeric' })}
+      </td>
+      <td>
+        {/* Off until the school signs the minors' data addendum (G2). */}
+        <label className="inline-flex items-center gap-2">
+          <input
+            type="checkbox"
+            aria-label={`Liga de ${organization.name}`}
+            checked={organization.leagueEnabled}
+            disabled={leagueMutation.isPending}
+            onChange={(event) => leagueMutation.mutate(event.target.checked)}
+          />
+          <span aria-hidden>{organization.leagueEnabled ? 'Activa' : 'Apagada'}</span>
+        </label>
+        {leagueMutation.error ? (
+          <p role="alert" className="m-0 mt-1 text-xs text-[var(--danger-text)]">
+            {readConvexError(leagueMutation.error, 'No se pudo cambiar la liga.')}
+          </p>
+        ) : null}
       </td>
       <td>
         <button type="button" className="btn-ghost" onClick={() => setIsEditing(true)}>

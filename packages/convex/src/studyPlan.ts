@@ -25,7 +25,7 @@ export const LIGHT_DAYS_BEFORE_EXAM = 2
 const MAX_TASKS = 4
 const MIN_TASKS = 2
 /** Untimed practice, answer review included. */
-const MINUTES_PER_PRACTICE_QUESTION = 2
+export const MINUTES_PER_PRACTICE_QUESTION = 2
 const LESSON_MINUTES = 10
 
 export interface StudyPlanInput {
@@ -54,6 +54,8 @@ export interface StudyPlanInput {
   weeklyGoalMinutes: number
   /** Answers in sessions closed today: what the daily mission counts. */
   answeredToday?: number
+  /** The student's daily goal (`students.dailyGoalQuestions`); absent, `DEFAULT_DAILY_GOAL_QUESTIONS`. */
+  dailyGoalQuestions?: number
   /**
    * The career's area weights (`careers.careerWeights`), when the student chose
    * one: the plan then works where the career's weighted score gains most. Absent,
@@ -95,20 +97,31 @@ const TOPIC_MINUTES = practiceMinutes(SESSION_KIND_CONFIG.topic.totalQuestions ?
 /** How many of the next subtopics the other screens show (Progreso, Ruta, Hoy). */
 const NEXT_SUBTOPIC_COUNT = 3
 
+/** The daily goals a student can pick in the welcome, in answers a day. */
+export const DAILY_GOAL_OPTIONS = [5, 10, 15, 20] as const
+export const DEFAULT_DAILY_GOAL_QUESTIONS = 5
+
+export function isValidDailyGoal(questions: number) {
+  return (DAILY_GOAL_OPTIONS as readonly number[]).includes(questions)
+}
+
 /**
  * The main session of the day (F54): five questions, the one big button on
- * Hoy. "Misión cumplida" is derived: five answers in sessions closed today,
- * whichever session they came from. Light days keep it: it is short.
+ * Hoy. "Misión cumplida" is derived: the student's daily goal in answers from
+ * sessions closed today, whichever session they came from. Light days keep it.
  */
 export function buildStudyPlan(input: StudyPlanInput) {
   const questionCount = SESSION_KIND_CONFIG.recommended.totalQuestions ?? 5
+  const goalQuestions = input.dailyGoalQuestions ?? DEFAULT_DAILY_GOAL_QUESTIONS
   return {
     ...buildTasks(input),
     hero: {
       questionCount,
       minutes: practiceMinutes(questionCount),
       action: { type: 'session', kind: 'recommended' } satisfies StudyTaskAction,
-      missionComplete: (input.answeredToday ?? 0) >= questionCount,
+      goalQuestions,
+      answeredToday: input.answeredToday ?? 0,
+      missionComplete: (input.answeredToday ?? 0) >= goalQuestions,
     },
   }
 }
@@ -208,6 +221,9 @@ function buildTasks(input: StudyPlanInput): {
   })
 
   let simulacro: StudyTask | null = null
+  // The first-ever simulacro (4.5 h) right after the diagnostic is a wall, not a first step:
+  // it is offered after the short daily block instead of leading the day.
+  let simulacroLeads = true
   if (pendingArea == null) {
     const sesion1 = lastSitting(1)
     const sesion2 = lastSitting(2)
@@ -220,6 +236,7 @@ function buildTasks(input: StudyPlanInput): {
       // Only both sittings make a simulacro; Sesión 2 dates it.
       const daysSince = sesion1 == null || sesion2 == null ? null : input.today - sesion2
       if (daysSince == null || daysSince >= RETEST_INTERVAL_DAYS) {
+        simulacroLeads = daysSince != null
         simulacro = simulacroTask(
           1,
           daysSince == null
@@ -323,5 +340,6 @@ function buildTasks(input: StudyPlanInput): {
   }
   // A 4 h 30 sitting rarely fits a weekday: it leads, but outside the daily
   // budget, so the weak block is still there on a day it does not fit.
-  return { tasks: simulacro == null ? tasks : [simulacro, ...tasks].slice(0, MAX_TASKS), nextSubtopics }
+  const withSimulacro = simulacro == null ? tasks : simulacroLeads ? [simulacro, ...tasks] : [...tasks, simulacro]
+  return { tasks: withSimulacro.slice(0, MAX_TASKS), nextSubtopics }
 }

@@ -8,6 +8,7 @@ import { MAX_WEEKLY_GOAL_MINUTES, MIN_WEEKLY_GOAL_MINUTES, isValidWeeklyGoal } f
 import { isValidAvatar, nicknameFrom } from './rewards'
 import { scrubClassRosters } from './schools'
 import { placedSubjectIds as placedSubjectIdsOf } from './progress'
+import { isValidDailyGoal } from './studyPlan'
 
 export const getStudent = query({
   args: {
@@ -143,6 +144,59 @@ export const setNickname = mutation({
   },
 })
 
+/**
+ * Age and consent, asked once at the start (Ley 1581: most students are minors,
+ * so a minor confirms their guardian knows and authorizes it).
+ */
+export const recordConsent = mutation({
+  args: {
+    studentId: v.id('students'),
+    isMinor: v.boolean(),
+  },
+  handler: async (ctx, args) => {
+    await assertIsStudent(ctx, args.studentId)
+    const now = Date.now()
+    await ctx.db.patch('students', args.studentId, { consentAt: now, isMinor: args.isMinor, updatedAt: now })
+  },
+})
+
+/** Answers a day that complete Hoy's mission (`DAILY_GOAL_OPTIONS`). */
+export const setDailyGoal = mutation({
+  args: {
+    studentId: v.id('students'),
+    questions: v.number(),
+  },
+  handler: async (ctx, args) => {
+    await assertIsStudent(ctx, args.studentId)
+    if (!isValidDailyGoal(args.questions)) throw new ConvexError('Elige 5, 10, 15 o 20 preguntas.')
+    await ctx.db.patch('students', args.studentId, { dailyGoalQuestions: args.questions, updatedAt: Date.now() })
+  },
+})
+
+/** Streak reminder emails: on unless the student turns them off. */
+export const setReminders = mutation({
+  args: {
+    studentId: v.id('students'),
+    off: v.boolean(),
+  },
+  handler: async (ctx, args) => {
+    await assertIsStudent(ctx, args.studentId)
+    await ctx.db.patch('students', args.studentId, { remindersOff: args.off, updatedAt: Date.now() })
+  },
+})
+
+/** The welcome is done: it does not show again on any device. */
+export const completeOnboarding = mutation({
+  args: {
+    studentId: v.id('students'),
+  },
+  handler: async (ctx, args) => {
+    await assertIsStudent(ctx, args.studentId)
+    const now = Date.now()
+    await ctx.db.patch('students', args.studentId, { onboardedAt: now, updatedAt: now })
+  },
+})
+
 export const getStudentAppState = query({
   args: {
     studentId: v.id('students'),
@@ -156,14 +210,12 @@ export const getStudentAppState = query({
 /**
  * The entry gate.
  *
- * Placement is now done one area at a time (`nivelacion`) instead of a single
- * 20-question `diagnostic`, so **the first completed nivelación unlocks the
- * app** and the remaining areas show up as pending work on "Hoy" and Progreso.
+ * Placement is the general `diagnostic` (`/diagnostic`, every area at once):
+ * **completing it unlocks the app** and places each area it scored.
  *
- * The legacy `diagnostic` kind still counts as placement: students who
- * completed one before this change must keep getting in without redoing
- * anything. It is simply no longer the only way through, and is no longer
- * launchable from the hub.
+ * Legacy per-area `nivelacion` sessions still count as placement: students who
+ * levelled that way before the general diagnostic must keep getting in without
+ * redoing anything. It is no longer launchable.
  */
 async function computeStudentAppState(ctx: QueryCtx, studentId: Id<'students'>) {
   const student = await ctx.db.get("students", studentId)
@@ -211,6 +263,10 @@ async function computeStudentAppState(ctx: QueryCtx, studentId: Id<'students'>) 
   return {
     studentId: student._id,
     hasPlacement,
+    /** Age and consent answered (`recordConsent`); the front routes on it. */
+    hasConsent: student.consentAt != null,
+    /** Finished the welcome (`completeOnboarding`); the front shows it until then. */
+    onboarded: student.onboardedAt != null,
     /** Areas the student has actually levelled, for the placement screen. */
     placedSubjectIds,
     isStaff,
@@ -266,6 +322,8 @@ export async function deleteStudentData(ctx: MutationCtx, studentId: Id<'student
   await remove('llmUsage', await ctx.db.query('llmUsage').withIndex('by_studentId_day_feature', (q) => q.eq('studentId', studentId)).collect())
   await remove('questionReports', await ctx.db.query('questionReports').withIndex('by_studentId_createdAt', (q) => q.eq('studentId', studentId)).collect())
   await remove('duelAnswers', await ctx.db.query('duelAnswers').withIndex('by_studentId', (q) => q.eq('studentId', studentId)).collect())
+  await remove('events', await ctx.db.query('events').withIndex('by_studentId', (q) => q.eq('studentId', studentId)).collect())
+  await remove('pilotSurveyResponses', await ctx.db.query('pilotSurveyResponses').withIndex('by_studentId', (q) => q.eq('studentId', studentId)).collect())
   // Duels, assignments and cycles keep going, minus the student: the class's work
   // is not theirs to take along. Every class of those schools, not just their
   // current one: leaving a class does not take the id off what it assigned.

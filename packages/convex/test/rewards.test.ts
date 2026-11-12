@@ -10,13 +10,20 @@ import {
   buildStickerAlbum,
   computeReward,
   earnedXp,
+  MEDAL_LABELS,
   firstWeekPath,
+  isComeback,
+  isStreakAtRisk,
   isValidAvatar,
   nicknameFrom,
+  sessionStreak,
   streakFrom,
+  streakMilestone,
+  weekStrip,
 } from '../src/rewards'
+import { colombiaDayNumber, colombiaDayStartMs } from '../src/colombiaTime'
 
-const noPrior = { xpEarnedToday: 0, streakDays: 3, earnedMedals: ['primera_sesion'] }
+const noPrior = { xpEarnedToday: 0, streakDays: 2, earnedMedals: ['primera_sesion'] }
 const answer = (timeMs: number | null, guided: Partial<{ guidedOutcome: 'self_corrected' | 'revealed'; guidedSkipped: boolean; guidedStep: number }> = {}) =>
   ({ timeMs, ...(guided.guidedOutcome == null ? {} : { guidedStep: 2 }), ...guided })
 
@@ -70,8 +77,16 @@ describe('computeReward', () => {
     })
 
     test('streak medals land on the session that reaches them and never repeat', () => {
-      expect(computeReward({ ...noPrior, streakDays: 7, answers: [answer(10_000)] }).medals).toEqual(['racha_7'])
-      expect(computeReward({ ...noPrior, streakDays: 8, earnedMedals: ['primera_sesion', 'racha_7'], answers: [answer(10_000)] }).medals).toEqual([])
+      expect(computeReward({ ...noPrior, streakDays: 3, answers: [answer(10_000)] }).medals).toEqual(['racha_3'])
+      const earned = ['primera_sesion', 'racha_3']
+      expect(computeReward({ ...noPrior, streakDays: 7, earnedMedals: earned, answers: [answer(10_000)] }).medals).toEqual(['racha_7'])
+      expect(computeReward({ ...noPrior, streakDays: 14, earnedMedals: [...earned, 'racha_7'], answers: [answer(10_000)] }).medals).toEqual(['racha_14'])
+      expect(computeReward({ ...noPrior, streakDays: 8, earnedMedals: [...earned, 'racha_7'], answers: [answer(10_000)] }).medals).toEqual([])
+    })
+
+    test('every streak medal has its name', () => {
+      expect(MEDAL_LABELS.racha_3).toBe('Tres días seguidos')
+      expect(MEDAL_LABELS.racha_14).toBe('Catorce días seguidos')
     })
 
     test('finishing a guided path gets its medal; skipping does not', () => {
@@ -97,7 +112,7 @@ describe('streakFrom', () => {
   const days = (...list: number[]) => new Set(list)
 
   test('no activity, no streak', () => {
-    expect(streakFrom(days(), 100)).toEqual({ streakDays: 0, shields: 0 })
+    expect(streakFrom(days(), 100)).toEqual({ streakDays: 0, shields: 0, lastShieldUsedDay: null })
   })
 
   test('today not yet done keeps yesterday’s streak alive', () => {
@@ -123,15 +138,105 @@ describe('streakFrom', () => {
   test('a shield spends itself on a missed day and the streak survives, without growing', () => {
     const active = new Set(Array.from({ length: 7 }, (_, index) => 100 + index))
     active.add(108) // 107 missed, one shield covers it
-    expect(streakFrom(active, 108)).toEqual({ streakDays: 8, shields: 0 })
+    expect(streakFrom(active, 108)).toEqual({ streakDays: 8, shields: 0, lastShieldUsedDay: 107 })
   })
 
   test('two missed days with one shield end the streak; replay is the same every time', () => {
     const active = new Set(Array.from({ length: 7 }, (_, index) => 100 + index))
     active.add(109)
     const first = streakFrom(active, 109)
-    expect(first).toEqual({ streakDays: 1, shields: 0 })
+    expect(first).toEqual({ streakDays: 1, shields: 0, lastShieldUsedDay: 107 })
     expect(streakFrom(active, 109)).toEqual(first)
+  })
+
+  test('remembers the last day a shield covered, not an earlier one', () => {
+    // 100-106 earn a shield, 107 spends it; 108-114 earn another, 115 spends it.
+    const active = new Set([...Array.from({ length: 7 }, (_, index) => 100 + index), ...Array.from({ length: 7 }, (_, index) => 108 + index), 116])
+    expect(streakFrom(active, 116)).toEqual({ streakDays: 15, shields: 0, lastShieldUsedDay: 115 })
+  })
+})
+
+describe('sessionStreak', () => {
+  const run = (count: number, from = 100) => new Set(Array.from({ length: count }, (_, index) => from + index))
+
+  test('the first session of the day moves the streak up by one', () => {
+    expect(sessionStreak(run(3), run(4), 103)).toEqual({ streakDays: 4, previousStreakDays: 3, shieldEarned: false })
+  })
+
+  test('a later session the same day changes nothing', () => {
+    expect(sessionStreak(run(4), run(4), 103)).toEqual({ streakDays: 4, previousStreakDays: 4, shieldEarned: false })
+  })
+
+  test('the seventh active day earns a shield', () => {
+    expect(sessionStreak(run(6), run(7), 106)).toEqual({ streakDays: 7, previousStreakDays: 6, shieldEarned: true })
+  })
+
+  test('no shield past the cap of two', () => {
+    expect(sessionStreak(run(20), run(21), 120).shieldEarned).toBe(false)
+  })
+})
+
+describe('streakMilestone', () => {
+  test('3, 7, 14 and 30 are moments when the streak reaches them', () => {
+    expect([[2, 3], [6, 7], [13, 14], [29, 30]].map(([before, after]) => streakMilestone(before!, after!))).toEqual([3, 7, 14, 30])
+  })
+
+  test('anything else, or a streak that did not move, is not', () => {
+    expect(streakMilestone(3, 4)).toBeNull()
+    expect(streakMilestone(7, 7)).toBeNull()
+    expect(streakMilestone(0, 1)).toBeNull()
+  })
+})
+
+describe('weekStrip', () => {
+  // Day 0 was a Thursday, so day 20_404 is a Wednesday and its Monday is 20_402.
+  const wednesday = 20_404
+
+  test('runs Monday to Sunday and marks what was done, today and what is to come', () => {
+    const strip = weekStrip(new Set([20_402, 20_400]), wednesday)
+    expect(strip.map((entry) => entry.day)).toEqual([20_402, 20_403, 20_404, 20_405, 20_406, 20_407, 20_408])
+    expect(strip.map((entry) => entry.status)).toEqual(['done', 'open', 'today', 'upcoming', 'upcoming', 'upcoming', 'upcoming'])
+    expect(strip.filter((entry) => entry.isToday).map((entry) => entry.day)).toEqual([wednesday])
+  })
+
+  test('today done is done; a past day without practice is never a miss (G5)', () => {
+    const statuses = weekStrip(new Set([wednesday]), wednesday).map((entry) => entry.status)
+    expect(statuses[2]).toBe('done')
+    expect(statuses).not.toContain('missed')
+  })
+
+  test('Monday and Sunday sit in their own week', () => {
+    expect(weekStrip(new Set(), 20_402)[0]?.isToday).toBe(true)
+    expect(weekStrip(new Set(), 20_408)[6]?.isToday).toBe(true)
+  })
+})
+
+describe('isStreakAtRisk', () => {
+  const at = (hour: number) => colombiaDayStartMs(20_405) + hour * 3_600_000
+
+  test('from 5 p.m. Colombia, with a streak and nothing done today', () => {
+    expect(isStreakAtRisk({ streakDays: 4, practicedToday: false, nowMs: at(17) })).toBe(true)
+    expect(isStreakAtRisk({ streakDays: 4, practicedToday: false, nowMs: at(23.9) })).toBe(true)
+  })
+
+  test('not before 5 p.m., not once practised, not without a streak', () => {
+    expect(isStreakAtRisk({ streakDays: 4, practicedToday: false, nowMs: at(16.9) })).toBe(false)
+    expect(isStreakAtRisk({ streakDays: 4, practicedToday: true, nowMs: at(18) })).toBe(false)
+    expect(isStreakAtRisk({ streakDays: 0, practicedToday: false, nowMs: at(18) })).toBe(false)
+    expect(colombiaDayNumber(at(23.9))).toBe(20_405)
+  })
+})
+
+describe('isComeback', () => {
+  test('three days or more since the last active day', () => {
+    expect(isComeback(97, 100)).toBe(true)
+    expect(isComeback(80, 100)).toBe(true)
+  })
+
+  test('not after one or two days off, and never for a student with no activity', () => {
+    expect(isComeback(98, 100)).toBe(false)
+    expect(isComeback(100, 100)).toBe(false)
+    expect(isComeback(null, 100)).toBe(false)
   })
 })
 

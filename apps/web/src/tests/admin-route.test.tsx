@@ -52,6 +52,7 @@ vi.mock('../components/StaffShell.tsx', () => ({
 vi.mock('../components/admin/AuditQueue.tsx', () => ({ AuditQueue: () => <p>Pantalla de auditoría</p> }))
 vi.mock('../components/admin/ReportsQueue.tsx', () => ({ ReportsQueue: () => <p>Reportes</p> }))
 vi.mock('../components/admin/SchoolsAdmin.tsx', () => ({ SchoolsAdmin: () => <p>Colegios</p> }))
+vi.mock('../components/admin/PilotPanel.tsx', () => ({ PilotPanel: () => <p>Panel del piloto</p> }))
 vi.mock('../components/MarkdownBlock.tsx', () => ({ MarkdownBlock: ({ markdown }: { markdown: string }) => <div>{markdown}</div> }))
 vi.mock('../lib/pdf-upload.ts', () => ({ uploadPdfToConvex: vi.fn() }))
 
@@ -108,12 +109,13 @@ describe('/admin', () => {
     expect(validateSearch({ tab: 'uploads' }).tab).toBe('bank')
     expect(validateSearch({ tab: 'questions' }).tab).toBe('bank')
     expect(validateSearch({ tab: 'audit' }).tab).toBe('audit')
+    expect(validateSearch({ tab: 'pilot' }).tab).toBe('pilot')
     expect(validateSearch({ tab: 'nada' }).tab).toBeUndefined()
   })
 
   it('staff see the whole panel, in Spanish, inside the staff shell', async () => {
     await renderPage()
-    expect(tabs()).toEqual(['Banco', 'Auditoría', 'Reportes', 'Colegios'])
+    expect(tabs()).toEqual(['Banco', 'Auditoría', 'Reportes', 'Colegios', 'Piloto'])
     expect(container.querySelector('[data-role="admin"]')).not.toBeNull()
   })
 
@@ -121,6 +123,20 @@ describe('/admin', () => {
     await renderPage()
     expect(container.textContent).toContain('Subir PDF')
     expect(container.textContent).not.toMatch(/Upload|Browse|Retry|questions|No PDFs/)
+  })
+
+  it('the pilot tab opens the pilot panel', async () => {
+    state.search = { tab: 'pilot' }
+    await renderPage()
+    expect(container.textContent).toContain('Panel del piloto')
+  })
+
+  it('a reviewer never reaches the pilot panel', async () => {
+    state.staff = { isAdmin: false, reviewerSubjects: ['ingles'] }
+    state.search = { tab: 'pilot' }
+    await renderPage()
+    expect(tabs()).toEqual(['Auditoría'])
+    expect(container.textContent).not.toContain('Panel del piloto')
   })
 
   it('a reviewer sees only the audit, whatever the link says', async () => {

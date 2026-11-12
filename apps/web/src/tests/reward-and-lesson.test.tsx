@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import { act, type ReactNode } from 'react'
+import { act, createElement, type ReactNode } from 'react'
 import { createRoot, type Root } from 'react-dom/client'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { RewardScreen } from '../components/RewardScreen.tsx'
@@ -9,11 +9,16 @@ const speech = vi.hoisted(() => ({ speak: vi.fn(), stopSpeaking: vi.fn(), canSpe
 
 vi.mock('lucide-react', () =>
   new Proxy({}, { has: () => true, get: (_, name) => (name === 'then' ? undefined : () => null) }))
-vi.mock('motion/react', () => ({
-  animate: vi.fn(),
-  useReducedMotion: () => true,
-  motion: { li: ({ children }: { children: ReactNode }) => <li>{children}</li> },
-}))
+// Motion is checked in the browser; here every motion.* is its plain element.
+vi.mock('motion/react', () => {
+  const MOTION_PROPS = ['variants', 'initial', 'animate', 'exit', 'transition', 'custom']
+  const motion = new Proxy({}, {
+    get: (_, tag: string) => ({ children, ref, ...props }: Record<string, unknown> & { children?: ReactNode; ref?: unknown }) =>
+      createElement(tag, { ...Object.fromEntries(Object.entries(props).filter(([key]) => !MOTION_PROPS.includes(key))), ref }, children),
+  })
+  const Pass = ({ children }: { children?: ReactNode }) => children
+  return { motion, AnimatePresence: Pass, MotionConfig: Pass, useReducedMotion: () => true, animate: () => ({ stop() {} }) }
+})
 vi.mock('@tanstack/react-router', () => ({ Link: ({ children }: { children: ReactNode }) => <a>{children}</a> }))
 vi.mock('@convex-dev/react-query', () => ({ convexQuery: (_: unknown, args: unknown) => ({ queryKey: [args] }) }))
 vi.mock('@tanstack/react-query', () => ({ useQuery: () => ({ data: undefined }) }))
@@ -37,9 +42,10 @@ afterEach(() => {
   container.remove()
 })
 
-const REWARD = { xp: 50, medals: ['primera_sesion'], streakDays: 6 }
+const REWARD: { xp: number; medals: string[]; streakDays: number; previousStreakDays?: number; shieldEarned?: boolean } =
+  { xp: 50, medals: ['primera_sesion'], streakDays: 6 }
 
-function renderReward(reward: typeof REWARD | null) {
+function renderReward(reward: typeof REWARD | null, isFresh = false) {
   act(() =>
     root.render(
       <RewardScreen
@@ -49,7 +55,7 @@ function renderReward(reward: typeof REWARD | null) {
         changes={[{ subtopicId: 'matematicas.functions_variation.functions_graphs', from: 'intentado', to: 'familiar' }]}
         correctCount={3}
         questionCount={5}
-        isFresh={false}
+        isFresh={isFresh}
       >
         <button type="button">Seguir</button>
       </RewardScreen>,
@@ -104,6 +110,47 @@ describe('RewardScreen', () => {
   it('celebrates the first day without pretending it is a streak', () => {
     renderReward({ ...REWARD, streakDays: 1 })
     expect(container.textContent).toContain('Empezaste tu racha')
+  })
+
+  describe('the streak', () => {
+    afterEach(() => vi.useRealTimers())
+
+    it('ticks up on the day’s first session, on a fresh close', () => {
+      vi.useFakeTimers()
+      renderReward({ ...REWARD, streakDays: 5, previousStreakDays: 4 }, true)
+      expect(container.querySelector('.reward-gains')?.textContent).toContain('Racha de 4 días')
+      act(() => vi.runAllTimers())
+      expect(container.querySelector('.reward-gains')?.textContent).toContain('Racha de 5 días')
+    })
+
+    it('stays put on a later session or a revisit', () => {
+      vi.useFakeTimers()
+      renderReward({ ...REWARD, streakDays: 5, previousStreakDays: 5 }, true)
+      expect(container.querySelector('.reward-gains')?.textContent).toContain('Racha de 5 días')
+      renderReward({ ...REWARD, streakDays: 5, previousStreakDays: 4 }, false)
+      expect(container.querySelector('.reward-gains')?.textContent).toContain('Racha de 5 días')
+    })
+
+    it('gives 3, 7, 14 and 30 days a moment of their own', () => {
+      renderReward({ ...REWARD, streakDays: 7, previousStreakDays: 6 }, true)
+      const moment = container.querySelector('.streak-moment')
+      expect(moment?.textContent).toContain('7')
+      expect(moment?.textContent).toContain('días seguidos')
+    })
+
+    it('no moment for any other day, or on a revisit', () => {
+      renderReward({ ...REWARD, streakDays: 8, previousStreakDays: 7 }, true)
+      expect(container.querySelector('.streak-moment')).toBeNull()
+      renderReward({ ...REWARD, streakDays: 7, previousStreakDays: 6 }, false)
+      expect(container.querySelector('.streak-moment')).toBeNull()
+    })
+
+    it('says so when the session earned a shield', () => {
+      renderReward({ ...REWARD, shieldEarned: true })
+      expect(container.querySelector('.reward-gains')?.textContent).toContain('Ganaste un escudo')
+      renderReward({ ...REWARD, shieldEarned: false })
+      expect(container.querySelector('.reward-gains')?.textContent).not.toContain('escudo')
+    })
   })
 })
 

@@ -3,7 +3,7 @@ import { lookForPath } from '../lib/student-look'
 
 describe('lookForPath', () => {
   it('gives every student screen the album look', () => {
-    for (const path of ['/today', '/path', '/practice', '/practice/abc/review', '/lesson/x', '/progress', '/diagnostic', '/duelo/1', '/join', '/cuenta']) {
+    for (const path of ['/today', '/path', '/practice', '/practice/abc/review', '/lesson/x', '/progress', '/diagnostic', '/duelo/1', '/join', '/cuenta', '/encuesta']) {
       expect(lookForPath(path)).toBe('student')
     }
   })

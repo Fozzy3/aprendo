@@ -14,6 +14,7 @@ import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AppRouteImport } from './routes/app'
 import { Route as CuentaRouteImport } from './routes/cuenta'
 import { Route as DiagnosticRouteImport } from './routes/diagnostic'
+import { Route as EncuestaRouteImport } from './routes/encuesta'
 import { Route as HistoryRouteImport } from './routes/history'
 import { Route as JoinRouteImport } from './routes/join'
 import { Route as LoginRouteImport } from './routes/login'
@@ -60,6 +61,11 @@ const CuentaRoute = CuentaRouteImport.update({
 const DiagnosticRoute = DiagnosticRouteImport.update({
   id: '/diagnostic',
   path: '/diagnostic',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EncuestaRoute = EncuestaRouteImport.update({
+  id: '/encuesta',
+  path: '/encuesta',
   getParentRoute: () => rootRouteImport,
 } as any)
 const HistoryRoute = HistoryRouteImport.update({
@@ -179,6 +185,7 @@ export interface FileRoutesByFullPath {
   '/app': typeof AppRoute
   '/cuenta': typeof CuentaRoute
   '/diagnostic': typeof DiagnosticRoute
+  '/encuesta': typeof EncuestaRoute
   '/history': typeof HistoryRoute
   '/join': typeof JoinRoute
   '/login': typeof LoginRoute
@@ -208,6 +215,7 @@ export interface FileRoutesByTo {
   '/app': typeof AppRoute
   '/cuenta': typeof CuentaRoute
   '/diagnostic': typeof DiagnosticRoute
+  '/encuesta': typeof EncuestaRoute
   '/history': typeof HistoryRoute
   '/join': typeof JoinRoute
   '/login': typeof LoginRoute
@@ -238,6 +246,7 @@ export interface FileRoutesById {
   '/app': typeof AppRoute
   '/cuenta': typeof CuentaRoute
   '/diagnostic': typeof DiagnosticRoute
+  '/encuesta': typeof EncuestaRoute
   '/history': typeof HistoryRoute
   '/join': typeof JoinRoute
   '/login': typeof LoginRoute
@@ -269,6 +278,7 @@ export interface FileRouteTypes {
     | '/app'
     | '/cuenta'
     | '/diagnostic'
+    | '/encuesta'
     | '/history'
     | '/join'
     | '/login'
@@ -298,6 +308,7 @@ export interface FileRouteTypes {
     | '/app'
     | '/cuenta'
     | '/diagnostic'
+    | '/encuesta'
     | '/history'
     | '/join'
     | '/login'
@@ -327,6 +338,7 @@ export interface FileRouteTypes {
     | '/app'
     | '/cuenta'
     | '/diagnostic'
+    | '/encuesta'
     | '/history'
     | '/join'
     | '/login'
@@ -357,6 +369,7 @@ export interface RootRouteChildren {
   AppRoute: typeof AppRoute
   CuentaRoute: typeof CuentaRoute
   DiagnosticRoute: typeof DiagnosticRoute
+  EncuestaRoute: typeof EncuestaRoute
   HistoryRoute: typeof HistoryRoute
   JoinRoute: typeof JoinRoute
   LoginRoute: typeof LoginRoute
@@ -414,6 +427,13 @@ declare module '@tanstack/react-router' {
       path: '/diagnostic'
       fullPath: '/diagnostic'
       preLoaderRoute: typeof DiagnosticRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/encuesta': {
+      id: '/encuesta'
+      path: '/encuesta'
+      fullPath: '/encuesta'
+      preLoaderRoute: typeof EncuestaRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/history': {
@@ -602,6 +622,7 @@ const rootRouteChildren: RootRouteChildren = {
   AppRoute: AppRoute,
   CuentaRoute: CuentaRoute,
   DiagnosticRoute: DiagnosticRoute,
+  EncuestaRoute: EncuestaRoute,
   HistoryRoute: HistoryRoute,
   JoinRoute: JoinRoute,
   LoginRoute: LoginRoute,

@@ -13,7 +13,8 @@ import { bankTiersForStudent, collectUsableQuestionsBySubject } from './question
 import { settledAttempts } from './sessionIntegrity'
 import { loadLiveExamSeal } from './sessions'
 import { SESSION_KIND_CONFIG } from './sessionKinds'
-import { MEDAL_LABELS, type MedalId, buildStickerAlbum, earnedXp, firstWeekPath, streakFrom } from './rewards'
+import { MEDAL_LABELS, type MedalId, buildStickerAlbum, earnedXp, firstWeekPath, isComeback, streakFrom, weekStrip } from './rewards'
+import { isSurveyDue } from './pilotSurveyQuestions'
 import { buildStudyPlan } from './studyPlan'
 import { DEFAULT_WEEKLY_GOAL_MINUTES, weeklyStudyMinutes } from './studyTime'
 
@@ -32,7 +33,7 @@ export const getTodayDashboard = query({
   handler: async (ctx, args) => {
     await assertIsStudent(ctx, args.studentId)
 
-    const [student, attempts, sessions, subjectAggregates, subtopicAggregates] = await Promise.all([
+    const [student, attempts, sessions, subjectAggregates, subtopicAggregates, surveyResponse] = await Promise.all([
       ctx.db.get('students', args.studentId),
       ctx.db
         .query('questionAttempts')
@@ -50,6 +51,10 @@ export const getTodayDashboard = query({
         .query('learnerSubtopicAggregates')
         .withIndex('by_studentId', (q) => q.eq('studentId', args.studentId))
         .collect(),
+      ctx.db
+        .query('pilotSurveyResponses')
+        .withIndex('by_studentId', (q) => q.eq('studentId', args.studentId))
+        .first(),
     ])
 
     const activeDays = new Set<number>()
@@ -66,7 +71,8 @@ export const getTodayDashboard = query({
     const today = colombiaDayNumber(now)
 
     // Shields replay deterministically; see `rewards.streakFrom`.
-    const { streakDays, shields } = streakFrom(activeDays, today)
+    const { streakDays, shields, lastShieldUsedDay } = streakFrom(activeDays, today)
+    const lastActiveDay = activeDays.size === 0 ? null : Math.max(...activeDays)
 
     // The calendar week (Monday to Sunday), not the last seven days: it is the
     // week the coach summarizes, so "esta semana" means the same thing in both.
@@ -201,6 +207,7 @@ export const getTodayDashboard = query({
       launchableSubtopics: [...launchableSubtopics].map(([subtopicId, subjectId]) => ({ subtopicId, subjectId })),
       reviewDueCount,
       answeredToday: completedToday.reduce((sum, session) => sum + (session.summary?.answeredCount ?? 0), 0),
+      dailyGoalQuestions: student?.dailyGoalQuestions,
       simulacroSittings: sessions.flatMap((session) =>
         session.kind === 'simulacro' && session.status === 'completed' && session.simulacroSessionNumber != null
           ? [{
@@ -216,6 +223,11 @@ export const getTodayDashboard = query({
     return {
       streakDays,
       shields,
+      /** The day a shield covered, only when that was yesterday: Hoy names it once. */
+      shieldUsedDay: lastShieldUsedDay === today - 1 ? lastShieldUsedDay : null,
+      /** Three days or more away: Hoy starts soft (`rewards.isComeback`). */
+      comeback: isComeback(lastActiveDay, today),
+      week: weekStrip(activeDays, today),
       xp: {
         today: earnedXp(sessions, (completedAt) => colombiaDayNumber(completedAt) === today),
         thisWeek: earnedXp(sessions, (completedAt) => colombiaWeekIndex(completedAt) === thisWeek),
@@ -229,6 +241,8 @@ export const getTodayDashboard = query({
       activeDaysThisWeek,
       examDate: student?.examDate ?? null,
       examPlan,
+      /** Hoy offers the pilot survey (`pilotSurveyQuestions.isSurveyDue`). */
+      surveyDue: isSurveyDue(sessions, surveyResponse != null),
       globalScore: {
         estimate,
         target,

@@ -13,6 +13,7 @@ const now = 1_700_000_000_000
 async function seedStudent(ctx: MutationCtx, email: string, questionId: Id<'questions'>) {
   const studentId = await ctx.db.insert('students', {
     email, normalizedEmail: email, createdAt: now, updatedAt: now, lastSeenAt: now,
+    consentAt: now, isMinor: true, lastActiveDay: 20_000, lastReminderDay: 20_001,
   })
   const sessionId = await ctx.db.insert('sessions', {
     studentId, kind: 'topic', status: 'completed', recommendationSource: 'manual',
@@ -62,13 +63,16 @@ async function seedStudent(ctx: MutationCtx, email: string, questionId: Id<'ques
     teams: [{ name: 'A', studentIds: [studentId] }], createdAt: now,
   })
   await ctx.db.insert('duelAnswers', { duelId, questionIndex: 0, studentId, teamIndex: 0, isCorrect: true, answeredAt: now })
+  await ctx.db.insert('events', { studentId, name: 'screen_view', at: now, props: { path: '/today' } })
+  await ctx.db.insert('pilotSurveyResponses', { studentId, answers: { start_ease: 4 }, submittedAt: now })
   return studentId
 }
 
 const STUDENT_TABLES = [
   'students', 'sessions', 'sessionQuestions', 'questionAttempts', 'learnerSubjectAggregates',
   'learnerSubtopicAggregates', 'learnerProfileSnapshots', 'coachSummaries', 'practiceTutorThreads',
-  'practiceTutorArtifacts', 'llmUsage', 'questionReports', 'memberships', 'classGroupMembers', 'duelAnswers',
+  'practiceTutorArtifacts', 'llmUsage', 'questionReports', 'memberships', 'classGroupMembers', 'duelAnswers', 'events',
+  'pilotSurveyResponses',
 ] as const
 
 describe('deleteStudentData', () => {

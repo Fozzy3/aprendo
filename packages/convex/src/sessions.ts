@@ -56,7 +56,7 @@ import {
 } from './sessionIntegrity'
 import { pickSimulacroForm } from './simulacroForm'
 import { accumulateQuestionTime, officialMsPerQuestion, questionTimeMs } from './pacing'
-import { computeReward, earnedXp, streakFrom } from './rewards'
+import { computeReward, earnedXp, sessionStreak } from './rewards'
 import { colombiaDayNumber } from './colombiaTime'
 import {
   buildNivelacionResult,
@@ -968,13 +968,16 @@ export const createSession = mutation({
     })),
     /** `topic` only: a teacher's assignment (F40), which fixes subtopic, count and feedback. */
     assignmentId: v.optional(v.id('assignments')),
-    /** `topic` only: Hoy's mission names one topic and asks five questions (F54). Never lengthens a session. */
+    /**
+     * `topic` and `repaso` only: Hoy's mission names one topic and asks five
+     * questions (F54), and the comeback starts with five. Never lengthens a session.
+     */
     questionLimit: v.optional(v.number()),
   },
   handler: async (ctx, rawArgs) => {
     await assertIsStudent(ctx, rawArgs.studentId)
     const { args, questionLimit: assignmentLimit, schoolTest } = await applyAssignment(ctx, rawArgs)
-    const questionLimit = args.kind === 'topic' && args.questionLimit != null
+    const questionLimit = (args.kind === 'topic' || args.kind === 'repaso') && args.questionLimit != null
       ? Math.min(assignmentLimit, Math.max(1, args.questionLimit))
       : assignmentLimit
 
@@ -1469,6 +1472,13 @@ export const submitAnswer = mutation({
     await ctx.db.patch('sessions', session._id, {
       currentPosition: Math.min(session.questionCount, sessionQuestion.position + 1),
     })
+
+    // What the reminder cron indexes on; written once a day, not per answer.
+    const day = colombiaDayNumber(now)
+    const student = await ctx.db.get('students', session.studentId)
+    if (student != null && student.lastActiveDay !== day) {
+      await ctx.db.patch('students', student._id, { lastActiveDay: day })
+    }
 
     return { answered: true }
   },
@@ -1984,7 +1994,7 @@ async function settleSession(ctx: MutationCtx, session: Doc<'sessions'>, session
 
   const summary = computeSessionSummary(session, sessionQuestions, questions, attempts, durationMs)
 
-  const reward = await rewardFor(ctx, session.studentId, answeredAttempts, completedAt)
+  const reward = await rewardFor(ctx, session.studentId, session._id, answeredAttempts, completedAt)
 
   await ctx.db.patch('sessions', session._id, {
     status: 'completed',
@@ -2164,11 +2174,13 @@ export function computeSessionSummary(
 /**
  * The session's reward (`rewards.computeReward`), computed in the patch that
  * closes it: `completeSession` returns early when already completed, so it is
- * paid exactly once. This session's own answers already count as activity.
+ * paid exactly once. This session's own answers already count as activity;
+ * without them is the streak it started from (`rewards.sessionStreak`).
  */
 async function rewardFor(
   ctx: QueryCtx,
   studentId: Id<'students'>,
+  sessionId: Id<'sessions'>,
   answeredAttempts: Doc<'questionAttempts'>[],
   completedAt: number,
 ) {
@@ -2177,9 +2189,14 @@ async function rewardFor(
     ctx.db.query('sessions').withIndex('by_studentId', (q) => q.eq('studentId', studentId)).collect(),
   ])
   const today = colombiaDayNumber(completedAt)
-  const activeDays = new Set(studentAttempts.flatMap((attempt) =>
+  const daysOf = (attempts: Doc<'questionAttempts'>[]) => new Set(attempts.flatMap((attempt) =>
     attempt.answeredAt != null && attempt.isCorrect != null ? [colombiaDayNumber(attempt.answeredAt)] : []))
-  return computeReward({
+  const streak = sessionStreak(
+    daysOf(studentAttempts.filter((attempt) => attempt.sessionId !== sessionId)),
+    daysOf(studentAttempts),
+    today,
+  )
+  const reward = computeReward({
     answers: answeredAttempts.map((attempt) => ({
       timeMs: questionTimeMs(attempt),
       guidedOutcome: attempt.guidedOutcome,
@@ -2187,9 +2204,10 @@ async function rewardFor(
       guidedStep: attempt.guidedStep,
     })),
     xpEarnedToday: earnedXp(studentSessions, (at) => colombiaDayNumber(at) === today),
-    streakDays: streakFrom(activeDays, today).streakDays,
+    streakDays: streak.streakDays,
     earnedMedals: studentSessions.flatMap((session) => session.reward?.medals ?? []),
   })
+  return { ...reward, previousStreakDays: streak.previousStreakDays, shieldEarned: streak.shieldEarned }
 }
 
 /**

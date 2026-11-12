@@ -144,7 +144,8 @@ export default function ReviewTutor({
   })
 
   const tutorMutation = useMutation({
-    mutationFn: async (input: { prompt: string }) => {
+    // `userCount`: the student's messages on screen at send time (see `pendingPrompt`).
+    mutationFn: async (input: { prompt: string; userCount: number }) => {
       const ids = { practiceSessionId, studentId: studentId as never, questionId: questionId as never }
       if (tutorThreadId == null) await createTutorThread(ids)
       return sendTutorMessage({ ...ids, prompt: input.prompt })
@@ -237,6 +238,12 @@ export default function ReviewTutor({
     return order
   }, [tutorMessagesResult.results])
 
+  // The student's message shows the moment it is sent, not when the server has
+  // saved it (a round trip or two on mobile data); the saved copy replaces it.
+  const userCount = tutorMessages.filter((message) => message.role === 'user').length
+  const pendingPrompt = tutorMutation.isPending && userCount <= (tutorMutation.variables?.userCount ?? 0)
+    ? tutorMutation.variables?.prompt ?? null
+    : null
   const lastMessage = tutorMessages.at(-1)
   // Read each finished reply once. What was on screen when the chat loaded is
   // history (null for an empty chat, so its first reply is read).
@@ -290,7 +297,7 @@ export default function ReviewTutor({
     const trimmed = text.trim()
     if (!trimmed || !canSendTutorMessage) return
     tutorMutation.mutate(
-      { prompt: trimmed },
+      { prompt: trimmed, userCount },
       {
         // A message the server turns away (daily limit, an exam in progress)
         // gives the student back what they wrote, unless they started another.
@@ -377,7 +384,7 @@ export default function ReviewTutor({
 
       <Conversation className="min-h-0 flex-1">
         <ConversationContent className="gap-[0.85rem] px-[0.95rem] pt-4 pb-2">
-          {tutorMessages.length === 0 ? (
+          {tutorMessages.length === 0 && pendingPrompt == null ? (
             <ConversationEmptyState className="items-stretch gap-[0.7rem] px-[1.1rem] pt-[1.6rem] pb-4 text-left" icon={null}>
               <div className="tutor-empty-mark" aria-hidden><Bot size={20} /></div>
               <h3 className="tutor-empty-title">Pregunta lo que necesites.</h3>
@@ -430,6 +437,13 @@ export default function ReviewTutor({
               </Message>
             ))
           )}
+          {pendingPrompt != null ? (
+            <Message from="user" className="flex flex-row-reverse items-start gap-[0.55rem]">
+              <MessageContent className="tutor-bubble tutor-bubble-user">
+                <MarkdownBlock markdown={pendingPrompt} skipHtml />
+              </MessageContent>
+            </Message>
+          ) : null}
           {isTutorThinking ? (
             <Message from="assistant" className="flex flex-row items-start gap-[0.55rem]">
               <span className="tutor-msg-avatar" aria-hidden><Bot size={12} /></span>

@@ -15,6 +15,16 @@ export function colombiaDayNumber(timestampMs: number): number {
   return Math.floor((timestampMs + BOGOTA_OFFSET_MS) / DAY_MS)
 }
 
+/** The hour of the day in Colombia, 0 to 23. */
+export function colombiaHour(timestampMs: number): number {
+  return Math.floor((((timestampMs + BOGOTA_OFFSET_MS) % DAY_MS) + DAY_MS) % DAY_MS / 3_600_000)
+}
+
+/** The Monday of the Colombia week a day number falls in. */
+export function colombiaMonday(dayNumber: number): number {
+  return dayNumber - ((((dayNumber + DAYS_FROM_MONDAY_TO_EPOCH) % 7) + 7) % 7)
+}
+
 /** Integer week index in Colombia time: weeks run Monday 00:00 to Sunday 23:59. */
 export function colombiaWeekIndex(timestampMs: number): number {
   return Math.floor((colombiaDayNumber(timestampMs) + DAYS_FROM_MONDAY_TO_EPOCH) / 7)

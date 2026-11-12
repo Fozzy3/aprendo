@@ -56,4 +56,35 @@ describe('createSession questionLimit', () => {
     const atLeastOne = await as.mutation(api.sessions.createSession, { studentId, kind: 'topic', subtopicId: SUBTOPIC, questionLimit: 0 })
     expect((await t.run((ctx) => ctx.db.get('sessions', atLeastOne)))?.questionCount).toBe(1)
   })
+
+  // The comeback on Hoy starts soft: a repaso of five, not ten.
+  test('trims a repaso too', async () => {
+    const t = setupTest()
+    const { studentId, as } = await signUp(t, 'ana@x.co')
+    await seedTopic(t, studentId, 0)
+    const subtopics = [SUBTOPIC, 'matematicas.number_proportionality.ratios_proportions_percent', 'matematicas.algebra_equations.equations_inequalities']
+    await t.run(async (ctx) => {
+      const pdfUploadId = (await ctx.db.query('pdfUploads').first())!._id
+      for (const [index, subtopicId] of subtopics.entries()) {
+        await ctx.db.insert('learnerSubtopicAggregates', {
+          studentId, subjectId: 'matematicas', subtopicId, attemptCount: 2, correctCount: 1, accuracy: 0.5,
+          recentAttemptCount: 2, recentAccuracy: 0.5, avgResponseTimeMs: 0, hintRate: 0, tutorRate: 0,
+          masteryScore: 0.5, evidenceLevel: 'low', updatedAt: 0, reviewDueAt: 0,
+        })
+        for (const sequence of [0, 1]) {
+          await ctx.db.insert('questions', {
+            pdfUploadId, sequence: index * 2 + sequence, questionNumber: index * 2 + sequence + 1, bodyMarkdown: 'q',
+            options: [{ label: 'A', bodyMarkdown: 'a' }, { label: 'B', bodyMarkdown: 'b' }], createdAt: 0,
+            subjectId: 'matematicas', categoryId: subtopicId.split('.').slice(0, 2).join('.'), primarySubtopicId: subtopicId,
+            answerCorrectOption: 'A', eligibility: 'practice_only', bankTier: 'original',
+          })
+        }
+      }
+    })
+    const full = await as.mutation(api.sessions.createSession, { studentId, kind: 'repaso' })
+    expect((await t.run((ctx) => ctx.db.get('sessions', full)))?.questionCount).toBe(6)
+    await t.run((ctx) => ctx.db.patch('sessions', full, { status: 'abandoned' }))
+    const soft = await as.mutation(api.sessions.createSession, { studentId, kind: 'repaso', questionLimit: 5 })
+    expect((await t.run((ctx) => ctx.db.get('sessions', soft)))?.questionCount).toBe(5)
+  })
 })

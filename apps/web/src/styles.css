@@ -2504,7 +2504,10 @@ pre code {
     gap: 0.5rem;
   }
 
+  /* The status pill has no room beside the brand on a phone; the page states
+     the same rule in its body. */
   .student-topnav,
+  .student-pill,
   .wordmark-subtitle {
     display: none;
   }
@@ -2599,20 +2602,6 @@ pre code {
   }
 }
 
-/* Welcome steps crossfade through document.startViewTransition (Welcome.tsx). */
-::view-transition-old(root),
-::view-transition-new(root) {
-  animation-duration: 320ms;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  ::view-transition-group(*),
-  ::view-transition-old(*),
-  ::view-transition-new(*) {
-    animation: none !important;
-  }
-}
-
 /* ─── First-run welcome and the diagnostic intro: one card on the desk ─── */
 .welcome,
 .diagnostic-intro > .timed-intro {
@@ -2630,23 +2619,27 @@ pre code {
   outline: none;
 }
 
-/* Where the student is in the welcome: filled segments, never a number alone. */
+/* Where the student is in the welcome: one bar that fills (a spring, Welcome.tsx). */
 .welcome-progress {
-  display: grid;
-  grid-auto-columns: minmax(0, 1fr);
-  grid-auto-flow: column;
-  gap: 0.375rem;
-}
-
-.welcome-progress span {
   height: 6px;
+  overflow: hidden;
   border-radius: 3px;
   background: var(--bg-inset);
-  transition: background-color 200ms ease;
 }
 
-.welcome-progress span.is-done {
+.welcome-progress-fill {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
   background: var(--brand);
+  transform-origin: left;
+}
+
+/* One step at a time; each step stacks its blocks with the card's gap. */
+.welcome-step {
+  display: grid;
+  gap: 1.25rem;
+  min-width: 0;
 }
 
 /* The five areas of the exam, named, each with its dot. */
@@ -2778,6 +2771,8 @@ pre code {
   height: 100%;
   border-radius: 4px;
   background: var(--subject-color);
+  /* Grows from its start, weakest area first (DiagnosticResult.tsx). */
+  transform-origin: left;
 }
 
 .diagnostic-result-level {
@@ -3758,206 +3753,206 @@ pre code {
 .empty-state-action { margin-top: 0.75rem; }
 
 /* ===========================================================================
-   Landing for schools (Persuade).
+   Landing (Persuade), for the student first.
 
-   The rector buys a working instrument, so the page shows one: a class sheet
-   from the teacher panel, ruled, with the margin notes in red. Everything else
-   is the notebook's own grammar at a larger scale: serif headings, rules
-   between sections, no cards, no illustration.
+   It wears the student app's palette A, "Tinta con rojo de acento": warm paper,
+   white cards, near-black ink, and red only for the main action and progress.
+   The product shows itself: the hero is the Hoy screen in HTML, not a picture.
+   Tokens are local (`--lp-*`) because `/` is not a student route, and the
+   shared ones are remapped so the wordmark, toggle and footer follow along.
    =========================================================================== */
 .landing {
-  /* The public face wears the brand red; the panels it shows keep the notebook. */
-  --brand: #b3132f;
-  --brand-hover: #8f0f26;
-  --accent: #b3132f;
-  --accent-hover: #8f0f26;
-  --accent-text: #a8172f;
-  --accent-soft: rgba(179, 19, 47, 0.08);
-  --desk: #f8f1f2;
-  --landing-red: #b3132f;
+  --lp-desk: #f6f4f1;
+  --lp-card: #ffffff;
+  --lp-ink: #1c1a1f;
+  --lp-text-2: #4d4853;
+  --lp-muted: #6a6570;
+  --lp-line: #e3dfda;
+  --lp-track: #e8e4df;
+  --lp-red: #d91e3c;
+  --lp-red-hover: #bd1631;
+  --lp-bar: #d91e3c;
+  --lp-red-text: #b8122f;
+  --lp-mark: #fbdbe0;
+  --lp-cover: #1c1a1f;
+  --lp-cover-on: #2e2b33;
+  --lp-ease: cubic-bezier(0.23, 1, 0.32, 1);
+  --lp-width: min(72rem, calc(100% - 2rem));
+
+  --font-sans: "Figtree", ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-sans);
+  --text-primary: var(--lp-ink);
+  --text-secondary: var(--lp-text-2);
+  --text-tertiary: var(--lp-muted);
+  --border: rgba(28, 26, 31, 0.12);
+  --border-strong: rgba(28, 26, 31, 0.24);
+  --bg: var(--lp-desk);
+  --bg-card: var(--lp-card);
+  --bg-card-hover: var(--lp-track);
+  --radius-md: 10px;
+  --accent: var(--lp-red);
+  --accent-text: var(--lp-red-text);
+
   min-height: 100vh;
-  background: var(--bg);
+  overflow-x: clip;
+  background: var(--lp-desk);
+  color: var(--lp-ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
 }
 
 :root.dark .landing {
-  --brand: #ff8597;
-  --brand-hover: #ffa3b1;
-  --accent: #ff8597;
-  --accent-hover: #ffa3b1;
-  --accent-text: #ffa3b1;
-  --accent-soft: rgba(255, 133, 151, 0.12);
-  --desk: #170d10;
-  --landing-red: #7d1024;
+  --lp-desk: #131215;
+  --lp-card: #1f1d23;
+  --lp-ink: #f4f2ef;
+  --lp-text-2: #d3cfd8;
+  --lp-muted: #aaa4b0;
+  --lp-line: #34313a;
+  --lp-track: #2e2b33;
+  --lp-bar: #f0364f;
+  --lp-red-text: #ff8a9c;
+  --lp-mark: #4d2531;
+  --lp-cover: #0c0b0e;
+  --lp-cover-on: #24212a;
+  --border: rgba(244, 242, 239, 0.12);
+  --border-strong: rgba(244, 242, 239, 0.26);
 }
 
-/* The red cover. Tokens re-mapped to white, as on the app's top bar, so the
-   wordmark, the toggle and the buttons need no styles of their own. */
-.landing-cover {
-  --ink: #ffffff;
-  --margin: #ffc2cc;
-  --rule-strong: rgba(255, 255, 255, 0.45);
-  --text-primary: #ffffff;
-  --text-secondary: rgba(255, 255, 255, 0.86);
-  --text-tertiary: rgba(255, 255, 255, 0.72);
-  --border: rgba(255, 255, 255, 0.22);
-  --border-strong: rgba(255, 255, 255, 0.55);
-  --bg-inset: rgba(255, 255, 255, 0.12);
-  --bg-card: rgba(255, 255, 255, 0.08);
-  --bg-card-hover: rgba(255, 255, 255, 0.16);
-  --accent: #ffffff;
-  background: var(--landing-red);
-  color: var(--text-primary);
+.landing ::selection {
+  background: var(--lp-mark);
+  color: var(--lp-ink);
 }
 
-.landing-cover ::selection {
-  background: #ffffff;
-  color: var(--landing-red);
+.landing a:not(.lp-btn) {
+  color: var(--lp-red-text);
+  text-underline-offset: 0.2em;
 }
 
-.landing-cover .btn-primary,
-.landing-contact .btn-primary {
-  border-color: #ffffff;
-  background: #ffffff;
-  color: #8f0f26;
-}
-
-@media (hover: hover) and (pointer: fine) {
-  .landing-cover .btn-primary:hover,
-  .landing-contact .btn-primary:hover {
-    border-color: #ffe4e8;
-    background: #ffe4e8;
-    color: #8f0f26;
-  }
-}
-
-.landing-cover .btn-primary:active {
-  background: #ffe4e8;
-  color: #8f0f26;
-}
-
-.landing-bar {
+/* ─── Bar ─── */
+.lp-bar {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
-  width: min(72rem, calc(100% - 2rem));
+  width: var(--lp-width);
   margin-inline: auto;
   padding: 1rem 0;
-  border-bottom: 1px solid var(--border);
 }
 
-.landing-bar-actions {
+.lp-bar-actions {
   display: flex;
   align-items: center;
   gap: 0.5rem;
 }
 
-.landing-section {
-  width: min(72rem, calc(100% - 2rem));
-  margin-inline: auto;
-  padding: clamp(3rem, 7vw, 5.5rem) 0;
-  border-top: 1px solid var(--border-strong);
-}
-
-.landing-hero {
-  width: min(72rem, calc(100% - 2rem));
-  margin-inline: auto;
-  /* Room for the class sheet that lies across the cover's lower edge. */
-  padding: clamp(3rem, 7vw, 6rem) 0 clamp(7rem, 14vw, 11rem);
-}
-
-.landing-title {
-  max-width: 14ch;
-  margin: 0;
-  font-family: var(--font-display);
-  font-size: clamp(2.5rem, 0.9rem + 5.4vw, 5.75rem);
-  text-wrap: balance;
-  font-weight: 600;
-  line-height: 1.02;
-  letter-spacing: -0.03em;
-  color: var(--text-primary);
-}
-
-.landing-hero-lead {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  align-items: end;
-  gap: 1.5rem clamp(2rem, 5vw, 4.5rem);
-  margin-top: clamp(1.5rem, 3vw, 2.5rem);
-}
-
-.landing-hero-lead .landing-cta {
-  margin-top: 0;
-}
-
-.landing-sheet {
-  position: relative;
-  width: min(72rem, calc(100% - 2rem));
-  margin: calc(-1 * clamp(5rem, 10vw, 8rem)) auto 0;
-}
-
-.landing-sheet + .landing-section {
-  border-top: 0;
-}
-
-/* It floats over the cover's edge, so here a shadow is depth, not decoration. */
-.landing-sheet .ruled-page {
-  background: var(--paper);
-  box-shadow: 0 24px 48px -12px rgba(60, 8, 18, 0.28);
-}
-
-/* How a student starts: three steps, each led by the number it is about. */
-.landing-steps {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 0 clamp(1.5rem, 4vw, 3rem);
-  margin: 2.5rem 0 0;
-  padding: 0;
-  list-style: none;
-}
-
-.landing-steps li {
-  padding-top: 1.25rem;
-  border-top: 2px solid var(--brand);
-}
-
-.landing-step-figure {
-  display: block;
-  font-family: var(--font-display);
-  font-size: clamp(3rem, 2rem + 3vw, 4.5rem);
-  font-weight: 600;
+/* ─── Buttons: flat, 12px, a press is a small scale ─── */
+.lp-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: 3rem;
+  padding: 0 1.4rem;
+  border: 1px solid transparent;
+  border-radius: 12px;
+  font-family: var(--font-sans);
+  font-size: 1rem;
+  font-weight: 700;
   line-height: 1;
-  letter-spacing: -0.03em;
-  color: var(--accent-text);
-  font-variant-numeric: lining-nums tabular-nums;
+  white-space: nowrap;
+  transition:
+    background-color 140ms ease,
+    border-color 140ms ease,
+    color 140ms ease,
+    transform 100ms var(--lp-ease);
 }
 
-.landing-steps h3 {
-  margin: 1rem 0 0;
-  font-family: var(--font-display);
-  font-size: 1.3rem;
-  font-weight: 600;
-  color: var(--text-primary);
+.lp-btn:active {
+  transform: scale(0.97);
 }
 
-.landing-steps p {
-  max-width: 34ch;
-  margin: 0.5rem 0 0;
-  line-height: 1.6;
-  color: var(--text-secondary);
-  text-wrap: pretty;
+.lp-btn:focus-visible {
+  outline: 2px solid var(--lp-ink);
+  outline-offset: 3px;
 }
 
-.landing-lede {
-  max-width: 40rem;
+.lp-btn.is-primary {
+  background: var(--lp-red);
+  color: #ffffff;
+}
+
+.lp-btn.is-primary svg {
+  transition: transform 160ms var(--lp-ease);
+}
+
+.lp-btn.is-secondary {
+  border-color: var(--border-strong);
+  background: var(--lp-card);
+  color: var(--lp-ink);
+}
+
+.lp-btn.is-quiet {
+  min-height: 2.75rem;
+  padding-inline: 1rem;
+  color: var(--lp-ink);
+}
+
+/* On the ink band: a white control, so the page keeps one red voice. */
+.lp-btn.is-inverse {
+  background: #ffffff;
+  color: #1c1a1f;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .lp-btn.is-primary:hover {
+    background: var(--lp-red-hover);
+  }
+
+  .lp-btn.is-primary:hover svg {
+    transform: translateX(3px);
+  }
+
+  .lp-btn.is-secondary:hover,
+  .lp-btn.is-quiet:hover {
+    background: var(--lp-track);
+  }
+
+  .lp-btn.is-inverse:hover {
+    background: #ece9e5;
+  }
+}
+
+/* ─── Hero: the promise beside the Hoy screen ─── */
+.lp-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.25fr);
+  align-items: center;
+  gap: clamp(2rem, 4vw, 4rem);
+  width: var(--lp-width);
+  margin-inline: auto;
+  padding: clamp(2rem, 5vw, 4.5rem) 0 clamp(1rem, 3vw, 2.5rem);
+}
+
+.lp-title {
+  max-width: 12ch;
   margin: 0;
-  font-size: 1.15rem;
-  line-height: 1.6;
-  color: var(--text-secondary);
+  font-size: clamp(2.5rem, 1rem + 3.4vw, 3.75rem);
+  font-weight: 800;
+  line-height: 1.02;
+  letter-spacing: -0.035em;
+  text-wrap: balance;
+}
+
+.lp-lede {
+  max-width: 34rem;
+  margin: 1.5rem 0 0;
+  font-size: 1.1875rem;
+  line-height: 1.55;
+  color: var(--lp-text-2);
   text-wrap: pretty;
 }
 
-.landing-cta {
+.lp-cta {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -3965,484 +3960,765 @@ pre code {
   margin-top: 2rem;
 }
 
-.landing-cta .btn-primary,
-.landing-cta .btn-secondary {
-  min-height: 3rem;
-  padding-inline: 1.5rem;
-  font-size: 1rem;
+.lp-cta .lp-btn {
+  min-height: 3.25rem;
 }
 
-.landing-h2 {
-  max-width: 40rem;
-  margin: 0;
-  font-family: var(--font-display);
-  font-size: clamp(1.75rem, 1.25rem + 1.6vw, 2.75rem);
-  font-weight: 600;
-  line-height: 1.1;
-  letter-spacing: -0.02em;
-}
-
-.landing-h3 {
-  margin: 2rem 0 0;
-  font-family: var(--font-display);
-  font-size: 1.25rem;
-  font-weight: 600;
-}
-
-.landing-copy {
-  max-width: 40rem;
-  margin: 1rem 0 0;
-  font-size: 1.05rem;
-  line-height: 1.65;
-  color: var(--text-secondary);
-  text-wrap: pretty;
-}
-
-/* What it measures: a definition list on the ruling, term in the margin. */
-.landing-terms {
-  display: grid;
-  margin: 2rem 0 0;
-  border-top: 1px solid var(--border);
-}
-
-.landing-terms > div {
-  display: grid;
-  grid-template-columns: minmax(10rem, 16rem) minmax(0, 1fr);
-  gap: 0.5rem 2rem;
-  padding: 1.1rem 0;
-  border-bottom: 1px solid var(--border);
-}
-
-.landing-terms dt {
-  font-family: var(--font-display);
-  font-size: 1.15rem;
-  font-weight: 600;
-  color: var(--text-primary);
-}
-
-.landing-terms dd {
-  max-width: 44rem;
-  margin: 0;
-  line-height: 1.6;
-  color: var(--text-secondary);
-  text-wrap: pretty;
-}
-
-.landing-split,
-.landing-teacher {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-  align-items: start;
-  gap: clamp(2rem, 5vw, 4.5rem);
-}
-
-.landing-teacher .landing-terms > div {
-  grid-template-columns: minmax(0, 1fr);
-}
-
-/* The student's side lies on the desk: the one field of colour before the close. */
-.landing-band {
-  background: var(--desk);
-}
-
-.landing-band + .landing-section {
-  border-top: 0;
-}
-
-.landing-band-inner {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  align-items: center;
-  gap: clamp(2rem, 6vw, 5rem);
-  width: min(72rem, calc(100% - 2rem));
-  margin-inline: auto;
-  padding: clamp(3rem, 7vw, 5.5rem) 0;
-}
-
-.landing-contact {
-  background: var(--landing-red);
-}
-
-.landing-contact-inner {
-  width: min(72rem, calc(100% - 2rem));
-  margin-inline: auto;
-  padding: clamp(3rem, 7vw, 5.5rem) 0;
-}
-
-.landing-contact .landing-h2 {
-  color: #ffffff;
-}
-
-.landing-contact .landing-copy {
-  color: #ffe4e8;
-}
-
-/* Interface fragments: the product itself, every one captioned as an example. */
-.ui-figure {
+/* ─── The app, in HTML: same tokens as the student screens ─── */
+.lp-figure-wrap {
   min-width: 0;
   margin: 0;
 }
 
-.ui-figure figcaption {
-  max-width: 60ch;
+.lp-figure-wrap figcaption {
   margin-top: 0.75rem;
-  font-size: 0.85rem;
-  line-height: 1.45;
-  color: var(--text-tertiary);
+  font-size: 0.8125rem;
+  color: var(--lp-muted);
 }
 
-@media (min-width: 781px) {
-  .ui-report {
-    width: 100%;
-    grid-template-columns: calc(var(--cell) * 7) minmax(0, 1fr);
-    gap: 0 var(--cell);
-    padding: calc(var(--cell) * 1.5);
-  }
-
-  .ui-report .area-chart-row {
-    grid-template-columns: 9.5rem minmax(0, 1fr) 3.25rem;
-    gap: 0.75rem;
-  }
+.lp-app {
+  display: grid;
+  grid-template-columns: 8.5rem minmax(0, 1fr) minmax(11rem, 14rem);
+  overflow: hidden;
+  border: 1px solid var(--lp-line);
+  border-radius: 20px;
+  background: var(--lp-desk);
+  color: var(--lp-ink);
+  font-size: 0.875rem;
+  line-height: 1.3;
 }
 
-.ui-report .ruled-section:last-child {
-  padding-bottom: 0;
+:root.dark .lp-app {
+  background: #18171b;
 }
 
-.ui-report .ruled-row {
-  border-bottom: 0;
-  padding-block: 0;
-}
-
-/* The student's phone, on the Álbum palette whatever the page's theme. */
-.ui-phones {
-  display: flex;
-  align-items: stretch;
-  gap: 1.25rem;
-}
-
-.ui-phone {
-  display: flex;
-  width: 19rem;
+.lp-app svg {
+  width: 1rem;
+  height: 1rem;
   flex: none;
-  flex-direction: column;
-  overflow: hidden;
-  border-radius: 1.25rem;
-  background: #ffffff;
-  box-shadow: 0 14px 34px rgb(60 8 18 / 0.18);
-  color: #24141a;
-  font-family: "Figtree", ui-sans-serif, system-ui, sans-serif;
-  font-weight: 500;
-  line-height: 1.25;
 }
 
-.ui-today {
+.lp-app-rail {
   display: flex;
-  flex: 1;
   flex-direction: column;
+  gap: 0.2rem;
+  padding: 1.1rem 0.6rem;
+  background: var(--lp-cover);
+  color: #f6f4f1;
+}
+
+.lp-app-brand {
+  padding: 0 0.5rem 0.9rem;
+  font-size: 1rem;
+  font-weight: 800;
+}
+
+.lp-app-rail span:not(.lp-app-brand) {
+  display: flex;
+  align-items: center;
   gap: 0.55rem;
-  padding: 1rem;
-  background: #f8f1f2;
-}
-
-.ui-today-title {
-  margin: 0;
-  font-size: 1.35rem;
-  font-weight: 800;
-}
-
-.ui-today-status {
-  display: flex;
-  gap: 0.35rem;
-  margin: 0;
-}
-
-.ui-today-status span {
-  padding: 0.2rem 0.55rem;
-  border: 1px solid #ecdcdf;
-  border-radius: 999px;
-  background: #ffffff;
-  color: #54404a;
-  font-size: 0.7rem;
-  font-weight: 600;
-}
-
-.ui-today-h {
-  margin: 0.35rem 0 0;
-  font-size: 0.85rem;
+  padding: 0.55rem 0.6rem;
+  border-radius: 10px;
+  font-size: 0.8125rem;
   font-weight: 700;
+  opacity: 0.75;
 }
 
-.ui-today-next {
+.lp-app-rail .is-active {
+  background: var(--lp-cover-on);
+  opacity: 1 !important;
+}
+
+.lp-app-rail .is-active svg {
+  color: #f0364f;
+}
+
+.lp-app-main {
   display: flex;
   flex-direction: column;
-  gap: 0.3rem;
-  padding: 0.85rem;
-  border-radius: 0.8rem;
-  background: #b3132f;
-  color: #ffffff;
+  gap: 0.85rem;
+  padding: 1.25rem;
 }
 
-.ui-today-next b {
-  font-size: 1.05rem;
+.lp-app-hello {
+  margin: 0;
+  font-size: 1.5rem;
   font-weight: 800;
+  letter-spacing: -0.02em;
 }
 
-.ui-today-next span {
-  font-size: 0.8rem;
-  line-height: 1.35;
-}
-
-.ui-today-next small {
-  font-size: 0.68rem;
+.lp-app-facts {
+  margin: -0.5rem 0 0;
   font-weight: 600;
-  opacity: 0.85;
+  color: var(--lp-muted);
 }
 
-.ui-today-next em {
-  margin-top: 0.35rem;
-  padding: 0.55rem;
-  border-radius: 0.6rem;
-  background: #ffffff;
-  color: #b3132f;
-  font-size: 0.85rem;
-  font-style: normal;
-  font-weight: 700;
-  text-align: center;
+.lp-app-goal {
+  display: grid;
+  gap: 0.4rem;
 }
 
-.ui-today-areas {
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  border: 1px solid #ecdcdf;
-  border-radius: 0.8rem;
-  background: #ffffff;
-}
-
-.ui-today-areas > div {
-  display: flex;
-  flex-direction: column;
-  gap: 0.3rem;
-  padding: 0.6rem 0.75rem;
-}
-
-.ui-today-areas > div + div {
-  border-top: 1px solid #ecdcdf;
-}
-
-.ui-today-area-top {
+.lp-app-goal span {
   display: flex;
   justify-content: space-between;
-  color: #54404a;
-  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--lp-muted);
+}
+
+.lp-app-goal b {
+  color: var(--lp-ink);
   font-weight: 700;
 }
 
-.ui-today-area-top b {
-  color: #24141a;
-  font-size: 0.8rem;
-}
-
-.ui-today-areas i {
+.lp-app-goal > i {
   display: block;
-  height: 0.3rem;
+  height: 8px;
   overflow: hidden;
-  border-radius: 0.15rem;
-  background: #f3e8ea;
+  border-radius: 999px;
+  background: var(--lp-track);
 }
 
-.ui-today-areas i i {
+.lp-app-goal > i > i {
+  display: block;
+  width: 60%;
   height: 100%;
+  border-radius: 999px;
+  background: var(--lp-bar);
+  transform-origin: left;
+}
+
+.lp-app-next {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  padding: 1.1rem 1.1rem 1.1rem 1.35rem;
+  border: 1px solid var(--lp-line);
+  border-radius: 16px;
+  background: var(--lp-card);
+  box-shadow: inset 4px 0 0 var(--lp-red);
+}
+
+.lp-app-next small {
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: var(--lp-red-text);
+}
+
+.lp-app-next > b {
+  font-size: 1.25rem;
+  font-weight: 800;
+  line-height: 1.2;
+  text-wrap: balance;
+}
+
+.lp-app-next > span:not(.lp-app-meta) {
+  color: var(--lp-text-2);
+  text-wrap: pretty;
+}
+
+.lp-app-meta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: var(--lp-muted);
+}
+
+.lp-app-meta i {
+  width: 0.55rem;
+  height: 0.55rem;
+  border-radius: 999px;
   background: var(--area);
 }
 
-.ui-today-areas small {
-  color: #6b555c;
-  font-size: 0.66rem;
+.lp-app-next em {
+  align-self: flex-start;
+  margin-top: 0.35rem;
+  padding: 0.75rem 1.6rem;
+  border-radius: 12px;
+  background: var(--lp-red);
+  color: #ffffff;
+  font-style: normal;
+  font-weight: 700;
 }
 
-.ui-album-tabs {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  padding: 0.5rem 0.3rem 0.7rem;
-  border-top: 1px solid #f0e2e4;
-}
-
-.ui-album-tabs span {
+.lp-app-side {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 0.1rem;
-  font-size: 0.66rem;
-  font-weight: 700;
-  color: #6b555c;
-}
-
-.ui-album-tabs span.is-active {
-  color: #c41e3a;
-}
-
-.ui-album-tabs svg {
-  width: 1.25rem;
-  height: 1.25rem;
-}
-
-.ui-guide-bar {
-  display: flex;
-  align-items: center;
   gap: 0.6rem;
-  padding: 0.7rem 1rem;
-  background: #097d52;
+  padding: 1.25rem 1.1rem;
+  background: var(--lp-card);
+  border-left: 1px solid var(--lp-line);
+}
+
+.lp-app-h {
+  margin: 0;
+  font-size: 0.875rem;
+  font-weight: 800;
+}
+
+.lp-app-side .lp-app-h + * {
+  margin-bottom: 0.5rem;
+}
+
+.lp-app-week {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 0.2rem;
+}
+
+.lp-app-week span {
+  display: grid;
+  justify-items: center;
+  gap: 0.25rem;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  color: var(--lp-muted);
+}
+
+.lp-app-week i {
+  display: grid;
+  place-items: center;
+  width: 1.4rem;
+  height: 1.4rem;
+  border: 1.5px solid var(--lp-line);
+  border-radius: 999px;
+}
+
+.lp-app-week .done i {
+  border-color: var(--lp-bar);
+  background: var(--lp-bar);
   color: #ffffff;
 }
 
-.ui-guide-bar > svg {
-  width: 1.2rem;
-  height: 1.2rem;
-  flex: none;
+.lp-app-week .done svg {
+  width: 0.8rem;
+  height: 0.8rem;
+  stroke-width: 3;
 }
 
-.ui-guide-beads {
+.lp-app-week .today i {
+  border: 0;
+  background: var(--lp-mark);
+  box-shadow: 0 0 0 2px var(--lp-bar);
+}
+
+.lp-app-week .today {
+  color: var(--lp-ink);
+}
+
+.lp-app-areas {
+  display: grid;
+  gap: 0.6rem;
+}
+
+.lp-app-areas > div {
+  display: grid;
+  gap: 0.3rem;
+}
+
+.lp-app-areas span {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.lp-app-areas span i {
+  width: 0.5rem;
+  height: 0.5rem;
+  flex: none;
+  border-radius: 999px;
+  background: var(--area);
+}
+
+.lp-app-areas small {
+  margin-left: auto;
+  font-size: 0.6875rem;
+  color: var(--lp-muted);
+}
+
+.lp-app-areas > div > b {
+  display: block;
+  height: 5px;
+  overflow: hidden;
+  border-radius: 3px;
+  background: var(--lp-track);
+}
+
+.lp-app-areas > div > b > b {
+  display: block;
+  height: 100%;
+  border-radius: 3px;
+  background: var(--area);
+}
+
+/* ─── Sections ─── */
+.lp-section {
+  width: var(--lp-width);
+  margin-inline: auto;
+  padding: clamp(3.5rem, 8vw, 6.5rem) 0 0;
+}
+
+.lp-h2 {
+  max-width: 22ch;
+  margin: 0;
+  font-size: clamp(1.75rem, 1.2rem + 1.8vw, 2.75rem);
+  font-weight: 800;
+  line-height: 1.08;
+  letter-spacing: -0.03em;
+  text-wrap: balance;
+}
+
+.lp-copy {
+  max-width: 38rem;
+  margin: 1rem 0 0;
+  font-size: 1.0625rem;
+  line-height: 1.6;
+  color: var(--lp-text-2);
+  text-wrap: pretty;
+}
+
+/* How a student starts: three facts, each led by its number in words. */
+.lp-steps {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+  margin: 2.25rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.lp-steps li {
+  padding: 1.5rem;
+  border-radius: 16px;
+  background: var(--lp-card);
+}
+
+.lp-figure {
+  display: block;
+  font-size: clamp(2.25rem, 1.5rem + 2vw, 3.25rem);
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.04em;
+  font-variant-numeric: tabular-nums;
+}
+
+.lp-steps h3 {
+  margin: 1.25rem 0 0;
+  font-size: 1.125rem;
+  font-weight: 800;
+}
+
+.lp-steps p {
+  margin: 0.4rem 0 0;
+  line-height: 1.55;
+  color: var(--lp-text-2);
+  text-wrap: pretty;
+}
+
+/* The guided question, then why it works. */
+.lp-guide {
+  display: grid;
+  grid-template-columns: minmax(0, 26rem) minmax(0, 1fr);
+  align-items: center;
+  gap: clamp(2rem, 6vw, 5rem);
+}
+
+.lp-guide-ui {
+  overflow: hidden;
+  border: 1px solid var(--lp-line);
+  border-radius: 20px;
+  background: var(--lp-card);
+  color: var(--lp-ink);
+  font-size: 0.9375rem;
+}
+
+.lp-guide-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.8rem 1rem;
+  background: #097d52;
+  color: #ffffff;
+  font-size: 0.8125rem;
+  font-weight: 700;
+}
+
+.lp-guide-bar svg {
+  width: 1.1rem;
+  height: 1.1rem;
+}
+
+.lp-guide-beads {
   display: flex;
   flex: 1;
   gap: 0.3rem;
 }
 
-.ui-guide-beads i {
+.lp-guide-beads i {
   flex: 1;
-  height: 0.5rem;
-  border-radius: 0.15rem;
-  background: #097049;
+  height: 0.45rem;
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.28);
 }
 
-.ui-guide-beads i.done { background: #ffd3db; }
-.ui-guide-beads i.current { background: #ffffff; }
-
-.ui-guide-slot {
-  width: 2.4rem;
-  height: 2.4rem;
-  flex: none;
-  font-size: 0.8rem;
-  font-weight: 700;
-  line-height: 2.4rem;
-  text-align: center;
+.lp-guide-beads .done {
+  background: #fbdbe0;
 }
 
-.ui-guide-sheet {
-  flex: 1;
-  padding: 1rem;
+.lp-guide-beads .current {
+  background: #ffffff;
 }
 
-.ui-guide-q {
-  margin: 0 0 0.85rem;
-  font-size: 1rem;
+.lp-guide-sheet {
+  padding: 1.1rem 1.1rem 1rem;
+}
+
+.lp-guide-q {
+  margin: 0;
+  font-size: 1.0625rem;
   font-weight: 500;
   line-height: 1.4;
   text-wrap: pretty;
 }
 
-.ui-guide-opt {
+.lp-guide-opts {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.5rem;
+  margin-top: 0.9rem;
+}
+
+.lp-guide-opts span {
   display: flex;
   align-items: center;
-  gap: 0.7rem;
-  margin-bottom: 0.45rem;
-  padding: 0.55rem 0.7rem;
-  border-radius: 0.6rem;
-  background: #f8f1f2;
-  font-size: 0.95rem;
-  font-weight: 500;
+  gap: 0.6rem;
+  min-height: 3rem;
+  padding: 0 0.6rem;
+  border-radius: 12px;
+  background: var(--lp-desk);
+  font-weight: 700;
 }
 
-.ui-guide-opt em {
-  width: 1.6rem;
-  height: 1.6rem;
-  flex: none;
-  border-radius: 0.35rem;
-  background: #ffffff;
-  color: #24141a;
-  font-size: 0.85rem;
+.lp-guide-opts em {
+  display: grid;
+  place-items: center;
+  width: 1.9rem;
+  height: 1.9rem;
+  border-radius: 8px;
+  background: var(--lp-card);
   font-style: normal;
-  font-weight: 800;
-  line-height: 1.6rem;
-  text-align: center;
+  font-size: 0.8125rem;
 }
 
-.ui-guide-opt.is-wrong {
+.lp-guide-opts .is-wrong {
   background: #ffe6e2;
-  box-shadow: inset 0 0 0 2px #e8402f;
+  box-shadow: inset 0 0 0 2px #c8321f;
   color: #a31d10;
 }
 
-.ui-guide-opt.is-wrong em {
-  background: #e8402f;
+.lp-guide-opts .is-wrong em {
+  background: #c8321f;
   color: #ffffff;
 }
 
-.ui-guide-opt.is-wrong svg {
+.lp-guide-opts .is-wrong svg {
   width: 1rem;
   height: 1rem;
   margin-left: auto;
 }
 
-.ui-guide-ask {
-  padding: 1rem 1rem 1.25rem;
-  background: #2a1218;
+.lp-guide-ask {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  padding: 1.1rem;
+  background: #1c1a1f;
   color: #ffffff;
 }
 
-.ui-guide-ask p {
-  margin: 0 0 0.35rem;
-  font-size: 0.78rem;
-  font-weight: 600;
-  color: rgb(255 255 255 / 0.72);
+:root.dark .lp-guide-ask {
+  background: #0c0b0e;
 }
 
-.ui-guide-title {
-  margin-bottom: 0.6rem;
-  font-size: 1.15rem;
+.lp-guide-ask p {
+  margin: 0;
+  font-size: 0.8125rem;
   font-weight: 700;
-  line-height: 1.3;
+  color: #ff8a9c;
 }
 
-.ui-guide-chip {
-  display: block;
-  margin-top: 0.4rem;
-  padding: 0.6rem 0.7rem;
-  border-radius: 0.55rem;
+.lp-guide-ask b {
+  margin-bottom: 0.2rem;
+  font-size: 1.1875rem;
+  font-weight: 800;
+}
+
+.lp-guide-ask span {
+  padding: 0.7rem 0.85rem;
+  border-radius: 12px;
   background: #ffffff;
-  color: #2a1218;
-  font-size: 0.82rem;
+  color: #1c1a1f;
   font-weight: 700;
 }
 
-@media (max-width: 1000px) {
-  .landing-hero-lead,
-  .landing-band-inner,
-  .landing-split,
-  .landing-teacher {
+/* What counts: four terms on one white sheet, two by two. */
+.lp-terms {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 2rem clamp(2rem, 5vw, 4rem);
+  margin: 2.25rem 0 0;
+  padding: clamp(1.5rem, 3vw, 2.5rem);
+  border-radius: 20px;
+  background: var(--lp-card);
+}
+
+.lp-terms dt {
+  font-size: 1.125rem;
+  font-weight: 800;
+}
+
+.lp-terms dt::before {
+  content: "";
+  display: block;
+  width: 1.75rem;
+  height: 4px;
+  margin-bottom: 0.85rem;
+  border-radius: 2px;
+  background: var(--lp-bar);
+}
+
+.lp-terms dd {
+  margin: 0.4rem 0 0;
+  line-height: 1.55;
+  color: var(--lp-text-2);
+  text-wrap: pretty;
+}
+
+/* Teachers and schools: the one ink band, the student app's brand surface. */
+.lp-band {
+  margin-top: clamp(4rem, 9vw, 7rem);
+  background: var(--lp-cover);
+  color: #f6f4f1;
+  --lp-ink: #f6f4f1;
+  --lp-text-2: #d3cfd8;
+}
+
+.lp-band-inner {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 26rem);
+  align-items: center;
+  gap: clamp(2rem, 6vw, 5rem);
+  width: var(--lp-width);
+  margin-inline: auto;
+  padding: clamp(3.5rem, 8vw, 6rem) 0;
+}
+
+.lp-band .lp-btn:focus-visible {
+  outline-color: #ffffff;
+}
+
+.lp-band figcaption {
+  color: #aaa4b0;
+}
+
+.lp-band-terms {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.25rem 2rem;
+  max-width: 38rem;
+  margin: 1.75rem 0 0.5rem;
+}
+
+.lp-band-terms dt {
+  font-weight: 800;
+}
+
+.lp-band-terms dd {
+  margin: 0.3rem 0 0;
+  line-height: 1.5;
+  color: #d3cfd8;
+}
+
+.lp-teacher-ui {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  padding: 1.25rem;
+  border-radius: 20px;
+  background: #ffffff;
+  color: #1c1a1f;
+  font-size: 0.875rem;
+  --lp-muted: #6a6570;
+}
+
+:root.dark .lp-teacher-ui {
+  background: #1f1d23;
+  color: #f4f2ef;
+  --lp-muted: #aaa4b0;
+}
+
+.lp-teacher-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin: 0 0 0.35rem;
+}
+
+.lp-teacher-head b {
+  font-size: 1.5rem;
+  font-weight: 800;
+}
+
+.lp-teacher-head span {
+  font-weight: 600;
+  color: var(--lp-muted);
+}
+
+.lp-teacher-row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  margin-bottom: 0.4rem;
+  padding: 0.9rem 1rem;
+  border-radius: 12px;
+  background: #f6f4f1;
+}
+
+:root.dark .lp-teacher-row {
+  background: #2e2b33;
+}
+
+.lp-teacher-row b {
+  font-size: 1rem;
+  font-weight: 800;
+}
+
+.lp-teacher-row > span:last-child {
+  line-height: 1.45;
+  color: var(--lp-muted);
+}
+
+.lp-split {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(2rem, 6vw, 5rem);
+}
+
+/* The close: the first step again, said once. */
+.lp-close {
+  width: var(--lp-width);
+  margin: clamp(4rem, 9vw, 7rem) auto clamp(3rem, 6vw, 5rem);
+  padding: clamp(2rem, 5vw, 3.5rem);
+  border-radius: 24px;
+  background: var(--lp-card);
+}
+
+.landing .public-footer a {
+  color: var(--lp-text-2);
+}
+
+/* ─── Motion: the hero enters once; the goal bar fills ─── */
+@media (prefers-reduced-motion: no-preference) {
+  .lp-hero-text > *,
+  .lp-hero-figure {
+    animation: lp-rise 520ms var(--lp-ease) backwards;
+  }
+
+  .lp-hero-text > :nth-child(2) { animation-delay: 70ms; }
+  .lp-hero-text > :nth-child(3) { animation-delay: 140ms; }
+  .lp-hero-figure { animation-delay: 200ms; }
+
+  .lp-app-goal > i > i {
+    animation: lp-fill 700ms var(--lp-ease) 650ms backwards;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lp-btn,
+  .lp-btn svg {
+    transition: none;
+  }
+
+  .lp-btn:active {
+    transform: none;
+  }
+}
+
+@keyframes lp-rise {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+}
+
+@keyframes lp-fill {
+  from {
+    transform: scaleX(0);
+  }
+}
+
+/* ─── Narrower screens ─── */
+@media (max-width: 1100px) {
+  .lp-hero,
+  .lp-band-inner {
     grid-template-columns: minmax(0, 1fr);
   }
 
-  .ui-phones {
-    flex-wrap: wrap;
-    justify-content: center;
+  .lp-title {
+    max-width: 14ch;
   }
 
-  .landing-terms > div {
+  .lp-hero-figure,
+  .lp-band-inner .lp-figure-wrap {
+    max-width: 46rem;
+  }
+}
+
+@media (max-width: 860px) {
+  .lp-steps,
+  .lp-terms,
+  .lp-split,
+  .lp-guide {
     grid-template-columns: minmax(0, 1fr);
   }
 
-  .landing-steps {
-    grid-template-columns: minmax(0, 1fr);
-    gap: 2rem;
+  .lp-guide .lp-figure-wrap {
+    order: 1;
   }
 }
 
 @media (max-width: 640px) {
-  .landing-cta .btn-primary,
-  .landing-cta .btn-secondary {
-    width: 100%;
+  .lp-app {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .lp-app-rail {
+    display: none;
+  }
+
+  .lp-app-side {
+    border-top: 1px solid var(--lp-line);
+    border-left: 0;
+  }
+
+  .lp-app-main {
+    padding: 1rem;
+  }
+
+  .lp-cta .lp-btn {
+    flex: 1 1 100%;
+  }
+
+  .lp-band-terms {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .lp-guide-opts {
+    grid-template-columns: minmax(0, 1fr);
   }
 }
 
@@ -6048,19 +6324,6 @@ html:has(.is-immersive) {
   }
 }
 
-/* The welcome progress changes instantly, not inside the crossfade. */
-.welcome-progress {
-  view-transition-name: welcome-progress;
-}
-
-::view-transition-old(welcome-progress) {
-  display: none;
-}
-
-::view-transition-new(welcome-progress) {
-  animation: none;
-}
-
 /* The reward moment of a session: a topic that went up (only those move). */
 .session-close-mark.is-up {
   animation: close-mark-up 360ms cubic-bezier(0.34, 1.36, 0.64, 1) backwards;
@@ -6102,7 +6365,7 @@ html:has(.is-immersive) {
 
 /* Tabular digits for figures and tables, proportional ones in running prose. */
 .page-lede,
-.landing-lede,
+.lp-lede,
 .markdown-body {
   font-variant-numeric: proportional-nums;
 }

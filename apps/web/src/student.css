@@ -5,6 +5,18 @@
 @import url("https://fonts.googleapis.com/css2?family=Figtree:wght@400..800&display=swap");
 
 @media screen {
+  /* Motion tokens, the one unscoped block: a screen reads them while the route
+     (and `data-look`) is still changing. `lib/motion-tokens.ts` hands the same
+     values to motion/react. */
+  :root {
+    --ease-out-strong: cubic-bezier(0.23, 1, 0.32, 1);
+    --duration-press: 100ms;
+    --duration-quick: 160ms;
+    --duration-step: 280ms;
+    --duration-spring: 400ms;
+    --duration-stagger: 50ms;
+  }
+
   :root[data-look='student'] {
     --font-sans: "Figtree", ui-sans-serif, system-ui, sans-serif;
     --font-display: var(--font-sans);
@@ -18,37 +30,40 @@
     --text-xl: 1.75rem;
     --text-2xl: 2.25rem;
 
+    /* Palette A, "Tinta con rojo de acento" (2026-11-11): near-black ink is the
+       brand surface, warm paper the desk, and red is only action and progress. */
     --paper: #ffffff;
-    --rule: #ecdcdf;
-    --rule-strong: #d9bfc4;
-    --ink: #24141a;
-    --graphite: #5e4a4f;
+    --rule: #e3dfda;
+    --rule-strong: #cfc9c2;
+    --ink: #1c1a1f;
+    --graphite: #5a5560;
     --margin: #c8321f;
     --green-ink: #08704a;
 
-    /* Rojo: the brand. Cover bars and the next-step card. */
-    --cover: #b3132f;
+    /* Tinta: the brand surface. The side rail, the top bar, the Yo cover, the streak moment. */
+    --cover: #1c1a1f;
+    --cover-on: #2e2b33;
     --cover-accent: #ffffff;
-    --desk: #f8f1f2;
+    --desk: #f6f4f1;
 
     --bg: var(--paper);
     --bg-card: #ffffff;
-    --bg-card-hover: #fcf6f7;
-    --bg-inset: #f3e8ea;
+    --bg-card-hover: #fbfaf8;
+    --bg-inset: #e8e4df;
     --bg-elevated: #ffffff;
 
     --text-primary: var(--ink);
-    --text-secondary: #54404a;
-    --text-tertiary: #6b555c;
+    --text-secondary: #4d4853;
+    --text-tertiary: #6a6570;
     --text-inverted: #ffffff;
 
-    --brand: #c41e3a;
-    --brand-hover: #a3172f;
-    --accent: #c41e3a;
-    --accent-soft: rgba(196, 30, 58, 0.08);
-    --accent-medium: rgba(196, 30, 58, 0.2);
-    --accent-hover: #a3172f;
-    --accent-text: #a8172f;
+    --brand: #d91e3c;
+    --brand-hover: #bd1631;
+    --accent: #d91e3c;
+    --accent-soft: rgba(217, 30, 60, 0.08);
+    --accent-medium: rgba(217, 30, 60, 0.2);
+    --accent-hover: #bd1631;
+    --accent-text: #b8122f;
 
     --success: #08704a;
     --success-soft: rgba(9, 125, 82, 0.12);
@@ -59,15 +74,15 @@
     --warn: var(--graphite);
     --warn-soft: rgba(75, 95, 87, 0.12);
 
-    /* The one primary action per screen (red; white on a red surface). */
+    /* The one primary action per screen: red, white text, on white or ink only. */
     --sticker: #d91e3c;
     --sticker-hover: #bd1631;
     --on-sticker: #ffffff;
     /* Marks that are never pressed: the current topic, done beads, what is yours. */
-    --mark: #ffd3db;
+    --mark: #fbdbe0;
     --on-mark: var(--ink);
     /* The guided-question panel. */
-    --panel: #2a1218;
+    --panel: #1c1a1f;
     --on-danger: #ffffff;
 
     /* One colour per area, for its header, marks and bars: white text reads at 4.5:1 or better.
@@ -78,13 +93,13 @@
     --subject-sociales_ciudadanas: #b4540a;
     --subject-ingles: #b3257a;
 
-    --border: rgba(36, 20, 26, 0.12);
-    --border-strong: rgba(36, 20, 26, 0.24);
-    --border-accent: rgba(196, 30, 58, 0.4);
+    --border: rgba(28, 26, 31, 0.12);
+    --border-strong: rgba(28, 26, 31, 0.24);
+    --border-accent: rgba(217, 30, 60, 0.4);
     --border-hard: var(--ink);
 
-    --shadow-md: 0 4px 14px rgba(36, 20, 26, 0.12);
-    --shadow-lg: 0 12px 32px rgba(36, 20, 26, 0.18);
+    --shadow-md: 0 4px 14px rgba(28, 26, 31, 0.12);
+    --shadow-lg: 0 12px 32px rgba(28, 26, 31, 0.18);
 
     --radius-sm: 8px;
     --radius-md: 12px;
@@ -92,46 +107,47 @@
     --radius-xl: 20px;
     --radius-pill: 999px;
 
-    --ease-out-strong: cubic-bezier(0.23, 1, 0.32, 1);
-
     -webkit-tap-highlight-color: transparent;
   }
 
   /* After the light block, and more specific than `:root.dark` in styles.css. */
+  /* Ink-first night: the rail is the darkest ink, cards lift off the desk, and
+     the action keeps the same red with white text. */
   :root.dark[data-look='student'] {
-    --paper: #1c1215;
-    --rule: #3a262b;
-    --rule-strong: #54383f;
-    --ink: #f6eced;
-    --graphite: #c2aeb3;
+    --paper: #1d1b20;
+    --rule: #34313a;
+    --rule-strong: #4a4650;
+    --ink: #f4f2ef;
+    --graphite: #bdb7c2;
     --margin: #f0796a;
     --green-ink: #62d2a2;
 
-    --cover: #8a1328;
-    --desk: #130b0e;
+    --cover: #0c0b0e;
+    --cover-on: #24212a;
+    --desk: #131215;
 
-    --bg-card: #24171b;
-    --bg-card-hover: #2d1d22;
-    --bg-inset: #170e11;
-    --bg-elevated: #2a1b20;
+    --bg-card: #1f1d23;
+    --bg-card-hover: #26232b;
+    --bg-inset: #2e2b33;
+    --bg-elevated: #26232b;
 
-    --text-secondary: #d9c5ca;
-    --text-tertiary: #bfa8ae;
-    --text-inverted: #1a070c;
+    --text-secondary: #d3cfd8;
+    --text-tertiary: #aaa4b0;
+    --text-inverted: #131215;
 
-    --brand: #ff8597;
-    --brand-hover: #ffa3b1;
-    --accent: #ff8597;
-    --accent-soft: rgba(255, 133, 151, 0.13);
-    --accent-medium: rgba(255, 133, 151, 0.26);
-    --accent-hover: #ffa3b1;
-    --accent-text: #ffa3b1;
+    --brand: #f0364f;
+    --brand-hover: #ff5a70;
+    --accent: #ff6b81;
+    --accent-soft: rgba(255, 107, 129, 0.13);
+    --accent-medium: rgba(255, 107, 129, 0.26);
+    --accent-hover: #ff8a9c;
+    --accent-text: #ff8a9c;
 
-    --sticker: #ff6b81;
-    --sticker-hover: #ff8597;
-    --on-sticker: #1a070c;
-    --mark: #6b2433;
-    --panel: #0d0608;
+    --sticker: #d91e3c;
+    --sticker-hover: #e8344f;
+    --on-sticker: #ffffff;
+    --mark: #4d2531;
+    --panel: #0c0b0e;
 
     --success: #62d2a2;
     --success-soft: rgba(98, 210, 162, 0.14);
@@ -139,11 +155,11 @@
     --danger-soft: rgba(240, 121, 106, 0.16);
     --danger-text: #ff9c8f;
 
-    --border: rgba(246, 236, 237, 0.14);
-    --border-strong: rgba(246, 236, 237, 0.28);
-    --border-accent: rgba(255, 133, 151, 0.45);
+    --border: rgba(244, 242, 239, 0.12);
+    --border-strong: rgba(244, 242, 239, 0.26);
+    --border-accent: rgba(255, 107, 129, 0.45);
 
-    --on-danger: #1a070c;
+    --on-danger: #131215;
     --cover-accent: #ffffff;
     --shadow-md: 0 4px 14px rgba(0, 0, 0, 0.4);
     --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.5);
@@ -346,6 +362,10 @@
     color: var(--accent-text);
   }
 
+  html[data-look='student'] .student-topnav-item.is-active {
+    border-bottom-color: var(--brand);
+  }
+
   /* The shell: the notch and the four tabs, icons on both bars. */
   html[data-look='student'] .student-topbar {
     padding-top: env(safe-area-inset-top, 0px);
@@ -458,8 +478,8 @@
     width: 2.5rem;
     height: 2.5rem;
     border-radius: 10px;
-    background: var(--accent-soft);
-    color: var(--accent-text);
+    background: var(--desk);
+    color: var(--text-primary);
   }
 
   .plan-row-text,
@@ -587,7 +607,7 @@
   }
 
   .hoy-status > li.is-done {
-    color: var(--success-text);
+    color: var(--text-primary);
   }
 
   .hoy-grid,
@@ -626,17 +646,16 @@
     margin-bottom: 0;
   }
 
-  /* On the red card the action turns white: one red action, never red on red. */
+  /* A white card whose red inset edge points at the one red action inside it. */
   .next-card {
-    --sticker: #ffffff;
-    --sticker-hover: #ffe9ec;
-    --on-sticker: var(--cover);
     display: grid;
     gap: 0.5rem;
-    padding: 1.25rem;
+    padding: 1.25rem 1.25rem 1.25rem 1.5rem;
+    border: 1px solid var(--border);
     border-radius: var(--radius-lg);
-    background: var(--cover);
-    color: #fff;
+    background: var(--bg-card);
+    box-shadow: inset 4px 0 0 var(--sticker);
+    color: var(--text-primary);
   }
 
   .next-title {
@@ -650,18 +669,10 @@
   .next-reason {
     margin: 0;
     max-width: 60ch;
-    color: rgba(255, 255, 255, 0.9);
+    color: var(--text-secondary);
     font-size: var(--text-base);
     line-height: 1.45;
     text-wrap: pretty;
-  }
-
-  .next-card .task-meta {
-    color: rgba(255, 255, 255, 0.85);
-  }
-
-  .next-card .task-area::before {
-    background: #fff;
   }
 
   html[data-look='student'] .next-go {
@@ -774,32 +785,435 @@
     margin-top: 0.25rem;
   }
 
-  .first-week-days {
+  /* The week, Monday to Sunday, on Hoy: a dot per day. A past day without
+     practice is the same quiet inset as one to come, only without its outline:
+     never red, never a miss. */
+  .week-strip {
+    display: grid;
+    gap: 0.75rem;
+    padding: 1rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    background: var(--bg-card);
+  }
+
+  html[data-look='student'] .week-strip-title {
+    margin: 0;
+    font-size: var(--text-base);
+    font-weight: 700;
+  }
+
+  .week-strip ol {
     display: grid;
     grid-template-columns: repeat(7, minmax(0, 1fr));
-    gap: 0.375rem;
+    gap: 0.25rem;
     margin: 0;
     padding: 0;
     list-style: none;
   }
 
-  .first-week-day {
+  .week-strip li {
     display: grid;
-    place-items: center;
-    height: 2.75rem;
-    border-radius: var(--radius-sm);
-    background: var(--bg-inset);
-    color: var(--text-secondary);
-    font-weight: 700;
-    font-variant-numeric: tabular-nums;
+    justify-items: center;
+    gap: 0.375rem;
   }
 
-  .first-week-day.is-done {
-    background: var(--brand);
+  .week-strip-dot {
+    display: grid;
+    place-items: center;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+    background: var(--bg-inset);
     color: var(--paper);
   }
 
-  .first-week-day.is-today {
+  .week-strip .is-upcoming .week-strip-dot {
+    background: transparent;
+    box-shadow: inset 0 0 0 1px var(--border-strong);
+  }
+
+  .week-strip .is-done .week-strip-dot {
+    background: var(--brand);
+  }
+
+  .week-strip .is-today:not(.is-done) .week-strip-dot {
+    background: var(--mark);
+    box-shadow: inset 0 0 0 2px var(--brand);
+  }
+
+  .week-strip-letter {
+    color: var(--text-tertiary);
+    font-size: var(--text-xs);
+    font-weight: 700;
+  }
+
+  .week-strip .is-today .week-strip-letter {
+    color: var(--text-primary);
+    font-weight: 800;
+  }
+
+  /* The daily goal under the facts: a line of words and a bar that fills. */
+  .goal-meter {
+    display: grid;
+    gap: 0.5rem;
+    max-width: 28rem;
+  }
+
+  .goal-meter-text {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.25rem 0.5rem;
+    margin: 0;
+    font-size: var(--text-sm);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .goal-meter-icon {
+    display: grid;
+    place-items: center;
+    width: 1.5rem;
+    height: 1.5rem;
+    border-radius: 50%;
+    background: var(--mark);
+    color: var(--on-mark);
+    transition: background-color var(--duration-quick) ease, color var(--duration-quick) ease;
+  }
+
+  .goal-meter-count {
+    color: var(--text-secondary);
+    font-weight: 600;
+  }
+
+  .goal-meter-bar {
+    display: block;
+    height: 8px;
+    border-radius: 4px;
+    background: var(--bg-inset);
+    overflow: hidden;
+  }
+
+  .goal-meter-bar > span {
+    display: block;
+    height: 100%;
+    border-radius: inherit;
+    background: var(--brand);
+    transform-origin: left;
+    transition: background-color var(--duration-quick) ease;
+  }
+
+  /* A met goal keeps the action red (palette A): only the check is new. */
+  .goal-meter.is-met .goal-meter-icon {
+    background: var(--brand);
+    color: #fff;
+  }
+
+  /* Said once, then put away: a shield that covered yesterday. */
+  .hoy-note {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.5rem 0.5rem 0.5rem 1rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    background: var(--bg-card);
+  }
+
+  .hoy-note-icon {
+    display: grid;
+    flex: none;
+    place-items: center;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+    background: var(--mark);
+    color: var(--on-mark);
+  }
+
+  .hoy-note-text {
+    flex: 1;
+    min-width: 0;
+    margin: 0;
+    font-weight: 700;
+    text-wrap: pretty;
+  }
+
+  html[data-look='student'] .hoy-note-close {
+    flex: none;
+    min-height: 44px;
+  }
+
+  /* Late in the day, above the step: the streak still alive. */
+  .next-note {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.375rem;
+    margin: 0 0 0.25rem;
+    color: var(--accent-text);
+    font-size: var(--text-sm);
+    font-weight: 700;
+    line-height: 1.4;
+    text-wrap: pretty;
+  }
+
+  .next-note > svg {
+    flex: none;
+    margin-top: 0.1em;
+  }
+
+  /* In the welcome the days are a choice: the chosen one takes the ink, like an area pill. */
+  html[data-look='student'] .first-week-choices .btn-secondary[aria-pressed='true'] {
+    border-color: var(--ink);
+    background: var(--ink);
+    color: var(--paper);
+  }
+
+  /* ── Welcome: one decision per screen (Welcome.tsx) ─────────────────── */
+  .welcome-choices {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.5rem;
+    min-width: 0;
+    margin: 0;
+    padding: 0;
+    border: 0;
+  }
+
+  .welcome-choices.is-stacked {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .welcome-choices legend {
+    margin-bottom: 0.625rem;
+    font-size: var(--text-md);
+    font-weight: 700;
+  }
+
+  .welcome-choice {
+    position: relative;
+    display: flex;
+    align-items: center;
+    min-height: 3.5rem;
+    padding: 0.625rem 0.875rem;
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-md);
+    background: var(--bg-card);
+    color: var(--text-primary);
+    cursor: pointer;
+    touch-action: manipulation;
+    transition:
+      transform var(--duration-press) var(--ease-out-strong),
+      background-color var(--duration-quick) ease;
+  }
+
+  .welcome-choice input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .welcome-choice > span {
+    display: grid;
+    gap: 0.125rem;
+  }
+
+  /* The unit sits under its number so every goal card has the same shape. */
+  .welcome-choice-unit {
+    display: block;
+  }
+
+  .welcome-choice small {
+    color: var(--text-secondary);
+    font-size: var(--text-sm);
+    font-weight: 600;
+  }
+
+  .welcome-choice:active {
+    transform: scale(0.97);
+  }
+
+  /* Chosen: a 2px ink ring, the same mark as a chosen answer. */
+  .welcome-choice:has(input:checked) {
+    border-color: var(--ink);
+    box-shadow: inset 0 0 0 1px var(--ink);
+  }
+
+  .welcome-choice:has(input:focus-visible) {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .welcome-choice:hover:not(:has(input:checked)) {
+      background: var(--bg-card-hover);
+    }
+  }
+
+  .welcome-consent {
+    display: grid;
+    gap: 0.5rem;
+  }
+
+  .welcome-check {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    min-height: 44px;
+    padding-block: 0.5rem;
+    font-weight: 600;
+    line-height: 1.4;
+    cursor: pointer;
+  }
+
+  .welcome-check input {
+    flex-shrink: 0;
+    width: 1.375rem;
+    height: 1.375rem;
+    margin: 0;
+    accent-color: var(--brand);
+  }
+
+  .welcome-note {
+    margin: 0;
+    color: var(--text-secondary);
+    font-size: var(--text-sm);
+    line-height: 1.4;
+  }
+
+  .welcome-week {
+    margin: 0;
+    color: var(--text-secondary);
+  }
+
+  .welcome-week strong {
+    color: var(--text-primary);
+  }
+
+  /* On by default: a switch, not a checkbox, because it is a setting that stays. */
+  .welcome-switch {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    min-height: 3.5rem;
+    padding: 0.625rem 0.875rem;
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-md);
+    font-weight: 700;
+    cursor: pointer;
+  }
+
+  .welcome-switch input {
+    flex-shrink: 0;
+    position: relative;
+    width: 2.75rem;
+    height: 1.625rem;
+    margin: 0;
+    border-radius: var(--radius-pill);
+    background: var(--bg-inset);
+    box-shadow: inset 0 0 0 1px var(--border-strong);
+    appearance: none;
+    cursor: pointer;
+    transition: background-color var(--duration-quick) ease;
+  }
+
+  .welcome-switch input::before {
+    content: '';
+    position: absolute;
+    top: 0.1875rem;
+    left: 0.1875rem;
+    width: 1.25rem;
+    height: 1.25rem;
+    border-radius: 50%;
+    background: var(--paper);
+    box-shadow: 0 1px 2px rgba(28, 26, 31, 0.24);
+    transition: transform var(--duration-quick) var(--ease-out-strong);
+  }
+
+  .welcome-switch input:checked {
+    background: var(--brand);
+    box-shadow: none;
+  }
+
+  .welcome-switch input:checked::before {
+    transform: translateX(1.125rem);
+  }
+
+  .welcome-footer .btn-ghost {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+  }
+
+  /* ── Pilot survey (PilotSurvey.tsx): the welcome's card, one question per screen ── */
+  .survey-question {
+    margin: 0;
+    font-size: var(--text-lg);
+    font-weight: 800;
+    line-height: 1.2;
+    text-wrap: balance;
+  }
+
+  .survey-scale {
+    display: grid;
+    gap: 0.5rem;
+    min-width: 0;
+    margin: 0;
+    padding: 0;
+    border: 0;
+  }
+
+  .survey-points {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 0.375rem;
+  }
+
+  /* 0 to 10: six and five on a phone, one row once it fits. */
+  .survey-points.is-nps {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+  }
+
+  @media (min-width: 640px) {
+    .survey-points.is-nps {
+      grid-template-columns: repeat(11, minmax(0, 1fr));
+      gap: 0.25rem;
+    }
+  }
+
+  .survey-point {
+    justify-content: center;
+    min-height: 3.25rem;
+    padding: 0;
+    font-size: var(--text-md);
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .survey-ends {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    margin: 0;
+    color: var(--text-secondary);
+    font-size: var(--text-sm);
+    font-weight: 600;
+  }
+
+  .survey-text {
+    width: 100%;
+    min-height: 8rem;
+    line-height: 1.5;
+    resize: vertical;
+  }
+
+  .survey-done-icon {
+    display: grid;
+    place-items: center;
+    width: 3rem;
+    height: 3rem;
+    border-radius: 50%;
     background: var(--mark);
     color: var(--on-mark);
   }
@@ -849,23 +1263,35 @@
     transition: background-color 140ms ease, color 140ms ease;
   }
 
+  /* Chosen: ink, like every selection; the area keeps only its dot. */
   .aprende-area[aria-pressed='true'] {
-    border-color: var(--area);
-    background: var(--area);
-    color: #fff;
+    border-color: var(--ink);
+    background: var(--ink);
+    color: var(--paper);
   }
 
-  .aprende-area[aria-pressed='true']::before {
-    background: #fff;
-  }
-
+  /* A white card: the area's colour is its top edge, dot and bar, never the
+     ground; the button is the usual red action. */
   .aprende-head {
     display: grid;
     gap: 0.625rem;
     padding: 1.25rem;
+    border: 1px solid var(--border);
     border-radius: var(--radius-lg);
+    background: var(--bg-card);
+    box-shadow: inset 0 4px 0 var(--area);
+    color: var(--text-primary);
+  }
+
+  .aprende-head-top .aprende-name::before {
+    content: "";
+    display: inline-block;
+    width: 0.75rem;
+    height: 0.75rem;
+    margin-right: 0.625rem;
+    border-radius: 50%;
     background: var(--area);
-    color: #fff;
+    vertical-align: 0.1em;
   }
 
   .aprende-head-top {
@@ -878,7 +1304,7 @@
 
   html[data-look='student'] .aprende-name {
     margin: 0;
-    color: #fff;
+    color: var(--text-primary);
     font-size: var(--text-xl);
     font-weight: 800;
     line-height: 1.15;
@@ -888,7 +1314,8 @@
   .aprende-level {
     padding: 0.25rem 0.75rem;
     border-radius: var(--radius-pill);
-    background: rgba(255, 255, 255, 0.2);
+    background: var(--bg-inset);
+    color: var(--text-primary);
     font-size: var(--text-sm);
     font-weight: 700;
     white-space: nowrap;
@@ -897,11 +1324,6 @@
   .aprende-head .aprende-bar {
     height: 8px;
     border-radius: 4px;
-    background: rgba(0, 0, 0, 0.22);
-  }
-
-  .aprende-head .aprende-bar > span {
-    background: #fff;
   }
 
   .aprende-count {
@@ -913,7 +1335,7 @@
   .aprende-note {
     margin: 0;
     max-width: 65ch;
-    color: rgba(255, 255, 255, 0.9);
+    color: var(--text-secondary);
     font-size: var(--text-sm);
     line-height: 1.45;
     text-wrap: pretty;
@@ -942,8 +1364,11 @@
     display: flex;
     align-items: center;
     min-height: 2.75rem;
-    color: var(--accent-text);
+    color: var(--text-primary);
     font-weight: 700;
+    text-decoration: underline;
+    text-decoration-color: var(--border-strong);
+    text-underline-offset: 3px;
     cursor: pointer;
   }
 
@@ -1023,7 +1448,7 @@
     border: 0;
     border-radius: var(--radius-md);
     background: transparent;
-    color: var(--accent-text);
+    color: var(--text-primary);
     font: inherit;
     font-size: var(--text-sm);
     font-weight: 700;
@@ -1093,10 +1518,10 @@
     transition: transform 100ms var(--ease-out-strong), background-color 140ms ease;
   }
 
+  /* The first reto to take: the next-step card's red edge, and a red icon. */
   .reto-tile.is-primary {
-    border-color: transparent;
-    background: var(--sticker);
-    color: var(--on-sticker);
+    padding-left: 1.25rem;
+    box-shadow: inset 4px 0 0 var(--sticker);
   }
 
   .reto-tile:active:not(:disabled) {
@@ -1116,12 +1541,12 @@
     width: 2.75rem;
     height: 2.75rem;
     border-radius: 10px;
-    background: var(--accent-soft);
-    color: var(--accent-text);
+    background: var(--desk);
+    color: var(--text-primary);
   }
 
   .reto-tile.is-primary .reto-tile-icon {
-    background: rgba(36, 20, 26, 0.1);
+    background: var(--sticker);
     color: var(--on-sticker);
   }
 
@@ -1156,7 +1581,8 @@
   }
 
   /* "Arma tu práctica" sits in the same list, so it wears the same card. */
-  .retos-list > li > .ruled-row {
+  .retos-list > li > div > .ruled-row {
+    width: 100%;
     min-height: 5rem;
     padding: 0.875rem 1rem;
     border: 1px solid var(--border);
@@ -1173,11 +1599,8 @@
   }
 
   @media (hover: hover) and (pointer: fine) {
-    .reto-tile:hover:not(:disabled):not(.is-primary) {
+    .reto-tile:hover:not(:disabled) {
       background: var(--bg-card-hover);
-    }
-    .reto-tile.is-primary:hover:not(:disabled) {
-      background: var(--sticker-hover);
     }
   }
 
@@ -1192,8 +1615,16 @@
     overflow: hidden;
   }
 
-  .yo > :not(.yo-cover) {
+  .yo > :not(.yo-cover),
+  .yo-main > *,
+  .yo-side > * {
     margin-inline: 1.25rem;
+  }
+
+  /* One sheet on a phone: the two columns only exist from 1024px. */
+  .yo-main,
+  .yo-side {
+    display: contents;
   }
 
   .yo-cover {
@@ -1892,6 +2323,8 @@
     font-weight: 800;
     line-height: 1.2;
     text-wrap: balance;
+    /* Topic names wrap after their slashes (`breakAtSlashes`); this is only the last resort. */
+    overflow-wrap: break-word;
     font-variant-numeric: tabular-nums;
   }
 
@@ -1922,13 +2355,14 @@
     margin-inline: -0.75rem;
     padding-inline: 0.75rem;
     border-radius: var(--radius-sm);
-    background: var(--success-soft);
+    background: color-mix(in srgb, var(--brand) 7%, transparent);
   }
 
   .reward-change-name {
     font-size: var(--text-md);
     font-weight: 700;
     text-wrap: pretty;
+    overflow-wrap: break-word;
   }
 
   .reward-change-level {
@@ -1946,9 +2380,10 @@
     font-weight: 800;
   }
 
+  /* Progress is the action colour (palette A): green stays for a right answer only. */
   .reward-up {
-    background: var(--success);
-    color: var(--paper);
+    background: var(--brand);
+    color: #fff;
   }
 
   .reward-down {
@@ -1972,6 +2407,51 @@
     from {
       background: color-mix(in srgb, var(--mark) 55%, var(--paper));
     }
+  }
+
+  /* A streak of 3, 7, 14 or 30 days: the second authored moment, an ink card
+     that settles in once, on a fresh close. The flame carries the red. */
+  .streak-moment {
+    display: grid;
+    justify-items: center;
+    gap: 0.125rem;
+    padding: 1.25rem 1rem 1.5rem;
+    border-radius: var(--radius-lg);
+    background: var(--cover);
+    color: #fff;
+    text-align: center;
+  }
+
+  .streak-moment p {
+    margin: 0;
+  }
+
+  .streak-moment-icon {
+    margin-bottom: 0.25rem;
+    color: #ff5a70;
+  }
+
+  .streak-moment-count {
+    font-size: 3.5rem;
+    font-weight: 800;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .streak-moment-label {
+    font-size: var(--text-md);
+    font-weight: 700;
+  }
+
+  .streak-moment .streak-moment-note {
+    margin-top: 0.375rem;
+    color: rgba(255, 255, 255, 0.9);
+    font-size: var(--text-sm);
+    text-wrap: pretty;
+  }
+
+  .reward-streak-count {
+    display: inline-block;
   }
 
   .reward-gains {
@@ -2039,8 +2519,8 @@
     display: grid;
     gap: 0.5rem;
     padding: 1rem 1.25rem 1.25rem;
-    background: var(--area);
-    color: #fff;
+    box-shadow: inset 0 4px 0 var(--area);
+    color: var(--text-primary);
   }
 
   .lesson-level {
@@ -2061,13 +2541,13 @@
     align-items: center;
     gap: 0.375rem;
     min-height: 44px;
-    color: #fff;
+    color: var(--text-secondary);
     font-weight: 700;
   }
 
   html[data-look='student'] .lesson-name {
     margin: 0;
-    color: #fff;
+    color: var(--text-primary);
     font-size: var(--text-xl);
     font-weight: 800;
     line-height: 1.15;
@@ -2211,9 +2691,9 @@
   }
 
   .avatar-part-option[aria-pressed='true'] {
-    border-color: transparent;
-    background: var(--mark);
-    color: var(--on-mark);
+    border-color: var(--ink);
+    background: var(--ink);
+    color: var(--paper);
   }
 
   .nickname-picker {
@@ -2380,6 +2860,255 @@
     }
   }
 
+  /* ── Desktop (1024px and up): an ink rail on the left, the page beside it ──
+     The same header, laid on its side: brand on top, the four sections, and
+     the account at the foot. Solve and review keep their top bar; so does the
+     welcome, which has no sections yet. */
+  @media (min-width: 1024px) {
+    html[data-look='student'] .student-shell:not(.is-immersive):not(.has-no-tabs) {
+      --rail: 14rem;
+    }
+
+    html[data-look='student'] .student-shell:not(.is-immersive):not(.has-no-tabs) > .student-topbar {
+      position: fixed;
+      inset: 0 auto 0 0;
+      width: var(--rail);
+      padding: max(1.5rem, env(safe-area-inset-top, 0px)) 0.75rem 1.25rem;
+      /* At night the rail sits a shade under the desk; the hairline keeps its edge. */
+      border-right: 1px solid var(--border);
+      overflow-y: auto;
+    }
+
+    html[data-look='student'] .student-shell:not(.is-immersive):not(.has-no-tabs) .student-topbar-inner {
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      gap: 1.75rem;
+      width: 100%;
+      min-height: 100%;
+      margin: 0;
+    }
+
+    html[data-look='student'] .student-shell:not(.is-immersive):not(.has-no-tabs) .school-label {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.75rem;
+      padding-inline: 0.625rem;
+    }
+
+    html[data-look='student'] .student-shell:not(.is-immersive):not(.has-no-tabs) .wordmark {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      column-gap: 0.5rem;
+    }
+
+    html[data-look='student'] .student-shell:not(.is-immersive):not(.has-no-tabs) .wordmark-name {
+      font-size: 1.25rem;
+      font-weight: 800;
+    }
+
+    html[data-look='student'] .student-shell:not(.is-immersive):not(.has-no-tabs) .wordmark-subtitle {
+      grid-column: 2;
+      padding: 0;
+      border: 0;
+      font-size: var(--text-xs);
+      font-weight: 600;
+    }
+
+    html[data-look='student'] .student-shell:not(.is-immersive):not(.has-no-tabs) .school-label-card {
+      max-width: 100%;
+    }
+
+    html[data-look='student'] .student-shell:not(.is-immersive):not(.has-no-tabs) .student-topnav {
+      flex-direction: column;
+      gap: 0.25rem;
+      align-self: stretch;
+    }
+
+    html[data-look='student'] .student-shell:not(.is-immersive):not(.has-no-tabs) .student-topnav-item {
+      gap: 0.75rem;
+      min-height: 2.75rem;
+      margin: 0;
+      padding: 0 0.75rem;
+      border: 0;
+      border-radius: 10px;
+      font-size: 0.9375rem;
+      transition: background-color 140ms ease, color 140ms ease;
+    }
+
+    html[data-look='student'] .student-shell:not(.is-immersive):not(.has-no-tabs) .student-topnav-item.is-active {
+      background: var(--cover-on);
+    }
+
+    /* The active section's icon carries the red, the one marker on the rail. */
+    html[data-look='student'] .student-shell:not(.is-immersive):not(.has-no-tabs) .student-topnav-item.is-active svg {
+      color: #ff5a70;
+      fill-opacity: 0.18;
+    }
+
+    @media (hover: hover) and (pointer: fine) {
+      html[data-look='student'] .student-shell:not(.is-immersive):not(.has-no-tabs) .student-topnav-item:not(.is-active):hover {
+        background: rgba(255, 255, 255, 0.06);
+      }
+    }
+
+    html[data-look='student'] .student-shell:not(.is-immersive):not(.has-no-tabs) .student-topbar-actions {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 0.25rem;
+      margin-top: auto;
+      padding-top: 1rem;
+      border-top: 1px solid var(--border);
+    }
+
+    html[data-look='student'] .student-shell:not(.is-immersive):not(.has-no-tabs) .student-topbar-actions > .btn-ghost {
+      justify-content: flex-start;
+    }
+
+    html[data-look='student'] .student-shell:not(.is-immersive):not(.has-no-tabs) .student-topbar-account {
+      gap: 0.25rem;
+    }
+
+    html[data-look='student'] .student-shell:not(.is-immersive):not(.has-no-tabs) > .student-shell-main {
+      width: auto;
+      margin: 0 0 0 var(--rail);
+      padding: 2rem clamp(1.5rem, 3vw, 3rem) 3rem;
+    }
+
+    /* Hoy: the day on the left, the week and the areas on the right. */
+    .hoy {
+      width: min(100%, 73.75rem);
+    }
+
+    .hoy-grid {
+      grid-template-columns: minmax(0, 1fr) clamp(18rem, 26vw, 22rem);
+      gap: 1.5rem 2rem;
+    }
+
+    html[data-look='student'] .hoy-title {
+      font-size: var(--text-2xl);
+      letter-spacing: -0.01em;
+    }
+
+    /* Aprende: the areas become a list beside the topics. */
+    .aprende {
+      grid-template-columns: 13rem minmax(0, 1fr);
+      align-items: start;
+      gap: 1rem 2rem;
+      width: min(100%, 68rem);
+    }
+
+    .aprende > * {
+      grid-column: 2;
+    }
+
+    .aprende > .aprende-areas {
+      position: sticky;
+      top: 2rem;
+      grid-column: 1;
+      grid-row: 1 / span 3;
+      flex-direction: column;
+      gap: 0.125rem;
+      margin: 0;
+      padding: 0;
+      overflow: visible;
+    }
+
+    .aprende-area {
+      justify-content: flex-start;
+      text-align: left;
+      border-color: transparent;
+      border-radius: var(--radius-md);
+      background: transparent;
+      font-size: var(--text-base);
+    }
+
+    /* Retos: the challenges as a grid, what to continue and the league beside. */
+    .retos {
+      grid-auto-flow: row dense;
+      align-items: start;
+      gap: 1rem 2rem;
+      width: min(100%, 68rem);
+    }
+
+    /* The side column only exists when there is something to continue or a league. */
+    .retos:has(> .ruled-section, > .league) {
+      grid-template-columns: minmax(0, 1fr) 20rem;
+    }
+
+    .retos > * {
+      grid-column: 1 / -1;
+    }
+
+    .retos > section[aria-label] {
+      grid-column: 1;
+      grid-row: span 2;
+    }
+
+    .retos > .ruled-section,
+    .retos > .league {
+      grid-column: 2;
+    }
+
+    .retos-list {
+      grid-template-columns: repeat(auto-fill, minmax(17rem, 1fr));
+    }
+
+    .retos-list > li:has(.timed-intro, [role='group'], #practice-builder) {
+      grid-column: 1 / -1;
+    }
+
+    .reto-tile {
+      align-items: flex-start;
+      min-height: 8.5rem;
+    }
+
+    /* Yo: the student on the left, the evidence on the right. */
+    .yo.is-split {
+      display: grid;
+      grid-template-columns: 19rem minmax(0, 1fr);
+      grid-template-rows: auto 1fr;
+      grid-template-areas: "cover main" "side main";
+      column-gap: 2rem;
+      align-items: start;
+      width: min(100%, 68rem);
+      padding: 0;
+      border: 0;
+      background: none;
+      overflow: visible;
+    }
+
+    .yo.is-split > .yo-cover {
+      grid-area: cover;
+      margin: 0;
+      border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    }
+
+    .yo.is-split > .yo-side,
+    .yo.is-split > .yo-main {
+      display: block;
+      margin: 0;
+      padding-bottom: 1.25rem;
+      border: 1px solid var(--border);
+      background: var(--paper);
+    }
+
+    .yo.is-split > .yo-side {
+      grid-area: side;
+      border-top: 0;
+      border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+    }
+
+    .yo.is-split > .yo-main {
+      grid-area: main;
+      border-radius: var(--radius-lg);
+    }
+
+    .yo.is-split > .yo-main > :first-child {
+      border-top-color: transparent;
+    }
+  }
+
   /* No press scale and no level-up flash under reduced motion; colour still changes. */
   @media (prefers-reduced-motion: reduce) {
     html[data-look='student'] .btn-primary,
@@ -2392,7 +3121,9 @@
     .ask-chip,
     .ask-go,
     .lesson-listen,
-    .avatar-part-option {
+    .avatar-part-option,
+    .welcome-choice,
+    .welcome-switch input::before {
       transition: background-color 140ms ease, border-color 140ms ease;
     }
     html[data-look='student'] .btn-primary:active,
@@ -2408,7 +3139,8 @@
     .ask-chip:active:not(:disabled),
     .ask-go:active,
     .lesson-listen:active,
-    .avatar-part-option:active {
+    .avatar-part-option:active,
+    .welcome-choice:active {
       transform: none;
     }
     html[data-look='student'] .option-card.solve-option.is-incorrect,

@@ -4,10 +4,13 @@ import {
   coachSummaryDocumentValidator,
   conceptLessonDocumentValidator,
   conceptLessonStatusValidator,
+  eventNameValidator,
+  eventPropsValidator,
   learnerAggregateValidator,
   membershipRoleValidator,
   organizationPlanValidator,
   pdfUploadStatusValidator,
+  pilotSurveyAnswersValidator,
   questionAttemptValidator,
   questionAuditDocumentValidator,
   questionDocumentValidator,
@@ -94,12 +97,30 @@ export default defineSchema(
       avatar: v.optional(v.object({ skin: v.string(), hair: v.string(), top: v.string(), accessory: v.string() })),
       /** Subjects this account may sign off in the question audit. */
       reviewerSubjects: v.optional(v.array(v.string())),
+      /** When the student accepted the terms (Ley 1581); unset means not asked yet. */
+      consentAt: v.optional(v.number()),
+      /** Under 18 at consent: their guardian's authorization is what they confirmed. */
+      isMinor: v.optional(v.boolean()),
+      /** When the student finished the welcome (Phase 2); unset sends them back to it. */
+      onboardedAt: v.optional(v.number()),
+      /** Answers a day that complete Hoy's mission (5/10/15/20); unset means `DEFAULT_DAILY_GOAL_QUESTIONS`. */
+      dailyGoalQuestions: v.optional(v.number()),
+      /** The student turned off streak reminder emails; unset means on. */
+      remindersOff: v.optional(v.boolean()),
+      /**
+       * Colombia day number of the last graded answer, set by `submitAnswer`. Not
+       * backfilled: unset means no reminder until the student answers again.
+       */
+      lastActiveDay: v.optional(v.number()),
+      /** Colombia day of the last reminder email, so one goes out a day at most. */
+      lastReminderDay: v.optional(v.number()),
       createdAt: v.number(),
       updatedAt: v.number(),
       lastSeenAt: v.number(),
     })
       .index('by_normalizedEmail', ['normalizedEmail'])
-      .index('by_createdAt', ['createdAt']),
+      .index('by_createdAt', ['createdAt'])
+      .index('by_lastActiveDay', ['lastActiveDay']),
     sessions: defineTable(sessionDocumentValidator)
       .index('by_studentId', ['studentId'])
       .index('by_studentId_kind', ['studentId', 'kind'])
@@ -323,6 +344,21 @@ export default defineSchema(
       .index('by_studentId_questionId', ['studentId', 'questionId'])
       .index('by_studentId_createdAt', ['studentId', 'createdAt'])
       .index('by_status_createdAt', ['status', 'createdAt']),
+    // Pilot measurement (see `events.ts`): only what sessions and attempts cannot tell.
+    events: defineTable({
+      studentId: v.id('students'),
+      name: eventNameValidator,
+      at: v.number(),
+      props: v.optional(eventPropsValidator),
+    })
+      .index('by_studentId', ['studentId'])
+      .index('by_name_at', ['name', 'at']),
+    // The pilot survey (see `pilotSurvey.ts`): one row per student.
+    pilotSurveyResponses: defineTable({
+      studentId: v.id('students'),
+      answers: pilotSurveyAnswersValidator,
+      submittedAt: v.number(),
+    }).index('by_studentId', ['studentId']),
   },
   { schemaValidation: true },
 )

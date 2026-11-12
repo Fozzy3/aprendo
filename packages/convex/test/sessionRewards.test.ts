@@ -49,7 +49,9 @@ describe('completeSession reward', () => {
     ])
 
     const first = await as.mutation(api.sessions.completeSession, { sessionId })
-    expect(first.reward).toEqual({ xp: 2 * XP_PER_ANSWER, medals: ['primera_sesion'], streakDays: 1 })
+    expect(first.reward).toEqual({
+      xp: 2 * XP_PER_ANSWER, medals: ['primera_sesion'], streakDays: 1, previousStreakDays: 0, shieldEarned: false,
+    })
 
     const stored = (await t.run((ctx) => ctx.db.get('sessions', sessionId)))!.reward
     expect(stored).toEqual(first.reward!)
@@ -87,7 +89,41 @@ describe('completeSession reward', () => {
     const third = await as.mutation(api.sessions.completeSession, { sessionId: await seedSession(t, studentId, manyAnswers) })
     expect(third.reward?.xp).toBe(0)
   })
+
+  test('the first session of the seventh day moves the streak from 6 to 7 and earns a shield; a second one does not', async () => {
+    const t = setupTest()
+    const { studentId, as } = await signUp(t, 'ana@x.co')
+    await seedPastDays(t, studentId, 6)
+    const first = await as.mutation(api.sessions.completeSession, { sessionId: await seedSession(t, studentId, [{ isCorrect: true, timeMs: 10_000 }]) })
+    expect(first.reward).toMatchObject({ streakDays: 7, previousStreakDays: 6, shieldEarned: true })
+    expect(first.reward?.medals).toEqual(['primera_sesion', 'racha_3', 'racha_7'])
+    const second = await as.mutation(api.sessions.completeSession, { sessionId: await seedSession(t, studentId, [{ isCorrect: true, timeMs: 10_000 }]) })
+    expect(second.reward).toMatchObject({ streakDays: 7, previousStreakDays: 7, shieldEarned: false })
+  })
 })
+
+const DAY_MS = 24 * 60 * 60 * 1000
+
+/** One graded answer on each of the `count` days before today. */
+async function seedPastDays(t: ReturnType<typeof setupTest>, studentId: Id<'students'>, count: number, gapDays = 0) {
+  const sessionId = await seedSession(t, studentId, [])
+  await t.run(async (ctx) => {
+    const [question] = await ctx.db.query('questions').take(1)
+    const questionId = question?._id ?? await ctx.db.insert('questions', {
+      pdfUploadId: (await ctx.db.query('pdfUploads').first())!._id, sequence: 0, questionNumber: 1, bodyMarkdown: 'q',
+      options: [{ label: 'A', bodyMarkdown: 'a' }], createdAt: 0, subjectId: 'matematicas', answerCorrectOption: 'A',
+    })
+    const sessionQuestionId = await ctx.db.insert('sessionQuestions', { sessionId, questionId, position: 0, selectionReason: 'topic_focus' })
+    for (let back = 1 + gapDays; back <= count + gapDays; back += 1) {
+      await ctx.db.insert('questionAttempts', {
+        studentId, sessionId, questionId, sessionQuestionId, attemptType: 'topic', selectedOption: 'A', isCorrect: true,
+        answeredAt: Date.now() - back * DAY_MS, responseTimeMs: 10_000,
+        usedHint: false, usedTutor: false, hintCount: 0, tutorMessageCount: 0, wasSkipped: false,
+      })
+    }
+    await ctx.db.patch('sessions', sessionId, { status: 'abandoned' })
+  })
+}
 
 describe('Hoy: XP, shields, first week and the 5-question mission', () => {
   test('a student who has not practised has a mission to do, no shields and a commitment pending', async () => {
@@ -118,13 +154,55 @@ describe('Hoy: XP, shields, first week and the 5-question mission', () => {
     expect(today.firstWeek.committed).toBe(true)
   })
 
-  test('four answers leave the mission open', async () => {
+  test('four answers leave the mission open, and the meter says how far it got', async () => {
     const t = setupTest()
     const { studentId, as } = await signUp(t, 'ana@x.co')
     const answers = Array.from({ length: 4 }, () => ({ isCorrect: true, timeMs: 10_000 }))
     await as.mutation(api.sessions.completeSession, { sessionId: await seedSession(t, studentId, answers) })
     const today = await as.query(api.today.getTodayDashboard, { studentId })
-    expect(today.plan.hero?.missionComplete).toBe(false)
+    expect(today.plan.hero).toMatchObject({ missionComplete: false, answeredToday: 4, goalQuestions: 5 })
+  })
+
+  test('the week strip has seven days with today done', async () => {
+    const t = setupTest()
+    const { studentId, as } = await signUp(t, 'ana@x.co')
+    await as.mutation(api.sessions.completeSession, { sessionId: await seedSession(t, studentId, [{ isCorrect: true, timeMs: 10_000 }]) })
+    const today = await as.query(api.today.getTodayDashboard, { studentId })
+    expect(today.week).toHaveLength(7)
+    expect(today.week.find((entry) => entry.isToday)?.status).toBe('done')
+  })
+
+  test('a shield that covered yesterday is named, and the day it covered', async () => {
+    const t = setupTest()
+    const { studentId, as } = await signUp(t, 'ana@x.co')
+    await seedPastDays(t, studentId, 7, 1) // 8 to 2 days ago: a shield, then yesterday off
+    const today = await as.query(api.today.getTodayDashboard, { studentId })
+    expect(today.streakDays).toBe(7)
+    expect(today.shieldUsedDay).toBe(today.week.find((entry) => entry.isToday)!.day - 1)
+    expect(today.comeback).toBe(false)
+  })
+
+  test('three days away is a comeback; never having practised is not', async () => {
+    const t = setupTest()
+    const { studentId, as } = await signUp(t, 'ana@x.co')
+    expect((await as.query(api.today.getTodayDashboard, { studentId })).comeback).toBe(false)
+    await seedPastDays(t, studentId, 1, 2)
+    const today = await as.query(api.today.getTodayDashboard, { studentId })
+    expect(today.comeback).toBe(true)
+    expect(today.shieldUsedDay).toBeNull()
+  })
+
+  test('the pilot survey is due after three completed sessions, until answered', async () => {
+    const t = setupTest()
+    const { studentId, as } = await signUp(t, 'ana@x.co')
+    for (let index = 0; index < 2; index += 1) {
+      await as.mutation(api.sessions.completeSession, { sessionId: await seedSession(t, studentId, [{ isCorrect: true, timeMs: 10_000 }]) })
+    }
+    expect((await as.query(api.today.getTodayDashboard, { studentId })).surveyDue).toBe(false)
+    await as.mutation(api.sessions.completeSession, { sessionId: await seedSession(t, studentId, [{ isCorrect: true, timeMs: 10_000 }]) })
+    expect((await as.query(api.today.getTodayDashboard, { studentId })).surveyDue).toBe(true)
+    await t.run((ctx) => ctx.db.insert('pilotSurveyResponses', { studentId, answers: {}, submittedAt: Date.now() }))
+    expect((await as.query(api.today.getTodayDashboard, { studentId })).surveyDue).toBe(false)
   })
 
   test('the sticker album shows what the aggregates earned and the medals of the sessions', async () => {

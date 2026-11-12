@@ -2,7 +2,7 @@
 // visitors, so it takes their look rather than asking who is signed in.
 const STUDENT_PREFIXES = [
   '/today', '/path', '/syllabus', '/practice', '/lesson', '/progress',
-  '/history', '/diagnostic', '/duelo', '/join', '/cuenta',
+  '/history', '/diagnostic', '/duelo', '/join', '/cuenta', '/encuesta',
 ]
 
 /** The `data-look` for a route; it lives on <html> so Radix portals inherit it. */

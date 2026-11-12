@@ -2,26 +2,28 @@
 name: Aprendo
 description: ICFES Saber 11 preparation. Plan de estudio on student screens, Cuaderno cuadriculado everywhere else.
 colors:
-  plan-cover: "#b3132f"
-  plan-brand: "#c41e3a"
-  plan-brand-deep: "#a3172f"
+  plan-cover: "#1c1a1f"
+  plan-cover-on: "#2e2b33"
+  plan-brand: "#d91e3c"
+  plan-brand-deep: "#bd1631"
   plan-action: "#d91e3c"
   plan-action-hover: "#bd1631"
-  plan-mark: "#ffd3db"
-  plan-panel: "#2a1218"
+  plan-action-text: "#b8122f"
+  plan-mark: "#fbdbe0"
+  plan-panel: "#1c1a1f"
   plan-green-ink: "#08704a"
   plan-success-text: "#075f3f"
-  plan-ink: "#24141a"
-  plan-text-secondary: "#54404a"
-  plan-text-tertiary: "#6b555c"
-  plan-graphite: "#5e4a4f"
+  plan-ink: "#1c1a1f"
+  plan-text-secondary: "#4d4853"
+  plan-text-tertiary: "#6a6570"
+  plan-graphite: "#5a5560"
   plan-paper: "#ffffff"
-  plan-card-hover: "#fcf6f7"
-  plan-desk: "#f8f1f2"
-  plan-inset: "#f3e8ea"
-  plan-rule: "#ecdcdf"
-  plan-hairline: "rgba(36, 20, 26, 0.12)"
-  plan-hairline-strong: "rgba(36, 20, 26, 0.24)"
+  plan-card-hover: "#fbfaf8"
+  plan-desk: "#f6f4f1"
+  plan-inset: "#e8e4df"
+  plan-rule: "#e3dfda"
+  plan-hairline: "rgba(28, 26, 31, 0.12)"
+  plan-hairline-strong: "rgba(28, 26, 31, 0.24)"
   plan-red: "#c8321f"
   plan-red-text: "#a31d10"
   plan-red-soft: "#ffe6e2"
@@ -30,13 +32,14 @@ colors:
   plan-area-ciencias: "#0a6fb0"
   plan-area-sociales: "#b4540a"
   plan-area-ingles: "#b3257a"
-  plan-dark-paper: "#1c1215"
-  plan-dark-card: "#24171b"
-  plan-dark-desk: "#130b0e"
-  plan-dark-ink: "#f6eced"
-  plan-dark-cover: "#8a1328"
-  plan-dark-brand: "#ff8597"
-  plan-dark-action: "#ff6b81"
+  plan-dark-paper: "#1d1b20"
+  plan-dark-card: "#1f1d23"
+  plan-dark-desk: "#131215"
+  plan-dark-ink: "#f4f2ef"
+  plan-dark-cover: "#0c0b0e"
+  plan-dark-brand: "#f0364f"
+  plan-dark-action: "#d91e3c"
+  plan-dark-action-text: "#ff8a9c"
   plan-dark-red: "#f0796a"
   notebook-paper: "#fbfcfe"
   notebook-rule: "#c9d8ea"
@@ -127,10 +130,10 @@ components:
   plan-button-secondary-hover:
     backgroundColor: "{colors.plan-card-hover}"
   plan-next-card:
-    backgroundColor: "{colors.plan-cover}"
-    textColor: "{colors.plan-paper}"
+    backgroundColor: "{colors.plan-paper}"
+    textColor: "{colors.plan-ink}"
     rounded: "{rounded.plan-lg}"
-    padding: "20px"
+    padding: "20px 20px 20px 24px"
   plan-list-row:
     backgroundColor: "{colors.plan-paper}"
     textColor: "{colors.plan-ink}"
@@ -334,48 +337,48 @@ Implementation: `apps/web/src/student.css`, scoped to `html[data-look='student']
 
 ## Overview
 
-**Palette change (2026-11-11):** the owner moved the brand to red. Green pitch and sticker yellow are gone: red cover and action, rose marks, warm neutrals. Matemáticas stays green and correct stays green; Lectura moved from red to violet so no area reads as the brand.
+**Palette A, "Tinta con rojo de acento" (2026-11-11, second change that day):** the owner found the crimson surfaces and the area-coloured cards with a red button arbitrary, and picked palette A from `plans/reports/paletas-escritorio.html` (frame `.a`). Near-black ink is the brand surface, warm paper the desk, white the cards; red is only action and progress. Area colours shrink to dots, thin bars and edges.
 
 **Creative North Star: "Plan de estudio"**
 
-Every screen answers three things in words: what to do now, why, and how each topic is going. Hoy is a plan, not a game board: a red card with the next step and its reason, one white button, then the rest of the day and the five areas with their level and bar. Aprende lists every topic of an area with its level and accuracy. Progress is named, never a numbered slot.
+Every screen answers three things in words: what to do now, why, and how each topic is going. Hoy is a plan, not a game board: a white card with a red edge holding the next step and its reason and the one red button, then the rest of the day and the five areas with their level and bar. Aprende lists every topic of an area with its level and accuracy. Progress is named, never a numbered slot.
 
-Density is low and the phone comes first: white cards on a pale warm desk, one family of type, flat controls that answer a press with a small scale. The register is calm and credible, for students of 15 to 17 in short sessions and mixed light. It replaced the Álbum (sticker album) on 2026-11-10 because the metaphor read as unclear and decorative.
+Density is low and the phone comes first: white cards on a warm paper desk, one family of type, flat controls that answer a press with a small scale. On a computer the same screens get a side rail and use the width. The register is calm and credible, for students of 15 to 17 in short sessions and mixed light. It replaced the Álbum (sticker album) on 2026-11-10 because the metaphor read as unclear and decorative.
 
-**Review status.** This section records what the code ships. Signed-in screens were reviewed from component renders with fictional data, not live data; solve, review and Yo were not captured. Empty, long-label and real-volume states are unconfirmed on screen, and values may move after a live review.
+**Review status.** Palette A and the desktop layout were reviewed live (2026-11-11) on a fresh dev account after the diagnostic: Hoy, Aprende, Retos, Yo, the reward, the welcome and `/encuesta` at 1280×900 and 390 wide, light and dark, no horizontal scroll. The streak-milestone card (3/7/14/30 days), the class league and "Para continuar" were not on screen with that data.
 
 **Key Characteristics:**
-- White cards on a pale green desk, 1px hairlines, 16px corners.
-- Brand red for the next-step card and the cover bars; one colour per area for its header band, dot and bar.
-- Action red (white text) for the one primary action; on a red surface the action turns white with red text. Rose marks for what is never pressed.
+- White cards on warm paper (#f6f4f1), 1px hairlines, 16px corners.
+- Ink (#1c1a1f) for the brand surfaces: the side rail and top bar, the Yo cover, the streak moment, the guided-question panel.
+- Action red (#d91e3c, white text) for the one primary action and for progress (goal bar, done days, the active nav marker, the next card's edge). Never a large surface.
+- Selection is ink: a chosen area pill, day, avatar part or welcome option.
+- Area colours as dots, bars and a 4px edge only, never a card's ground.
 - Figtree alone, 400 to 800, on seven type steps.
 - Flat controls; a press is scale 0.97. One authored moment: the level-up flash on the reward.
 
 ## Colors
 
-A quiet warm-white page with one saturated voice: red, for "this is your plan" and "do this".
+A quiet warm-paper page, an ink frame, and one saturated voice: red, for "do this" and "you moved".
 
 ### Primary
-- **Cover Red** (#b3132f): the next-step card, the Yo cover, the top bars, the duel bar. White text at 6.9:1.
-- **Brand Red** (#c41e3a, hover #a3172f): links, accents, focus, the welcome progress and step numerals. Text-sized red on white is #a8172f.
-- **Action Red** (#d91e3c, hover #bd1631, white text at 5:1): the one primary action (`--sticker`). On a red surface (`.next-card`) the action re-maps to white with Cover Red text.
-- **Rose Mark** (#ffd3db, ink text; token `--mark`): what is marked but never pressed: the current topic tint and "Siguiente" tag, done progress beads, today in the first week, the hint panel, the student's own league row, portrait ground, medals, avatar parts, the level-up flash.
+- **Ink** (#1c1a1f, `--cover`, `--ink`): the side rail and the top bar (active item on #2e2b33, `--cover-on`), the Yo cover, the streak moment, the duel bar, the guided panel. Text and selections use the same ink.
+- **Action Red** (#d91e3c, hover #bd1631, white text at 4.9:1; tokens `--sticker`, `--brand`, `--accent`): the one primary action, the goal meter, done days in the week strip, the red inset edge of the next-step card and of the first reto, the active section marker (rail icon, tab label, top-nav underline), the welcome progress bar. Text-sized red on white is #b8122f (`--accent-text`).
+- **Rose Mark** (#fbdbe0, ink text; `--mark`): small marks that are never pressed: the "Siguiente" tag and the current topic tint, today in the week strip, the daily-goal icon, done beads, the hint panel, the student's own league row, portrait ground, medals.
 
 ### Secondary
-Area colours, set on an element as `--area` (in solve, `--field`). White text on each reads at 4.5:1 or better. They do not change in dark mode.
+Area colours, set on an element as `--area` (in solve, `--field`). They do not change in dark mode.
 - **Lectura Violet** (#6d3fc0), **Matemáticas Green** (#097d52), **Ciencias Blue** (#0a6fb0), **Sociales Amber** (#b4540a), **Inglés Magenta** (#b3257a).
 
 ### Neutral
-- **Warm Black** (#24141a): text and ink. **Panel** (#2a1218): the guided-question panel.
-- **Secondary and Tertiary Text** (#54404a, #6b555c).
-- **Paper** (#ffffff), **Card Hover** (#fcf6f7), **Desk** (#f8f1f2), **Inset** (#f3e8ea), **Rule** (#ecdcdf); hairlines rgba(36, 20, 26, 0.12) and 0.24.
-- **Correct** stays green ink (#08704a). **Correction** stays vermilion (#c8321f, text #a31d10 on #ffe6e2), warmer than the brand crimson; a wrong answer always carries its × and ring, never colour alone.
-- **Dark:** paper #1c1215, card #24171b, desk #130b0e, ink #f6eced, cover #8a1328, brand #ff8597, action #ff6b81 with dark text, mark #6b2433.
+- **Secondary and Tertiary Text** (#4d4853, #6a6570).
+- **Paper** (#ffffff), **Card Hover** (#fbfaf8), **Desk** (#f6f4f1), **Track / Inset** (#e8e4df), **Rule** (#e3dfda); hairlines rgba(28, 26, 31, 0.12) and 0.24.
+- **Correct** stays green ink (#08704a). **Correction** stays vermilion (#c8321f, text #a31d10 on #ffe6e2), warmer than the action red; a wrong answer always carries its × and ring, never colour alone.
+- **Dark (ink-first night):** rail #0c0b0e with a hairline edge, desk #131215, card #1f1d23, paper #1d1b20, track #2e2b33, ink #f4f2ef, text #d3cfd8 / #aaa4b0. The action keeps #d91e3c with white text; bars and done days use #f0364f; red text is #ff8a9c; mark #4d2531.
 
 ### Named Rules
-**The One Red Action Rule.** One filled red control per screen: the primary action. On a red surface it turns white. Every rose is a mark that is never pressed.
+**The Red Is Action Rule.** Red marks only what to press and how far you got: one filled red control per screen, the progress bars and done days, and the active marker. It never fills a card, a bar or a header. Row icons are neutral (ink on desk), and secondary text actions ("Practicar" on a topic row) are ink.
 
-**The Area Rule.** An area's colour appears in three places only: the header band, the dot before its name, and its bar. Words on a band are white. A new area colour must hold 4.5:1 against white, and none may read as the brand red.
+**The Area Rule.** An area's colour appears only as the dot before its name, its bar, and a 4px edge on its header card (Aprende, lesson cover). A new area colour must hold 4.5:1 against white, and none may read as the action red.
 
 ## Typography
 
@@ -400,9 +403,15 @@ The seven steps are tokens (`--text-xs` 0.8125rem to `--text-2xl` 2.25rem); the 
 
 ## Layout
 
-Phone first, one breakpoint at 780/781px. On the phone, tab screens sit in a 16px gutter with 20px above, over four tabs (Hoy, Aprende, Retos, Yo); solve and review run edge to edge.
+Phone first. Below 781px tab screens sit in a 16px gutter with 20px above, under an ink top bar and over four bottom tabs (Hoy, Aprende, Retos, Yo); from 781 to 1023px the ink top bar carries the four sections. Solve and review run edge to edge.
 
-Hoy is one column on the phone and, from 781px, a main column beside a 22rem side column (first week, "Tus áreas", join), capped at 68rem. Aprende, Retos and lessons cap at 44rem, Yo at 46rem, the reward card and Cuenta at 40rem. The primary button is full width on the phone and starts at the left, at least 14rem, on desktop.
+**Desktop (1024px and up, 2026-11-11).** The header turns into a fixed ink side rail, 14rem wide (`StudentAppShell` markup unchanged, CSS only in `student.css`): "Aprendo / Saber 11" on top, the four sections as vertical items (44px, the active one on #2e2b33 with a red icon), and at the foot, over a hairline, the role switcher, theme, Cuenta and Salir. The page sits to the right with 24-48px of padding. Solve and review (`is-immersive`) and the pre-placement welcome (`has-no-tabs`) keep the top bar.
+- **Hoy:** capped at 73.75rem (~1180px). Main column: greeting (2.25rem), status facts, goal meter, the next step, "También para hoy"; right column (18-22rem): first-week commitment, week strip, league, "Tus áreas", join. The greeting lives in the main column, so the side column starts at the top.
+- **Aprende:** the area pills become a sticky vertical list (13rem) beside the area card and its topics, capped at 68rem.
+- **Retos:** the challenges are a grid of cards (min 17rem); "Para continuar" and the league take a 20rem column beside them only when they exist.
+- **Yo:** the cover, Logros and Ajustes form a 19rem column (one card) beside a card with the score, areas, career, exam, study time and sessions (`.yo.is-split`, `.yo-side`, `.yo-main`; both wrappers are `display: contents` on a phone, so the phone order is unchanged).
+
+Below 1024px, Aprende is 44rem, Retos 44rem, Yo 46rem, and Hoy's two columns start at 781px. Lessons cap at 44rem, the reward card and Cuenta at 40rem. The primary button is full width on the phone and starts at the left, at least 14rem, on wider screens.
 
 Rhythm: 24px between sections on Hoy, 16px on Aprende and Retos, 20px inside cards. List rows are at least 64px, reto tiles 80px. Solve is a field-coloured bar, a white sheet of 44rem, and a bottom dock capped at 62dvh. Safe-area insets are respected at every screen edge. Interactive targets are at least 44px, and inputs are 16px so iOS does not zoom.
 
@@ -426,22 +435,28 @@ Soft and plain: 16px cards, lists, bands and sheets; 12px buttons, answer option
 ### Buttons
 Flat and direct.
 - **Shape:** 12px, at least 3rem (3.25rem on Hoy and the reward, 52px in solve), Figtree 700.
-- **Primary:** Action Red with white text, no border, no shadow. One per screen; white with red text on a red surface.
+- **Primary:** Action Red with white text, no border, no shadow. One per screen, always on white or ink, never on a coloured surface.
 - **Secondary:** card surface with a 1px strong hairline; hover and press to Card Hover.
 - **Danger:** Correction Red with white text.
 - **Hover / Focus:** hover only on fine pointers; on touch the same look comes from `:active`. Every press scales to 0.97.
 
 ### Lists and rows
 - **List:** one white card, 1px hairline, 16px corners; rows divided by hairlines.
-- **Row:** a 40px soft-green icon tile, a 700 title, a secondary line, meta (area dot and minutes), a chevron. Press to Inset.
+- **Row:** a 40px neutral icon tile (ink on desk), a 700 title, a secondary line, meta (area dot and minutes), a chevron. Press to Inset.
 
 ### Next-step card
-Cover Red, 16px, 20px padding: the task title (Headline), its reason, area and minutes in white, then the white primary.
+A white card, 16px, 1px hairline, with a 4px red inset left edge (`box-shadow: inset 4px 0 0`): the task title (Headline), its reason in secondary text, area and minutes, then the red primary. The first reto on Retos wears the same edge with a red icon tile. After 5 p.m. Colombia, with a streak and nothing done today, a red Support line above the title: "Tu racha de N días sigue viva: {meta} preguntas la cuidan". Three or more days away, the card becomes "Qué bueno verte. Empecemos suave" with one button for five questions (repaso if due, else the plan's first topic, else the recommended five).
+
+### Daily loop on Hoy (2026-11-11)
+- **Goal meter** under the status facts: a rose icon, "Meta de hoy", "n de m preguntas" and an 8px brand bar that fills (280ms, `--ease-out-strong`). Met: the icon turns green with a check that pops once (scale 0.25 to 1 with blur), the bar turns green, the words read "Meta cumplida".
+- **Week strip** (side column, every student): seven 32px dots Monday to Sunday with their initial. Done is brand red with a white check; today is rose with a 2px brand ring; a past day without practice is the quiet inset fill, a day to come is an outline. Never red for a missed day.
+- **Shield note**: a white row, rose shield, "Un escudo cuidó tu racha ayer." and "Entendido"; dismissed per device.
+- The class league sits in the side column too, and hides itself when the student has none.
 
 ### Area band and area rows
-- **Band (Aprende, lesson cover):** the area colour, white Title, a level pill at 20% white, a white bar on a 22% black track, and the count.
+- **Area card (Aprende, lesson cover):** a white card with a 4px inset top edge in the area colour, the area dot before the ink Title, a neutral level pill, an 8px bar in the area colour on the track, the count, the note, and the usual red primary.
 - **Area row (Hoy):** dot, name, level word, a 6px bar in the area colour, "n de m temas en Competente o más".
-- **Area chips:** pills with the area dot; the chosen one fills with its area colour and white text.
+- **Area chips:** pills with the area dot; the chosen one fills with ink and keeps its dot. On desktop they stack as a list beside the topics.
 
 ### Topic row and MasteryBadge
 Each topic shows its name, its MasteryBadge (a four-bar signal meter and the level word at 600), and its evidence (accuracy) when there is any. The current topic carries the "Siguiente" tag and a light rose tint. The row's action is a quiet red text button; the level is what the row is about.
@@ -453,12 +468,14 @@ Desk background, no border, 12px corners, at least 56px, Figtree 700, the letter
 A Panel (#2a1218) under the question after a wrong answer: a Headline prompt, full-width white chips (12px) that turn rose on press, underlined links, and a red "go". Never shows the correct option.
 
 ### Navigation
-Four tabs with icons, 0.8125rem labels at 700; the active tab takes the brand red and a 22% icon fill. In solve, a bar in the area colour holds the back button, progress beads (rose done, white current; one track past 15 questions), the clock and the "3/10" count.
+Four tabs with icons, 0.8125rem labels at 700; the active tab takes the red text colour and a 22% icon fill. The 781-1023px top bar underlines the active section in red; the desktop rail is described under Layout. In solve, a bar in the area colour holds the back button, progress beads (rose done, white current; one track past 15 questions), the clock and the "3/10" count.
 
 ### Reward
 A white card: the score as a Title, the topics that moved (each with its MasteryBadge, a green "Subiste" or grey "Bajó" pill and a note), then what was earned as plain facts, then the red primary.
 
-**The One Moment Rule.** A topic that went up on a fresh close settles in once: its row flashes from 55% rose to soft green (520ms, after 250ms). It is the only celebration. Under reduced motion it does not play, and no press scales; colour changes stay.
+**The One Moment Rule.** A topic that went up on a fresh close settles in once: its row flashes from 55% rose to soft green (520ms, after 250ms). Under reduced motion it does not play, and no press scales; colour changes stay.
+
+**Streak moments (2026-11-11).** The only other celebration, and only on a fresh close. The day's first session shows yesterday's count, then the new number rises in (280ms, after 400ms). Reaching 3, 7, 14 or 30 days adds an ink card under the score (the one full ink card in the content): a red flame, the number at 3.5rem/800, "días seguidos" and one line; it scales in from 0.96 (400ms, after 280ms). A shield earned in the session is one more plain fact, "Ganaste un escudo para tu racha". Under reduced motion only opacity moves.
 
 ## Do's and Don'ts
 
@@ -466,7 +483,7 @@ A white card: the score as a Title, the topics that moved (each with its Mastery
 - **Do** set every student screen through these tokens, and add new student routes to `lib/student-look.ts`.
 - **Do** give each screen one red primary action, and write the next step as a name with its reason, area and minutes.
 - **Do** show every topic in a topic list with its MasteryBadge.
-- **Do** use the area colour only as band, dot and bar, through `--area`.
+- **Do** use the area colour only as dot, bar and header edge, through `--area`.
 - **Do** use 100ms strong ease-out for presses and 140ms for colour, and remove transforms and the level-up flash under reduced motion.
 
 ### Don't:
@@ -479,4 +496,8 @@ A white card: the score as a Title, the topics that moved (each with its Mastery
 
 ## Onboarding (2026-11-11)
 
-Placement is one general diagnostic (20 questions, 4 per area, 40 min), not one nivelación per area. The welcome is a white card on the desk: a red segmented progress bar on top, the five areas as named chips, the flow as three numbered steps joined by a hairline, then the first-week commitment. The diagnostic intro is the same card (`.diagnostic-intro > .timed-intro`) with the areas listed under its facts. The result lists every area on one bar, weakest first, marked preliminary.
+Placement is one general diagnostic (20 questions, 4 per area, 40 min), not one nivelación per area. The welcome (2026-11-11, `Welcome.tsx`) is a white card on the desk with one decision per screen: hello with the five area chips, consent (age and a required box), exam date, daily goal (5/10/15/20 questions as option cards, with the days of the week), character, reminders, then the diagnostic's rules. A red bar on top fills with a spring; steps slide by direction (280ms, `--ease-out-strong`), their blocks stagger 50ms, the weekly total counts up, the avatar pops on change. Chosen options take a 2px ink ring (days fill with ink) and press to 0.97. Motion durations are tokens in `student.css` (`--duration-*`), read by `lib/motion-tokens.ts`; under reduced motion only opacity moves. Students placed before consent was asked see only consent and the goal. The diagnostic intro is the same card (`.diagnostic-intro > .timed-intro`) with the areas listed under its facts. The result lists every area on one bar, weakest first, marked preliminary; the bars grow in that order, then "Tu plan está listo" with the one CTA to Hoy.
+
+## Pilot survey (2026-11-11)
+
+`/encuesta` (`PilotSurvey.tsx`) is the welcome card again: the same red bar, step slide and footer, one question per screen. Scales 1–5 and 0–10 are a row of option cells (0–10 wraps six and five on the phone, one row from 640px) with the two ends named under them; choices reuse the welcome options. The six scales are required, the rest show "Saltar" as the secondary button. The end screen pops a rose check once. Hoy offers it as a plan row after three completed sessions; Cuenta has its section.

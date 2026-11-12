@@ -36,9 +36,10 @@ export function TimedSessionIntro({
   timeLimitMs: number
   isStarting: boolean
   error?: string | null
-  cancelLabel: string
+  /** Without it there is no way back (the first diagnostic). */
+  cancelLabel?: string
   onStart: () => void
-  onCancel: () => void
+  onCancel?: () => void
   /** A simulacro shows the exam strategy for these areas before its clock starts (F35). */
   strategySubjectIds?: string[]
   /** What the session covers, shown under its facts. */
@@ -57,7 +58,7 @@ export function TimedSessionIntro({
   }, [])
 
   const cancel = () => {
-    onCancel()
+    onCancel?.()
     // After the caller has put the picker back.
     requestAnimationFrame(() => {
       const trigger = triggerPath == null ? null : elementAt(triggerPath)
@@ -89,29 +90,7 @@ export function TimedSessionIntro({
 
       {children}
 
-      <ul className="timed-intro-rules">
-        <li>
-          <BotOff size={18} aria-hidden />
-          <span>
-            <strong>Sin tutor y sin explicaciones hasta el final.</strong> Las
-            respuestas correctas y el tutor llegan en la revisión.
-          </span>
-        </li>
-        <li>
-          <Hourglass size={18} aria-hidden />
-          <span>
-            <strong>El reloj sigue corriendo si sales.</strong> Puedes volver y
-            seguir mientras quede tiempo.
-          </span>
-        </li>
-        <li>
-          <Flag size={18} aria-hidden />
-          <span>
-            <strong>Si se acaba el tiempo, se entrega sola</strong> con lo que
-            hayas respondido.
-          </span>
-        </li>
-      </ul>
+      <TimedSessionRules />
 
       {strategySubjectIds != null ? (
         <details className="timed-intro-strategy">
@@ -141,11 +120,42 @@ export function TimedSessionIntro({
           <Play size={16} aria-hidden />
           {isStarting ? 'Empezando…' : 'Empezar'}
         </button>
-        <button type="button" className="btn-ghost" disabled={isStarting} onClick={cancel}>
-          {cancelLabel}
-        </button>
+        {onCancel != null ? (
+          <button type="button" className="btn-ghost" disabled={isStarting} onClick={cancel}>
+            {cancelLabel}
+          </button>
+        ) : null}
       </div>
     </section>
+  )
+}
+
+/** The rules of a timed session, also the last step of the welcome. */
+export function TimedSessionRules() {
+  return (
+    <ul className="timed-intro-rules">
+      <li>
+        <BotOff size={18} aria-hidden />
+        <span>
+          <strong>Sin tutor y sin explicaciones hasta el final.</strong> Las
+          respuestas correctas y el tutor llegan en la revisión.
+        </span>
+      </li>
+      <li>
+        <Hourglass size={18} aria-hidden />
+        <span>
+          <strong>El reloj sigue corriendo si sales.</strong> Puedes volver y
+          seguir mientras quede tiempo.
+        </span>
+      </li>
+      <li>
+        <Flag size={18} aria-hidden />
+        <span>
+          <strong>Si se acaba el tiempo, se entrega sola</strong> con lo que
+          hayas respondido.
+        </span>
+      </li>
+    </ul>
   )
 }
 

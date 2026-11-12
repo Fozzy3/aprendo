@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Aprendo: paletas y escritorio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; }
+  body { font-family: Figtree, system-ui, sans-serif; background: #e9e7e4; color: #1b1b1b; padding: 32px 24px 64px; }
+  .intro { max-width: 1180px; margin: 0 auto 28px; }
+  .intro h1 { font-size: 28px; font-weight: 800; }
+  .intro p { margin-top: 8px; max-width: 70ch; line-height: 1.5; color: #444; }
+  .option { max-width: 1180px; margin: 0 auto 44px; }
+  .option > h2 { font-size: 20px; font-weight: 800; margin-bottom: 4px; }
+  .option > p { color: #444; margin-bottom: 14px; line-height: 1.45; max-width: 80ch; }
+  .swatches { display: flex; gap: 8px; margin-bottom: 14px; flex-wrap: wrap; }
+  .swatches span { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 600; padding: 4px 10px 4px 4px; background: #fff; border-radius: 999px; }
+  .swatches i { width: 22px; height: 22px; border-radius: 50%; border: 1px solid rgba(0,0,0,.12); }
+
+  /* The proposed desktop frame: side rail, main column, right rail. */
+  .frame { display: grid; grid-template-columns: 208px 1fr 300px; min-height: 560px; border-radius: 16px; overflow: hidden; background: var(--desk); color: var(--ink); box-shadow: 0 1px 2px rgba(0,0,0,.08), 0 12px 32px rgba(0,0,0,.10); }
+  .rail { background: var(--rail); color: var(--on-rail); padding: 22px 14px; display: flex; flex-direction: column; gap: 4px; }
+  .brand { font-weight: 800; font-size: 20px; padding: 0 10px 18px; letter-spacing: -0.01em; }
+  .brand small { display: block; font-weight: 600; font-size: 12px; opacity: .7; margin-top: 2px; }
+  .nav { padding: 10px 12px; border-radius: 10px; font-weight: 700; font-size: 15px; opacity: .78; }
+  .nav.on { background: var(--rail-on); opacity: 1; }
+  .rail .streak { margin-top: auto; padding: 12px; border-radius: 12px; background: var(--rail-on); font-size: 13px; line-height: 1.4; }
+  .rail .streak b { display: block; font-size: 22px; }
+  .main { padding: 28px 30px; display: grid; gap: 20px; align-content: start; }
+  .main h3 { font-size: 30px; font-weight: 800; letter-spacing: -0.02em; }
+  .meter { display: grid; gap: 6px; font-size: 14px; font-weight: 600; color: var(--muted); }
+  .meter div { height: 10px; border-radius: 999px; background: var(--track); overflow: hidden; }
+  .meter div i { display: block; height: 100%; width: 60%; background: var(--action); border-radius: 999px; }
+  .next { background: var(--card-hero); color: var(--on-hero); border-radius: 16px; padding: 22px; display: grid; gap: 8px; }
+  .next small { font-weight: 700; font-size: 12px; letter-spacing: .06em; text-transform: uppercase; opacity: .75; }
+  .next b { font-size: 22px; }
+  .next p { opacity: .85; line-height: 1.45; max-width: 52ch; }
+  .btn { justify-self: start; margin-top: 8px; padding: 13px 26px; border-radius: 12px; background: var(--action); color: var(--on-action); font-weight: 800; font-size: 16px; }
+  .task { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 14px 16px; display: flex; gap: 12px; align-items: center; }
+  .task .dot { width: 10px; height: 10px; border-radius: 50%; flex: none; }
+  .task b { display: block; font-size: 15px; }
+  .task span { font-size: 13px; color: var(--muted); }
+  .side { padding: 28px 22px; background: var(--side); border-left: 1px solid var(--line); display: grid; gap: 18px; align-content: start; }
+  .side h4 { font-size: 14px; font-weight: 800; margin-bottom: 8px; }
+  .week { display: flex; gap: 6px; }
+  .week i { flex: 1; height: 34px; border-radius: 8px; background: var(--track); display: grid; place-items: center; font-style: normal; font-size: 12px; font-weight: 700; color: var(--muted); }
+  .week i.done { background: var(--action); color: var(--on-action); }
+  .week i.today { outline: 2px solid var(--action); outline-offset: 1px; }
+  .area { display: grid; gap: 5px; font-size: 13px; font-weight: 700; margin-bottom: 10px; }
+  .area div { height: 6px; border-radius: 999px; background: var(--track); }
+  .area div i { display: block; height: 100%; border-radius: 999px; }
+
+  .a { --desk: #f6f4f1; --ink: #1c1a1f; --muted: #6a6570; --rail: #1c1a1f; --on-rail: #f6f4f1; --rail-on: #2e2b33; --card: #fff; --card-hero: #fff; --on-hero: #1c1a1f; --line: #e3dfda; --track: #e8e4df; --action: #d91e3c; --on-action: #fff; --side: #fbfaf8; }
+  .a .next { border: 1px solid var(--line); box-shadow: inset 4px 0 0 var(--action); }
+  .b { --desk: #f3f5f9; --ink: #101c33; --muted: #5b667c; --rail: #101c33; --on-rail: #eef2fa; --rail-on: #1d2c4a; --card: #fff; --card-hero: #101c33; --on-hero: #fff; --line: #dde2ec; --track: #e2e7f0; --action: #ffc21a; --on-action: #101c33; --side: #fafbfd; }
+  .c { --desk: #f5f3ec; --ink: #12261f; --muted: #5d6b64; --rail: #0c5a43; --on-rail: #f2f7f3; --rail-on: #0a4a37; --card: #fff; --card-hero: #0c5a43; --on-hero: #fff; --line: #e1ddd0; --track: #e6e2d5; --action: #f2542d; --on-action: #fff; --side: #faf8f2; }
+</style>
+</head>
+<body>
+<div class="intro">
+  <h1>Aprendo: tres paletas sobre la pantalla Hoy en computador</h1>
+  <p>Las tres usan el mismo diseño de escritorio propuesto: menú lateral en vez de la barra roja, columna central con el siguiente paso y una columna derecha con la semana y las áreas. Los colores de las áreas quedan solo en puntos y barras, nunca como fondo de tarjetas. Elige una paleta; el diseño se aplica igual.</p>
+</div>
+
+<!-- One frame, three palettes. -->
+<section class="option">
+  <h2>A. Tinta con rojo de acento</h2>
+  <p>Base casi negra y papel cálido. El rojo queda solo para la acción y el progreso, así nunca compite con los colores de las áreas.</p>
+  <div class="swatches"><span><i style="background:#1c1a1f"></i>Tinta</span><span><i style="background:#f6f4f1"></i>Papel</span><span><i style="background:#d91e3c"></i>Acción</span></div>
+  <div class="frame a">
+    <aside class="rail"><div class="brand">Aprendo<small>Saber 11</small></div><div class="nav on">Hoy</div><div class="nav">Aprende</div><div class="nav">Retos</div><div class="nav">Yo</div><div class="streak"><b>4 días</b>de racha · 1 escudo</div></aside>
+    <main class="main"><h3>Hola, Valentina</h3><div class="meter">6 de 10 preguntas hoy<div><i></i></div></div><div class="next"><small>Tu siguiente paso</small><b>Practica Probabilidad y conteo</b><p>Es el tema de Matemáticas donde más puntos del global puedes ganar. 5 preguntas, unos 10 minutos.</p><div class="btn">Empezar</div></div><div class="task"><i class="dot" style="background:#6d3fc0"></i><div><b>Repaso: 3 temas de Lectura Crítica</b><span>Ya toca repasarlos · 8 min</span></div></div><div class="task"><i class="dot" style="background:#b4540a"></i><div><b>Lección: Causalidad histórica</b><span>Sociales y Ciudadanas · 10 min</span></div></div></main>
+    <aside class="side"><div><h4>Tu semana</h4><div class="week"><i class="done">L</i><i class="done">M</i><i class="done">M</i><i class="today">J</i><i>V</i><i>S</i><i>D</i></div></div><div><h4>Tus áreas</h4><div class="area">Lectura Crítica · Nivel 3<div><i style="width:70%;background:#6d3fc0"></i></div></div><div class="area">Matemáticas · Nivel 1<div><i style="width:25%;background:#097d52"></i></div></div><div class="area">Ciencias Naturales · Nivel 2<div><i style="width:45%;background:#0a6fb0"></i></div></div><div class="area">Sociales · Nivel 1<div><i style="width:20%;background:#b4540a"></i></div></div><div class="area">Inglés · A1<div><i style="width:40%;background:#b3257a"></i></div></div></div></aside>
+  </div>
+</section>
+
+<section class="option">
+  <h2>B. Azul noche con amarillo</h2>
+  <p>Azul muy oscuro y un amarillo vivo para la acción. Más energía y más contraste; el amarillo no se parece a ningún color de área.</p>
+  <div class="swatches"><span><i style="background:#101c33"></i>Azul noche</span><span><i style="background:#f3f5f9"></i>Fondo</span><span><i style="background:#ffc21a"></i>Acción</span></div>
+  <div class="frame b">
+    <aside class="rail"><div class="brand">Aprendo<small>Saber 11</small></div><div class="nav on">Hoy</div><div class="nav">Aprende</div><div class="nav">Retos</div><div class="nav">Yo</div><div class="streak"><b>4 días</b>de racha · 1 escudo</div></aside>
+    <main class="main"><h3>Hola, Valentina</h3><div class="meter">6 de 10 preguntas hoy<div><i></i></div></div><div class="next"><small>Tu siguiente paso</small><b>Practica Probabilidad y conteo</b><p>Es el tema de Matemáticas donde más puntos del global puedes ganar. 5 preguntas, unos 10 minutos.</p><div class="btn">Empezar</div></div><div class="task"><i class="dot" style="background:#6d3fc0"></i><div><b>Repaso: 3 temas de Lectura Crítica</b><span>Ya toca repasarlos · 8 min</span></div></div><div class="task"><i class="dot" style="background:#b4540a"></i><div><b>Lección: Causalidad histórica</b><span>Sociales y Ciudadanas · 10 min</span></div></div></main>
+    <aside class="side"><div><h4>Tu semana</h4><div class="week"><i class="done">L</i><i class="done">M</i><i class="done">M</i><i class="today">J</i><i>V</i><i>S</i><i>D</i></div></div><div><h4>Tus áreas</h4><div class="area">Lectura Crítica · Nivel 3<div><i style="width:70%;background:#6d3fc0"></i></div></div><div class="area">Matemáticas · Nivel 1<div><i style="width:25%;background:#097d52"></i></div></div><div class="area">Ciencias Naturales · Nivel 2<div><i style="width:45%;background:#0a6fb0"></i></div></div><div class="area">Sociales · Nivel 1<div><i style="width:20%;background:#b4540a"></i></div></div><div class="area">Inglés · A1<div><i style="width:40%;background:#b3257a"></i></div></div></div></aside>
+  </div>
+</section>
+
+<section class="option">
+  <h2>C. Verde esmeralda con coral</h2>
+  <p>Verde profundo sobre crema, con coral para la acción. Más cálida y tranquila. Ojo: el verde de marca queda cerca del verde de Matemáticas.</p>
+  <div class="swatches"><span><i style="background:#0c5a43"></i>Esmeralda</span><span><i style="background:#f5f3ec"></i>Crema</span><span><i style="background:#f2542d"></i>Acción</span></div>
+  <div class="frame c">
+    <aside class="rail"><div class="brand">Aprendo<small>Saber 11</small></div><div class="nav on">Hoy</div><div class="nav">Aprende</div><div class="nav">Retos</div><div class="nav">Yo</div><div class="streak"><b>4 días</b>de racha · 1 escudo</div></aside>
+    <main class="main"><h3>Hola, Valentina</h3><div class="meter">6 de 10 preguntas hoy<div><i></i></div></div><div class="next"><small>Tu siguiente paso</small><b>Practica Probabilidad y conteo</b><p>Es el tema de Matemáticas donde más puntos del global puedes ganar. 5 preguntas, unos 10 minutos.</p><div class="btn">Empezar</div></div><div class="task"><i class="dot" style="background:#6d3fc0"></i><div><b>Repaso: 3 temas de Lectura Crítica</b><span>Ya toca repasarlos · 8 min</span></div></div><div class="task"><i class="dot" style="background:#b4540a"></i><div><b>Lección: Causalidad histórica</b><span>Sociales y Ciudadanas · 10 min</span></div></div></main>
+    <aside class="side"><div><h4>Tu semana</h4><div class="week"><i class="done">L</i><i class="done">M</i><i class="done">M</i><i class="today">J</i><i>V</i><i>S</i><i>D</i></div></div><div><h4>Tus áreas</h4><div class="area">Lectura Crítica · Nivel 3<div><i style="width:70%;background:#6d3fc0"></i></div></div><div class="area">Matemáticas · Nivel 1<div><i style="width:25%;background:#097d52"></i></div></div><div class="area">Ciencias Naturales · Nivel 2<div><i style="width:45%;background:#0a6fb0"></i></div></div><div class="area">Sociales · Nivel 1<div><i style="width:20%;background:#b4540a"></i></div></div><div class="area">Inglés · A1<div><i style="width:40%;background:#b3257a"></i></div></div></div></aside>
+  </div>
+</section>
+</body>
+</html>

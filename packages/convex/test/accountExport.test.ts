@@ -42,18 +42,36 @@ describe('exportMyData', () => {
     const ana = await signUp(t, 'ana@x.co')
     const luis = await signUp(t, 'luis@x.co')
     await t.run(async (ctx) => {
+      await ctx.db.patch('students', ana.studentId, {
+        consentAt: now, isMinor: true, onboardedAt: now, dailyGoalQuestions: 10, remindersOff: true,
+        lastActiveDay: 20_000, lastReminderDay: 20_001,
+      })
       const questionId = await seedQuestion(ctx)
       await seedAttempt(ctx, ana.studentId, questionId, { kind: 'topic', status: 'completed' })
       await seedAttempt(ctx, luis.studentId, questionId, { kind: 'topic', status: 'completed' })
+      await ctx.db.insert('events', { studentId: ana.studentId, name: 'screen_view', at: now, props: { path: '/today' } })
+      await ctx.db.insert('events', { studentId: luis.studentId, name: 'screen_view', at: now })
+      await ctx.db.insert('pilotSurveyResponses', { studentId: ana.studentId, answers: { start_ease: 4 }, submittedAt: now })
+      await ctx.db.insert('pilotSurveyResponses', { studentId: luis.studentId, answers: { start_ease: 2 }, submittedAt: now })
     })
 
     const data = await ana.as.query(api.accountExport.exportMyData, { studentId: ana.studentId })
 
     expect(data.account.email).toBe('ana@x.co')
+    expect(data.account.isMinor).toBe(true)
+    expect(data.account.consentAt).toBe(now)
+    expect(data.account.onboardedAt).toBe(now)
+    expect(data.account.dailyGoalQuestions).toBe(10)
+    expect(data.account.remindersOff).toBe(true)
+    expect(data.account.lastActiveDay).toBe(20_000)
+    expect(data.account.lastReminderDay).toBe(20_001)
     expect(data.sessions).toHaveLength(1)
     expect(data.questionAttempts).toHaveLength(1)
     expect(data.questionAttempts[0]?.studentId).toBe(ana.studentId)
     expect(data.questionAttempts[0]?.isCorrect).toBe(true)
+    expect(data.events).toHaveLength(1)
+    expect(data.events[0]).toMatchObject({ studentId: ana.studentId, props: { path: '/today' } })
+    expect(data.pilotSurveyResponses).toEqual([expect.objectContaining({ studentId: ana.studentId, answers: { start_ease: 4 } })])
   })
 
   test('denies every other caller, teachers included', async () => {

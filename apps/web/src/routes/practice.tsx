@@ -2,7 +2,7 @@ import { useConvexMutation } from '@convex-dev/react-query'
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { Link, Outlet, createFileRoute, useChildMatches, useNavigate } from '@tanstack/react-router'
 import { ArrowRight, ChevronRight, Play, RotateCcw, Timer, Zap, type LucideIcon } from 'lucide-react'
-import { useEffect, useState, type CSSProperties } from 'react'
+import { useState, type CSSProperties } from 'react'
 import { api } from '@aprendo/convex/api'
 import {
   LAUNCHABLE_SESSION_KINDS,
@@ -26,10 +26,10 @@ import { formatTimeLimit } from '../lib/session-display.ts'
 import {
   reviewQueueQuery,
   sessionHistoryQuery,
-  studentAppStateQuery,
   studentProgressQuery,
 } from '../lib/student-queries.ts'
 import { useCurrentStudent } from '../lib/student-session.ts'
+import { useStudentGuard } from '../lib/use-student-guard.ts'
 import { getSubjectLabel, getSubtopicLabel } from '@aprendo/convex/taxonomy'
 import { FullScreenLoader } from '../components/FullScreenLoader.tsx'
 import { readConvexError } from '../lib/convex-error.ts'
@@ -93,10 +93,9 @@ function PracticeHubPage() {
   // Timed kinds stop at an intro before the clock starts; see TimedSessionIntro.
   const [pendingStart, setPendingStart] = useState<PendingStart | null>(null)
 
-  const appStateQuery = useQuery({
-    ...studentAppStateQuery(session?.studentId),
-    enabled: isHubIndex && isReady && session != null,
-  })
+  // The same gate as every student tab, held off while a session is on screen:
+  // the diagnostic itself is solved under this layout.
+  const guard = useStudentGuard({ enabled: isHubIndex })
   const historyQuery = useQuery({
     ...sessionHistoryQuery(session?.studentId, { limit: 100 }),
     enabled: isHubIndex && isReady && session != null,
@@ -135,26 +134,12 @@ function PracticeHubPage() {
     },
   })
 
-  useEffect(() => {
-    if (!isHubIndex) return
-    if (isReady && session == null) {
-      void navigate({ to: '/login' })
-    }
-  }, [isHubIndex, isReady, navigate, session])
-
-  useEffect(() => {
-    if (!isHubIndex) return
-    if (!isReady || session == null || appStateQuery.data == null) return
-    if (!appStateQuery.data.hasPlacement && !appStateQuery.data.isStaff) {
-      void navigate({ to: '/diagnostic' })
-    }
-  }, [appStateQuery.data, isHubIndex, isReady, navigate, session])
-
   if (!isHubIndex) {
     return <Outlet />
   }
 
-  if (!isReady || session == null || appStateQuery.isPending || historyQuery.isPending) {
+  if (guard.status === 'redirecting') return <FullScreenLoader message={guard.reason} />
+  if (guard.status !== 'ready' || historyQuery.isPending) {
     return (
       <FullScreenLoader />
     )
@@ -186,7 +171,7 @@ function PracticeHubPage() {
   const primaryKind: SessionKind = repasoDue != null && repasoDue > 0 ? 'repaso' : retoLocked ? 'simulacro' : 'reto'
 
   return (
-    <StudentAppShell session={session} activeSection="practice">
+    <StudentAppShell session={guard.session} activeSection="practice">
       <div className="retos fade-in">
         <h1 className="page-title">Retos</h1>
         <p className="page-lede">Repasa lo que toca, mide tu nivel o ensaya el examen con reloj.</p>
@@ -386,7 +371,7 @@ function PracticeHubPage() {
 
             <li>
               <PracticeBuilder
-                studentId={session.studentId}
+                studentId={guard.session.studentId}
                 expanded={expandedKind === 'personalizada'}
                 disabled={startMutation.isPending}
                 isStarting={startMutation.isPending && startMutation.variables?.kind === 'personalizada'}
@@ -412,7 +397,7 @@ function PracticeHubPage() {
           ) : null}
         </section>
 
-        <LeagueStrip studentId={session.studentId} />
+        <LeagueStrip studentId={guard.session.studentId} />
       </div>
     </StudentAppShell>
   )

@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import { act, useState, type ComponentType, type ReactNode } from 'react'
+import { act, createElement, useState, type ComponentType, type ReactNode } from 'react'
 import { createRoot, type Root } from 'react-dom/client'
 import { getFunctionName } from 'convex/server'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
@@ -16,11 +16,22 @@ const state = vi.hoisted(() => ({
   changePassword: vi.fn(),
   deleteUser: vi.fn(),
   fetchQuery: vi.fn(),
+  track: vi.fn(),
   history: [] as unknown[],
 }))
 
 vi.mock('lucide-react', () =>
   new Proxy({}, { has: () => true, get: (_, name) => (name === 'then' ? undefined : () => null) }))
+// Motion is checked in the browser; here every motion.* is its plain element.
+vi.mock('motion/react', () => {
+  const MOTION_PROPS = ['variants', 'initial', 'animate', 'exit', 'transition', 'custom']
+  const motion = new Proxy({}, {
+    get: (_, tag: string) => ({ children, ref, ...props }: Record<string, unknown> & { children?: ReactNode; ref?: unknown }) =>
+      createElement(tag, { ...Object.fromEntries(Object.entries(props).filter(([key]) => !MOTION_PROPS.includes(key))), ref }, children),
+  })
+  const Pass = ({ children }: { children?: ReactNode }) => children
+  return { motion, AnimatePresence: Pass, MotionConfig: Pass, useReducedMotion: () => true, animate: () => ({ stop() {} }) }
+})
 
 vi.mock('@tanstack/react-router', () => ({
   createFileRoute: () => (options: object) => ({ options, useSearch: () => ({}), useParams: () => ({}) }),
@@ -39,6 +50,7 @@ vi.mock('@tanstack/react-router', () => ({
   useChildMatches: ({ select }: { select: (matches: unknown[]) => unknown }) => select([]),
   useNavigate: () => state.navigate,
   useRouter: () => ({ history: { back: vi.fn() } }),
+  useLocation: () => ({ pathname: '/', searchStr: '' }),
 }))
 
 vi.mock('@convex-dev/react-query', () => ({
@@ -81,6 +93,7 @@ vi.mock('convex/react', () => ({
   usePaginatedQuery: () => ({ status: 'Exhausted', results: state.history, loadMore: vi.fn() }),
 }))
 vi.mock('../lib/student-session.ts', () => ({ useCurrentStudent: () => state.current }))
+vi.mock('../lib/use-track.ts', () => ({ useTrack: () => state.track }))
 vi.mock('../lib/use-signed-in.ts', () => ({ useSignedIn: () => state.current.session }))
 vi.mock('../lib/auth-client.ts', () => ({
   authClient: {
@@ -117,7 +130,16 @@ let root: Root
 const appState = (overrides: object = {}) => ({
   isPending: false,
   isError: false,
-  data: { hasPlacement: true, isStaff: false, roles: ['student'], placedSubjectIds: [], defaultRoute: '/today', ...overrides },
+  data: {
+    hasPlacement: true,
+    hasConsent: true,
+    onboarded: true,
+    isStaff: false,
+    roles: ['student'],
+    placedSubjectIds: [],
+    defaultRoute: '/today',
+    ...overrides,
+  },
 })
 
 beforeEach(() => {
@@ -127,7 +149,7 @@ beforeEach(() => {
     'students:getStudentAppState': appState(),
   }
   state.history = []
-  for (const mock of [state.mutation, state.navigate, state.signOut, state.updateUser, state.changePassword, state.deleteUser, state.fetchQuery]) {
+  for (const mock of [state.mutation, state.navigate, state.signOut, state.updateUser, state.changePassword, state.deleteUser, state.fetchQuery, state.track]) {
     mock.mockReset()
   }
   container = document.createElement('main')
@@ -297,6 +319,14 @@ describe('the student guard', () => {
     expect(state.navigate).not.toHaveBeenCalled()
     expect(container.querySelector('.student-shell')).not.toBeNull()
   })
+
+  it('sends a placed student without consent to the welcome, to come back after', async () => {
+    seedAprende()
+    state.queries['students:getStudentAppState'] = appState({ hasConsent: false, onboarded: false })
+    await render('../routes/path.tsx')
+    expect(state.navigate).toHaveBeenCalledWith({ to: '/diagnostic', search: { volver: '/' } })
+    expect(container.querySelector('.student-shell')).toBeNull()
+  })
 })
 
 describe('/app', () => {
@@ -335,8 +365,21 @@ describe('/app', () => {
 
 describe('/diagnostic', () => {
   beforeEach(() => {
-    window.localStorage.setItem('aprendo:welcome-seen', '1')
     state.queries['sessions:listSessions'] = { isPending: false, data: [] }
+    state.queries['students:getStudent'] = { isPending: false, data: { _id: 's1', name: 'Ana Ruiz' } }
+  })
+
+  it('opens with the welcome until the student has finished it', async () => {
+    state.queries['students:getStudentAppState'] = appState({ hasPlacement: false, hasConsent: false, onboarded: false })
+    await render('../routes/diagnostic.tsx')
+    expect(container.textContent).toContain('bienvenida')
+    expect(container.textContent).not.toContain('intro')
+  })
+
+  it('skips the welcome once it is done', async () => {
+    state.queries['students:getStudentAppState'] = appState({ hasPlacement: false })
+    await render('../routes/diagnostic.tsx')
+    expect(container.textContent).not.toContain('bienvenida')
   })
 
   it('wears the student chrome, without tabs before the first placement', async () => {
@@ -445,9 +488,16 @@ function seedHoy(tasks: object[] = [
       plan: {
         tasks,
         nextSubtopics: [],
-        hero: { questionCount: 5, minutes: 5, action: { type: 'session', kind: 'recommended' }, missionComplete: false },
+        hero: {
+          questionCount: 5, minutes: 5, action: { type: 'session', kind: 'recommended' },
+          goalQuestions: 5, answeredToday: 2, missionComplete: false,
+        },
       },
       streakDays: 4, shields: 1, xp: { today: 30, thisWeek: 120 }, firstWeek: { active: false }, examPlan: null,
+      practicedToday: true, shieldUsedDay: null, comeback: false,
+      week: ['done', 'open', 'today', 'upcoming', 'upcoming', 'upcoming', 'upcoming'].map((status, index) => ({
+        day: 20_402 + index, status, isToday: status === 'today',
+      })),
     },
   }
   state.queries['today:getStickerAlbum'] = {
@@ -523,6 +573,128 @@ describe('/today, Hoy', () => {
     const next = container.querySelector('[aria-labelledby="hoy-next-title"]')!
     expect(next.textContent).toContain('Sigue donde ibas')
     expect(next.querySelector('a.btn-primary')?.getAttribute('href')).toBe('/practice/$sessionId')
+  })
+
+  type Dashboard = { plan: { hero: Record<string, unknown> } } & Record<string, unknown>
+  const dashboard = () => (state.queries['today:getTodayDashboard'] as { data: Dashboard }).data
+
+  it('meters the daily goal, before and once it is met', async () => {
+    seedHoy()
+    await render('../routes/today.tsx')
+    const meter = container.querySelector('.goal-meter')!
+    expect(meter.textContent).toContain('2 de 5 preguntas')
+    expect(meter.classList.contains('is-met')).toBe(false)
+
+    act(() => root.unmount())
+    root = createRoot(container)
+    Object.assign(dashboard().plan.hero, { answeredToday: 6, missionComplete: true })
+    await render('../routes/today.tsx')
+    expect(container.querySelector('.goal-meter.is-met')?.textContent).toContain('Meta cumplida')
+    expect(container.textContent).not.toContain('Meta del día cumplida')
+  })
+
+  it('shows the week Monday to Sunday, a past day without practice in neutral words', async () => {
+    seedHoy()
+    await render('../routes/today.tsx')
+    const days = [...container.querySelectorAll('.week-strip li')]
+    expect(days).toHaveLength(7)
+    expect(days.map((day) => day.getAttribute('aria-label'))).toEqual([
+      'Lunes: practicaste', 'Martes: sin práctica', 'Miércoles: hoy', 'Jueves: por venir',
+      'Viernes: por venir', 'Sábado: por venir', 'Domingo: por venir',
+    ])
+    expect(days[1]?.classList.contains('is-open')).toBe(true)
+  })
+
+  it('says once that a shield looked after the streak yesterday', async () => {
+    seedHoy()
+    dashboard().shieldUsedDay = 20_403
+    await render('../routes/today.tsx')
+    expect(container.textContent).toContain('Un escudo cuidó tu racha ayer')
+    await act(async () => button('Entendido').click())
+    expect(container.textContent).not.toContain('Un escudo cuidó tu racha ayer')
+
+    act(() => root.unmount())
+    root = createRoot(container)
+    await render('../routes/today.tsx')
+    expect(container.textContent).not.toContain('Un escudo cuidó tu racha ayer')
+  })
+
+  it('late in the day, a streak not yet kept reads as alive, with the goal that keeps it', async () => {
+    vi.useFakeTimers({ toFake: ['Date'] })
+    vi.setSystemTime(new Date('2026-11-11T23:30:00Z')) // 18:30 in Colombia
+    seedHoy()
+    dashboard().practicedToday = false
+    await render('../routes/today.tsx')
+    expect(container.querySelector('.next-card')?.textContent).toContain('Tu racha de 4 días sigue viva: 5 preguntas la cuidan')
+    vi.useRealTimers()
+  })
+
+  it('in the morning it says nothing about the streak', async () => {
+    vi.useFakeTimers({ toFake: ['Date'] })
+    vi.setSystemTime(new Date('2026-11-11T14:00:00Z')) // 9:00 in Colombia
+    seedHoy()
+    dashboard().practicedToday = false
+    await render('../routes/today.tsx')
+    expect(container.querySelector('.next-card')?.textContent).not.toContain('sigue viva')
+    vi.useRealTimers()
+  })
+
+  it('after days away, opens soft with one button for five questions', async () => {
+    seedHoy()
+    dashboard().comeback = true
+    state.mutation.mockResolvedValue('new-session')
+    await render('../routes/today.tsx')
+    const next = container.querySelector('[aria-labelledby="hoy-next-title"]')!
+    expect(next.textContent).toContain('¡Qué bueno verte! Empecemos suave')
+    expect(container.querySelectorAll('.btn-primary')).toHaveLength(1)
+    await act(async () => (next.querySelector('.btn-primary') as HTMLButtonElement).click())
+    expect(state.mutation).toHaveBeenCalledWith({
+      studentId: 's1', kind: 'topic', subtopicId: 'matematicas.number_proportionality.ratios_proportions_percent', questionLimit: 5,
+    })
+  })
+
+  it('shows the class league when there is one', async () => {
+    seedHoy()
+    state.queries['league:getClassLeague'] = {
+      isPending: false,
+      data: { status: 'no_xp_yet' },
+    }
+    await render('../routes/today.tsx')
+    expect(container.querySelector('.league')?.textContent).toContain('liga de tu curso')
+  })
+
+  it('offers the pilot survey while it is due, and counts that it was shown', async () => {
+    seedHoy()
+    dashboard().surveyDue = true
+    await render('../routes/today.tsx')
+    const card = [...container.querySelectorAll('a')].find((link) => link.textContent?.includes('Cuéntanos cómo te va (4 min)'))
+    expect(card?.getAttribute('href')).toBe('/encuesta')
+    expect(state.track).toHaveBeenCalledWith('survey_shown')
+    expect(container.querySelectorAll('.btn-primary')).toHaveLength(1)
+  })
+
+  it('says nothing about the survey when it is not due', async () => {
+    seedHoy()
+    dashboard().surveyDue = false
+    await render('../routes/today.tsx')
+    expect(container.textContent).not.toContain('Cuéntanos cómo te va')
+    expect(state.track).not.toHaveBeenCalledWith('survey_shown')
+  })
+})
+
+describe('/encuesta', () => {
+  it('opens the survey on its first question, in the student look', async () => {
+    state.queries['pilotSurvey:getMine'] = { isPending: false, data: null }
+    await render('../routes/encuesta.tsx')
+    expect(container.querySelector('.student-shell')).not.toBeNull()
+    expect(container.querySelector('h1')?.textContent).toBe('¿Qué tan fácil fue empezar a usar Aprendo?')
+  })
+
+  it('says thanks instead of asking again once answered', async () => {
+    state.queries['pilotSurvey:getMine'] = { isPending: false, data: { submittedAt: 1 } }
+    await render('../routes/encuesta.tsx')
+    expect(container.querySelector('h1')?.textContent).toBe('Ya la respondiste, gracias')
+    expect(container.querySelector('[role="progressbar"]')).toBeNull()
   })
 })
 
@@ -661,6 +833,22 @@ describe('/practice, Retos', () => {
     await render('../routes/practice.tsx')
     expect(state.navigate).not.toHaveBeenCalled()
   })
+
+  it('sends an unplaced student to the diagnostic, as every student tab does', async () => {
+    seedRetos()
+    state.queries['students:getStudentAppState'] = appState({ hasPlacement: false })
+    await render('../routes/practice.tsx')
+    expect(state.navigate).toHaveBeenCalledWith({ to: '/diagnostic' })
+    expect(container.querySelector('.retos')).toBeNull()
+  })
+
+  it('sends a placed student without consent to the welcome, to come back after', async () => {
+    seedRetos()
+    state.queries['students:getStudentAppState'] = appState({ hasConsent: false, onboarded: false })
+    await render('../routes/practice.tsx')
+    expect(state.navigate).toHaveBeenCalledWith({ to: '/diagnostic', search: { volver: '/' } })
+    expect(container.querySelector('.retos')).toBeNull()
+  })
 })
 
 describe('/cuenta', () => {
@@ -759,5 +947,43 @@ describe('/cuenta', () => {
   it('has its own Salir', async () => {
     await render('../routes/cuenta.tsx')
     expect(container.querySelector('[aria-labelledby="cuenta-signout-title"] button')?.textContent).toBe('Salir')
+  })
+
+  it('shows reminder emails as on and turns them off', async () => {
+    state.queries['students:getStudent'] = { isPending: false, data: { _id: 's1' } }
+    state.mutation.mockResolvedValue(null)
+    await render('../routes/cuenta.tsx')
+    const toggle = container.querySelector<HTMLInputElement>('[aria-labelledby="cuenta-reminders-title"] [role="switch"]')!
+    expect(toggle.checked).toBe(true)
+    await act(async () => toggle.click())
+    expect(state.mutation).toHaveBeenCalledWith({ studentId: 's1', off: true })
+    expect(toggle.checked).toBe(false)
+  })
+
+  it('shows reminders the student turned off as off, and puts the switch back if saving fails', async () => {
+    state.queries['students:getStudent'] = { isPending: false, data: { _id: 's1', remindersOff: true } }
+    state.mutation.mockRejectedValue(new Error('x'))
+    await render('../routes/cuenta.tsx')
+    const toggle = container.querySelector<HTMLInputElement>('[aria-labelledby="cuenta-reminders-title"] [role="switch"]')!
+    expect(toggle.checked).toBe(false)
+    await act(async () => toggle.click())
+    expect(state.mutation).toHaveBeenCalledWith({ studentId: 's1', off: false })
+    expect(toggle.checked).toBe(false)
+  })
+
+  it('invites to the pilot survey until it is answered', async () => {
+    state.queries['pilotSurvey:getMine'] = { isPending: false, data: null }
+    await render('../routes/cuenta.tsx')
+    const section = container.querySelector('[aria-labelledby="cuenta-survey-title"]')!
+    expect(section.querySelector('h2')?.textContent).toBe('Encuesta del piloto')
+    expect(section.querySelector('a')?.getAttribute('href')).toBe('/encuesta')
+  })
+
+  it('thanks the student once the survey is answered', async () => {
+    state.queries['pilotSurvey:getMine'] = { isPending: false, data: { submittedAt: 1 } }
+    await render('../routes/cuenta.tsx')
+    const section = container.querySelector('[aria-labelledby="cuenta-survey-title"]')!
+    expect(section.textContent).toContain('Ya la respondiste, gracias')
+    expect(section.querySelector('a')).toBeNull()
   })
 })

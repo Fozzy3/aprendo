@@ -71,11 +71,13 @@ Current routes:
 - `/diagnostic` general diagnostic (20 questions, 4 per area, 40 min) that places every area at once; per-area nivelación is legacy
 - Student tabs: `/today` (Hoy), `/path` (Aprende; `/syllabus` redirects here), `/practice` (Retos), `/progress` (Yo; `/history` redirects here); `/lesson/$subtopicId`
 - `/practice/$sessionId` solve with the Socratic guided path, `/practice/$sessionId/review` reward and review, `/duelo/$id` live class duel
-- `/join` join a class with its code, `/cuenta` account, data export and deletion
+- `/join` join a class with its code, `/cuenta` account, data export and deletion, `/encuesta` pilot survey (questions in `packages/convex/src/pilotSurveyQuestions.ts`)
 - `/teacher`, `/teacher/$classGroupId` (tabs: week, results, plan), `/teacher/student/$studentId` teacher panel (never grades or acts for a student), `/teacher/guia/$subtopicId` printable class guide, `/teacher/duelo/$id` duel on the projector
 - `/school` school admin tabs: courses, people, periodic tests, institution
 - `/admin` Aprendo staff: bank, question audit (reviewers see only this), reports, school licences
 - `/reset-password`, `/terminos`, `/privacidad`
+
+Pilot-ready cut, approved 2026-11-11: `plans/piloto-retencion.md` (launch blockers, measurement, animated onboarding, visible daily loop, reminder emails, pilot survey).
 
 Current roadmap, approved 2026-11-08: `plans/reconstruccion-estudiante-y-banco.md` (F50–F77: full front-end rebuild, gamification, Socratic study, question bank audit and original bank).
 

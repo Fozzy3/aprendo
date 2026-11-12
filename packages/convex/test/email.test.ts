@@ -1,5 +1,5 @@
 import { describe, expect, mock, test } from 'bun:test'
-import { sendEmail } from '../src/email'
+import { emailVerificationRequired, sendEmail } from '../src/email'
 
 const message = { to: 'ana@x.co', subject: 'Confirma tu correo', text: 'Abre https://aprendo.co/v' }
 
@@ -10,6 +10,17 @@ describe('sendEmail', () => {
     await sendEmail(message, { apiKey: undefined, from: 'Aprendo <a@aprendo.co>', fetch: fetchMock, log })
     expect(fetchMock).not.toHaveBeenCalled()
     expect(log).toHaveBeenCalled()
+  })
+
+  test('on a real site without a key the log carries recipient and subject, never the link', async () => {
+    const lines: string[] = []
+    await sendEmail(message, {
+      apiKey: undefined, siteUrl: 'https://aprendo.co', from: 'Aprendo <a@aprendo.co>',
+      fetch: mock(() => Promise.resolve(new Response('{}'))), log: (line) => lines.push(line),
+    })
+    expect(lines.join('\n')).toContain('ana@x.co')
+    expect(lines.join('\n')).toContain('Confirma tu correo')
+    expect(lines.join('\n')).not.toContain('https://aprendo.co/v')
   })
 
   test('posts the message to Resend', async () => {
@@ -26,5 +37,18 @@ describe('sendEmail', () => {
     await expect(
       sendEmail(message, { apiKey: 're_123', from: 'Aprendo <a@aprendo.co>', fetch: fetchMock, log: () => {} }),
     ).rejects.toThrow(/422/)
+  })
+})
+
+describe('emailVerificationRequired', () => {
+  test('stays open only in local development, where neither a key nor a site is set', () => {
+    expect(emailVerificationRequired({})).toBe(false)
+    expect(emailVerificationRequired({ RESEND_API_KEY: 're_123' })).toBe(true)
+    // A production site missing its key fails closed instead of letting any email in.
+    expect(emailVerificationRequired({ SITE_URL: 'https://aprendo.co' })).toBe(true)
+  })
+
+  test('the owner can switch it off on purpose, even with a key and a site', () => {
+    expect(emailVerificationRequired({ RESEND_API_KEY: 're_123', SITE_URL: 'https://aprendo.co', EMAIL_VERIFICATION: 'off' })).toBe(false)
   })
 })

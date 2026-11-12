@@ -153,66 +153,73 @@ export function StudentProgressPage({ session }: { session: ActiveStudentSession
   const lastWeek = weekly.at(-1) ?? null
   const trendDelta = firstWeek != null && lastWeek != null && weekly.length >= 2 ? lastWeek.accuracy - firstWeek.accuracy : null
 
+  // On a phone both wrappers dissolve (`display: contents`) and the page reads
+  // top to bottom as before; on a wide screen the cover, rewards and settings
+  // become a column beside the charts.
   return (
-    <div className="yo fade-in">
+    <div className="yo is-split fade-in">
       {cover}
 
-      <GlobalScoreCard studentId={studentId} data={progress.globalScore} />
+      <div className="yo-main">
+        <GlobalScoreCard studentId={studentId} data={progress.globalScore} />
 
-      <section className="ruled-section" aria-labelledby="progress-areas-title">
-        <div className="section-head">
-          <h2 id="progress-areas-title" className="section-title">Tus áreas</h2>
-          {overallDelta != null ? (
-            <span className="section-meta">
-              Desde tu diagnóstico: <Delta delta={overallDelta} />
-            </span>
-          ) : null}
-        </div>
-        <AreaLevelsChart
-          rows={progress.subjectLevels.map(areaChartRow)}
-          emptyAction={() => (
-            <Link to="/diagnostic" className="area-chart-action">
-              Hacer el diagnóstico
-            </Link>
-          )}
-        />
-      </section>
-
-      <CareerCard studentId={studentId} mode="summary" career={progress.globalScore.career} />
-
-      {todayQuery.data != null ? (
-        <>
-          <ExamCountdown studentId={studentId} examDate={todayQuery.data.examDate} plan={todayQuery.data.examPlan} />
-          <TargetGap
-            data={todayQuery.data.globalScore}
-            daysRemaining={todayQuery.data.examPlan?.daysRemaining ?? null}
-          />
-          <StudyTimeCard studentId={studentId} studyTime={todayQuery.data.studyTime} />
-        </>
-      ) : null}
-
-      {weekly.length >= 2 ? (
-        <details className="yo-more">
-          <summary>
-            Ver más: semana a semana{' '}
-            {trendDelta != null ? <Delta delta={trendDelta} /> : null}
-          </summary>
-          <TrendChart points={weekly} />
-          <div className="mt-1 flex justify-between text-xs text-[var(--text-tertiary)]">
-            <span>{firstWeek != null ? formatWeekLabel(firstWeek.weekStartMs) : ''}</span>
-            <span>Precisión por semana</span>
-            <span>{lastWeek != null ? formatWeekLabel(lastWeek.weekStartMs) : ''}</span>
+        <section className="ruled-section" aria-labelledby="progress-areas-title">
+          <div className="section-head">
+            <h2 id="progress-areas-title" className="section-title">Tus áreas</h2>
+            {overallDelta != null ? (
+              <span className="section-meta">
+                Desde tu diagnóstico: <Delta delta={overallDelta} />
+              </span>
+            ) : null}
           </div>
-        </details>
-      ) : null}
+          <AreaLevelsChart
+            rows={progress.subjectLevels.map(areaChartRow)}
+            // Yo is only reachable after the diagnostic: an area without a level needs practice, not another diagnostic.
+            emptyAction={() => (
+              <Link to="/path" className="area-chart-action">
+                Practicar para medirla
+              </Link>
+            )}
+          />
+        </section>
 
-      {todayQuery.data != null ? <WeeklyCoach studentId={studentId} activeDaysThisWeek={todayQuery.data.activeDaysThisWeek} /> : null}
+        <CareerCard studentId={studentId} mode="summary" career={progress.globalScore.career} />
 
-      <StudyHistory studentId={studentId} />
+        {todayQuery.data != null ? (
+          <>
+            <ExamCountdown studentId={studentId} examDate={todayQuery.data.examDate} plan={todayQuery.data.examPlan} />
+            <TargetGap
+              data={todayQuery.data.globalScore}
+              daysRemaining={todayQuery.data.examPlan?.daysRemaining ?? null}
+            />
+            <StudyTimeCard studentId={studentId} studyTime={todayQuery.data.studyTime} />
+          </>
+        ) : null}
 
-      <YoRewards studentId={studentId} student={student.data} medals={album.data?.medals ?? []} />
+        {weekly.length >= 2 ? (
+          <details className="yo-more">
+            <summary>
+              Ver más: semana a semana{' '}
+              {trendDelta != null ? <Delta delta={trendDelta} /> : null}
+            </summary>
+            <TrendChart points={weekly} />
+            <div className="mt-1 flex justify-between text-xs text-[var(--text-tertiary)]">
+              <span>{firstWeek != null ? formatWeekLabel(firstWeek.weekStartMs) : ''}</span>
+              <span>Precisión por semana</span>
+              <span>{lastWeek != null ? formatWeekLabel(lastWeek.weekStartMs) : ''}</span>
+            </div>
+          </details>
+        ) : null}
 
-      <YoSettings />
+        {todayQuery.data != null ? <WeeklyCoach studentId={studentId} activeDaysThisWeek={todayQuery.data.activeDaysThisWeek} /> : null}
+
+        <StudyHistory studentId={studentId} />
+      </div>
+
+      <div className="yo-side">
+        <YoRewards studentId={studentId} student={student.data} medals={album.data?.medals ?? []} />
+        <YoSettings />
+      </div>
     </div>
   )
 }

@@ -294,6 +294,9 @@ export const sessionDocumentValidator = v.object({
     xp: v.number(),
     medals: v.array(v.string()),
     streakDays: v.number(),
+    /** The streak before this session: below `streakDays` only on the day's first session. */
+    previousStreakDays: v.optional(v.number()),
+    shieldEarned: v.optional(v.boolean()),
   })),
 })
 
@@ -537,6 +540,21 @@ export const learnerAggregateValidator = v.object({
 
 /** What a school bought; `llmBudget.ts` maps each plan to its allowances. */
 export const organizationPlanValidator = v.union(v.literal('pilot'), v.literal('school'))
+
+/** What the pilot measures that sessions and attempts cannot tell (see `events.ts`). */
+export const eventNameValidator = v.union(
+  v.literal('onboarding_step'),
+  v.literal('onboarding_done'),
+  v.literal('screen_view'),
+  v.literal('email_click'),
+  v.literal('survey_shown'),
+  v.literal('reminder_sent'),
+)
+
+export const eventPropsValidator = v.record(v.string(), v.union(v.string(), v.number(), v.boolean()))
+
+/** Pilot survey answers by question id; `pilotSurveyQuestions.surveyAnswersError` checks each against its question. */
+export const pilotSurveyAnswersValidator = v.record(v.string(), v.union(v.number(), v.string(), v.array(v.string())))
 
 export const membershipRoleValidator = v.union(
   v.literal('student'),

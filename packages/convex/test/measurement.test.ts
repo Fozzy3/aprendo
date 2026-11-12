@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'bun:test'
 import { api } from '../src/_generated/api'
-import { bottomQuartileMean, day7Return, weeklySessions } from '../src/measurement'
+import { bottomQuartileMean, day7Return, dayReturn, pilotFunnel, weeklySessions } from '../src/measurement'
 import { colombiaWeekIndex, colombiaWeekStartMs } from '../src/colombiaTime'
 import { setupTest, signUp } from './signIn'
 
@@ -18,6 +18,52 @@ describe('day7Return', () => {
   test('a student whose first session is under 7 days old is not in the denominator', () => {
     const rows = [{ studentId: 'new', completedAt: NOW - 2 * DAY }]
     expect(day7Return(rows, NOW)).toEqual({ eligible: 0, returned: 0, rate: null })
+  })
+})
+
+describe('dayReturn', () => {
+  test('counts a student back exactly N days after their first session', () => {
+    const session = (studentId: string, daysAfter: number) => ({ studentId, completedAt: NOW - 5 * DAY + daysAfter * DAY })
+    expect(dayReturn([session('a', 0), session('a', 1), session('b', 0), session('b', 2)], NOW, 1))
+      .toEqual({ eligible: 2, returned: 1, rate: 0.5 })
+  })
+})
+
+describe('pilotFunnel', () => {
+  const at = (daysAgo: number) => NOW - daysAgo * DAY
+  const done = (studentId: string, kind: string, daysAgo: number) => ({ studentId, kind, completedAt: at(daysAgo) })
+
+  test('counts each step of the pilot, and only the students in it', () => {
+    const funnel = pilotFunnel({
+      students: [
+        { studentId: 'a', consentAt: at(9) },
+        { studentId: 'b', consentAt: at(9) },
+        { studentId: 'c' },
+      ],
+      onboardedIds: ['a', 'b', 'staff'],
+      completed: [
+        done('a', 'diagnostic', 9),
+        ...[8, 7, 6, 5, 4, 3, 2].map((daysAgo) => done('a', 'recommended', daysAgo)),
+        done('b', 'diagnostic', 9),
+        done('b', 'diagnostic', 9),
+        done('staff', 'recommended', 1),
+      ],
+      remindersSent: 4,
+      emailClicks: 1,
+    }, NOW)
+
+    expect(funnel.steps).toEqual([
+      { key: 'signedUp', count: 3 },
+      { key: 'consented', count: 2 },
+      { key: 'onboarded', count: 2 },
+      { key: 'diagnosed', count: 2 },
+      { key: 'practiced', count: 1 },
+      { key: 'active2Days', count: 1 },
+      { key: 'active7Days', count: 1 },
+    ])
+    expect(funnel.d1Return).toEqual({ eligible: 2, returned: 1, rate: 0.5 })
+    expect(funnel.d7Return).toEqual({ eligible: 2, returned: 1, rate: 0.5 })
+    expect(funnel.reminders).toEqual({ sent: 4, clicked: 1 })
   })
 })
 
@@ -84,6 +130,28 @@ describe('admin measurement', () => {
     expect(report.classes[0]!.bottomQuartile.recent).toBeGreaterThan(0)
   })
 
+  test('only a platform admin reads the pilot funnel, which leaves staff out', async () => {
+    const t = setupTest()
+    const { admin, student } = await seed(t)
+    await t.run(async (ctx) => {
+      await ctx.db.patch('students', student.studentId, { consentAt: Date.now() })
+      await ctx.db.insert('events', { studentId: student.studentId, name: 'onboarding_done', at: Date.now() })
+      await ctx.db.insert('events', { studentId: student.studentId, name: 'reminder_sent', at: Date.now() })
+      await ctx.db.insert('events', { studentId: student.studentId, name: 'email_click', at: Date.now() })
+      await ctx.db.insert('events', { studentId: admin.studentId, name: 'onboarding_done', at: Date.now() })
+    })
+    await expect(student.as.query(api.measurement.getPilotFunnel, {})).rejects.toThrow()
+    const funnel = await admin.as.query(api.measurement.getPilotFunnel, {})
+    expect(funnel.steps.slice(0, 5)).toEqual([
+      { key: 'signedUp', count: 1 },
+      { key: 'consented', count: 1 },
+      { key: 'onboarded', count: 1 },
+      { key: 'diagnosed', count: 0 },
+      { key: 'practiced', count: 1 },
+    ])
+    expect(funnel.reminders).toEqual({ sent: 1, clicked: 1 })
+  })
+
   test('the toggles are admin-only, per school and per class', async () => {
     const t = setupTest()
     const { admin, student, orgId, classGroupId } = await seed(t)
@@ -94,5 +162,14 @@ describe('admin measurement', () => {
     await admin.as.mutation(api.measurement.setClassLeagueOff, { classGroupId, off: true })
     const report = await admin.as.query(api.measurement.getEngagementMetrics, {})
     expect(report.classes[0]).toMatchObject({ schoolLeagueEnabled: true, classLeagueOff: true })
+  })
+
+  test('the schools list says whether each school has the league on, for the admin toggle', async () => {
+    const t = setupTest()
+    const { admin, orgId } = await seed(t)
+    const leagueOf = async () => (await admin.as.query(api.schools.listOrganizations, {})).find((row) => row._id === orgId)?.leagueEnabled
+    expect(await leagueOf()).toBe(false)
+    await admin.as.mutation(api.measurement.setSchoolLeague, { orgId, enabled: true })
+    expect(await leagueOf()).toBe(true)
   })
 })

@@ -1,9 +1,11 @@
 import { useConvexMutation } from '@convex-dev/react-query'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useAnimate, useReducedMotion } from 'motion/react'
 import { useState } from 'react'
 import { api } from '@aprendo/convex/api'
 import { AVATAR_PARTS } from '@aprendo/convex/rewards'
 import { readConvexError } from '../lib/convex-error.ts'
+import { motionTokens } from '../lib/motion-tokens.ts'
 import { AvatarPortrait } from './AvatarPortrait.tsx'
 import { NicknamePicker } from './NicknamePicker.tsx'
 
@@ -30,15 +32,23 @@ export function AvatarEditor({ studentId, avatar, nickname }: { studentId: strin
     mutationFn: (next: Avatar) => setAvatar({ studentId: studentId as never, avatar: next }),
     onSuccess: () => queryClient.invalidateQueries(),
   })
+  // The portrait pops when a part changes: the tap landed on the face, not only the chip.
+  const [preview, animatePreview] = useAnimate<HTMLDivElement>()
+  const reduceMotion = useReducedMotion()
   const choose = (part: Part, value: string) => {
     const next = { ...draft, [part]: value }
     setDraft(next)
     save.mutate(next)
+    if (!reduceMotion && preview.current != null) {
+      void animatePreview(preview.current, { transform: ['scale(0.92)', 'scale(1)'] }, {
+        type: 'spring', bounce: 0.3, duration: motionTokens().spring,
+      })
+    }
   }
 
   return (
     <div className="avatar-editor">
-      <div className="avatar-sticker avatar-editor-preview">
+      <div ref={preview} className="avatar-sticker avatar-editor-preview">
         <AvatarPortrait avatar={draft} title="Tu lámina" />
       </div>
       {(Object.keys(AVATAR_PARTS) as Part[]).map((part) => (

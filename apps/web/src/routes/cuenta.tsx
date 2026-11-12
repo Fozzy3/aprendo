@@ -1,4 +1,4 @@
-import { convexQuery } from '@convex-dev/react-query'
+import { convexQuery, useConvexMutation } from '@convex-dev/react-query'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { Link, createFileRoute } from '@tanstack/react-router'
 import { useState, type FormEvent } from 'react'
@@ -8,7 +8,7 @@ import { StaffShell } from '../components/StaffShell.tsx'
 import { StudentAppShell } from '../components/StudentAppShell.tsx'
 import { toast } from '../components/Toast.tsx'
 import { authClient } from '../lib/auth-client.ts'
-import { mySchoolsQuery, studentAppStateQuery } from '../lib/student-queries.ts'
+import { mySchoolsQuery, studentAppStateQuery, studentQuery } from '../lib/student-queries.ts'
 import type { ActiveStudentSession } from '../lib/student-session.ts'
 import { useSignOut } from '../lib/use-sign-out.ts'
 import { useSignedIn } from '../lib/use-signed-in.ts'
@@ -34,12 +34,15 @@ function AccountPage() {
   if (session == null) return <FullScreenLoader />
 
   const schools = schoolsQuery.data ?? []
+  const isStaff = appStateQuery.data?.isStaff === true || schools.some((school) => school.role !== 'student')
   const page = (
     <div className="page-sheet cuenta fade-in">
       <h1 className="page-title">Tu cuenta</h1>
       <p className="page-lede">{session.email}</p>
       <NameForm currentName={session.name} />
       <PasswordForm />
+      {isStaff ? null : <Reminders studentId={session.studentId} />}
+      {isStaff ? null : <PilotSurveySection studentId={session.studentId} />}
       <SchoolsSection schools={schools} />
       <ExportData studentId={session.studentId} />
       <SignOut />
@@ -47,7 +50,7 @@ function AccountPage() {
     </div>
   )
 
-  return appStateQuery.data?.isStaff === true || schools.some((school) => school.role !== 'student') ? (
+  return isStaff ? (
     <StaffShell>{page}</StaffShell>
   ) : (
     <StudentAppShell session={session} activeSection="progress">
@@ -162,6 +165,62 @@ function PasswordForm() {
           </button>
         </div>
       </form>
+    </section>
+  )
+}
+
+/** The toggle every reminder email points to (`reminders.ts`). */
+function Reminders({ studentId }: { studentId: ActiveStudentSession['studentId'] }) {
+  const studentData = useQuery(studentQuery(studentId)).data
+  const setReminders = useConvexMutation(api.students.setReminders)
+  // The click shows at once; a failed save puts the switch back.
+  const [chosen, setChosen] = useState<boolean | null>(null)
+  const on = chosen ?? studentData?.remindersOff !== true
+
+  const toggle = (next: boolean) => {
+    setChosen(next)
+    setReminders({ studentId, off: !next }).catch(() => {
+      setChosen(!next)
+      toast('No pudimos guardar el cambio. Intenta de nuevo.')
+    })
+  }
+
+  return (
+    <section className="ruled-section" aria-labelledby="cuenta-reminders-title">
+      <h2 id="cuenta-reminders-title" className="section-title">Recordatorios por correo</h2>
+      <p className="text-sm text-[var(--text-secondary)]">
+        Te escribimos cuando tu racha está por cortarse o si llevas unos días sin practicar.
+      </p>
+      <label className="welcome-switch">
+        <span>Recordatorios por correo</span>
+        <input
+          type="checkbox"
+          role="switch"
+          checked={on}
+          disabled={studentData == null}
+          onChange={(event) => toggle(event.target.checked)}
+        />
+      </label>
+    </section>
+  )
+}
+
+/** The pilot survey, also offered on Hoy (`/encuesta`); answered once. */
+function PilotSurveySection({ studentId }: { studentId: ActiveStudentSession['studentId'] }) {
+  const mine = useQuery(convexQuery(api.pilotSurvey.getMine, { studentId: studentId as never }))
+  return (
+    <section className="ruled-section" aria-labelledby="cuenta-survey-title">
+      <h2 id="cuenta-survey-title" className="section-title">Encuesta del piloto</h2>
+      {mine.data != null ? (
+        <p className="text-sm text-[var(--text-secondary)]">Ya la respondiste, gracias.</p>
+      ) : (
+        <>
+          <p className="text-sm text-[var(--text-secondary)]">
+            Quince preguntas sobre cómo te ha ido con Aprendo. Te toma unos 4 minutos.
+          </p>
+          {mine.isPending ? null : <Link to="/encuesta" className="btn-secondary no-underline">Responder la encuesta</Link>}
+        </>
+      )}
     </section>
   )
 }

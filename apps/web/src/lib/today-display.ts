@@ -39,6 +39,23 @@ export function taskTarget(task: { kind: string; action: StudyTaskAction }):
   return { type: 'launch', args: taskSessionArgs(action) }
 }
 
+/** How many questions the comeback starts with. */
+const COMEBACK_QUESTIONS = 5
+
+/**
+ * The soft start after three days away: five of the review when something is
+ * due, else five of the plan's first topic, else the recommended five. Never
+ * a lesson or a timed sitting: one tap and a short session.
+ */
+export function comebackLaunch(tasks: { action: StudyTaskAction }[]) {
+  const sessions = tasks.flatMap(({ action }) => (action.type === 'session' ? [action] : []))
+  const repaso = sessions.find((action) => action.kind === 'repaso')
+  if (repaso != null) return { kind: 'repaso' as const, questionLimit: COMEBACK_QUESTIONS }
+  const topic = sessions.find((action) => action.kind === 'topic')
+  if (topic != null) return { ...taskSessionArgs(topic), questionLimit: COMEBACK_QUESTIONS }
+  return { kind: 'recommended' as const }
+}
+
 /**
  * Hoy's areas: topics at Competente or above out of the area's topics (the
  * album counts them), with the ICFES level once there is evidence for one.

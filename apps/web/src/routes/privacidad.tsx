@@ -1,7 +1,7 @@
 import { Link, createFileRoute } from '@tanstack/react-router'
 import { LegalPage } from '../components/PublicPage.tsx'
 import { CONTACT_EMAIL } from '../lib/contact.ts'
-import { publicHead } from '../lib/site.ts'
+import { DATA_CONTROLLER, publicHead } from '../lib/site.ts'
 
 export const Route = createFileRoute('/privacidad')({
   head: () => publicHead({"title":"Política de tratamiento de datos | Aprendo","description":"Cómo trata Aprendo los datos de estudiantes, docentes y colegios, según la Ley 1581 de 2012.","path":"/privacidad"}),
@@ -15,12 +15,19 @@ export const Route = createFileRoute('/privacidad')({
  */
 function PrivacyPage() {
   return (
-    <LegalPage title="Política de tratamiento de datos personales" updated="8 de noviembre de 2026">
+    <LegalPage title="Política de tratamiento de datos personales" updated="11 de noviembre de 2026">
       <p>Aplica a quienes usan Aprendo: estudiantes, docentes y administradores de colegios.</p>
+
+      <h2>Quién responde por tus datos</h2>
+      <p>
+        El responsable del tratamiento es {DATA_CONTROLLER.legalName}, NIT {DATA_CONTROLLER.nit}, con domicilio
+        en {DATA_CONTROLLER.address}. Correo de contacto: {DATA_CONTROLLER.email}.
+      </p>
 
       <h2>Qué datos tratamos</h2>
       <ul>
         <li>Tu nombre y tu correo electrónico, para tu cuenta.</li>
+        <li>Si eres menor de edad o no, y cuándo aceptaste esta política. Te lo preguntamos al empezar.</li>
         <li>
           Lo que haces al estudiar: tus respuestas, el tiempo en cada pregunta, qué tan seguro dijiste estar,
           las preguntas que marcaste o tachaste y los reportes de preguntas con problemas.
@@ -39,6 +46,14 @@ function PrivacyPage() {
         Para prepararte para el Saber 11: medir tu nivel, recomendarte qué estudiar y, si tu colegio usa
         Aprendo, mostrarle a tus docentes tu nivel para que te acompañen. No vendemos tus datos ni los usamos
         para publicidad.
+      </p>
+
+      <h2>Correos y encuesta</h2>
+      <p>
+        Además de los correos para confirmar tu cuenta y cambiar tu contraseña, te enviamos recordatorios si tu
+        racha está por cortarse o si llevas unos días sin practicar. Puedes apagarlos en Tu cuenta. Durante el
+        piloto también te invitamos a una encuesta sobre cómo te va con Aprendo: es opcional y tus respuestas
+        solo sirven para mejorar la aplicación.
       </p>
 
       <h2>La liga del curso</h2>
@@ -61,7 +76,7 @@ function PrivacyPage() {
           OpenRouter y el proveedor del modelo de lenguaje, que reciben el texto de tus mensajes al tutor y de
           la pregunta que estás revisando, para responderte.
         </li>
-        <li>Resend, que envía los correos de confirmación y de cambio de contraseña.</li>
+        <li>Resend, que envía los correos de confirmación, de cambio de contraseña y los recordatorios.</li>
       </ul>
       <p>Algunos de estos servicios guardan la información fuera de Colombia.</p>
 
@@ -69,9 +84,9 @@ function PrivacyPage() {
       <p>
         La mayoría de estudiantes de grado 11 son menores de edad. Tratamos sus datos solo para su educación y
         respetando su interés superior. Su madre, padre o acudiente que sea su representante legal autoriza el
-        tratamiento; cuando el estudiante entra por su colegio, el colegio recoge esa autorización. Si eres
-        menor de edad y entras por tu cuenta, tu madre, padre o acudiente debe estar de acuerdo. Aprendo no
-        guarda datos de tu madre, padre o acudiente.
+        tratamiento; cuando el estudiante entra por su colegio, el colegio recoge esa autorización. Al empezar te
+        preguntamos tu edad: si eres menor de edad, confirmas que tu madre, padre o acudiente sabe que usas
+        Aprendo y lo autoriza. Aprendo no guarda datos de tu madre, padre o acudiente.
       </p>
 
       <h2>Tus derechos</h2>

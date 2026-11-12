@@ -27,7 +27,8 @@
     "./studyPlan": "./src/studyPlan.ts",
     "./studyTime": "./src/studyTime.ts",
     "./taxonomy": "./src/taxonomy.ts",
-    "./careers": "./src/careers.ts"
+    "./careers": "./src/careers.ts",
+    "./pilotSurveyQuestions": "./src/pilotSurveyQuestions.ts"
   },
   "dependencies": {
     "@ai-sdk/google": "^3.0.54",

@@ -8,6 +8,7 @@ import type { FunctionReturnType } from 'convex/server'
 import { api } from '@aprendo/convex/api'
 import { AuditQueue } from '../components/admin/AuditQueue.tsx'
 import { ReportsQueue } from '../components/admin/ReportsQueue.tsx'
+import { PilotPanel } from '../components/admin/PilotPanel.tsx'
 import { SchoolsAdmin } from '../components/admin/SchoolsAdmin.tsx'
 import { FullScreenLoader } from '../components/FullScreenLoader.tsx'
 import { MarkdownBlock } from '../components/MarkdownBlock.tsx'
@@ -16,7 +17,7 @@ import { readConvexError } from '../lib/convex-error.ts'
 import { pdfUploadsQuery, questionBrowserQuery } from '../lib/pdf-queries.ts'
 import { uploadPdfToConvex } from '../lib/pdf-upload.ts'
 
-type AdminTab = 'bank' | 'audit' | 'reports' | 'schools'
+type AdminTab = 'bank' | 'audit' | 'reports' | 'schools' | 'pilot'
 
 type AdminSearch = {
   tab?: AdminTab
@@ -25,12 +26,12 @@ type AdminSearch = {
   questionId?: string
 }
 
-const TAB_LABEL: Record<AdminTab, string> = { bank: 'Banco', audit: 'Auditoría', reports: 'Reportes', schools: 'Colegios' }
+const TAB_LABEL: Record<AdminTab, string> = { bank: 'Banco', audit: 'Auditoría', reports: 'Reportes', schools: 'Colegios', pilot: 'Piloto' }
 
 /** The tab a link asks for; the old PDFs and Preguntas links land on Banco. */
 function parseTab(tab: unknown): AdminTab | undefined {
   if (tab === 'uploads' || tab === 'questions' || tab === 'bank') return 'bank'
-  return tab === 'audit' || tab === 'reports' || tab === 'schools' ? tab : undefined
+  return tab === 'audit' || tab === 'reports' || tab === 'schools' || tab === 'pilot' ? tab : undefined
 }
 
 export const Route = createFileRoute('/admin')({
@@ -70,7 +71,7 @@ function AdminPage() {
   const { staff } = Route.useRouteContext()
   const navigate = useNavigate()
   const activeTab: AdminTab = staff.isAdmin ? (search.tab ?? 'bank') : 'audit'
-  const tabs: AdminTab[] = staff.isAdmin ? ['bank', 'audit', 'reports', 'schools'] : ['audit']
+  const tabs: AdminTab[] = staff.isAdmin ? ['bank', 'audit', 'reports', 'schools', 'pilot'] : ['audit']
 
   return (
     <StaffShell
@@ -97,6 +98,8 @@ function AdminPage() {
         />
       ) : activeTab === 'reports' ? (
         <ReportsQueue />
+      ) : activeTab === 'pilot' ? (
+        <PilotPanel />
       ) : (
         <SchoolsAdmin />
       )}

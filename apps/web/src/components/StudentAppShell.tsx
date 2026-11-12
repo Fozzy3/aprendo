@@ -1,10 +1,15 @@
-import { Link } from '@tanstack/react-router'
+import { Link, useLocation } from '@tanstack/react-router'
 import { BookOpen, House, Trophy, UserRound } from 'lucide-react'
+import { useEffect } from 'react'
 import { RoleSwitcher } from './RoleSwitcher.tsx'
 import { SchoolLabel } from './SchoolLabel.tsx'
 import { ThemeToggle } from './ThemeToggle.tsx'
 import type { ActiveStudentSession } from '../lib/student-session.ts'
 import { useSignOut } from '../lib/use-sign-out.ts'
+import { useTrack } from '../lib/use-track.ts'
+
+/** Each route mounts its own shell: module scope keeps a remount from counting the screen twice. */
+let lastTrackedPath: string | null = null
 
 type StudentSection = 'today' | 'path' | 'syllabus' | 'practice' | 'progress'
 
@@ -44,6 +49,16 @@ export function StudentAppShell({
 }) {
   const { signOut, isSigningOut } = useSignOut()
   const showTabs = !immersive && !hideTabs
+  const { pathname, searchStr } = useLocation()
+  const track = useTrack(session.studentId)
+
+  useEffect(() => {
+    if (lastTrackedPath === pathname) return
+    lastTrackedPath = pathname
+    const ref = new URLSearchParams(searchStr).get('ref')
+    track('screen_view', ref == null ? { path: pathname } : { path: pathname, ref })
+    if (ref === 'recordatorio') track('email_click', { path: pathname })
+  }, [pathname, searchStr, track])
 
   const isActive = (item: (typeof NAV_ITEMS)[number]) =>
     (item.sections as ReadonlyArray<StudentSection>).includes(activeSection)

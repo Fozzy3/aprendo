@@ -148,12 +148,22 @@ describe('/', () => {
     expect(text).toMatch(/no hacen parte de lo que un colegio paga/i)
   })
 
-  it('covers what the rector asked about', async () => {
+  it('speaks to the student first: free pilot, sign-up and sign-in', async () => {
+    await render('../routes/index.tsx')
+    expect(container.querySelector('h1')?.textContent).toMatch(/Saber 11/)
+    expect(container.textContent).toMatch(/gratis mientras dure el piloto/i)
+    expect(link('Empezar gratis')?.getAttribute('href')).toBe('/login')
+    expect(link('Ya tengo cuenta')?.getAttribute('href')).toBe('/login')
+  })
+
+  it('covers what students and schools ask about', async () => {
     await render('../routes/index.tsx')
     const text = container.textContent ?? ''
     expect(text).toContain('Qué mide')
+    expect(text).toContain('Para docentes y colegios')
     expect(text).toContain('Plan de la semana')
-    expect(text).toContain('Datos de menores de edad')
+    expect(text).toContain('Tus datos')
+    expect(text).toMatch(/menor de edad/)
     expect(text).toContain('De dónde salen las preguntas')
   })
 
@@ -250,5 +260,26 @@ describe('legal pages', () => {
     for (const term of ['liga', 'apodo', 'avatar', 'acudiente', 'Descargar mis datos', 'Eliminar mi cuenta']) {
       expect(text).toContain(term)
     }
+  })
+
+  it('/privacidad names the data controller and covers reminders, the survey and the age question', async () => {
+    const { DATA_CONTROLLER } = await import('../lib/site.ts')
+    await render('../routes/privacidad.tsx')
+    const text = container.textContent ?? ''
+    for (const term of [DATA_CONTROLLER.legalName, DATA_CONTROLLER.nit, DATA_CONTROLLER.address, DATA_CONTROLLER.email]) {
+      expect(text).toContain(term)
+    }
+    for (const term of ['recordatorio', 'encuesta', 'edad']) {
+      expect(text).toContain(term)
+    }
+  })
+
+  it('/terminos names the data controller and declares the pilot free and non-commercial', async () => {
+    const { DATA_CONTROLLER } = await import('../lib/site.ts')
+    await render('../routes/terminos.tsx')
+    const text = container.textContent ?? ''
+    expect(text).toContain(DATA_CONTROLLER.legalName)
+    expect(text).toContain('gratuito')
+    expect(text).toContain('sin fines comerciales')
   })
 })

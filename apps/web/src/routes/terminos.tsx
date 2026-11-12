@@ -1,6 +1,6 @@
 import { Link, createFileRoute } from '@tanstack/react-router'
 import { LegalPage } from '../components/PublicPage.tsx'
-import { publicHead } from '../lib/site.ts'
+import { DATA_CONTROLLER, publicHead } from '../lib/site.ts'
 
 export const Route = createFileRoute('/terminos')({
   head: () => publicHead({"title":"Términos de uso | Aprendo","description":"Términos de uso de Aprendo, la plataforma de preparación para el Saber 11 para colegios de Colombia.","path":"/terminos"}),
@@ -10,12 +10,24 @@ export const Route = createFileRoute('/terminos')({
 /** Términos de uso, in plain Spanish and limited to what the product does. */
 function TermsPage() {
   return (
-    <LegalPage title="Términos de uso" updated="8 de noviembre de 2026">
+    <LegalPage title="Términos de uso" updated="11 de noviembre de 2026">
       <h2>Qué es Aprendo</h2>
       <p>
         Una herramienta de preparación para el examen Saber 11. Los niveles y puntajes que muestra son
         estimaciones hechas con tus respuestas en Aprendo: no son resultados oficiales y no garantizan un
         puntaje en el examen. Aprendo no está afiliado al ICFES.
+      </p>
+
+      <h2>Quién ofrece Aprendo</h2>
+      <p>
+        {DATA_CONTROLLER.legalName}, NIT {DATA_CONTROLLER.nit}, con domicilio en {DATA_CONTROLLER.address}.
+        Correo de contacto: {DATA_CONTROLLER.email}.
+      </p>
+
+      <h2>El piloto</h2>
+      <p>
+        Mientras dure el piloto, Aprendo es gratuito y sin fines comerciales: no cobramos ni vendemos acceso.
+        Las preguntas de los cuadernillos del ICFES se muestran con su fuente y solo para que estudies.
       </p>
 
       <h2>Las preguntas</h2>
@@ -34,8 +46,8 @@ function TermsPage() {
 
       <h2>El tutor</h2>
       <p>
-        El tutor de inteligencia artificial está disponible al practicar y al revisar, nunca durante una
-        nivelación o un simulacro. Tiene un límite diario de mensajes.
+        El tutor de inteligencia artificial está disponible al practicar y al revisar, nunca durante el
+        diagnóstico o un simulacro. Tiene un límite diario de mensajes.
       </p>
 
       <h2>Colegios</h2>

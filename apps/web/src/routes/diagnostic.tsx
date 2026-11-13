@@ -9,7 +9,7 @@ import { StudentAppShell } from '../components/StudentAppShell.tsx'
 import { TimedSessionIntro } from '../components/TimedSessionIntro.tsx'
 import { Welcome } from '../components/Welcome.tsx'
 import { findResumableSession } from '../lib/resume-session.ts'
-import { safeNext } from '../lib/safe-next.ts'
+import { welcomeReturn } from '../lib/safe-next.ts'
 import { sessionHistoryQuery, studentAppStateQuery, studentQuery } from '../lib/student-queries.ts'
 import { useCurrentStudent } from '../lib/student-session.ts'
 import { getAllSubjectThemes } from '../lib/subject-theme.ts'
@@ -99,7 +99,7 @@ function PlacementPage() {
             student={student}
             short={hasAnyPlacement}
             onDone={async () => {
-              if (hasAnyPlacement) router.history.push(safeNext(volver ?? '/today'))
+              if (hasAnyPlacement) router.history.push(welcomeReturn(volver))
               else setSessionId(await createSession({ studentId: session.studentId, kind: 'diagnostic' }))
             }}
           />

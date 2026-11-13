@@ -8,3 +8,13 @@ export function safeNext(value: unknown): string {
   }
   return value
 }
+
+/**
+ * Where a placed student goes after the short welcome: back where they were,
+ * Hoy by default, and never the diagnostic they are already on (the guard can
+ * record `/diagnostic` as the origin while the route is still changing).
+ */
+export function welcomeReturn(volver: unknown): string {
+  if (typeof volver !== 'string' || volver.startsWith('/diagnostic')) return '/today'
+  return safeNext(volver)
+}

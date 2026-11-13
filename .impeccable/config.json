@@ -29,6 +29,51 @@
         ],
         "createdAt": "2026-11-09T04:27:54.437Z",
         "reason": "unchosen decision sketch: owner picked Álbum on 2026-11-08; this file never ships"
+      },
+      {
+        "rule": "cream-palette",
+        "value": "*",
+        "files": [
+          "plans/reports/*.html"
+        ],
+        "createdAt": "2026-11-13T13:52:22.855Z",
+        "reason": "Paper #f6f4f1 is the owner-chosen palette A (Tinta con rojo de acento, 2026-11-11)"
+      },
+      {
+        "rule": "undersized-ui-text",
+        "value": "*",
+        "files": [
+          "plans/reports/presentacion-aprendo.html"
+        ],
+        "createdAt": "2026-11-13T13:52:22.877Z",
+        "reason": "Slide text scales with viewport; smallest ~13.6px at 1600px"
+      },
+      {
+        "rule": "oversized-h1",
+        "value": "*",
+        "files": [
+          "plans/reports/presentacion-aprendo.html"
+        ],
+        "createdAt": "2026-11-13T14:05:15.369Z",
+        "reason": "Slide deck: projected display headline; .next/.mini-next and the phone/panel mocks reproduce the real app's Hoy next-step card (student.css inset 4px stripe)"
+      },
+      {
+        "rule": "side-tab",
+        "value": "*",
+        "files": [
+          "plans/reports/presentacion-aprendo.html"
+        ],
+        "createdAt": "2026-11-13T14:05:15.376Z",
+        "reason": "Slide deck: projected display headline; .next/.mini-next and the phone/panel mocks reproduce the real app's Hoy next-step card (student.css inset 4px stripe)"
+      },
+      {
+        "rule": "nested-cards",
+        "value": "*",
+        "files": [
+          "plans/reports/presentacion-aprendo.html"
+        ],
+        "createdAt": "2026-11-13T14:05:15.384Z",
+        "reason": "Slide deck: projected display headline; .next/.mini-next and the phone/panel mocks reproduce the real app's Hoy next-step card (student.css inset 4px stripe)"
       }
     ]
   }

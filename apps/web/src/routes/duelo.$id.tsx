@@ -1,7 +1,7 @@
 import { convexQuery, useConvexMutation } from '@convex-dev/react-query'
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { Link, createFileRoute } from '@tanstack/react-router'
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import type { FunctionReturnType } from 'convex/server'
 import { api } from '@aprendo/convex/api'
 import { FullScreenLoader } from '../components/FullScreenLoader.tsx'
@@ -30,6 +30,14 @@ function DuelPlayer({ duelId, studentId }: { duelId: string; studentId: string }
   const view = useQuery(convexQuery(api.duels.getDuelPlayerView, ids))
   const join = useMutation({ mutationFn: useConvexMutation(api.duels.joinDuel) })
   const msLeft = useMsLeft(view.data?.endsAt)
+  // Tapping the banner is the whole way in: a live duel joins on arrival.
+  const shouldJoin = view.data != null && view.data.teamIndex == null && view.data.status !== 'finished' && msLeft !== 0
+  const joinRequested = useRef(false)
+  useEffect(() => {
+    if (!shouldJoin || joinRequested.current) return
+    joinRequested.current = true
+    join.mutate(ids)
+  }, [shouldJoin])
 
   if (view.isPending) return <FullScreenLoader />
   if (view.isError || view.data == null) {
@@ -51,7 +59,7 @@ function DuelPlayer({ duelId, studentId }: { duelId: string; studentId: string }
     <main className="duel-page">
       <header className="duel-top">
         {data.teams.map((team, index) => (
-          <div key={team.name} className={`duel-top-team${index === data.teamIndex ? ' is-mine' : ''}`}>
+          <div key={team.name} className={`duel-top-team${index === data.teamIndex && data.status === 'playing' ? ' is-mine' : ''}`}>
             <span className="duel-top-name">{team.name}</span>
             <span className="duel-top-score">{team.score}</span>
           </div>
@@ -65,27 +73,25 @@ function DuelPlayer({ duelId, studentId }: { duelId: string; studentId: string }
             <Link to="/today" className="btn-primary no-underline">Volver a Hoy</Link>
           </>
         ) : data.teamIndex == null ? (
-          <>
-            <h1 className="duel-title">Duelo en vivo</h1>
-            <button
-              type="button"
-              className="btn-primary"
-              disabled={join.isPending}
-              onClick={() => join.mutate(ids)}
-            >
-              Entrar al duelo
-            </button>
-            {join.error != null ? (
-              <p role="alert" className="notice is-danger">{readConvexError(join.error, 'No pudiste entrar. Inténtalo otra vez.')}</p>
-            ) : null}
-          </>
+          join.error == null ? (
+            <h1 className="duel-title">Entrando al duelo…</h1>
+          ) : (
+            <>
+              <h1 className="duel-title">No pudiste entrar</h1>
+              <p role="alert" className="notice is-danger">{readConvexError(join.error, 'Inténtalo otra vez.')}</p>
+              <button type="button" className="btn-primary" disabled={join.isPending} onClick={() => join.mutate(ids)}>
+                Entrar al duelo
+              </button>
+            </>
+          )
         ) : data.question != null ? (
           <DuelQuestion key={data.question.index} ids={ids} question={data.question} answered={data.answered} msLeft={msLeft} />
         ) : (
-          <>
-            <h1 className="duel-title">Estás en {data.teams[data.teamIndex]!.name}</h1>
-            <p>Tu profe empieza en un momento.</p>
-          </>
+          // Teams are drafted when the game starts, so the lobby names none.
+          <div className="duel-joined">
+            <h1 className="duel-joined-title">¡Estás dentro!</h1>
+            <p className="duel-joined-wait">Tu profe empieza en un momento.</p>
+          </div>
         )}
       </div>
     </main>

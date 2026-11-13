@@ -186,6 +186,22 @@ describe('duel', () => {
     expect(await t.run((ctx) => ctx.db.query('duelAnswers').collect())).toEqual([])
   })
 
+  test('with fewer than two students, the error hands the teacher the class code', async () => {
+    const { t, profe, rector, orgId, inviteCode } = await classWithDuelBank()
+    const classGroupId = await rector.as.mutation(api.schools.createClassGroup, { orgId, name: '11B', grade: '11' })
+    await rector.as.mutation(api.schools.assignTeacher, { classGroupId, accountId: profe.studentId })
+    const code = await t.run(async (ctx) => (await ctx.db.get('classGroups', classGroupId))!.inviteCode)
+    expect(code).not.toBe(inviteCode)
+    await expect(profe.as.mutation(api.duels.openDuel, { classGroupId })).rejects.toThrow(code)
+  })
+
+  test('the lobby on the projector names the class and shows its code', async () => {
+    const { profe, classGroupId, inviteCode } = await classWithDuelBank()
+    const duelId = await profe.as.mutation(api.duels.openDuel, { classGroupId })
+    const view = await profe.as.query(api.duels.getDuelHostView, { duelId })
+    expect(view).toMatchObject({ status: 'lobby', classGroupName: '11A', inviteCode })
+  })
+
   test('a paying school draws only original questions (G1)', async () => {
     const { profe, classGroupId } = await classWithDuelBank('school', 'icfes')
     await expect(profe.as.mutation(api.duels.openDuel, { classGroupId })).rejects.toThrow(/preguntas/)

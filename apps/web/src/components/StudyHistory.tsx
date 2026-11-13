@@ -216,7 +216,6 @@ function HistoryRow({ session }: { session: HistorySession }) {
         </span>
         <span className="ruled-row-note">
           {formatDateTime(session.startedAt)}
-          {isCompleted && summary != null && ` · ${formatDuration(summary.durationMs)}`}
         </span>
       </span>
       {isCompleted && summary != null ? (
@@ -246,11 +245,4 @@ function formatDateTime(timestamp: number): string {
     hour: '2-digit',
     minute: '2-digit',
   })
-}
-
-function formatDuration(durationMs: number): string {
-  const minutes = Math.round(durationMs / 60_000)
-  if (minutes < 60) return `${minutes} min`
-  const hours = Math.floor(minutes / 60)
-  return `${hours} h ${minutes % 60} min`
 }

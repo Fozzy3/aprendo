@@ -171,7 +171,7 @@ components:
 
 # Aprendo — DESIGN.md
 
-> Two systems coexist, chosen per route by `lib/student-look.ts`, which sets `data-look` on `<html>`. Student screens (Hoy, Aprende, Retos, Yo, lessons, practice, placement, duel, `/join`, `/cuenta`) use **Plan de estudio**, the second half of this file; it replaced Álbum on 2026-11-10. Teacher, school, staff, public and print use **Cuaderno cuadriculado**, the first half. Passages in the notebook half that mention students (solve and review, button sizes) predate the student look; on a student's screen, Plan de estudio governs.
+> Two systems coexist, chosen per route by `lib/student-look.ts`, which sets `data-look` on `<html>`. Student screens (Hoy, Aprende, Retos, Yo, lessons, practice, placement, duel, `/join`, `/cuenta`), sign-in (`/login`, `/reset-password`) and the teacher's panel (`/teacher/*` except the printable guide and the projector) use **Plan de estudio**, the second half of this file; it replaced Álbum on 2026-11-10 and reached sign-in and teachers on 2026-11-13. School admin, staff, public pages, the printable guide and print use **Cuaderno cuadriculado**, the first half. Passages in the notebook half that mention students (solve and review, button sizes) predate the student look; on a student's screen, Plan de estudio governs.
 
 # Cuaderno cuadriculado: teacher, school, staff, public and print
 
@@ -490,9 +490,16 @@ A white card: the score as a Title, the topics that moved (each with its Mastery
 - **Don't** show a numbered slot, sticker or tile without a name; progress is written in words.
 - **Don't** make decoration look interactive: status facts on Hoy are plain icon and text, never pills or buttons.
 - **Don't** add a second red control to a screen, or tilts, 3D press edges or resting shadows.
-- **Don't** bring the notebook's ruling or red margin to student screens, or this look to teacher, school, staff, public or printed screens.
+- **Don't** bring the notebook's ruling or red margin to student screens, or this look to school, staff, public or printed screens.
 - **Don't** add a label line above a heading; the heading speaks.
 - **Don't** hardcode the red, the ink or the area colours where a token exists.
+
+## Sign-in and the teacher's panel (2026-11-13)
+
+The owner liked the student look and asked for sign-in and the teacher's screens to match. `lib/student-look.ts` lists them; `student.css` holds the rest, screen only.
+- **Sign-in** (`AuthFrame`): an ink cover with the wordmark, "Un paso cada día." and the week strip (three red done days pop in once, 70ms apart; today ringed), the form on a white card. Phone: the cover is a band and the card overlaps its edge. From 900px: the cover is the left 42%, the card centred beside it. Links are ink; the one red is the submit.
+- **Teacher shell** (`StaffShell`): the student's ink rail from 1024px (Cursos and Colegio with icons, the open course's name and its three tabs under Cursos with a red dot on the open one, the account at the foot). Below 1024px the ink top bar; on a phone the brand and the account on one row, the sections on the next.
+- **Teacher pages**: the notebook markup reads as white cards on the desk inside `.staff-main` (sections are cards, lists run edge to edge, tables sit in their card). The course facts and code are a card beside the page from 1024px, under the title below it. The course tabs below 1024px are pills on a track, the open one in ink. Levels 1-4: correction red, then three steps to ink. Focus on inputs is ink.
 
 ## Onboarding (2026-11-11)
 
@@ -501,3 +508,7 @@ Placement is one general diagnostic (20 questions, 4 per area, 40 min), not one 
 ## Pilot survey (2026-11-11)
 
 `/encuesta` (`PilotSurvey.tsx`) is the welcome card again: the same red bar, step slide and footer, one question per screen. Scales 1–5 and 0–10 are a row of option cells (0–10 wraps six and five on the phone, one row from 640px) with the two ends named under them; choices reuse the welcome options. The six scales are required, the rest show "Saltar" as the secondary button. The end screen pops a rose check once. Hoy offers it as a plan row after three completed sessions; Cuenta has its section.
+
+## Live duel (2026-11-13)
+
+Three steps, no hunting. **Teacher:** a red "Duelo en vivo" button (`DuelLaunchButton`) at the top of the course page and on every course card; one click opens the projector. **Projector** (`/teacher/duelo/$id`, `.duel-stage`): its own light tokens whatever the look or theme, because dark washes out in a lit room; Figtree, sizes in `vw`/`vh` so 720p and 1080p both fit one screen. The lobby is "Duelo en vivo", three numbered steps (Abre Aprendo, Hoy, Entrar), the app's QR (`public/qr-aprendo.svg`, a fixed address) with the class code, one white card per team with its count and a dot per student, and the red "Empezar" once two are in. A student who joins pops in as a red dot that settles to ink, and the count rises in with a blur (the one delight here; reduced motion keeps only the colour and opacity). The game is the scores on an ink band and the question on a white sheet. **Student:** the red banner (`ActiveDuelBanner`, the one red surface allowed, because it is the action) on Hoy and at the top of Retos, with a breathing ring on its icon; tapping it joins.

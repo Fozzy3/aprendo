@@ -740,6 +740,8 @@ describe('/progress, Yo', () => {
     await render('../routes/progress.tsx')
     expect(container.querySelector('[aria-labelledby="history-days-title"]')).not.toBeNull()
     expect(container.querySelector('[aria-labelledby="history-sessions-title"]')?.textContent).toContain('3 de 5')
+    // Wall-clock duration lies for a session left open for weeks ("1458 h"): not shown.
+    expect(container.querySelector('[aria-labelledby="history-sessions-title"]')?.textContent).not.toContain('1 min')
   })
 
   it('holds the career, the exam date, the theme, the account and sign out', async () => {
@@ -788,6 +790,15 @@ describe('/practice, Retos', () => {
   }
   const tiles = () => [...container.querySelectorAll<HTMLButtonElement>('.reto-tile')]
   const tile = (name: string) => tiles().find((element) => element.textContent?.includes(name))!
+
+  it('puts a live class duel first, right under the title, one tap from the game', async () => {
+    seedRetos()
+    state.queries['duels:getActiveDuel'] = { isPending: false, data: { duelId: 'd1', status: 'lobby', classGroupName: '11A' } }
+    await render('../routes/practice.tsx')
+    const banner = container.querySelector('.retos > h1 + a.duel-banner')
+    expect(banner?.getAttribute('href')).toBe('/duelo/$id')
+    expect(banner?.textContent).toContain('Duelo en vivo')
+  })
 
   it('launches Repaso, Reto and Simulacro, and nothing else', async () => {
     seedRetos()

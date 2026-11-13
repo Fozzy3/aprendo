@@ -95,7 +95,9 @@ export const openDuel = mutation({
     if (latest != null && isDuelLive(latest, now)) return latest._id
 
     const students = await listClassStudents(ctx, args.classGroupId)
-    if (students.length < MIN_PLAYERS) throw new ConvexError('Hacen falta al menos dos estudiantes en el curso.')
+    if (students.length < MIN_PLAYERS) {
+      throw new ConvexError(`Hacen falta al menos dos estudiantes en el curso. Compárteles el código ${classGroup.inviteCode}.`)
+    }
     const questionIds = await selectDuelQuestions(ctx, classGroup.orgId, students, now)
     if (questionIds.length === 0) throw new ConvexError('Todavía no hay preguntas disponibles para un duelo en este colegio.')
 
@@ -306,11 +308,15 @@ export const getDuelHostView = query({
   args: { duelId: v.id('classDuels') },
   handler: async (ctx, args) => {
     const duel = await requireHost(ctx, args.duelId)
+    const classGroup = await ctx.db.get('classGroups', duel.classGroupId)
     const status = statusAt(duel, Date.now())
     const previous = duel.currentIndex > 0 ? await ctx.db.get('questions', duel.questionIds[duel.currentIndex - 1]!) : null
     return {
       status,
       classGroupId: duel.classGroupId,
+      // For a student who is not in the class yet: the lobby shows the code.
+      classGroupName: classGroup?.name ?? '',
+      inviteCode: classGroup?.inviteCode ?? '',
       endsAt: duel.createdAt + DUEL_MS,
       teams: await teamBoard(ctx, duel),
       question: status === 'playing' ? await publicQuestion(ctx, duel) : null,

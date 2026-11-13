@@ -101,7 +101,7 @@ export function StudyTimeCard({ studentId, studyTime }: { studentId: string; stu
       ) : null}
 
       <p className="m-0 tabular-nums">
-        <span className="figure">{formatMinutes(minutesThisWeek)}</span>
+        <span className="figure">{formatMinutes(minutesThisWeek)}</span>{' '}
         <span className="ml-1.5 text-sm text-[var(--text-secondary)]">
           de {formatMinutes(goalMinutes)} esta semana
         </span>

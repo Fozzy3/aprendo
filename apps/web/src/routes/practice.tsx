@@ -14,6 +14,7 @@ import {
   type FeedbackMode,
   type SessionKind,
 } from '@aprendo/convex/sessionKinds'
+import { ActiveDuelBanner } from '../components/ActiveDuelBanner.tsx'
 import { StudentAppShell } from '../components/StudentAppShell.tsx'
 import { TimedSessionIntro } from '../components/TimedSessionIntro.tsx'
 import { PracticeBuilder } from '../components/PracticeBuilder.tsx'
@@ -174,6 +175,7 @@ function PracticeHubPage() {
     <StudentAppShell session={guard.session} activeSection="practice">
       <div className="retos fade-in">
         <h1 className="page-title">Retos</h1>
+        <ActiveDuelBanner studentId={guard.session.studentId} />
 
         {(pendingSecondSitting != null && sittingTwo != null) || inProgress.length > 0 ? (
           <section className="ruled-section" aria-labelledby="hub-resume-title">

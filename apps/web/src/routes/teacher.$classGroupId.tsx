@@ -1,7 +1,6 @@
 import { convexQuery } from '@convex-dev/react-query'
-import { useConvexMutation } from '@convex-dev/react-query'
-import { useMutation, useQuery } from '@tanstack/react-query'
-import { Link, createFileRoute, useNavigate } from '@tanstack/react-router'
+import { useQuery } from '@tanstack/react-query'
+import { Link, createFileRoute } from '@tanstack/react-router'
 import { ArrowLeft, Copy, Printer } from 'lucide-react'
 import { useState, type CSSProperties } from 'react'
 import type { FunctionReturnType } from 'convex/server'
@@ -12,6 +11,7 @@ import { ClassAssignments, ClassWeekPlan } from '../components/ClassWeekPlan.tsx
 import { ClassCycle } from '../components/ClassCycle.tsx'
 import { ClassRounds } from '../components/ClassRounds.tsx'
 import { ClassWeakSpots } from '../components/ClassWeakSpots.tsx'
+import { DuelLaunchButton } from '../components/DuelLaunchButton.tsx'
 import { EmptyState } from '../components/EmptyState.tsx'
 import { FullScreenLoader, PageLoader } from '../components/FullScreenLoader.tsx'
 import { StaffShell } from '../components/StaffShell.tsx'
@@ -58,7 +58,15 @@ function ClassOverviewPage() {
   const now = Date.now()
 
   return (
-    <StaffShell active="classes">
+    <StaffShell
+      active="classes"
+      courseNav={overview != null && overview.students.length > 0 ? (
+        <div className="staff-course" role="group" aria-label={`Curso ${overview.classGroup.name}`}>
+          <span className="staff-course-name">{overview.classGroup.name}</span>
+          <ClassTabLinks classGroupId={classGroupId} tab={tab} itemClassName="staff-course-tab" />
+        </div>
+      ) : undefined}
+    >
       <div className="report-actions">
         <Link to="/teacher" className="back-link no-underline">
           <ArrowLeft size={14} aria-hidden /> Tus cursos
@@ -100,6 +108,7 @@ function ClassOverviewPage() {
                   La licencia del colegio venció: nadie puede unirse.
                 </p>
               ) : null}
+              {overview.canWrite ? <DuelLaunchButton classGroupId={classGroupId} /> : null}
             </header>
 
             {overview.students.length === 0 ? (
@@ -108,27 +117,15 @@ function ClassOverviewPage() {
               </EmptyState>
             ) : (
               <>
-                <nav className="tab-nav mb-6" aria-label="Secciones del curso">
-                  {CLASS_TABS.map(({ id, label }) => (
-                    <Link
-                      key={id}
-                      to="/teacher/$classGroupId"
-                      params={{ classGroupId }}
-                      search={id === 'semana' ? {} : { tab: id }}
-                      className={`tab-item${id === tab ? ' is-active' : ''}`}
-                      aria-current={id === tab ? 'page' : undefined}
-                    >
-                      {label}
-                    </Link>
-                  ))}
+                {/* On a computer the rail carries these (CSS hides this copy there). */}
+                <nav className="tab-nav class-tabs mb-6" aria-label="Secciones del curso">
+                  <ClassTabLinks classGroupId={classGroupId} tab={tab} itemClassName="tab-item" />
                 </nav>
 
                 {tab === 'semana' ? (
                   <>
                     <WeekActions
-                      classGroupId={classGroupId}
                       className={overview.classGroup.name}
-                      canWrite={overview.canWrite}
                       topics={(planQuery.data?.wholeClass ?? []).map((item) => getSubtopicLabel(item.subtopicId))}
                     />
                     {planQuery.data != null ? (
@@ -175,6 +172,22 @@ function ClassOverviewPage() {
 
 type Overview = FunctionReturnType<typeof api.teacher.getClassOverview>
 
+/** The three tabs, in the page and on the rail. */
+function ClassTabLinks({ classGroupId, tab, itemClassName }: { classGroupId: string; tab: ClassTab; itemClassName: string }) {
+  return CLASS_TABS.map(({ id, label }) => (
+    <Link
+      key={id}
+      to="/teacher/$classGroupId"
+      params={{ classGroupId }}
+      search={id === 'semana' ? {} : { tab: id }}
+      className={`${itemClassName}${id === tab ? ' is-active' : ''}`}
+      aria-current={id === tab ? 'page' : undefined}
+    >
+      {label}
+    </Link>
+  ))
+}
+
 function InviteCode({ code }: { code: string }) {
   const [copied, setCopied] = useState(false)
   const link = typeof window === 'undefined' ? '' : `${window.location.origin}/join?codigo=${code}`
@@ -196,37 +209,12 @@ function InviteCode({ code }: { code: string }) {
   )
 }
 
-/** Two things for the class this week that are not about one topic: the game and the note home. */
-function WeekActions({
-  classGroupId,
-  className,
-  canWrite,
-  topics,
-}: {
-  classGroupId: string
-  className: string
-  canWrite: boolean
-  topics: string[]
-}) {
-  const navigate = useNavigate()
-  const openDuel = useMutation({
-    mutationFn: useConvexMutation(api.duels.openDuel),
-    onSuccess: (duelId: string) => navigate({ to: '/teacher/duelo/$id', params: { id: duelId } }),
-  })
+/** The note home for the week; the duel moved to the top of the page. */
+function WeekActions({ className, topics }: { className: string; topics: string[] }) {
   const [copyState, setCopyState] = useState<'idle' | 'copied' | 'failed'>('idle')
 
   return (
     <div className="mb-2 flex flex-wrap items-center gap-2">
-      {canWrite ? (
-        <button
-          type="button"
-          className="btn-primary btn-sm"
-          disabled={openDuel.isPending}
-          onClick={() => openDuel.mutate({ classGroupId: classGroupId as never })}
-        >
-          {openDuel.isPending ? 'Abriendo…' : 'Iniciar duelo'}
-        </button>
-      ) : null}
       <button
         type="button"
         className="btn-secondary btn-sm"
@@ -239,9 +227,6 @@ function WeekActions({
       >
         {copyState === 'copied' ? 'Mensaje copiado' : copyState === 'failed' ? 'No se pudo copiar' : 'Copiar mensaje a familias'}
       </button>
-      {openDuel.error != null ? (
-        <p role="alert" className="notice is-danger w-full">{readConvexError(openDuel.error, 'No se pudo abrir el duelo.')}</p>
-      ) : null}
     </div>
   )
 }

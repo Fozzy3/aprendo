@@ -21,7 +21,7 @@ vi.mock('../components/ConfirmDialog.tsx', () => ({ confirmDialog: state.confirm
 
 vi.mock('lucide-react', () => {
   const Icon = () => null
-  return { ArrowLeft: Icon, ArrowRight: Icon, BookOpen: Icon, Copy: Icon, House: Icon, Printer: Icon, RefreshCw: Icon, Trash2: Icon, Trophy: Icon, UserRound: Icon }
+  return { ArrowLeft: Icon, ArrowRight: Icon, BookOpen: Icon, Copy: Icon, House: Icon, Printer: Icon, RefreshCw: Icon, School: Icon, Swords: Icon, Trash2: Icon, Trophy: Icon, UserRound: Icon, Users: Icon }
 })
 
 vi.mock('@tanstack/react-router', () => ({
@@ -293,7 +293,7 @@ describe('/teacher/$classGroupId', () => {
     await render('../routes/teacher.$classGroupId.tsx')
     expect(container.textContent).toContain('Esta semana con todo el curso')
     expect(container.textContent).not.toContain('Asignar práctica al curso')
-    expect(container.textContent).not.toContain('Iniciar duelo')
+    expect(container.textContent).not.toContain('Duelo en vivo')
     expect(container.textContent).toContain('Guía de clase')
   })
 
@@ -305,7 +305,7 @@ describe('/teacher/$classGroupId', () => {
     state.queries['teacher:getClassTeachingPlan'] = { isPending: false, data: weekPlan }
     await render('../routes/teacher.$classGroupId.tsx')
     expect(container.textContent).toContain('Asignar práctica al curso')
-    expect(container.textContent).toContain('Iniciar duelo')
+    expect(container.textContent).toContain('Duelo en vivo')
     await act(async () => button('Copiar mensaje a familias').click())
     expect(writeText.mock.calls[0]![0]).toContain('11B')
     expect(writeText.mock.calls[0]![0]).not.toContain('Luis')

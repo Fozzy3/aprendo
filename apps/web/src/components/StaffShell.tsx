@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { Link } from '@tanstack/react-router'
+import { School, Users } from 'lucide-react'
 import { Wordmark } from './BrandMark.tsx'
 import { RoleSwitcher, type AccountRole } from './RoleSwitcher.tsx'
 import { ThemeToggle } from './ThemeToggle.tsx'
@@ -9,12 +10,14 @@ import { useSignOut } from '../lib/use-sign-out.ts'
 /**
  * The frame for teachers and school admins: desktop first, the wordmark and the
  * school, and two sections (Cursos for everyone on staff, Colegio for the
- * school admin).
+ * school admin). On teacher screens (student look) it becomes the ink rail on
+ * a computer, with the open course's tabs under Cursos.
  */
 export function StaffShell({
   active,
   role = 'teacher',
   nav,
+  courseNav,
   home = '/teacher',
   children,
 }: {
@@ -24,6 +27,8 @@ export function StaffShell({
   role?: AccountRole
   /** A side with its own sections (/admin) replaces the teacher's. */
   nav?: React.ReactNode
+  /** The open course and its tabs, under Cursos on the rail (CSS shows it from 1024px). */
+  courseNav?: React.ReactNode
   home?: '/teacher' | '/admin'
   children: React.ReactNode
 }) {
@@ -32,6 +37,8 @@ export function StaffShell({
   const administers = schools.some((school) => school.role === 'org_admin')
   const schoolNames = [...new Set(schools.filter((school) => school.role !== 'student').map((school) => school.name))]
   const { signOut, isSigningOut } = useSignOut()
+  // On a course the rail marks the tab, not the section above it.
+  const classesCurrent = active === 'classes' && courseNav == null
 
   return (
     <div className="staff-shell">
@@ -52,17 +59,20 @@ export function StaffShell({
           <nav className="student-topnav" aria-label={home === '/admin' ? 'Equipo Aprendo' : 'Panel docente'}>
             {nav ?? <Link
               to="/teacher"
-              className={`student-topnav-item${active === 'classes' ? ' is-active' : ''}`}
-              aria-current={active === 'classes' ? 'page' : undefined}
+              className={`student-topnav-item${active === 'classes' ? ' is-active' : ''}${courseNav != null ? ' has-course' : ''}`}
+              aria-current={classesCurrent ? 'page' : undefined}
             >
+              <Users size={17} strokeWidth={2.25} aria-hidden />
               Cursos
             </Link>}
+            {nav == null ? courseNav : null}
             {nav == null && administers ? (
               <Link
                 to="/school"
                 className={`student-topnav-item${active === 'school' ? ' is-active' : ''}`}
                 aria-current={active === 'school' ? 'page' : undefined}
               >
+                <School size={17} strokeWidth={2.25} aria-hidden />
                 Colegio
               </Link>
             ) : null}
@@ -70,13 +80,15 @@ export function StaffShell({
 
           <div className="student-topbar-actions">
             <RoleSwitcher current={role} />
-            <ThemeToggle />
-            <Link to="/cuenta" className="btn-ghost text-xs no-underline">
-              Cuenta
-            </Link>
-            <button type="button" className="btn-ghost text-xs" disabled={isSigningOut} onClick={() => void signOut()}>
-              {isSigningOut ? 'Saliendo…' : 'Salir'}
-            </button>
+            <div className="student-topbar-account">
+              <ThemeToggle />
+              <Link to="/cuenta" className="btn-ghost text-xs no-underline">
+                Cuenta
+              </Link>
+              <button type="button" className="btn-ghost text-xs" disabled={isSigningOut} onClick={() => void signOut()}>
+                {isSigningOut ? 'Saliendo…' : 'Salir'}
+              </button>
+            </div>
           </div>
         </div>
       </header>

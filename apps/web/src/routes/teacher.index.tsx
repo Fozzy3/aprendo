@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query'
 import { Link, createFileRoute } from '@tanstack/react-router'
 import { ArrowRight } from 'lucide-react'
 import { api } from '@aprendo/convex/api'
+import { DuelLaunchButton } from '../components/DuelLaunchButton.tsx'
 import { EmptyState } from '../components/EmptyState.tsx'
 import { FullScreenLoader, PageLoader } from '../components/FullScreenLoader.tsx'
 import { StaffShell } from '../components/StaffShell.tsx'
@@ -80,7 +81,7 @@ function TeacherHomePage() {
               ) : null}
               <ul className="ruled-list">
                 {schoolClasses.map((classGroup) => (
-                  <li key={classGroup._id}>
+                  <li key={classGroup._id} className="duel-course-row">
                     <Link
                       to="/teacher/$classGroupId"
                       params={{ classGroupId: classGroup._id }}
@@ -97,6 +98,7 @@ function TeacherHomePage() {
                       </span>
                       <ArrowRight size={16} aria-hidden className="shrink-0 text-[var(--text-tertiary)]" />
                     </Link>
+                    <DuelLaunchButton classGroupId={classGroup._id} compact />
                   </li>
                 ))}
               </ul>

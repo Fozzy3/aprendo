@@ -1086,13 +1086,6 @@ a.ruled-row:hover {
   background: var(--desk);
 }
 
-.auth-sheet-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-}
-
 .auth-sheet {
   width: min(100%, 30rem);
   padding: calc(var(--cell) * 2) calc(var(--cell) * 2) calc(var(--cell) * 2) calc(var(--cell) * 4);
@@ -6561,58 +6554,4 @@ html:has(.is-immersive) {
 .lp-lede,
 .markdown-body {
   font-variant-numeric: proportional-nums;
-}
-
-/* ─── Duel on the projector (F60): read from the back of the room ─── */
-.duel-board {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 1.5rem;
-  margin: 1rem 0 1.5rem;
-  padding-block: 0.75rem;
-  border-block: 1px solid var(--border);
-}
-
-.duel-board dt {
-  color: var(--text-secondary);
-  font-size: clamp(1rem, 1.6vw, 1.25rem);
-}
-
-.duel-board dd {
-  margin: 0;
-}
-
-.duel-team-score {
-  font-family: var(--font-display);
-  font-size: clamp(2.5rem, 7vw, 5rem);
-  font-weight: 700;
-  line-height: 1.05;
-  font-variant-numeric: tabular-nums;
-}
-
-.duel-clock {
-  font-size: clamp(1.25rem, 2.5vw, 1.75rem);
-  font-variant-numeric: tabular-nums;
-}
-
-.duel-stem {
-  font-size: clamp(1.25rem, 2.2vw, 1.75rem);
-  line-height: 1.4;
-}
-
-.duel-options {
-  display: grid;
-  gap: 0.5rem;
-  margin: 1rem 0;
-  padding: 0;
-  list-style: none;
-  font-size: clamp(1.05rem, 1.7vw, 1.35rem);
-}
-
-.duel-options li {
-  display: flex;
-  gap: 0.75rem;
-  padding: 0.5rem 0.75rem;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
 }

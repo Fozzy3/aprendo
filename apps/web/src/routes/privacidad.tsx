@@ -52,8 +52,8 @@ function PrivacyPage() {
       <p>
         Además de los correos para confirmar tu cuenta y cambiar tu contraseña, te enviamos recordatorios si tu
         racha está por cortarse o si llevas unos días sin practicar. Puedes apagarlos en Tu cuenta. Durante el
-        piloto también te invitamos a una encuesta sobre cómo te va con Aprendo: es opcional y tus respuestas
-        solo sirven para mejorar la aplicación.
+        piloto también te invitamos a una encuesta sobre cómo te va con Aprendo: es opcional, te pide tu nombre y
+        tu código de estudiante, y tus respuestas solo sirven para mejorar la aplicación.
       </p>
 
       <h2>La liga del curso</h2>

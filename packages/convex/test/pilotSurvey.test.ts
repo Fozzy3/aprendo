@@ -13,6 +13,8 @@ import { setupTest, signUp } from './signIn'
 const REQUIRED: SurveyAnswers = {
   start_ease: 4, diagnostic_fit: 3, today_clarity: 5, help_useful: 'na', saber_likeness: 4, helps_improve: 5,
 }
+/** Who answered: typed on the survey's first screen. */
+const WHO = { name: 'Ana Pérez', studentCode: '20231020' }
 
 describe('the pilot survey questions', () => {
   test('are the fifteen of the plan, with unique ids', () => {
@@ -131,14 +133,14 @@ describe('pilotSurvey functions', () => {
     const t = setupTest()
     const ana = await signUp(t, 'ana@x.co')
     expect(await ana.as.query(api.pilotSurvey.getMine, { studentId: ana.studentId })).toBeNull()
-    await ana.as.mutation(api.pilotSurvey.submit, { studentId: ana.studentId, answers: { ...REQUIRED, confusing: '  Nada  ' } })
+    await ana.as.mutation(api.pilotSurvey.submit, { ...WHO, studentId: ana.studentId, answers: { ...REQUIRED, confusing: '  Nada  ' } })
     const mine = await ana.as.query(api.pilotSurvey.getMine, { studentId: ana.studentId })
     expect(typeof mine?.submittedAt).toBe('number')
     const rows = await t.run((ctx) => ctx.db.query('pilotSurveyResponses').collect())
     expect(rows).toHaveLength(1)
     expect(rows[0]?.answers.confusing).toBe('Nada')
 
-    await expect(ana.as.mutation(api.pilotSurvey.submit, { studentId: ana.studentId, answers: REQUIRED }))
+    await expect(ana.as.mutation(api.pilotSurvey.submit, { ...WHO, studentId: ana.studentId, answers: REQUIRED }))
       .rejects.toThrow('Ya respondiste')
     expect(await t.run((ctx) => ctx.db.query('pilotSurveyResponses').collect())).toHaveLength(1)
   })
@@ -147,9 +149,9 @@ describe('pilotSurvey functions', () => {
     const t = setupTest()
     const ana = await signUp(t, 'ana@x.co')
     const luis = await signUp(t, 'luis@x.co')
-    await expect(ana.as.mutation(api.pilotSurvey.submit, { studentId: ana.studentId, answers: { ...REQUIRED, recommend: 12 } }))
+    await expect(ana.as.mutation(api.pilotSurvey.submit, { ...WHO, studentId: ana.studentId, answers: { ...REQUIRED, recommend: 12 } }))
       .rejects.toThrow()
-    await expect(luis.as.mutation(api.pilotSurvey.submit, { studentId: ana.studentId, answers: REQUIRED })).rejects.toThrow()
+    await expect(luis.as.mutation(api.pilotSurvey.submit, { ...WHO, studentId: ana.studentId, answers: REQUIRED })).rejects.toThrow()
     await expect(luis.as.query(api.pilotSurvey.getMine, { studentId: ana.studentId })).rejects.toThrow()
     expect(await t.run((ctx) => ctx.db.query('pilotSurveyResponses').collect())).toEqual([])
   })
@@ -158,7 +160,7 @@ describe('pilotSurvey functions', () => {
     const t = setupTest()
     const ana = await signUp(t, 'ana@x.co')
     const admin = await signUp(t, 'admin@x.co', { isAdmin: true })
-    await ana.as.mutation(api.pilotSurvey.submit, { studentId: ana.studentId, answers: { ...REQUIRED, recommend: 10 } })
+    await ana.as.mutation(api.pilotSurvey.submit, { ...WHO, studentId: ana.studentId, answers: { ...REQUIRED, recommend: 10 } })
 
     await expect(ana.as.query(api.pilotSurvey.summary, {})).rejects.toThrow()
     await expect(ana.as.query(api.pilotSurvey.listResponses, {})).rejects.toThrow()
@@ -168,6 +170,18 @@ describe('pilotSurvey functions', () => {
     expect(summary).toMatchObject({ total: 1, nps: 100 })
     const responses = await admin.as.query(api.pilotSurvey.listResponses, {})
     expect(responses).toHaveLength(1)
-    expect(responses[0]).toEqual({ submittedAt: expect.any(Number), answers: { ...REQUIRED, recommend: 10 } })
+    expect(responses[0]).toEqual({ submittedAt: expect.any(Number), ...WHO, answers: { ...REQUIRED, recommend: 10 } })
+  })
+
+  test('keeps the name and code trimmed, and refuses them blank or too long', async () => {
+    const t = setupTest()
+    const ana = await signUp(t, 'ana@x.co')
+    for (const bad of [{ name: '  ' }, { studentCode: '' }, { name: 'x'.repeat(121) }, { studentCode: '1'.repeat(41) }]) {
+      await expect(ana.as.mutation(api.pilotSurvey.submit, { ...WHO, ...bad, studentId: ana.studentId, answers: REQUIRED }))
+        .rejects.toThrow('nombre y tu código')
+    }
+    await ana.as.mutation(api.pilotSurvey.submit, { name: '  Ana Pérez ', studentCode: ' 20231020 ', studentId: ana.studentId, answers: REQUIRED })
+    const rows = await t.run((ctx) => ctx.db.query('pilotSurveyResponses').collect())
+    expect(rows[0]).toMatchObject(WHO)
   })
 })

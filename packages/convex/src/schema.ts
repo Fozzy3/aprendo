@@ -356,6 +356,9 @@ export default defineSchema(
     // The pilot survey (see `pilotSurvey.ts`): one row per student.
     pilotSurveyResponses: defineTable({
       studentId: v.id('students'),
+      // Typed on the survey's first screen; rows from before 2026-11-13 lack them.
+      name: v.optional(v.string()),
+      studentCode: v.optional(v.string()),
       answers: pilotSurveyAnswersValidator,
       submittedAt: v.number(),
     }).index('by_studentId', ['studentId']),

@@ -28,6 +28,8 @@ const ENDS = {
 const isAnswered = (value: SurveyAnswer | undefined) =>
   value != null && (Array.isArray(value) ? value.length > 0 : typeof value !== 'string' || value.trim() !== '')
 
+type Draft = { name: string; studentCode: string; answers: SurveyAnswers }
+
 /** What gets sent: free text trimmed, and nothing for what was left blank. */
 const toSubmit = (answers: SurveyAnswers): SurveyAnswers =>
   Object.fromEntries(Object.entries(answers).flatMap(([id, value]) =>
@@ -59,23 +61,26 @@ function stepVariants() {
 }
 
 /**
- * The pilot survey, one question per screen (`/encuesta`). The six scales are
- * required; the rest can be skipped. Sent once at the end; a failed send keeps
+ * The pilot survey, one question per screen (`/encuesta`), after a first screen
+ * with the student's name and code. Those and the six scales are required; the
+ * rest can be skipped. Sent once at the end; a failed send keeps
  * the student on the last question with every answer.
  */
 export function PilotSurvey({ studentId, answered: answeredBefore = false }: { studentId: Id<'students'> | string; answered?: boolean }) {
   const submit = useConvexMutation(api.pilotSurvey.submit)
-  const [[index, direction], setPage] = useState<[number, 1 | -1]>([0, 1])
+  // Page -1 asks who is answering; 0 onwards are the questions.
+  const [[index, direction], setPage] = useState<[number, 1 | -1]>([-1, 1])
   // A draft in this browser, so a reload or a closed tab doesn't lose the answers; cleared once sent.
   const draftKey = `aprendo:encuesta:${studentId}`
-  const [answers, setAnswersState] = useState<SurveyAnswers>(() => {
+  const [draft, setDraftState] = useState<Draft>(() => {
     try {
-      return JSON.parse(localStorage.getItem(draftKey) ?? '{}') as SurveyAnswers
+      const saved = JSON.parse(localStorage.getItem(draftKey) ?? 'null') as Partial<Draft> | null
+      return { name: saved?.name ?? '', studentCode: saved?.studentCode ?? '', answers: saved?.answers ?? {} }
     } catch {
-      return {}
+      return { name: '', studentCode: '', answers: {} }
     }
   })
-  const setAnswers = (update: (current: SurveyAnswers) => SurveyAnswers) => setAnswersState((current) => {
+  const setDraft = (update: (current: Draft) => Draft) => setDraftState((current) => {
     const next = update(current)
     try {
       localStorage.setItem(draftKey, JSON.stringify(next))
@@ -84,6 +89,7 @@ export function PilotSurvey({ studentId, answered: answeredBefore = false }: { s
     }
     return next
   })
+  const answers = draft.answers
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [done, setDone] = useState(false)
@@ -96,11 +102,13 @@ export function PilotSurvey({ studentId, answered: answeredBefore = false }: { s
   if (done) return <SurveyDone title="Gracias por contarnos" />
   if (answeredBefore) return <SurveyDone title="Ya la respondiste, gracias" />
 
-  const question = QUESTIONS[index]!
-  const value = answers[question.id]
-  const answered = isAnswered(value)
+  const question = index >= 0 ? QUESTIONS[index]! : null
+  const value = question == null ? undefined : answers[question.id]
+  const answered = question == null ? draft.name.trim() !== '' && draft.studentCode.trim() !== '' : isAnswered(value)
+  const required = question == null || question.required === true
   const isLast = index === QUESTIONS.length - 1
-  const set = (next: SurveyAnswer) => setAnswers((current) => ({ ...current, [question.id]: next }))
+  const set = (next: SurveyAnswer) => question != null
+    && setDraft((current) => ({ ...current, answers: { ...current.answers, [question.id]: next } }))
 
   const go = (delta: 1 | -1) => {
     setError(null)
@@ -111,7 +119,7 @@ export function PilotSurvey({ studentId, answered: answeredBefore = false }: { s
     setBusy(true)
     setError(null)
     try {
-      await submit({ studentId: studentId as Id<'students'>, answers: toSubmit(answers) })
+      await submit({ studentId: studentId as Id<'students'>, name: draft.name, studentCode: draft.studentCode, answers: toSubmit(answers) })
       try {
         localStorage.removeItem(draftKey)
       } catch {
@@ -125,7 +133,7 @@ export function PilotSurvey({ studentId, answered: answeredBefore = false }: { s
     }
   }
 
-  const skips = !answered && !question.required && !isLast
+  const skips = !answered && !required && !isLast
   const label = isLast ? (busy ? 'Enviando…' : 'Enviar') : skips ? 'Saltar' : 'Siguiente'
 
   return (
@@ -135,10 +143,10 @@ export function PilotSurvey({ studentId, answered: answeredBefore = false }: { s
           className="welcome-progress"
           role="progressbar"
           aria-label="Tu avance"
-          aria-valuemin={1}
+          aria-valuemin={0}
           aria-valuemax={QUESTIONS.length}
           aria-valuenow={index + 1}
-          aria-valuetext={`Pregunta ${index + 1} de ${QUESTIONS.length}`}
+          aria-valuetext={question == null ? 'Tus datos' : `Pregunta ${index + 1} de ${QUESTIONS.length}`}
         >
           <motion.span
             className="welcome-progress-fill"
@@ -150,7 +158,7 @@ export function PilotSurvey({ studentId, answered: answeredBefore = false }: { s
 
         <AnimatePresence mode="wait" custom={direction}>
           <motion.div
-            key={question.id}
+            key={question?.id ?? 'who'}
             className="welcome-step"
             custom={direction}
             variants={step}
@@ -159,10 +167,35 @@ export function PilotSurvey({ studentId, answered: answeredBefore = false }: { s
             exit="exit"
           >
             <motion.h1 id="survey-title" ref={focusTitle} tabIndex={-1} className="survey-question" variants={item}>
-              {question.text}
+              {question?.text ?? '¿Quién responde?'}
             </motion.h1>
             <motion.div variants={item}>
-              <Answer question={question} value={value} onChange={set} />
+              {question == null ? (
+                <div className="grid gap-3">
+                  <label className="field">
+                    <span>Nombre completo</span>
+                    <input
+                      className="input"
+                      autoComplete="name"
+                      maxLength={120}
+                      value={draft.name}
+                      onChange={(event) => setDraft((current) => ({ ...current, name: event.target.value }))}
+                    />
+                  </label>
+                  <label className="field">
+                    <span>Código de estudiante</span>
+                    <input
+                      className="input"
+                      autoComplete="off"
+                      maxLength={40}
+                      value={draft.studentCode}
+                      onChange={(event) => setDraft((current) => ({ ...current, studentCode: event.target.value }))}
+                    />
+                  </label>
+                </div>
+              ) : (
+                <Answer question={question} value={value} onChange={set} />
+              )}
             </motion.div>
           </motion.div>
         </AnimatePresence>
@@ -170,7 +203,7 @@ export function PilotSurvey({ studentId, answered: answeredBefore = false }: { s
         {error != null ? <p role="alert" className="notice is-danger">{error}</p> : null}
 
         <div className="welcome-footer">
-          {index > 0 ? (
+          {index > -1 ? (
             <button type="button" className="btn-ghost" disabled={busy} onClick={() => go(-1)}>
               <ArrowLeft size={16} aria-hidden /> Atrás
             </button>
@@ -178,7 +211,7 @@ export function PilotSurvey({ studentId, answered: answeredBefore = false }: { s
           <button
             type="button"
             className={skips ? 'btn-secondary' : 'btn-primary'}
-            disabled={busy || (question.required === true && !answered)}
+            disabled={busy || (required && !answered)}
             onClick={() => (isLast ? void send() : go(1))}
           >
             {label}

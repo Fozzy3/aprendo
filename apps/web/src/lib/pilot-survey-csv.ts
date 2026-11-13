@@ -21,13 +21,20 @@ function answerText(question: SurveyQuestion, value: SurveyAnswer | undefined) {
 }
 
 /**
- * The pilot survey as a spreadsheet: one row per response, one column per
- * question, options in words. The BOM lets Excel read the accents.
+ * The pilot survey as a spreadsheet: one row per response with who answered
+ * (name and code), one column per question, options in words. The BOM lets Excel read the accents.
  */
-export function pilotSurveyCsv(responses: { submittedAt: number; answers: Record<string, SurveyAnswer> }[]) {
-  const header = ['Fecha', ...PILOT_SURVEY_QUESTIONS.map((question, index) => `${index + 1}. ${question.text}`)]
+export function pilotSurveyCsv(responses: {
+  submittedAt: number
+  name?: string
+  studentCode?: string
+  answers: Record<string, SurveyAnswer>
+}[]) {
+  const header = ['Fecha', 'Nombre', 'Código', ...PILOT_SURVEY_QUESTIONS.map((question, index) => `${index + 1}. ${question.text}`)]
   const rows = responses.map((response) => [
     new Date(response.submittedAt).toISOString(),
+    response.name ?? '',
+    response.studentCode ?? '',
     ...PILOT_SURVEY_QUESTIONS.map((question) => answerText(question, response.answers[question.id])),
   ])
   return `﻿${[header, ...rows].map((row) => row.map(cell).join(',')).join('\r\n')}`

@@ -66,12 +66,42 @@ const write = (value: string) => {
   })
 }
 
+const type = (label: string, value: string) => {
+  const input = [...container.querySelectorAll('label')].find((l) => l.textContent?.includes(label))?.querySelector('input')
+  if (input == null) throw new Error(`no field "${label}" in: ${container.textContent}`)
+  const setValue = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value')!.set!
+  act(() => {
+    setValue.call(input, value)
+    input.dispatchEvent(new Event('input', { bubbles: true }))
+  })
+}
+/** The first screen: who is answering. */
+const identify = async () => {
+  type('Nombre', 'Ana Pérez')
+  type('Código', '20231020')
+  await click('Siguiente')
+}
+
 describe('PilotSurvey', () => {
+  it('asks for the name and the student code first', async () => {
+    render()
+    expect(heading()).toBe('¿Quién responde?')
+    expect(hasButton('Atrás')).toBe(false)
+    expect(button('Siguiente').disabled).toBe(true)
+    type('Nombre', 'Ana Pérez')
+    expect(button('Siguiente').disabled).toBe(true)
+    type('Código', '20231020')
+    await click('Siguiente')
+    expect(heading()).toBe('¿Qué tan fácil fue empezar a usar Aprendo?')
+    await click('Atrás')
+    expect(container.querySelector<HTMLInputElement>('input[autocomplete="name"]')?.value).toBe('Ana Pérez')
+  })
+
   it('asks one question per screen, back keeps the answer, and sends what was answered', async () => {
     render()
+    await identify()
     expect(heading()).toBe('¿Qué tan fácil fue empezar a usar Aprendo?')
     expect(progress()).toBe('Pregunta 1 de 15')
-    expect(hasButton('Atrás')).toBe(false)
     // Required: no skipping, and no going on without an answer.
     expect(hasButton('Saltar')).toBe(false)
     expect(button('Siguiente').disabled).toBe(true)
@@ -124,6 +154,8 @@ describe('PilotSurvey', () => {
 
     expect(state.submit).toHaveBeenCalledWith({
       studentId: 's1',
+      name: 'Ana Pérez',
+      studentCode: '20231020',
       answers: {
         start_ease: 4, diagnostic_fit: 3, today_clarity: 5, help_useful: 'na', saber_likeness: 4, helps_improve: 5,
         come_back: ['racha', 'xp'], device: 'celular_propio', disappointment: 'muy', recommend: 9,
@@ -136,6 +168,7 @@ describe('PilotSurvey', () => {
 
   it('unticking every option of a multiple choice leaves it unanswered', async () => {
     render()
+    await identify()
     for (let index = 0; index < 6; index += 1) {
       choose(index === 3 ? 'No lo usé' : '3')
       await click('Siguiente')
@@ -151,6 +184,7 @@ describe('PilotSurvey', () => {
       throw new Error('x')
     })
     render()
+    await identify()
     for (let index = 0; index < 6; index += 1) {
       choose(index === 3 ? 'No lo usé' : '3')
       await click('Siguiente')
@@ -163,10 +197,13 @@ describe('PilotSurvey', () => {
 
   it('keeps the answers after a reload and forgets them once sent', async () => {
     render()
+    await identify()
     choose('4')
     act(() => root.unmount())
     root = createRoot(container)
     render()
+    expect(container.querySelector<HTMLInputElement>('input[autocomplete="name"]')?.value).toBe('Ana Pérez')
+    await click('Siguiente')
     expect(container.querySelector<HTMLInputElement>('input[value="4"]')?.checked).toBe(true)
 
     for (let index = 0; index < 6; index += 1) {
@@ -182,11 +219,12 @@ describe('PilotSurvey', () => {
 describe('pilotSurveyCsv', () => {
   it('has one row per response and one column per question, in words', () => {
     const csv = pilotSurveyCsv([
-      { submittedAt: Date.UTC(2026, 10, 11, 15), answers: { start_ease: 4, help_useful: 'na', come_back: ['racha', 'xp'], device: 'celular_propio', confusing: 'Dice "hola", y ya' } },
+      { submittedAt: Date.UTC(2026, 10, 11, 15), name: 'Ana Pérez', studentCode: '20231020', answers: { start_ease: 4, help_useful: 'na', come_back: ['racha', 'xp'], device: 'celular_propio', confusing: 'Dice "hola", y ya' } },
       { submittedAt: Date.UTC(2026, 10, 12, 15), answers: { recommend: 0, change: '=1+1' } },
     ])
     const [header, first, second] = csv.replace(/^﻿/, '').split('\r\n')
-    expect(header?.startsWith('Fecha,1. ¿Qué tan fácil fue empezar a usar Aprendo?,')).toBe(true)
+    expect(header?.startsWith('Fecha,Nombre,Código,1. ¿Qué tan fácil fue empezar a usar Aprendo?,')).toBe(true)
+    expect(first).toContain(',Ana Pérez,20231020,4,')
     expect(header).toContain('"3. Al abrir ""Hoy"", ¿tenías claro qué hacer?"')
     expect(header).toContain('15. ¿Qué le cambiarías o agregarías?')
     expect(first).toContain('2026-11-11')
@@ -194,6 +232,7 @@ describe('pilotSurveyCsv', () => {
     expect(first).toContain('"Dice ""hola"", y ya"')
     // A cell that a spreadsheet would run as a formula is kept as text.
     expect(second).toContain(`'=1+1`)
-    expect(second?.split(',')).toHaveLength(1 + PILOT_SURVEY_QUESTIONS.length)
+    // Responses from before the first screen existed leave name and code empty.
+    expect(second?.split(',')).toHaveLength(3 + PILOT_SURVEY_QUESTIONS.length)
   })
 })

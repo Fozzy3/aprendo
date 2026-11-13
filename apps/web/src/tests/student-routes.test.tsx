@@ -683,11 +683,11 @@ describe('/today, Hoy', () => {
 })
 
 describe('/encuesta', () => {
-  it('opens the survey on its first question, in the student look', async () => {
+  it('opens the survey on who is answering, in the student look', async () => {
     state.queries['pilotSurvey:getMine'] = { isPending: false, data: null }
     await render('../routes/encuesta.tsx')
     expect(container.querySelector('.student-shell')).not.toBeNull()
-    expect(container.querySelector('h1')?.textContent).toBe('¿Qué tan fácil fue empezar a usar Aprendo?')
+    expect(container.querySelector('h1')?.textContent).toBe('¿Quién responde?')
   })
 
   it('says thanks instead of asking again once answered', async () => {

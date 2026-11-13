@@ -4,7 +4,6 @@ import { Link } from '@tanstack/react-router'
 import { ArrowRight, BookOpen, ListChecks } from 'lucide-react'
 import type { CSSProperties } from 'react'
 import { api } from '@aprendo/convex/api'
-import { MIN_ATTEMPTS_FOR_LEVEL } from '@aprendo/convex/levels'
 import { PageLoader } from './FullScreenLoader.tsx'
 import { CareerCard } from './CareerPicker.tsx'
 import { PracticeSubtopicButton } from './PracticeSubtopicButton.tsx'
@@ -122,9 +121,9 @@ export function NivelacionResult({
               ))}
             </div>
             <p className="mt-1.5 text-xs text-[var(--text-tertiary)] tabular-nums">
-              Nivel {level.index} de {level.bandCount} del ICFES
+              Nivel {level.index} de {level.bandCount}
               {previousIndex != null && previousIndex !== level.index
-                ? ` · antes estabas en el ${previousIndex}`
+                ? ` · antes ${previousIndex}`
                 : ''}
             </p>
             <p className="mt-4 text-[0.9375rem] leading-relaxed text-[var(--text-primary)]">
@@ -134,11 +133,7 @@ export function NivelacionResult({
         ) : null}
 
         {!result.hasEnoughEvidence ? (
-          <p className="notice">
-            <strong className="text-[var(--text-primary)]">Estimación preliminar.</strong> Respondiste
-            menos de {MIN_ATTEMPTS_FOR_LEVEL} preguntas, así que este nivel puede cambiar. Nivela de nuevo esta área cuando
-            quieras para confirmarlo.
-          </p>
+          <p className="notice">Estimación preliminar</p>
         ) : null}
       </section>
 
@@ -146,20 +141,17 @@ export function NivelacionResult({
         <section className="ruled-section" aria-labelledby="nivelacion-next-title">
           <div className="section-head">
             <h2 id="nivelacion-next-title" className="section-title">
-              Para llegar a {level.nextBand.labelEs}
+              Siguiente: {level.nextBand.labelEs}
             </h2>
             {level.pointsToNextBand != null ? (
-              <span className="section-meta tabular-nums">te faltan {level.pointsToNextBand} puntos</span>
+              <span className="section-meta tabular-nums">+{level.pointsToNextBand} puntos</span>
             ) : null}
           </div>
-          <p className="m-0 text-sm leading-relaxed text-[var(--text-secondary)]">
-            {level.nextBand.descriptorEs}
-          </p>
         </section>
       ) : level != null ? (
         <section className="ruled-section">
           <p className="m-0 text-sm text-[var(--text-secondary)]">
-            Estás en el nivel más alto de esta área. Ahora toca sostenerlo.
+            Nivel más alto
           </p>
         </section>
       ) : null}
@@ -167,16 +159,13 @@ export function NivelacionResult({
       {result.weakestSubtopics.length > 0 ? (
         <section className="ruled-section" aria-labelledby="nivelacion-start-title">
           <h2 id="nivelacion-start-title" className="section-title">Por dónde empezar</h2>
-          <p className="mb-3 text-sm text-[var(--text-secondary)]">
-            Los temas que más te costaron en esta nivelación.
-          </p>
           <ul className="ruled-list">
             {result.weakestSubtopics.map((subtopic) => (
               <li key={subtopic.subtopicId} className="ruled-row flex-wrap">
                 <span className="ruled-row-main">
                   <span className="font-semibold">{getSubtopicLabel(subtopic.subtopicId)}</span>
                   <span className="ruled-row-note tabular-nums">
-                    Acertaste {subtopic.correctCount} de {subtopic.questionCount}
+                    {subtopic.correctCount} de {subtopic.questionCount}
                   </span>
                 </span>
                 <span className="flex flex-wrap items-start gap-2">
@@ -199,9 +188,6 @@ export function NivelacionResult({
         {pendingSubjects.length > 0 ? (
           <>
             <h2 className="section-title">Nivela la siguiente área</h2>
-            <p className="text-sm text-[var(--text-secondary)]">
-              Con las cinco áreas medidas te damos tu puntaje global estimado.
-            </p>
             <ul className="mt-3 flex list-none flex-wrap gap-2 p-0">
               {pendingSubjects.map((subject) => (
                 <li key={subject.id} className="chip">

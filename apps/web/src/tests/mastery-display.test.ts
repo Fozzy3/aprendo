@@ -5,14 +5,14 @@ describe('closingLine', () => {
   it('names the step up when the level moved', () => {
     expect(closingLine({ from: 'intentado', to: 'familiar' })).toEqual({
       moved: 'up',
-      text: 'Intentado → Familiar. Para Competente: una práctica perfecta de 4 o más preguntas, sin pedir ayuda al tutor.',
+      text: 'Intentado → Familiar. Para Competente: práctica perfecta, sin tutor.',
     })
-    expect(closingLine({ from: 'competente', to: 'dominado' }).text).toBe('Competente → Dominado. Es el nivel más alto: el repaso y los retos lo mantienen.')
+    expect(closingLine({ from: 'competente', to: 'dominado' }).text).toBe('Competente → Dominado. Nivel más alto.')
   })
 
   it('says what is missing when it did not', () => {
     expect(closingLine({ from: 'familiar', to: 'familiar' }).text)
-      .toBe('Sigue en Familiar. Para Competente: una práctica perfecta de 4 o más preguntas, sin pedir ayuda al tutor.')
+      .toBe('Sigue en Familiar. Para Competente: práctica perfecta, sin tutor.')
     expect(closingLine({ from: 'intentado', to: 'intentado' }).text).toMatch(/7 de cada 10/)
     expect(closingLine({ from: 'dominado', to: 'dominado' }).moved).toBe('same')
   })
@@ -139,7 +139,7 @@ describe('topicStats', () => {
   })
 
   it('counts answers and rounds the accuracy', () => {
-    expect(topicStats({ attemptCount: 1, accuracy: 1 })).toBe('1 respondida · 100 % de acierto')
-    expect(topicStats({ attemptCount: 12, accuracy: 0.666 })).toBe('12 respondidas · 67 % de acierto')
+    expect(topicStats({ attemptCount: 1, accuracy: 1 })).toBe('100 % de 1')
+    expect(topicStats({ attemptCount: 12, accuracy: 0.666 })).toBe('67 % de 12')
   })
 })

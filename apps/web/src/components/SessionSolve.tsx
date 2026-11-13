@@ -404,7 +404,7 @@ export function SessionSolve({ sessionId, onExit, onCompleted }: SessionSolvePro
     () =>
       confirmDialog({
         title: 'El reloj sigue corriendo',
-        body: `Te quedan ${formatClock(remainingMsRef.current ?? 0)}. Puedes volver y seguir mientras quede tiempo.`,
+        body: `Te quedan ${formatClock(remainingMsRef.current ?? 0)}.`,
         confirmLabel: 'Salir de todas formas',
       }),
     [],
@@ -646,8 +646,7 @@ export function SessionSolve({ sessionId, onExit, onCompleted }: SessionSolvePro
             </button>
           }
         >
-          Se le acabó el tiempo mientras no estabas, así que no la calificamos: unas pocas
-          respuestas no dicen cuánto sabes. Empieza una nueva cuando tengas el tiempo completo.
+          Se acabó el tiempo mientras no estabas.
         </EmptyState>
       </div>
     )
@@ -663,9 +662,7 @@ export function SessionSolve({ sessionId, onExit, onCompleted }: SessionSolvePro
               Volver
             </button>
           }
-        >
-          No hay preguntas disponibles para esta combinación todavía.
-        </EmptyState>
+        />
       </div>
     )
   }
@@ -767,7 +764,7 @@ export function SessionSolve({ sessionId, onExit, onCompleted }: SessionSolvePro
         <div className="solve-toast" role="alert">
           <Hourglass size={16} aria-hidden />
           <span>
-            <strong>Quedan 5 minutos.</strong> No dejes preguntas en blanco: adivinar puede sumar.
+            <strong>Quedan 5 minutos.</strong>
           </span>
           <button
             type="button"
@@ -907,7 +904,6 @@ export function SessionSolve({ sessionId, onExit, onCompleted }: SessionSolvePro
 
               {view.selectedOption != null && moment === 'answering' ? (
                 <div className="confidence-strip fade-in">
-                  <span className="confidence-strip-label">¿Qué tan seguro estás?</span>
                   <div className="confidence-strip-options" role="group" aria-label="Nivel de confianza">
                     {CONFIDENCE_OPTIONS.map((option) => {
                       const isActive = view.confidence === option.value
@@ -932,7 +928,7 @@ export function SessionSolve({ sessionId, onExit, onCompleted }: SessionSolvePro
               {moment === 'answering' && hint !== undefined ? (
                 <p className="solve-pista" role="status">
                   <Lightbulb size={18} aria-hidden />
-                  {hint != null ? <MarkdownBlock markdown={hint} /> : 'Esta pregunta todavía no tiene pista.'}
+                  {hint != null ? <MarkdownBlock markdown={hint} /> : 'Sin pista.'}
                 </p>
               ) : null}
             </div>

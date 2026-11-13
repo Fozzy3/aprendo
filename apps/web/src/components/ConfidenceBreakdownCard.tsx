@@ -36,16 +36,13 @@ export function ConfidenceBreakdownCard({ breakdown }: { breakdown: Breakdown })
     <section className="ruled-section" aria-labelledby={titleId}>
       <div className="section-head">
         <h2 id={titleId} className="section-title">Qué tan seguro respondes</h2>
-        {total > 0 ? <span className="section-meta">{total} respuestas declaradas</span> : null}
+        {total > 0 ? <span className="section-meta">{total} respuestas</span> : null}
       </div>
 
       {/* Nothing declared yet: explain the feature instead of rendering four zeros,
           which would read as "you have no misconceptions" — an actively false claim. */}
       {total === 0 ? (
-        <p className="m-0 max-w-[60ch] text-sm text-[var(--text-secondary)]">
-          Cuando respondas, dinos si estabas seguro, dudaste o adivinaste. Con eso podemos
-          separar lo que de verdad dominas de lo que te salió por suerte.
-        </p>
+        <p className="m-0 text-sm text-[var(--text-secondary)]">Sin datos aún.</p>
       ) : (
         <>
           <div
@@ -79,7 +76,6 @@ export function ConfidenceBreakdownCard({ breakdown }: { breakdown: Breakdown })
                   />
                   <span className="ruled-row-main">
                     <span className="text-sm font-semibold">{display.label}</span>
-                    <span className="ruled-row-note">{display.description}</span>
                   </span>
                   <span className="shrink-0 text-sm font-semibold tabular-nums">{breakdown[state]}</span>
                 </li>
@@ -87,18 +83,9 @@ export function ConfidenceBreakdownCard({ breakdown }: { breakdown: Breakdown })
             })}
           </ul>
 
-          {breakdown.misconception > 0 ? (
-            <p className="notice is-danger">
-              Tienes <strong>{breakdown.misconception}</strong>{' '}
-              {breakdown.misconception === 1 ? 'respuesta' : 'respuestas'} donde estabas seguro y
-              fallaste. Ese es el error que no se corrige solo, porque no sabes que lo tienes.
-            </p>
-          ) : null}
-
           {breakdown.undeclaredCount > 0 ? (
             <p className="mt-3 mb-0 text-xs text-[var(--text-tertiary)]">
-              {breakdown.undeclaredCount}{' '}
-              {breakdown.undeclaredCount === 1 ? 'respuesta más sin declarar' : 'respuestas más sin declarar'}.
+              +{breakdown.undeclaredCount} sin declarar
             </p>
           ) : null}
         </>

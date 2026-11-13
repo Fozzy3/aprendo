@@ -118,9 +118,9 @@ export function StudentProgressPage({ session }: { session: ActiveStudentSession
         <h1 className="yo-name">{session.name ?? 'Yo'}</h1>
         <p className="yo-count">
           {album.data != null
-            ? `${album.data.earnedCount} de ${album.data.total} temas en Competente o más`
-            : `${stickers} ${stickers === 1 ? 'tema' : 'temas'} en Competente o más`}
-          {streak > 0 ? ` · racha de ${streak} ${streak === 1 ? 'día' : 'días'}` : ''}
+            ? `${album.data.earnedCount}/${album.data.total} temas en Competente+`
+            : `${stickers} ${stickers === 1 ? 'tema' : 'temas'} en Competente+`}
+          {streak > 0 ? ` · racha ${streak} ${streak === 1 ? 'día' : 'días'}` : ''}
         </p>
       </div>
     </header>
@@ -132,16 +132,14 @@ export function StudentProgressPage({ session }: { session: ActiveStudentSession
         {cover}
         <YoRewards studentId={studentId} student={student.data} medals={album.data?.medals ?? []} />
         <EmptyState
-          title="Todavía no puedo medir nada"
+          title="Sin datos aún"
           action={
             <Link to="/diagnostic" className="btn-primary no-underline">
               Hacer el diagnóstico
             </Link>
           }
-        >
-          Haz el diagnóstico y desde ahí sigo cuánto avanzas.
-        </EmptyState>
-        <YoSettings />
+        />
+        <YoSettings studentId={studentId} />
       </div>
     )
   }
@@ -168,7 +166,7 @@ export function StudentProgressPage({ session }: { session: ActiveStudentSession
             <h2 id="progress-areas-title" className="section-title">Tus áreas</h2>
             {overallDelta != null ? (
               <span className="section-meta">
-                Desde tu diagnóstico: <Delta delta={overallDelta} />
+                Desde el inicio: <Delta delta={overallDelta} />
               </span>
             ) : null}
           </div>
@@ -177,7 +175,7 @@ export function StudentProgressPage({ session }: { session: ActiveStudentSession
             // Yo is only reachable after the diagnostic: an area without a level needs practice, not another diagnostic.
             emptyAction={() => (
               <Link to="/path" className="area-chart-action">
-                Practicar para medirla
+                Practicar
               </Link>
             )}
           />
@@ -199,7 +197,7 @@ export function StudentProgressPage({ session }: { session: ActiveStudentSession
         {weekly.length >= 2 ? (
           <details className="yo-more">
             <summary>
-              Ver más: semana a semana{' '}
+              Semana a semana{' '}
               {trendDelta != null ? <Delta delta={trendDelta} /> : null}
             </summary>
             <TrendChart points={weekly} />
@@ -218,14 +216,16 @@ export function StudentProgressPage({ session }: { session: ActiveStudentSession
 
       <div className="yo-side">
         <YoRewards studentId={studentId} student={student.data} medals={album.data?.medals ?? []} />
-        <YoSettings />
+        <YoSettings studentId={studentId} />
       </div>
     </div>
   )
 }
 
-function YoSettings() {
+function YoSettings({ studentId }: { studentId: string }) {
   const { signOut, isSigningOut } = useSignOut()
+  // Only once it is known unanswered: while loading, and after answering, no row.
+  const survey = useQuery(convexQuery(api.pilotSurvey.getMine, { studentId: studentId as never }))
   return (
     <section className="ruled-section yo-settings" aria-labelledby="yo-settings-title">
       <h2 id="yo-settings-title" className="section-title">Ajustes</h2>
@@ -248,6 +248,14 @@ function YoSettings() {
             <ChevronRight size={18} aria-hidden />
           </Link>
         </li>
+        {survey.data === null ? (
+          <li>
+            <Link to="/encuesta" className="ruled-row no-underline">
+              <span className="ruled-row-main font-semibold">¿Qué te pareció Aprendo?</span>
+              <ChevronRight size={18} aria-hidden />
+            </Link>
+          </li>
+        ) : null}
       </ul>
       <button type="button" className="btn-secondary mt-4 w-full" disabled={isSigningOut} onClick={() => void signOut()}>
         {isSigningOut ? 'Saliendo…' : 'Salir'}

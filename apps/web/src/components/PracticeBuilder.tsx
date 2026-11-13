@@ -7,7 +7,6 @@ import {
   MIN_PRACTICE_QUESTIONS,
   PRACTICE_SOURCES,
 } from '@aprendo/convex/practiceBuilder'
-import { SESSION_KIND_CONFIG } from '@aprendo/convex/sessionKinds'
 import {
   COUNT_OPTIONS,
   DEFAULT_BUILDER,
@@ -55,12 +54,11 @@ function Choice({
   )
 }
 
-function Field({ legend, children, help }: { legend: string; children: ReactNode; help?: string }) {
+function Field({ legend, children }: { legend: string; children: ReactNode }) {
   return (
     <fieldset className="builder-field">
       <legend className="builder-legend">{legend}</legend>
       <div className="builder-choices">{children}</div>
-      {help != null ? <p className="builder-help">{help}</p> : null}
     </fieldset>
   )
 }
@@ -93,7 +91,6 @@ export function PracticeBuilder({
     ? { canStart: false, message: 'No pudimos contar las preguntas. Revisa tu conexión.' }
     : builderStatus(state, counts)
   const subtopics = subtopicsForSubject(state.subjectId)
-  const config = SESSION_KIND_CONFIG.personalizada
 
   return (
     <div>
@@ -107,11 +104,7 @@ export function PracticeBuilder({
       >
         <span className="ruled-row-main">
           <span className="font-semibold">Arma tu práctica</span>
-          <span className="ruled-row-note">{config.taglineEs}</span>
-          <span className="inline-flex flex-wrap gap-x-3 text-xs text-[var(--text-tertiary)]">
-            <span>{MIN_PRACTICE_QUESTIONS} a {MAX_PRACTICE_QUESTIONS} preguntas</span>
-            <span>Con o sin reloj</span>
-          </span>
+          <span className="ruled-row-note">{MIN_PRACTICE_QUESTIONS}–{MAX_PRACTICE_QUESTIONS} preguntas</span>
         </span>
         <ChevronRight
           size={18}
@@ -189,14 +182,7 @@ export function PracticeBuilder({
               </Choice>
             </Field>
 
-            <Field
-              legend="Respuestas"
-              help={
-                state.feedbackMode === 'inmediata'
-                  ? 'Compruebas cada respuesta y ves la explicación en el momento.'
-                  : 'Como en el examen: ves las respuestas al entregar.'
-              }
-            >
+            <Field legend="Respuestas">
               <Choice
                 pressed={state.feedbackMode === 'inmediata'}
                 onClick={() => update({ feedbackMode: 'inmediata' })}
@@ -214,7 +200,7 @@ export function PracticeBuilder({
 
           <div className="builder-foot">
             <p className="builder-available" aria-live="polite">
-              {counts != null ? availableLabel(counts.available) : 'Contando preguntas…'}
+              {counts != null ? availableLabel(counts.available) : 'Contando…'}
             </p>
             {status.message != null ? <p className="builder-note">{status.message}</p> : null}
             {error != null ? (

@@ -82,7 +82,7 @@ function TeacherStudentPage() {
             {stats != null ? (
               <dl className="margin-facts">
                 <div>
-                  <dt>Preguntas respondidas</dt>
+                  <dt>Respondidas</dt>
                   <dd>{stats.totalAnswered}</dd>
                 </div>
                 <div>
@@ -94,7 +94,7 @@ function TeacherStudentPage() {
                   <dd>{stats.activeDayCount}</dd>
                 </div>
                 <div>
-                  <dt>Racha más larga</dt>
+                  <dt>Mejor racha</dt>
                   <dd>{stats.longestStreakDays} días</dd>
                 </div>
               </dl>
@@ -117,8 +117,7 @@ function TeacherStudentPage() {
                 </p>
               ) : (
                 <p className="m-0 text-sm text-[var(--text-secondary)]">
-                  Aún no: falta evidencia en{' '}
-                  {progress.globalScore.missingSubjectIds.map(getSubjectLabel).join(', ')}.
+                  Falta: {progress.globalScore.missingSubjectIds.map(getSubjectLabel).join(', ')}
                 </p>
               )}
             </section>
@@ -138,7 +137,7 @@ function TeacherStudentPage() {
             <section className="ruled-section" aria-labelledby="student-weak-title">
               <h2 id="student-weak-title" className="section-title">Temas que más le cuestan</h2>
               {progress.weakestSubtopics.length === 0 ? (
-                <p className="text-sm text-[var(--text-tertiary)]">Todavía no ha practicado temas.</p>
+                <p className="text-sm text-[var(--text-tertiary)]">Sin práctica aún.</p>
               ) : (
                 <ul className="ruled-list">
                   {progress.weakestSubtopics.map((aggregate) => (
@@ -150,7 +149,7 @@ function TeacherStudentPage() {
                         <span className="ruled-row-note">{getSubjectLabel(aggregate.subjectId)}</span>
                       </span>
                       <span className="ruled-row-note shrink-0 tabular-nums">
-                        {aggregate.correctCount} de {aggregate.attemptCount} correctas
+                        {aggregate.correctCount}/{aggregate.attemptCount}
                       </span>
                     </li>
                   ))}

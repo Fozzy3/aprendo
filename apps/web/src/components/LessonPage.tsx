@@ -97,7 +97,7 @@ export function LessonPage({ subtopicId, studentId }: { subtopicId: string; stud
       </header>
       {progress.data != null ? (
         <p className="lesson-level">
-          Tu nivel en este tema: <MasteryBadge level={levelFor(masteryLevelMap(progress.data.subtopicMastery), subtopicId)} />
+          <MasteryBadge level={levelFor(masteryLevelMap(progress.data.subtopicMastery), subtopicId)} />
         </p>
       ) : null}
 
@@ -123,7 +123,7 @@ export function LessonPage({ subtopicId, studentId }: { subtopicId: string; stud
         <>
           {rewriteFailed ? (
             <div role="status" className="notice flex flex-wrap items-center justify-between gap-3">
-              <span>No pudimos actualizar esta lección; te mostramos la versión anterior.</span>
+              <span>No se pudo actualizar.</span>
               <button
                 type="button"
                 disabled={requestMutation.isPending}
@@ -160,18 +160,15 @@ export function LessonPage({ subtopicId, studentId }: { subtopicId: string; stud
           ) : isBuildingDemo ? (
             <section className="ruled-section" aria-labelledby="lesson-demo-title">
               <h2 id="lesson-demo-title" className="section-title">Explóralo</h2>
-              <Writing>Creando una demostración interactiva…</Writing>
-              <p className="mt-1 text-xs text-[var(--text-tertiary)]">Ya puedes leer la lección mientras tanto.</p>
+              <Writing>Creando la demo…</Writing>
             </section>
           ) : null}
         </>
       )}
 
       {/* Practice — always available, independent of lesson state */}
-      <section id="practica" className="ruled-section" aria-labelledby="lesson-practice-title">
-        <h2 id="lesson-practice-title" className="section-title">Practica este tema</h2>
+      <section id="practica" className="ruled-section" aria-label="Practicar">
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <p className="m-0 text-sm text-[var(--text-secondary)]">Pon a prueba este tema con preguntas reales.</p>
           <button
             type="button"
             disabled={practiceMutation.isPending}

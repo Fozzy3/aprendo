@@ -49,7 +49,6 @@ export function CheckYourWork({
               <h3>
                 {blankCount} sin responder
               </h3>
-              <p>Una respuesta en blanco no suma nada; adivinar sí puede sumar.</p>
               <div className="solve-check-cells">
                 {summary.blank.map((index) => (
                   <QuestionCell
@@ -62,13 +61,13 @@ export function CheckYourWork({
               </div>
             </div>
           ) : (
-            <p className="solve-check-done">No dejaste ninguna en blanco.</p>
+            <p className="solve-check-done">Ninguna en blanco.</p>
           )}
 
           {flaggedCount > 0 ? (
             <div className="solve-check-group">
               <h3>
-                {flaggedCount} marcada{flaggedCount === 1 ? '' : 's'} para revisar
+                {flaggedCount} marcada{flaggedCount === 1 ? '' : 's'}
               </h3>
               <div className="solve-check-cells">
                 {summary.flagged.map((index) => (
@@ -82,10 +81,6 @@ export function CheckYourWork({
               </div>
             </div>
           ) : null}
-
-          <p className="solve-check-note">
-            Al entregar ya no podrás cambiar tus respuestas.
-          </p>
         </section>
       </main>
 

@@ -306,7 +306,7 @@ describe('/teacher/$classGroupId', () => {
     await render('../routes/teacher.$classGroupId.tsx')
     expect(container.textContent).toContain('Asignar práctica al curso')
     expect(container.textContent).toContain('Iniciar duelo')
-    await act(async () => button('Copiar mensaje para las familias').click())
+    await act(async () => button('Copiar mensaje a familias').click())
     expect(writeText.mock.calls[0]![0]).toContain('11B')
     expect(writeText.mock.calls[0]![0]).not.toContain('Luis')
   })

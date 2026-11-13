@@ -100,7 +100,7 @@ export function TodayPage({ studentId, name }: { studentId: string; name: string
     id: 'hero',
     kind: 'practice',
     title: 'Práctica recomendada',
-    reason: `${plan.hero.questionCount} preguntas de los temas donde más puedes subir.`,
+    reason: 'Tus áreas más débiles',
     minutes: plan.hero.minutes,
     action: plan.hero.action,
   }
@@ -156,7 +156,7 @@ export function TodayPage({ studentId, name }: { studentId: string; name: string
                 <div className="next-card">
                   <p className="next-title">Sigue donde ibas</p>
                   <p className="next-reason">
-                    Tienes un {SESSION_KIND_CONFIG[openSession.kind].labelEs.toLowerCase()} abierto de {plural(openSession.questionCount, 'pregunta', 'preguntas')}.
+                    {SESSION_KIND_CONFIG[openSession.kind].labelEs} · {plural(openSession.questionCount, 'pregunta', 'preguntas')}
                   </p>
                   <Link to="/practice/$sessionId" params={{ sessionId: openSession._id }} className="btn-primary next-go no-underline">
                     Continuar
@@ -164,8 +164,8 @@ export function TodayPage({ studentId, name }: { studentId: string; name: string
                 </div>
               ) : comeback ? (
                 <div className="next-card">
-                  <p className="next-title">¡Qué bueno verte! Empecemos suave</p>
-                  <p className="next-reason">Cinco preguntas para retomar el ritmo.</p>
+                  <p className="next-title">¡Qué bueno verte!</p>
+                  <p className="next-reason">5 preguntas para retomar</p>
                   <button
                     type="button"
                     className="btn-primary next-go"
@@ -180,9 +180,7 @@ export function TodayPage({ studentId, name }: { studentId: string; name: string
                   task={next}
                   busy={launch.isPending}
                   onStart={() => start(next)}
-                  note={atRisk
-                    ? `Tu racha de ${plural(streakDays, 'día', 'días')} sigue viva: ${plan.hero.goalQuestions} preguntas la cuidan.`
-                    : null}
+                  note={atRisk ? `Cuida tu racha de ${plural(streakDays, 'día', 'días')}` : null}
                 />
               )}
               {launch.error != null ? (
@@ -232,14 +230,12 @@ export function TodayPage({ studentId, name }: { studentId: string; name: string
                       >
                         <span className="area-row-top">
                           <span className="area-row-name">{area.label}</span>
-                          <span className="area-row-level">{area.level ?? 'Sin nivel aún'}</span>
+                          <span className="area-row-level">{area.level ?? 'Sin nivel'}</span>
                         </span>
                         <span className="area-bar" aria-hidden>
                           <span style={{ width: `${area.total === 0 ? 0 : (area.done / area.total) * 100}%` }} />
                         </span>
-                        <span className="area-row-count">
-                          {area.done} de {area.total} temas en Competente o más
-                        </span>
+                        <span className="area-row-count">{area.done}/{area.total} temas</span>
                       </Link>
                     </li>
                   ))}
@@ -251,7 +247,6 @@ export function TodayPage({ studentId, name }: { studentId: string; name: string
               <Link to="/join" className="plan-row no-underline">
                 <span className="plan-row-text">
                   <b>Unirme a mi curso</b>
-                  <span>Con el código de tu profe</span>
                 </span>
                 <ChevronRight size={20} aria-hidden />
               </Link>
@@ -285,7 +280,7 @@ function GoalMeter({ answered, goal }: { answered: number; goal: number }) {
           ) : <Target size={16} />}
         </span>
         <b>{met ? 'Meta cumplida' : 'Meta de hoy'}</b>
-        <span className="goal-meter-count">{met ? `${plural(answered, 'pregunta', 'preguntas')} hoy` : `${answered} de ${goal} preguntas`}</span>
+        <span className="goal-meter-count">{answered}/{goal}</span>
       </p>
       <span className="goal-meter-bar" aria-hidden>
         <motion.span
@@ -308,8 +303,8 @@ function SurveyCard({ studentId }: { studentId: string }) {
     <Link to="/encuesta" className="plan-row no-underline">
       <span className="plan-row-icon" aria-hidden><MessageCircle size={20} /></span>
       <span className="plan-row-text">
-        <b>Cuéntanos cómo te va (4 min)</b>
-        <span>Una encuesta corta para mejorar Aprendo.</span>
+        <b>Cuéntanos cómo te va</b>
+        <span>4 min</span>
       </span>
       <ChevronRight size={20} aria-hidden />
     </Link>

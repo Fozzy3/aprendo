@@ -42,7 +42,6 @@ function AccountPage() {
       <NameForm currentName={session.name} />
       <PasswordForm />
       {isStaff ? null : <Reminders studentId={session.studentId} />}
-      {isStaff ? null : <PilotSurveySection studentId={session.studentId} />}
       <SchoolsSection schools={schools} />
       <ExportData studentId={session.studentId} />
       <SignOut />
@@ -83,7 +82,7 @@ function NameForm({ currentName }: { currentName: string | null }) {
       <h2 id="cuenta-name-title" className="section-title">Tu nombre</h2>
       <form className="grid gap-3" onSubmit={(event) => void save(event)}>
         <label className="field">
-          <span>Como aparece para tu docente</span>
+          <span>Nombre</span>
           <input className="input" autoComplete="name" required value={name} onChange={(event) => setName(event.target.value)} />
         </label>
         {errorMessage ? (
@@ -187,10 +186,7 @@ function Reminders({ studentId }: { studentId: ActiveStudentSession['studentId']
 
   return (
     <section className="ruled-section" aria-labelledby="cuenta-reminders-title">
-      <h2 id="cuenta-reminders-title" className="section-title">Recordatorios por correo</h2>
-      <p className="text-sm text-[var(--text-secondary)]">
-        Te escribimos cuando tu racha está por cortarse o si llevas unos días sin practicar.
-      </p>
+      <h2 id="cuenta-reminders-title" className="section-title">Recordatorios</h2>
       <label className="welcome-switch">
         <span>Recordatorios por correo</span>
         <input
@@ -205,26 +201,6 @@ function Reminders({ studentId }: { studentId: ActiveStudentSession['studentId']
   )
 }
 
-/** The pilot survey, also offered on Hoy (`/encuesta`); answered once. */
-function PilotSurveySection({ studentId }: { studentId: ActiveStudentSession['studentId'] }) {
-  const mine = useQuery(convexQuery(api.pilotSurvey.getMine, { studentId: studentId as never }))
-  return (
-    <section className="ruled-section" aria-labelledby="cuenta-survey-title">
-      <h2 id="cuenta-survey-title" className="section-title">Encuesta del piloto</h2>
-      {mine.data != null ? (
-        <p className="text-sm text-[var(--text-secondary)]">Ya la respondiste, gracias.</p>
-      ) : (
-        <>
-          <p className="text-sm text-[var(--text-secondary)]">
-            Quince preguntas sobre cómo te ha ido con Aprendo. Te toma unos 4 minutos.
-          </p>
-          {mine.isPending ? null : <Link to="/encuesta" className="btn-secondary no-underline">Responder la encuesta</Link>}
-        </>
-      )}
-    </section>
-  )
-}
-
 function SchoolsSection({
   schools,
 }: {
@@ -235,7 +211,7 @@ function SchoolsSection({
       <h2 id="cuenta-schools-title" className="section-title">Colegios</h2>
       {schools.length === 0 ? (
         <p className="text-sm text-[var(--text-secondary)]">
-          No estás en ningún colegio. <Link to="/join">Unirme a un curso</Link>
+          Ninguno. <Link to="/join">Unirme a un curso</Link>
         </p>
       ) : (
         <ul className="ruled-list">
@@ -288,7 +264,6 @@ function ExportData({ studentId }: { studentId: ActiveStudentSession['studentId'
   return (
     <section className="ruled-section" aria-labelledby="cuenta-export-title">
       <h2 id="cuenta-export-title" className="section-title">Tus datos</h2>
-      <p className="text-sm text-[var(--text-secondary)]">Un archivo con todo lo que Aprendo guarda sobre ti.</p>
       {status === 'failed' ? (
         <p role="alert" className="text-sm text-[var(--danger-text)]">No pudimos preparar el archivo. Intenta de nuevo.</p>
       ) : null}
@@ -335,14 +310,11 @@ function DeleteAccount() {
   return (
     <section className="ruled-section" aria-labelledby="cuenta-delete-title">
       <h2 id="cuenta-delete-title" className="section-title">Eliminar la cuenta</h2>
-      <p className="text-sm text-[var(--text-secondary)]">
-        Se borran para siempre tus respuestas, sesiones, progreso y conversaciones con el tutor, y sales de
-        tus colegios. No se puede deshacer.
-      </p>
+      <p className="text-sm text-[var(--text-secondary)]">Borra todo y no se puede deshacer.</p>
       {isConfirming ? (
         <form className="mt-4 grid gap-3" onSubmit={(event) => void deleteAccount(event)}>
           <label className="field">
-            <span>Escribe tu contraseña para confirmar</span>
+            <span>Tu contraseña</span>
             <input
               type="password"
               className="input"

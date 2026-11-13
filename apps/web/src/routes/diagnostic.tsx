@@ -83,7 +83,7 @@ function PlacementPage() {
       activeSection="today"
       immersive={sessionId != null}
       hideTabs={!hasAnyPlacement}
-      topBarSupplement={<div className="student-pill">Sin tutor · medimos tu nivel</div>}
+      topBarSupplement={<div className="student-pill">Sin tutor</div>}
     >
       {sessionId != null ? (
         <SessionSolve
@@ -108,8 +108,7 @@ function PlacementPage() {
         <div className="diagnostic-intro">
           {unfinished != null ? (
             <section className="timed-intro fade-in">
-              <h2 className="timed-intro-title">Tienes un diagnóstico en curso</h2>
-              <p className="timed-intro-facts">El reloj siguió corriendo. Sigue donde ibas.</p>
+              <h2 className="timed-intro-title">Diagnóstico en curso</h2>
               <div className="timed-intro-actions">
                 <button type="button" className="btn-primary" onClick={() => setSessionId(unfinished._id)}>
                   Continuar
@@ -139,11 +138,6 @@ function PlacementPage() {
                   }
                 : {})}
             >
-              <p className="timed-intro-lede">
-                {hasAnyPlacement
-                  ? 'Repítelo cuando quieras medir de nuevo tu punto de partida.'
-                  : 'Preguntas de las cinco áreas, sin ayuda. Con ellas ubicamos tu nivel y armamos tu plan.'}
-              </p>
               <ul className="welcome-areas" aria-label="Áreas del diagnóstico">
                 {getAllSubjectThemes().map((subject) => (
                   <li key={subject.id} style={{ '--subject-color': subject.color } as CSSProperties}>

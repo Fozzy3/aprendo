@@ -71,7 +71,7 @@ export function AnswerFeedback({
                 </div>
               </div>
             ))}
-            {explanationSource === 'ai_generated' ? <p className="answer-feedback-note">Explicación escrita con IA.</p> : null}
+            {explanationSource === 'ai_generated' ? <p className="answer-feedback-note">Explicación con IA.</p> : null}
           </details>
         ) : null}
 

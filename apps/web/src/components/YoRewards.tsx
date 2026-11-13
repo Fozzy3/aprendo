@@ -32,7 +32,7 @@ export function YoRewards({
   return (
     <section className="ruled-section" aria-labelledby="yo-rewards-title">
       <h2 id="yo-rewards-title" className="section-title">Logros</h2>
-      {medals.length === 0 ? <p className="page-lede">Tus medallas aparecen aquí cuando las ganes.</p> : null}
+      {medals.length === 0 ? <p className="text-sm text-[var(--text-tertiary)]">Sin medallas aún.</p> : null}
       {medals.length > 0 ? (
         <ul className="yo-album" aria-label="Tus medallas">
           {medals.map((medal) => (
@@ -46,7 +46,7 @@ export function YoRewards({
 
       {student != null ? (
         <details className="yo-more">
-          <summary>Editar mi avatar y mi apodo</summary>
+          <summary>Avatar y apodo</summary>
           <AvatarEditor studentId={studentId} avatar={student.avatar ?? null} nickname={student.nickname ?? null} />
         </details>
       ) : null}
@@ -59,7 +59,7 @@ export function YoRewards({
             disabled={toggleLeague.isPending}
             onClick={() => toggleLeague.mutate(!isOptedOut)}
           >
-            {isOptedOut ? 'Volver a la liga de mi curso' : 'Salir de la liga de mi curso'}
+            {isOptedOut ? 'Volver a la liga' : 'Salir de la liga'}
           </button>
         </section>
       ) : null}

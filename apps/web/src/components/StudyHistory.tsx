@@ -32,10 +32,7 @@ export function StudyHistory({ studentId }: { studentId: string }) {
   return (
     <>
       <section className="ruled-section" aria-labelledby="history-days-title">
-        <div className="section-head">
-          <h2 id="history-days-title" className="section-title">Días de estudio</h2>
-          <span className="section-meta">Cada cuadro es un día</span>
-        </div>
+        <h2 id="history-days-title" className="section-title">Días de estudio</h2>
         {summary.data == null ? (
           <div className="h-24 bg-[var(--bg-inset)]" aria-hidden />
         ) : (
@@ -63,9 +60,7 @@ export function StudyHistory({ studentId }: { studentId: string }) {
         {history.status === 'LoadingFirstPage' ? (
           <p className="text-sm text-[var(--text-tertiary)]">Cargando…</p>
         ) : history.results.length === 0 ? (
-          <EmptyState title={kindFilter === 'all' ? 'Aún no hay sesiones' : 'Nada de este tipo todavía'}>
-            {kindFilter === 'all' ? 'Cuando termines la primera, aparece acá.' : 'Prueba con otro filtro.'}
-          </EmptyState>
+          <EmptyState title={kindFilter === 'all' ? 'Sin sesiones aún' : 'Nada de este tipo'} />
         ) : (
           <>
             <ul className="ruled-list">

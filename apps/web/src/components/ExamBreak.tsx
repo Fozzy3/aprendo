@@ -38,8 +38,7 @@ export function ExamBreak({
           </div>
         }
       >
-        Terminaste la Sesión 1. En el examen real sales y vuelves a la 1:30 p. m.: come algo,
-        toma agua y vuelve cuando estés listo.
+        Sesión 1 terminada.
       </EmptyState>
 
       <p className="timed-intro-facts exam-break-facts">

@@ -9,7 +9,7 @@ import { getSubtopicLabel } from '@aprendo/convex/taxonomy'
 import { belowShareLabel, studentDisplayName } from '../lib/teacher-display.ts'
 
 const formatDay = (ms: number) => new Date(ms).toLocaleDateString('es-CO', { day: 'numeric', month: 'short' })
-const accuracyCell = (accuracy: number | null) => (accuracy == null ? 'sin datos' : `${Math.round(accuracy * 100)}%`)
+const accuracyCell = (accuracy: number | null) => (accuracy == null ? '—' : `${Math.round(accuracy * 100)}%`)
 
 /**
  * The two-week teaching cycle (F42): measure, teach, practise, measure again.
@@ -66,17 +66,13 @@ export function ClassCycle({ classGroupId, canWrite }: { classGroupId: string; c
       <h2 id="class-cycle-title" className="section-title">Ciclo de enseñanza</h2>
       {data == null ? (
         <>
-          <p className="text-sm text-[var(--text-secondary)]">
-            Dos semanas: enseñas los temas de arriba, el curso practica y al final ves cuántos siguen por debajo de
-            Familiar. Empezarlo congela el plan de hoy como punto de partida.
-          </p>
+          <p className="text-sm text-[var(--text-secondary)]">Congela el plan de hoy y mide cuántos siguen bajo Familiar.</p>
           {canWrite ? startButton('Empezar un ciclo de 2 semanas') : null}
         </>
       ) : (
         <>
           <p className="text-sm text-[var(--text-secondary)]">
-            {data.isOver ? 'Terminó el' : 'Va del'} {formatDay(data.startedAt)} al {formatDay(data.endsAt)}.
-            {data.isOver ? ' Así cambió el curso:' : ' Por debajo de Familiar, al empezar y hoy:'}
+            {formatDay(data.startedAt)} – {formatDay(data.endsAt)}{data.isOver ? ' · terminó' : ''}
           </p>
           {data.progress.length > 0 ? (
             <div className="overflow-x-auto">
@@ -85,7 +81,7 @@ export function ClassCycle({ classGroupId, canWrite }: { classGroupId: string; c
                 <tr>
                   <th>Tema</th>
                   <th>Para</th>
-                  <th className="is-number">Al empezar</th>
+                  <th className="is-number">Bajo Familiar al inicio</th>
                   <th className="is-number">Hoy</th>
                 </tr>
               </thead>
@@ -102,7 +98,7 @@ export function ClassCycle({ classGroupId, canWrite }: { classGroupId: string; c
             </table>
             </div>
           ) : (
-            <p className="text-sm text-[var(--text-tertiary)]">Este ciclo empezó sin temas pendientes para el curso.</p>
+            <p className="text-sm text-[var(--text-tertiary)]">Sin temas pendientes al inicio.</p>
           )}
 
           {data.groups.map((group) => {
@@ -200,7 +196,7 @@ export function ClassCycle({ classGroupId, canWrite }: { classGroupId: string; c
 
           {canWrite ? (
             <div className="mt-4 flex flex-wrap items-center gap-2">
-              {startButton(data.isOver ? 'Empezar el siguiente ciclo' : 'Reiniciar el ciclo con el plan de hoy', !data.isOver)}
+              {startButton(data.isOver ? 'Empezar el siguiente ciclo' : 'Reiniciar el ciclo', !data.isOver)}
             </div>
           ) : null}
         </>

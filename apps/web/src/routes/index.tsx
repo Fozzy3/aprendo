@@ -326,7 +326,7 @@ function TodayFragment() {
       <div
         data-ui
         role="img"
-        aria-label="Ejemplo de la pantalla Hoy: meta de 6 de 10 preguntas, el siguiente paso Practica Probabilidad y conteo con un botón para empezar, la semana con tres días hechos y el nivel de cada área."
+        aria-label="Ejemplo de la pantalla Hoy: meta de 6 de 10 preguntas, el siguiente paso Probabilidad y conteo con un botón para empezar, la semana con tres días hechos y el nivel de cada área."
         className="lp-app"
       >
         <div className="lp-app-rail" aria-hidden>
@@ -341,7 +341,7 @@ function TodayFragment() {
           <p className="lp-app-facts">Racha de 3 días · 1 escudo</p>
           <div className="lp-app-goal">
             <span>
-              <b>Meta de hoy</b>6 de 10 preguntas
+              <b>Meta de hoy</b>6/10
             </span>
             <i>
               <i />
@@ -349,8 +349,8 @@ function TodayFragment() {
           </div>
           <div className="lp-app-next">
             <small>Tu siguiente paso</small>
-            <b>Practica Probabilidad y conteo</b>
-            <span>Es el tema de Matemáticas donde más puntos del global puedes ganar.</span>
+            <b>Probabilidad y conteo</b>
+            <span>Donde más puntos ganas</span>
             <span className="lp-app-meta">
               <i style={{ '--area': '#097d52' } as CSSProperties} />
               Matemáticas · 10 min

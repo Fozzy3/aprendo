@@ -8,8 +8,8 @@ import { readConvexError } from '../lib/convex-error.ts'
 type Reason = 'respuesta_incorrecta' | 'enunciado_confuso' | 'imagen_ilegible' | 'otro'
 
 export const REPORT_REASONS: Array<{ value: Reason; label: string }> = [
-  { value: 'respuesta_incorrecta', label: 'La respuesta correcta está mal' },
-  { value: 'enunciado_confuso', label: 'El enunciado es confuso' },
+  { value: 'respuesta_incorrecta', label: 'La respuesta está mal' },
+  { value: 'enunciado_confuso', label: 'Enunciado confuso' },
   { value: 'imagen_ilegible', label: 'No se lee la imagen' },
   { value: 'otro', label: 'Otro problema' },
 ]
@@ -47,7 +47,7 @@ export function QuestionReportForm({
   if (reportMutation.isSuccess) {
     return (
       <p role="status" className="mt-4 text-center text-xs text-[var(--text-secondary)]">
-        Gracias. Revisamos la pregunta y la corregimos si hace falta.
+        Gracias, la revisamos.
       </p>
     )
   }
@@ -71,7 +71,7 @@ export function QuestionReportForm({
       }}
     >
       <fieldset className="m-0 border-0 p-0">
-        <legend className="text-sm font-bold text-[var(--text-primary)]">¿Qué tiene esta pregunta?</legend>
+        <legend className="text-sm font-bold text-[var(--text-primary)]">¿Qué falla?</legend>
         <div className="mt-2 flex flex-wrap gap-2">
           {REPORT_REASONS.map((option) => (
             <button
@@ -88,7 +88,7 @@ export function QuestionReportForm({
       </fieldset>
 
       <label className="mt-3 block text-xs font-semibold text-[var(--text-secondary)]">
-        Cuéntanos más (opcional)
+        Detalle (opcional)
         <textarea
           className="input mt-1 min-h-20 resize-y text-sm"
           maxLength={MAX_NOTE_CHARS}

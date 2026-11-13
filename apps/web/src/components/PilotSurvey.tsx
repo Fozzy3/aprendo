@@ -66,7 +66,24 @@ function stepVariants() {
 export function PilotSurvey({ studentId, answered: answeredBefore = false }: { studentId: Id<'students'> | string; answered?: boolean }) {
   const submit = useConvexMutation(api.pilotSurvey.submit)
   const [[index, direction], setPage] = useState<[number, 1 | -1]>([0, 1])
-  const [answers, setAnswers] = useState<SurveyAnswers>({})
+  // A draft in this browser, so a reload or a closed tab doesn't lose the answers; cleared once sent.
+  const draftKey = `aprendo:encuesta:${studentId}`
+  const [answers, setAnswersState] = useState<SurveyAnswers>(() => {
+    try {
+      return JSON.parse(localStorage.getItem(draftKey) ?? '{}') as SurveyAnswers
+    } catch {
+      return {}
+    }
+  })
+  const setAnswers = (update: (current: SurveyAnswers) => SurveyAnswers) => setAnswersState((current) => {
+    const next = update(current)
+    try {
+      localStorage.setItem(draftKey, JSON.stringify(next))
+    } catch {
+      // Storage blocked: the answers still live in memory until sent.
+    }
+    return next
+  })
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [done, setDone] = useState(false)
@@ -75,7 +92,6 @@ export function PilotSurvey({ studentId, answered: answeredBefore = false }: { s
   // Each question takes focus as it arrives, so a screen reader hears it.
   const focusTitle = useCallback((title: HTMLHeadingElement | null) => title?.focus(), [])
 
-  // Sent here first: the live `getMine` turning true must not change the screen.
   // `done` first: the live `getMine` turning true right after sending must not change the screen.
   if (done) return <SurveyDone title="Gracias por contarnos" />
   if (answeredBefore) return <SurveyDone title="Ya la respondiste, gracias" />
@@ -96,6 +112,11 @@ export function PilotSurvey({ studentId, answered: answeredBefore = false }: { s
     setError(null)
     try {
       await submit({ studentId: studentId as Id<'students'>, answers: toSubmit(answers) })
+      try {
+        localStorage.removeItem(draftKey)
+      } catch {
+        // Storage blocked: nothing was saved.
+      }
       setDone(true)
     } catch (caught) {
       setError(readConvexError(caught, 'No pudimos enviar tus respuestas. Intenta de nuevo.'))
@@ -260,9 +281,6 @@ function SurveyDone({ title }: { title: string }) {
         <motion.h1 id="survey-title" ref={focusTitle} tabIndex={-1} className="page-title" variants={item}>
           {title}
         </motion.h1>
-        <motion.p className="page-lede" variants={item}>
-          Leemos todas las respuestas y con ellas decidimos qué mejorar en Aprendo.
-        </motion.p>
         <motion.div variants={item}>
           <Link to="/today" className="btn-primary no-underline">Volver a Hoy</Link>
         </motion.div>

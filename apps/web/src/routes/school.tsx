@@ -78,7 +78,7 @@ function SchoolAdminPage() {
         </EmptyState>
       ) : orgId == null ? (
         <EmptyState title="No administras ningún colegio">
-          Si tu colegio contrató Aprendo, el equipo de Aprendo te da acceso con este correo: {session.email}.
+          Pide acceso al equipo de Aprendo con {session.email}.
         </EmptyState>
       ) : adminQuery.isError || adminQuery.data == null ? (
         <EmptyState title="No pudimos abrir el colegio">
@@ -135,13 +135,11 @@ function SchoolAdminBody({
           <h1 className="page-title">{organization.name}</h1>
           {!organization.licenseActive ? (
             <p role="status" className="notice is-danger">
-              La licencia venció: los estudiantes no pueden unirse a cursos. Los datos se conservan; la renovación está
-              en Institución.
+              La licencia venció: nadie puede unirse. Renuévala en Institución.
             </p>
           ) : admin.seatsUsed >= organization.seatLimit ? (
             <p role="status" className="notice is-danger">
-              No quedan cupos: nadie más puede unirse. Libera cupos quitando estudiantes que ya no estén, o
-              pide más al equipo de Aprendo.
+              No quedan cupos: quita estudiantes que ya no estén o pide más.
             </p>
           ) : null}
         </header>
@@ -204,9 +202,6 @@ function IdentitySection({ admin }: { admin: SchoolAdmin }) {
   return (
     <section className="ruled-section" aria-labelledby="identity-title">
       <h2 id="identity-title" className="section-title">Nombre y escudo</h2>
-      <p className="mb-4 text-sm text-[var(--text-secondary)]">
-        Aparecen en la etiqueta de cada estudiante y docente, al lado de Aprendo.
-      </p>
       <form
         className="form-grid"
         onSubmit={(event: FormEvent) => {
@@ -229,7 +224,7 @@ function IdentitySection({ admin }: { admin: SchoolAdmin }) {
         {organization.crestUrl != null ? (
           <img src={organization.crestUrl} alt={`Escudo de ${organization.name}`} className="h-16 w-16 object-contain" />
         ) : (
-          <span className="text-sm text-[var(--text-tertiary)]">Sin escudo: se muestra el nombre.</span>
+          <span className="text-sm text-[var(--text-tertiary)]">Sin escudo</span>
         )}
         <label className="btn-secondary cursor-pointer">
           {organization.crestUrl != null ? 'Cambiar escudo' : 'Subir escudo'}
@@ -250,7 +245,7 @@ function IdentitySection({ admin }: { admin: SchoolAdmin }) {
           </button>
         ) : null}
       </div>
-      <p className="mt-2 text-xs text-[var(--text-tertiary)]">PNG, JPG, SVG o WebP, máximo 1 MB.</p>
+      <p className="mt-2 text-xs text-[var(--text-tertiary)]">PNG, JPG, SVG o WebP · máx. 1 MB</p>
       {renameMutation.error || crestMutation.error ? (
         <p role="alert" className="mt-2 text-sm text-[var(--danger-text)]">
           {readConvexError(renameMutation.error ?? crestMutation.error, 'No se pudo guardar.')}
@@ -276,7 +271,7 @@ function RenewalSection({ admin }: { admin: SchoolAdmin }) {
           Escribir para renovar
         </a>
       ) : (
-        <p className="text-sm text-[var(--text-secondary)]">Para renovarla, escríbale a su contacto en el equipo de Aprendo.</p>
+        <p className="text-sm text-[var(--text-secondary)]">Renueve con su contacto en Aprendo.</p>
       )}
     </section>
   )
@@ -334,9 +329,7 @@ function ClassesSection({ admin, teachers }: { admin: SchoolAdmin; teachers: Sch
       </form>
 
       {admin.classGroups.length === 0 ? (
-        <p className="text-sm text-[var(--text-tertiary)]">
-          Aún no hay cursos. Crea uno y comparte su código con los estudiantes.
-        </p>
+        <p className="text-sm text-[var(--text-tertiary)]">Aún no hay cursos.</p>
       ) : (
         <div className="overflow-x-auto">
           <table className="data-table">
@@ -498,7 +491,7 @@ function TeachersSection({
         <label className="field">
           <span>Correo del docente</span>
           <input className="input" type="email" required value={email} onChange={(event) => setEmail(event.target.value)} />
-          <small>El docente se registra primero en Aprendo con ese correo.</small>
+          <small>Debe tener cuenta en Aprendo.</small>
         </label>
         <div className="flex items-end">
           <button type="submit" className="btn-primary" disabled={addMutation.isPending}>
@@ -517,7 +510,7 @@ function TeachersSection({
             <span className="ruled-row-main">
               <span className="font-semibold">{studentDisplayName(teacher)}</span>
               <span className="ruled-row-note">
-                {teacher.role === 'org_admin' ? 'Administra el colegio' : 'Docente'} · {teacher.email}
+                {teacher.role === 'org_admin' ? 'Administrador' : 'Docente'} · {teacher.email}
               </span>
             </span>
             {teacher.email !== selfEmail ? (
@@ -560,9 +553,7 @@ function StudentsSection({ students, orgId }: { students: SchoolAdmin['members']
         <span className="section-meta">{students.length}</span>
       </div>
       {students.length === 0 ? (
-        <p className="text-sm text-[var(--text-tertiary)]">
-          Nadie se ha unido todavía. Los estudiantes entran con el código de su curso.
-        </p>
+        <p className="text-sm text-[var(--text-tertiary)]">Nadie se ha unido todavía.</p>
       ) : (
         <ul className="ruled-list">
           {students.map((student) => (

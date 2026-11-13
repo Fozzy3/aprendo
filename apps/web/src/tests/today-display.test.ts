@@ -84,32 +84,30 @@ const base = {
 describe('targetGapLines', () => {
   it('invites a target when there is none', () => {
     expect(targetGapLines({ ...base, target: null, gap: null }, 60)).toEqual({
-      headline: 'Ponte una meta de puntaje global',
-      detail: 'Con una meta, Hoy te dice cuánto te falta y si vas a tiempo.',
+      headline: 'Sin meta de puntaje',
+      detail: '',
       verdict: null,
     })
   })
 
   it('shows the gap and the weekly pace it needs, with no verdict before three weeks of data', () => {
     expect(targetGapLines(base, 60)).toEqual({
-      headline: 'Te faltan 40 puntos para tu meta de 330',
-      detail: 'Quedan 8 semanas: unos 5 puntos por semana.',
+      headline: 'Meta 330: faltan 40 puntos',
+      detail: '~5 puntos por semana',
       verdict: null,
     })
   })
 
   it('leaves the pace out without an exam date', () => {
-    expect(targetGapLines({ ...base, weeksRemaining: null }, null)?.detail).toBe(
-      'Pon la fecha de tu examen para saber a qué ritmo subir.',
-    )
+    expect(targetGapLines({ ...base, weeksRemaining: null }, null)?.detail).toBe('')
   })
 
-  it('tells a student whose exam already passed to update the date, with no verdict', () => {
+  it('gives no pace or verdict once the exam passed', () => {
     expect(
       targetGapLines({ ...base, weeksRemaining: null, pointsPerWeek: 4, onTrack: false }, -1),
     ).toEqual({
-      headline: 'Te faltan 40 puntos para tu meta de 330',
-      detail: 'Tu examen ya pasó: actualiza la fecha si vas a presentarlo de nuevo.',
+      headline: 'Meta 330: faltan 40 puntos',
+      detail: '',
       verdict: null,
     })
   })
@@ -121,18 +119,18 @@ describe('targetGapLines', () => {
         daysRemaining,
       )
       expect(lines?.verdict).toBeNull()
-      expect(lines?.detail).toBe('Tu examen ya está encima: repasa lo que ya sabes y descansa.')
+      expect(lines?.detail).toBe('Repasa y descansa')
     }
   })
 
   it('gives the verdict only when the backend has one', () => {
     expect(targetGapLines({ ...base, pointsPerWeek: 6, onTrack: true }, 60)?.verdict).toEqual({
       onTrack: true,
-      text: 'Vas a tiempo: subes unos 6 puntos por semana.',
+      text: 'Vas a tiempo (6 puntos por semana)',
     })
     expect(targetGapLines({ ...base, pointsPerWeek: -2, onTrack: false }, 60)?.verdict).toEqual({
       onTrack: false,
-      text: 'A tu ritmo actual (-2 puntos por semana) no llegas. Sube la dosis de práctica.',
+      text: 'A este ritmo no llegas (-2 puntos por semana)',
     })
   })
 

@@ -64,10 +64,10 @@ export function builderSessionArgs(state: BuilderState) {
 }
 
 const EMPTY_SOURCE_MESSAGE: Record<PracticeSource, string> = {
-  todas: 'No hay preguntas con estos filtros. Prueba con otra área o dificultad.',
-  no_vistas: 'Ya viste todas las preguntas con estos filtros. Elige «Todas» para repetirlas.',
-  falladas: 'No has fallado preguntas con estos filtros. Prueba con otros.',
-  marcadas: 'No has marcado preguntas con estos filtros. Márcalas con la bandera mientras resuelves.',
+  todas: 'No hay preguntas con estos filtros.',
+  no_vistas: 'Ya viste todas.',
+  falladas: 'No has fallado ninguna.',
+  marcadas: 'No has marcado ninguna.',
 }
 
 /**
@@ -85,13 +85,13 @@ export function builderStatus(
   if (available < MIN_PRACTICE_QUESTIONS) {
     return {
       canStart: false,
-      message: `Solo hay ${available} con estos filtros y una práctica necesita al menos ${MIN_PRACTICE_QUESTIONS}. Amplía los filtros.`,
+      message: `Solo hay ${available} (mínimo ${MIN_PRACTICE_QUESTIONS}).`,
     }
   }
   if (available < state.count) {
     return {
       canStart: false,
-      message: `Solo hay ${available} preguntas con estos filtros: elige menos o cambia los filtros.`,
+      message: `Solo hay ${available} preguntas.`,
     }
   }
   return { canStart: true, message: null }

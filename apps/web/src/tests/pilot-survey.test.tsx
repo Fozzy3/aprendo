@@ -31,6 +31,7 @@ let root: Root
 
 beforeEach(() => {
   state.submit = vi.fn(async () => null)
+  localStorage.clear()
   container = document.createElement('main')
   document.body.append(container)
   root = createRoot(container)
@@ -158,6 +159,23 @@ describe('PilotSurvey', () => {
     await click('Enviar')
     expect(container.querySelector('[role="alert"]')?.textContent).toContain('No pudimos enviar')
     expect(progress()).toBe('Pregunta 15 de 15')
+  })
+
+  it('keeps the answers after a reload and forgets them once sent', async () => {
+    render()
+    choose('4')
+    act(() => root.unmount())
+    root = createRoot(container)
+    render()
+    expect(container.querySelector<HTMLInputElement>('input[value="4"]')?.checked).toBe(true)
+
+    for (let index = 0; index < 6; index += 1) {
+      choose(index === 3 ? 'No lo usé' : '3')
+      await click('Siguiente')
+    }
+    for (let index = 6; index < 14; index += 1) await click('Saltar')
+    await click('Enviar')
+    expect(localStorage.getItem('aprendo:encuesta:s1')).toBeNull()
   })
 })
 

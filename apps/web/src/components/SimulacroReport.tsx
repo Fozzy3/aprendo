@@ -119,7 +119,7 @@ export function SimulacroReport({
             <span className="text-sm text-[var(--text-tertiary)]"> de {MAX_GLOBAL_SCORE}</span>
           </p>
           <p className="global-score-band tabular-nums">
-            Rango probable: <strong>{report.global.low}–{report.global.high}</strong> (± {report.global.margin})
+            Rango <strong>{report.global.low}–{report.global.high}</strong>
           </p>
           <div
             className="global-score-track"
@@ -136,7 +136,7 @@ export function SimulacroReport({
             <span className="global-score-marker" style={{ left: `${(report.global.score / MAX_GLOBAL_SCORE) * 100}%` }} />
           </div>
           <p className="global-score-note">
-            Estimado con tus respuestas en Aprendo, no es un puntaje oficial del ICFES.
+            Estimado, no oficial del ICFES.
           </p>
         </section>
       ) : gapMessage != null ? (
@@ -218,8 +218,7 @@ export function SimulacroReport({
                         <Flag size={12} aria-hidden /> Marcadas
                       </dt>
                       <dd className="m-0 tabular-nums">
-                        {area.flaggedCount} para revisar · {area.flaggedWrongCount}{' '}
-                        {area.flaggedWrongCount === 1 ? 'terminó mal' : 'terminaron mal'}
+                        {area.flaggedCount} · {area.flaggedWrongCount} mal
                       </dd>
                     </div>
                   ) : null}
@@ -252,14 +251,11 @@ export function SimulacroReport({
       {practiceTarget != null ? (
         <section className="ruled-section" aria-labelledby="report-practice">
           <h2 id="report-practice" className="section-title">Practicar lo que fallaste</h2>
-          <p className="text-sm text-[var(--text-secondary)]">
-            Empieza por {getSubtopicLabel(practiceTarget.subtopicId)}, el tema donde más fallaste.
-          </p>
           <div className="mt-3">
             <PracticeSubtopicButton
               studentId={studentId}
               subtopicId={practiceTarget.subtopicId}
-              label="Practicar lo que fallaste"
+              label={getSubtopicLabel(practiceTarget.subtopicId)}
               variant="primary"
             />
           </div>
@@ -269,9 +265,6 @@ export function SimulacroReport({
       {report.slowestQuestions.length > 0 ? (
         <section className="ruled-section" aria-labelledby="report-slowest">
           <h2 id="report-slowest" className="section-title">Donde se te fue el tiempo</h2>
-          <p className="mb-3 text-sm text-[var(--text-secondary)]">
-            Las preguntas en las que más pasaste del ritmo oficial.
-          </p>
           <ul className="ruled-list">
             {report.slowestQuestions.map((item) => (
               <li key={item.sessionQuestionId}>

@@ -110,7 +110,7 @@ function DuelQuestion({
   return (
     <>
       <p className="duel-progress">
-        <span>Pregunta {question.index + 1} de {question.total}</span>
+        <span>{question.index + 1}/{question.total}</span>
         {msLeft != null ? <span>{formatClock(msLeft)}</span> : null}
       </p>
       <div className="duel-question"><MarkdownBlock markdown={question.bodyMarkdown} /></div>
@@ -136,7 +136,7 @@ function DuelQuestion({
       </div>
       {answered != null ? (
         <p role="status" className="duel-feedback">
-          {answered.isCorrect ? '¡Punto para tu equipo!' : 'Esta no era. Viene otra.'}
+          {answered.isCorrect ? '¡Punto para tu equipo!' : 'Esta no era.'}
         </p>
       ) : null}
       {answer.error != null ? (

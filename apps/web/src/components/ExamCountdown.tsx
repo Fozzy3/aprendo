@@ -100,10 +100,7 @@ export function ExamCountdown({
   if (examDate == null || plan == null) {
     return (
       <section className="ruled-section" aria-labelledby="exam-countdown-title">
-        <h2 id="exam-countdown-title" className="section-title">¿Cuándo presentas el ICFES?</h2>
-        <p className="mb-3 text-sm text-[var(--text-secondary)]">
-          Con la fecha, tu plan deja de ser una sugerencia y pasa a tener rumbo.
-        </p>
+        <h2 id="exam-countdown-title" className="section-title mb-3">¿Cuándo presentas el ICFES?</h2>
         {dateForm}
       </section>
     )
@@ -134,12 +131,9 @@ export function ExamCountdown({
         </p>
         <div className="min-w-0 flex-1">
           <p className="m-0 font-semibold text-[var(--text-primary)]">{PHASE_COPY[plan.phase]}</p>
-          {plan.phase === 'past' ? (
-            <p className="m-0 text-sm text-[var(--text-secondary)]">Actualiza la fecha si vas a presentarlo de nuevo.</p>
-          ) : (
+          {plan.phase === 'past' ? null : (
             <p className="m-0 text-sm text-[var(--text-secondary)]">
-              {plan.weeksRemaining} {plan.weeksRemaining === 1 ? 'semana' : 'semanas'} · a tu ritmo
-              te alcanzan unas <strong className="tabular-nums">{plan.projectedSessions}</strong> sesiones más.
+              ~<strong className="tabular-nums">{plan.projectedSessions}</strong> sesiones más a tu ritmo
             </p>
           )}
         </div>
@@ -191,9 +185,6 @@ export function TargetGap({ data, daysRemaining }: { data: TodayGlobalScore; day
         <h2 id="target-gap-title" className="section-title">
           Aún no hay puntaje global
         </h2>
-        <p className="mb-3 text-sm text-[var(--text-secondary)]">
-          Se calcula con las cinco áreas. Mientras tanto, esto te falta en cada una:
-        </p>
         <ul className="ruled-list">
           {data.areaGaps.map((area) => {
             const theme = getSubjectTheme(area.subjectId)
@@ -229,8 +220,8 @@ export function TargetGap({ data, daysRemaining }: { data: TodayGlobalScore; day
           {lines.headline}
         </h2>
         <p className="m-0 text-sm text-[var(--text-secondary)]">
-          Tu global estimado: <strong className="tabular-nums">{data.estimate.score}</strong> (entre{' '}
-          {data.estimate.low} y {data.estimate.high}). {lines.detail}
+          Global estimado: <strong className="tabular-nums">{data.estimate.score}</strong> ({data.estimate.low}–{data.estimate.high})
+          {lines.detail === '' ? null : ` · ${lines.detail}`}
         </p>
         {lines.verdict != null ? (
           <p

@@ -56,7 +56,7 @@ export function ClassWeakSpots({
       ) : topics.isPending ? (
         <PageLoader message="Calculando temas…" />
       ) : topics.data.length === 0 ? (
-        <p className="text-sm text-[var(--text-tertiary)]">Todavía no hay respuestas por tema en este curso.</p>
+        <p className="text-sm text-[var(--text-tertiary)]">Sin respuestas aún.</p>
       ) : (
         <TopicBars rows={weakestCompetencies(topics.data)} />
       )}
@@ -71,11 +71,7 @@ export function ClassWeakSpots({
         <p role="alert" className="notice is-danger mt-4">{readConvexError(itemsError, 'No pudimos cargar las preguntas más falladas.')}</p>
       ) : items.length > 0 ? (
         <div className="mt-5">
-          <h3 className="m-0 mb-1 text-sm font-semibold">Las preguntas que más falla</h3>
-          <p className="text-sm text-[var(--text-secondary)]">
-            La opción equivocada más elegida es la trampa del curso. Ponla en el tablero: que voten, discutan en parejas y
-            vuelvan a votar.
-          </p>
+          <h3 className="m-0 mb-1 text-sm font-semibold">Más falladas</h3>
           <MissedQuestions items={items} />
         </div>
       ) : null}
@@ -134,8 +130,8 @@ function IcfesCompetencias({ rows }: { rows: IcfesRow[] }) {
                     <td>{getCompetenciaLabel(row.competencia)}</td>
                     <td className="is-number">
                       {row.answered < MIN_COMPETENCIA_ANSWERS
-                        ? `${row.answered} respuestas: aún pocas`
-                        : `${Math.round((row.correct / row.answered) * 100)}% de acierto · ${row.answered} respuestas`}
+                        ? `— · ${row.answered} respuestas`
+                        : `${Math.round((row.correct / row.answered) * 100)}% · ${row.answered} respuestas`}
                     </td>
                   </tr>
                 ))}
@@ -160,9 +156,9 @@ export function MissedQuestions({ items }: { items: MissedQuestion[] }) {
                 {item.subtopicId != null ? getSubtopicLabel(item.subtopicId) : 'Pregunta'}
               </span>{' '}
               <span className="ruled-row-note">
-                {item.wrong} de {item.answered} la fallaron · {item.topWrongCount} eligieron {item.topWrongOption}
-                {item.correctOption != null ? ` (la correcta es ${item.correctOption})` : ''}
-                {item.revealedCount > 0 ? ` · ${item.revealedCount} necesitaron que se les mostrara la respuesta` : ''}
+                {item.wrong}/{item.answered} fallaron · {item.topWrongCount} eligieron {item.topWrongOption}
+                {item.correctOption != null ? ` · correcta: ${item.correctOption}` : ''}
+                {item.revealedCount > 0 ? ` · ${item.revealedCount} vieron la respuesta` : ''}
               </span>
             </summary>
             <MarkdownBlock markdown={item.stem} />

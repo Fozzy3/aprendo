@@ -51,10 +51,7 @@ function JoinPage() {
         {mutation.isSuccess ? (
           <div className="mt-8">
             <h1 className="page-title">Ya estás en {mutation.data.classGroupName}</h1>
-            <p className="page-lede">
-              {mutation.data.schoolName} ahora ve tu nivel por área para acompañarte. Nadie más que tú
-              responde por tu cuenta.
-            </p>
+            <p className="page-lede">{mutation.data.schoolName} ve tu nivel por área.</p>
             <button type="button" className="btn-primary mt-6" onClick={() => void navigate({ to: '/app' })}>
               Seguir
             </button>
@@ -62,9 +59,8 @@ function JoinPage() {
         ) : (
           <form className="mt-8" onSubmit={submit}>
             <h1 className="page-title">Unirme a un curso</h1>
-            <p className="page-lede">Escribe el código que te dio tu docente. Son 8 letras y números.</p>
             <label className="field mt-6">
-              <span>Código del curso</span>
+              <span>Código de tu docente</span>
               <input
                 className="input invite-code-input"
                 required

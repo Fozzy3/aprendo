@@ -1,0 +1,506 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Aprendo · Presentación</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #1c1a1f;
+    --ink-on: #2e2b33;
+    --paper: #ffffff;
+    --desk: #f6f4f1;
+    --inset: #e8e4df;
+    --rule: #e3dfda;
+    --hair: rgba(28, 26, 31, 0.12);
+    --text-2: #4d4853;
+    --text-3: #6a6570;
+    --red: #d91e3c;
+    --red-text: #b8122f;
+    --mark: #fbdbe0;
+    --lectura: #6d3fc0;
+    --matematicas: #097d52;
+    --ciencias: #0a6fb0;
+    --sociales: #b4540a;
+    --ingles: #b3257a;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; }
+  body {
+    background: var(--ink);
+    color: var(--ink);
+    font-family: Figtree, ui-sans-serif, system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    display: grid;
+    place-items: center;
+    overflow: hidden;
+  }
+
+  /* 1em = 1% of the slide width (16px on a 1600px slide). */
+  .deck {
+    position: relative;
+    width: min(100vw, 177.78vh);
+    height: min(56.25vw, 100vh);
+    font-size: calc(min(100vw, 177.78vh) / 100);
+    background: var(--desk);
+    overflow: hidden;
+  }
+
+  .slide {
+    position: absolute;
+    inset: 0;
+    display: none;
+    padding: 5em 6em 5.5em;
+  }
+  .slide.is-active { display: flex; flex-direction: column; }
+
+  .notes { display: none; }
+
+  /* Shared type */
+  .eyebrow {
+    font-size: 1.15em;
+    font-weight: 700;
+    color: var(--text-3);
+    display: flex;
+    align-items: center;
+    gap: 0.6em;
+  }
+  .eyebrow::before {
+    content: "";
+    width: 0.55em; height: 0.55em;
+    border-radius: 50%;
+    background: var(--red);
+  }
+  h1, h2 {
+    font-weight: 800;
+    line-height: 1.08;
+    letter-spacing: -0.01em;
+    text-wrap: balance;
+  }
+  h1 { font-size: 4.4em; }
+  h2 { font-size: 3.6em; margin-top: 0.35em; }
+
+  .points { list-style: none; display: grid; gap: 1.1em; }
+  .points li {
+    font-size: 1.85em;
+    line-height: 1.3;
+    padding-left: 1.1em;
+    position: relative;
+    color: var(--text-2);
+    text-wrap: pretty;
+  }
+  .points li::before {
+    content: "";
+    position: absolute;
+    left: 0; top: 0.5em;
+    width: 0.42em; height: 0.42em;
+    border-radius: 2px;
+    background: var(--ink);
+  }
+  .points b { color: var(--ink); font-weight: 700; }
+
+  .dot { display: inline-block; width: 0.7em; height: 0.7em; border-radius: 50%; background: var(--area); flex: none; }
+
+  .foot {
+    position: absolute;
+    left: 6em; right: 6em; bottom: 2.4em;
+    display: flex; align-items: center; justify-content: space-between;
+    font-size: 1em; font-weight: 700; color: var(--text-3);
+  }
+  .foot .bar { flex: 1; height: 0.3em; margin: 0 1.6em; border-radius: 0.2em; background: var(--inset); overflow: hidden; }
+  .foot .bar i { display: block; height: 100%; background: var(--red); border-radius: 0.2em; }
+
+  .card {
+    background: var(--paper);
+    border: 1px solid var(--hair);
+    border-radius: 1em;
+  }
+
+  /* 1 · Title + problem */
+  .s1 { flex-direction: row !important; padding: 0; }
+  .s1 .left { flex: 1.25; padding: 5em 4em 5.5em 6em; display: flex; flex-direction: column; }
+  .s1 h1 { margin: 0.4em 0 0.9em; }
+  .s1 .right {
+    flex: 1;
+    background: var(--ink);
+    color: #f4f2ef;
+    padding: 5em 5em 5.5em;
+    display: flex; flex-direction: column; justify-content: center;
+  }
+  .brand { font-size: 5.2em; font-weight: 800; letter-spacing: -0.02em; line-height: 1; }
+  .brand span { color: var(--red); }
+  .brand-sub { font-size: 1.5em; font-weight: 600; color: #aaa4b0; margin-top: 0.5em; }
+  .promise { font-size: 2.2em; font-weight: 700; line-height: 1.3; margin-top: 2em; text-wrap: balance; }
+  .areas { list-style: none; display: grid; gap: 0.75em; margin-top: 2.6em; }
+  .areas li { display: flex; align-items: center; gap: 0.8em; font-size: 1.35em; font-weight: 600; color: #d3cfd8; }
+  .s1 .foot { left: 6em; right: auto; width: calc(55.5% - 10em); }
+
+  /* 2 · Method */
+  .flow { display: grid; grid-template-columns: repeat(4, 1fr); gap: 2.2em; margin-top: 3.4em; position: relative; }
+  .step { padding: 1.9em 1.8em 2em; position: relative; }
+  .step + .step::before {
+    content: "";
+    position: absolute; left: -2.2em; top: 3.1em;
+    width: 2.2em; height: 2px; background: var(--ink);
+  }
+  .step + .step::after {
+    content: "";
+    position: absolute; left: -0.75em; top: calc(3.1em - 0.45em);
+    border: 0.5em solid transparent; border-left: 0.6em solid var(--ink);
+    border-right: 0;
+  }
+  .step .n {
+    width: 2.4em; height: 2.4em; border-radius: 50%;
+    display: grid; place-items: center;
+    background: var(--ink); color: #fff;
+    font-weight: 800; font-size: 1.05em;
+  }
+  .step h3 { font-size: 1.85em; font-weight: 800; margin-top: 0.75em; line-height: 1.15; }
+  .step p { font-size: 1.3em; line-height: 1.4; color: var(--text-2); margin-top: 0.5em; text-wrap: pretty; }
+  .loop { font-size: 1.2em; font-weight: 700; color: var(--text-3); margin-top: 1.2em; text-align: right; }
+
+  .scales { display: grid; grid-template-columns: 1.35fr 1fr; gap: 2.2em; margin-top: 2.4em; }
+  .scale { padding: 1.5em 1.8em; }
+  .scale .k { font-size: 1.1em; font-weight: 700; color: var(--text-3); }
+  .levels { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1em; margin-top: 0.9em; }
+  .levels div { font-size: 1.25em; font-weight: 700; }
+  .levels i { display: block; height: 0.4em; border-radius: 0.2em; background: var(--inset); margin-top: 0.5em; overflow: hidden; }
+  .levels i::after { content: ""; display: block; height: 100%; width: var(--w); background: var(--red); }
+  .chips { display: flex; gap: 0.8em; margin-top: 0.9em; flex-wrap: wrap; }
+  .chip { font-size: 1.2em; font-weight: 700; padding: 0.35em 0.9em; border-radius: 0.6em; border: 1px solid var(--hair); background: var(--desk); }
+
+  /* 3 · Daily loop */
+  .s3 { flex-direction: row !important; gap: 5em; align-items: center; }
+  .phone {
+    width: 30em; flex: none;
+    background: var(--desk);
+    border: 1px solid var(--hair);
+    border-radius: 2.2em;
+    padding: 1.6em;
+    box-shadow: 0 0.75em 2em rgba(16, 35, 28, 0.12);
+  }
+  .phone .top { background: var(--ink); color: #fff; border-radius: 1em; padding: 0.9em 1.2em; font-weight: 800; font-size: 1.1em; display: flex; justify-content: space-between; }
+  .phone .top span { color: #aaa4b0; font-weight: 600; }
+  .phone .hello { font-size: 1.9em; font-weight: 800; margin: 0.8em 0 0.2em; }
+  .phone .facts { font-size: 1.05em; font-weight: 600; color: var(--text-2); }
+  .meter { margin-top: 1em; padding: 1em 1.1em; }
+  .meter .row { display: flex; justify-content: space-between; font-size: 1.05em; font-weight: 700; }
+  .meter .row span { color: var(--text-3); font-variant-numeric: tabular-nums; }
+  .meter i { display: block; height: 0.5em; border-radius: 0.25em; background: var(--inset); margin-top: 0.6em; overflow: hidden; }
+  .meter i::after { content: ""; display: block; height: 100%; width: 60%; background: var(--red); }
+  .next { margin-top: 0.9em; padding: 1.1em 1.2em 1.2em; box-shadow: inset 0.3em 0 0 var(--red); }
+  .tag { display: inline-block; background: var(--mark); color: var(--ink); font-weight: 800; font-size: 0.85em; padding: 0.2em 0.7em; border-radius: 1em; }
+  .next h4 { font-size: 1.35em; font-weight: 800; margin-top: 0.55em; line-height: 1.2; }
+  .next .area { display: flex; align-items: center; gap: 0.5em; font-size: 0.95em; font-weight: 700; color: var(--text-2); margin-top: 0.4em; }
+  .next .area .dot { width: 0.6em; height: 0.6em; }
+  .next .why { font-size: 0.95em; color: var(--text-2); margin-top: 0.45em; }
+  .btn { margin-top: 0.9em; background: var(--red); color: #fff; font-weight: 700; font-size: 1.05em; border-radius: 0.75em; padding: 0.75em 1em; text-align: center; }
+  .week { margin-top: 0.9em; padding: 0.9em 1.1em; }
+  .week .k { font-size: 0.95em; font-weight: 700; color: var(--text-3); }
+  .days { display: grid; grid-template-columns: repeat(7, 1fr); gap: 0.4em; margin-top: 0.6em; text-align: center; }
+  .days div { font-size: 0.85em; font-weight: 700; color: var(--text-3); }
+  .days b { display: block; width: 1.9em; height: 1.9em; margin: 0.3em auto 0; border-radius: 50%; background: var(--inset); }
+  .days .done b { background: var(--red); }
+  .days .today b { background: var(--mark); box-shadow: inset 0 0 0 2px var(--ink); }
+  .s3 .copy { flex: 1; }
+  .s3 h2 { margin-bottom: 1.1em; }
+
+  /* 4 · Teacher */
+  .s4 .cols { display: grid; grid-template-columns: 1.1fr 1fr; gap: 4em; margin-top: 2.6em; flex: 1; }
+  .tiers { display: grid; gap: 1em; align-content: start; }
+  .tier { padding: 1.3em 1.6em; display: grid; grid-template-columns: 1fr auto; gap: 0.3em 1.5em; align-items: baseline; }
+  .tier h3 { font-size: 1.65em; font-weight: 800; }
+  .tier .rule { font-size: 1.1em; font-weight: 700; color: var(--text-3); text-align: right; }
+  .tier p { grid-column: 1 / -1; font-size: 1.3em; color: var(--text-2); line-height: 1.35; }
+  .tiers .k { font-size: 1.15em; font-weight: 700; color: var(--text-3); margin-bottom: 0.2em; }
+  .s4 .points li { font-size: 1.7em; }
+  .never {
+    margin-top: 1.8em;
+    padding: 1.1em 1.5em;
+    background: var(--ink); color: #f4f2ef;
+    border-radius: 1em;
+    font-size: 1.5em; font-weight: 700; line-height: 1.3;
+  }
+
+  /* 5 · Evidence */
+  .chain { display: grid; grid-template-columns: repeat(4, 1fr); gap: 2.2em; margin-top: 3em; }
+  .link { padding: 1.4em 1.5em; position: relative; }
+  .link + .link::before {
+    content: "";
+    position: absolute; left: -2.2em; top: 50%;
+    width: 2.2em; height: 2px; background: var(--ink);
+  }
+  .link + .link::after {
+    content: "";
+    position: absolute; left: -0.75em; top: calc(50% - 0.45em);
+    border: 0.5em solid transparent; border-left: 0.6em solid var(--ink);
+    border-right: 0;
+  }
+  .link h3 { font-size: 1.55em; font-weight: 800; line-height: 1.2; }
+  .link p { font-size: 1.2em; color: var(--text-2); margin-top: 0.4em; line-height: 1.35; }
+  .evidence-note { font-size: 1.3em; font-weight: 600; color: var(--text-2); margin-top: 1.3em; }
+  .evidence-note b { color: var(--ink); }
+  .two { display: grid; grid-template-columns: 1fr 1fr; gap: 4em; margin-top: 3.6em; }
+  .two h3 { font-size: 1.25em; font-weight: 700; color: var(--text-3); margin-bottom: 1em; }
+  .two .points li { font-size: 1.6em; }
+
+  /* 6 · Close */
+  .s6 { background: var(--ink); color: #f4f2ef; justify-content: center; }
+  .s6 .eyebrow { color: #aaa4b0; }
+  .s6 h2 { font-size: 4.6em; max-width: 14em; }
+  .s6 .points { margin-top: 2.2em; max-width: 52em; }
+  .s6 .points li { color: #d3cfd8; font-size: 1.9em; }
+  .s6 .points li::before { background: var(--red); }
+  .s6 .points b { color: #fff; }
+  .cta-row { display: flex; align-items: center; gap: 2.4em; margin-top: 3em; }
+  .cta { background: var(--red); color: #fff; font-weight: 800; font-size: 1.9em; padding: 0.7em 1.4em; border-radius: 0.6em; }
+  .contact { font-size: 1.5em; font-weight: 600; color: #aaa4b0; }
+  .contact span { border-bottom: 2px dashed #6a6570; color: #d3cfd8; padding: 0 0.3em; }
+  .fine { position: absolute; left: 6em; bottom: 2.4em; font-size: 1.05em; color: #aaa4b0; font-weight: 600; }
+  .s6 .foot { display: none; }
+
+  @media print {
+    @page { size: 16in 9in; margin: 0; }
+    html, body { height: auto; overflow: visible; background: none; display: block; }
+    .deck { width: 16in; height: auto; font-size: 0.16in; overflow: visible; background: none; }
+    .slide {
+      display: flex !important;
+      flex-direction: column;
+      position: relative;
+      width: 16in; height: 9in;
+      background: var(--desk);
+      break-after: page;
+      page-break-after: always;
+      print-color-adjust: exact;
+      -webkit-print-color-adjust: exact;
+    }
+    .s1, .s3 { flex-direction: row !important; }
+    .s6 { background: var(--ink); }
+    .slide:last-of-type { break-after: auto; page-break-after: auto; }
+    .foot { display: none !important; }
+    .phone { box-shadow: none; }
+  }
+</style>
+</head>
+<body>
+<main class="deck" aria-live="polite">
+
+  <!-- 1 · Título y problema -->
+  <section class="slide s1" aria-label="Diapositiva 1">
+    <div class="left">
+      <p class="eyebrow">El problema</p>
+      <h1>Llegan al ICFES sin saber qué les falta.</h1>
+      <ul class="points">
+        <li>El estudiante repasa todo igual, sin saber <b>dónde pierde puntos</b>.</li>
+        <li>El docente <b>no alcanza a seguir</b> a cada estudiante.</li>
+        <li>La práctica está suelta: cartillas, PDF y videos.</li>
+      </ul>
+    </div>
+    <div class="right">
+      <div class="brand">Aprendo<span>.</span></div>
+      <p class="brand-sub">Preparación para el Saber 11</p>
+      <p class="promise">Un plan de estudio para cada estudiante. Un panel para su docente.</p>
+      <ul class="areas">
+        <li><span class="dot" style="--area: var(--lectura)"></span>Lectura crítica</li>
+        <li><span class="dot" style="--area: var(--matematicas)"></span>Matemáticas</li>
+        <li><span class="dot" style="--area: var(--ciencias)"></span>Ciencias naturales</li>
+        <li><span class="dot" style="--area: var(--sociales)"></span>Sociales y ciudadanas</li>
+        <li><span class="dot" style="--area: var(--ingles)"></span>Inglés</li>
+      </ul>
+    </div>
+    <aside class="notes">Abrir con la pregunta: ¿cuántos de sus estudiantes saben hoy en qué subtema pierden puntos? Aprendo cubre las cinco pruebas del Saber 11.</aside>
+  </section>
+
+  <!-- 2 · Método -->
+  <section class="slide s2" aria-label="Diapositiva 2">
+    <p class="eyebrow">Cómo enseña</p>
+    <h2>Medir, practicar con guía y volver a tiempo.</h2>
+    <div class="flow">
+      <div class="step card">
+        <div class="n">1</div>
+        <h3>Diagnóstico</h3>
+        <p>20 preguntas, 4 por área, 40&nbsp;min. Sin tutor.</p>
+      </div>
+      <div class="step card">
+        <div class="n">2</div>
+        <h3>Plan del día</h3>
+        <p>Los subtemas donde más puntos gana, según su meta de carrera.</p>
+      </div>
+      <div class="step card">
+        <div class="n">3</div>
+        <h3>Práctica guiada</h3>
+        <p>Si falla, el tutor le pregunta en vez de darle la respuesta.</p>
+      </div>
+      <div class="step card">
+        <div class="n">4</div>
+        <h3>Repaso espaciado</h3>
+        <p>Lo fallado vuelve con preguntas nuevas: 1, 3, 7, 21 y 60 días.</p>
+      </div>
+    </div>
+    <p class="loop">Y el plan se recalcula con cada sesión.</p>
+    <div class="scales">
+      <div class="scale card">
+        <p class="k">Dominio por subtema</p>
+        <div class="levels">
+          <div>Intentado<i style="--w: 25%"></i></div>
+          <div>Familiar<i style="--w: 50%"></i></div>
+          <div>Competente<i style="--w: 75%"></i></div>
+          <div>Dominado<i style="--w: 100%"></i></div>
+        </div>
+      </div>
+      <div class="scale card">
+        <p class="k">Cada respuesta lleva su confianza</p>
+        <div class="chips"><span class="chip">Seguro</span><span class="chip">Dudé</span><span class="chip">Adiviné</span></div>
+      </div>
+    </div>
+    <aside class="notes">Lecciones cortas de 3 a 5 pasos: el estudiante predice y luego ve por qué. "Repetir las que fallé" corre en modo guiado. Un acierto con ayuda del tutor cuenta, pero no sube a Competente. Un error cometido "seguro" se trata como error de concepto. La carrera es opcional: diez familias con pesos típicos (fuente UIS); el puntaje global oficial no cambia.</aside>
+  </section>
+
+  <!-- 3 · Ciclo diario -->
+  <section class="slide s3" aria-label="Diapositiva 3">
+    <div class="phone" aria-hidden="true">
+      <div class="top">Hoy <span>Aprende · Retos · Yo</span></div>
+      <p class="hello">Hola, Valentina</p>
+      <p class="facts">Racha de 4 días · 1 escudo</p>
+      <div class="meter card"><div class="row">Meta de hoy <span>6 de 10</span></div><i></i></div>
+      <div class="next card">
+        <span class="tag">Siguiente</span>
+        <h4>Razones, proporciones y porcentajes</h4>
+        <p class="area"><span class="dot" style="--area: var(--matematicas)"></span>Matemáticas</p>
+        <p class="why">Donde más puntos ganas para tu carrera.</p>
+        <div class="btn">Empezar</div>
+      </div>
+      <div class="week card">
+        <p class="k">Esta semana</p>
+        <div class="days">
+          <div class="done">L<b></b></div><div class="done">M<b></b></div><div class="done">M<b></b></div><div class="done">J<b></b></div><div class="today">V<b></b></div><div>S<b></b></div><div>D<b></b></div>
+        </div>
+      </div>
+    </div>
+    <div class="copy">
+      <p class="eyebrow">El estudiante, cada día</p>
+      <h2>Abre «Hoy» y sabe qué hacer.</h2>
+      <ul class="points">
+        <li><b>Meta diaria</b> que él elige: 5, 10, 15 o 20 preguntas.</li>
+        <li><b>Racha con escudos</b>: un día perdido no la borra.</li>
+        <li><b>Retos</b>, liga semanal del curso y duelos en clase.</li>
+        <li><b>Recompensa por esfuerzo</b>, no por acertar.</li>
+      </ul>
+    </div>
+    <aside class="notes">Pantalla ilustrativa. Un escudo se gana cada 7 días activos, se guardan hasta 2 y se gastan solos. Si la racha está por cortarse, un correo a las 6 p. m.; se apaga en Cuenta. Tras 3 días sin entrar, vuelve con una sesión suave de 5 preguntas. Nada de mensajes que regañen.</aside>
+  </section>
+
+  <!-- 4 · Docente y colegio -->
+  <section class="slide s4" aria-label="Diapositiva 4">
+    <p class="eyebrow">El docente y el colegio</p>
+    <h2>El lunes, el docente sabe qué enseñar.</h2>
+    <div class="cols">
+      <div class="tiers">
+        <p class="k">Panel del curso · Esta semana</p>
+        <div class="tier card"><h3>Todo el curso</h3><span class="rule">40 % o más con dificultad</span><p>Una clase corta del subtema.</p></div>
+        <div class="tier card"><h3>Grupo pequeño</h3><span class="rule">15 a 40 %, hasta 6</span><p>10 a 15 minutos mientras el resto practica.</p></div>
+        <div class="tier card"><h3>Uno a uno</h3><span class="rule">inactivo o nivel 1</span><p>Una conversación corta, con una pregunta para abrirla.</p></div>
+      </div>
+      <div>
+        <ul class="points">
+          <li>Asigna práctica o tiquete de salida <b>con un clic</b>.</li>
+          <li><b>Guía de clase</b> por subtema, imprimible.</li>
+          <li><b>Duelo en vivo</b> por equipos, en el proyector.</li>
+          <li>El colegio: <b>pruebas periódicas</b> y el antes y después de cada ciclo.</li>
+        </ul>
+        <p class="never">El docente nunca califica ni responde por el estudiante.</p>
+      </div>
+    </div>
+    <aside class="notes">Pestañas del curso: Esta semana, Resultados y Plan. Los niveles cuentan solo a estudiantes con evidencia (3 intentos en el subtema, mínimo 5 estudiantes); "con dificultad" = por debajo de Familiar. Uno a uno: nivel 1 en un área, 14 días inactivo o sin diagnóstico. La guía está escrita con IA y marcada para que el docente la revise. El duelo dura 10 minutos, solo muestra puntaje por equipo y no cuenta para el dominio. El docente tampoco ve respuestas en vivo. Ciclo de 2 semanas: medir, decidir, enseñar, practicar, volver a medir.</aside>
+  </section>
+
+  <!-- 5 · Evidencia -->
+  <section class="slide s5" aria-label="Diapositiva 5">
+    <p class="eyebrow">Qué medimos</p>
+    <h2>Cada respuesta es evidencia.</h2>
+    <div class="chain">
+      <div class="link card"><h3>Respuestas</h3><p>Acierto, tiempo, confianza y ayuda pedida.</p></div>
+      <div class="link card"><h3>Dominio por subtema</h3><p>De Intentado a Dominado.</p></div>
+      <div class="link card"><h3>Nivel por área</h3><p>Escala ICFES 1 a 4; A- a B+ en inglés.</p></div>
+      <div class="link card"><h3>Plan siguiente</h3><p>Reglas a la vista, no una caja negra.</p></div>
+    </div>
+    <p class="evidence-note"><b>Sin nivel hasta tener evidencia suficiente.</b> Pocas preguntas no alcanzan para decirle a nadie su nivel.</p>
+    <div class="two">
+      <div>
+        <h3>En el piloto</h3>
+        <ul class="points">
+          <li>Quién vuelve al día 2 y al día 7.</li>
+          <li>Encuesta del piloto en la app.</li>
+        </ul>
+      </div>
+      <div>
+        <h3>Lo que sigue</h3>
+        <ul class="points">
+          <li>Banco de preguntas propio, revisado por docentes.</li>
+          <li>Ajustar las reglas con los colegios piloto.</li>
+        </ul>
+      </div>
+    </div>
+    <aside class="notes">El progreso sale de las respuestas registradas, no de lo que el tutor "cree". Embudo del piloto: registro, consentimiento, bienvenida, diagnóstico, primera práctica, día 2, día 7; correos enviados frente a abiertos. La encuesta tiene 15 preguntas (facilidad, diagnóstico, utilidad del tutor, parecido al Saber 11, qué los hace volver). Por ciclo: cuántos estaban por debajo de Familiar al empezar y hoy.</aside>
+  </section>
+
+  <!-- 6 · Cierre -->
+  <section class="slide s6" aria-label="Diapositiva 6">
+    <p class="eyebrow">Piloto</p>
+    <h2>Probémoslo con un curso de grado 11.</h2>
+    <ul class="points">
+      <li><b>Gratis y sin fines comerciales</b> durante el piloto.</li>
+      <li>Los estudiantes entran con un <b>enlace del curso</b>.</li>
+      <li>El docente usa el panel <b>desde la primera semana</b>.</li>
+      <li>A las dos semanas, revisamos juntos <b>el antes y después</b>.</li>
+    </ul>
+    <div class="cta-row">
+      <span class="cta">¿Empezamos?</span>
+      <p class="contact">Contacto: <span>correo · teléfono</span></p>
+    </div>
+    <p class="fine">Menores de edad, con autorización de su acudiente. Las preguntas oficiales del ICFES se muestran con su fuente, solo para estudio.</p>
+    <aside class="notes">Pedir: un curso, un docente que abra el panel cada semana y la autorización de los acudientes. Completar el contacto antes de presentar.</aside>
+  </section>
+
+  <div class="foot" aria-hidden="true"><span>Aprendo</span><span class="bar"><i></i></span><span class="count"></span></div>
+</main>
+
+<script>
+  const slides = [...document.querySelectorAll('.slide')]
+  const foot = document.querySelector('.foot')
+  const bar = foot.querySelector('.bar i')
+  const count = foot.querySelector('.count')
+  let current = 0
+
+  function show(index) {
+    current = Math.max(0, Math.min(slides.length - 1, index))
+    slides.forEach((slide, i) => slide.classList.toggle('is-active', i === current))
+    const slide = slides[current]
+    foot.style.display = slide.classList.contains('s6') ? 'none' : ''
+    foot.style.left = slide.classList.contains('s1') ? '6em' : ''
+    foot.style.right = slide.classList.contains('s1') ? 'calc(44.5% + 4em)' : ''
+    bar.style.width = `${((current + 1) / slides.length) * 100}%`
+    count.textContent = `${current + 1} / ${slides.length}`
+    if (location.hash !== `#${current + 1}`) history.replaceState(null, '', `#${current + 1}`)
+  }
+
+  const fromHash = () => (parseInt(location.hash.slice(1), 10) || 1) - 1
+
+  document.addEventListener('keydown', (event) => {
+    if (['ArrowRight', 'ArrowDown', 'PageDown', ' ', 'Enter'].includes(event.key)) { event.preventDefault(); show(current + 1) }
+    if (['ArrowLeft', 'ArrowUp', 'PageUp', 'Backspace'].includes(event.key)) { event.preventDefault(); show(current - 1) }
+    if (event.key === 'Home') show(0)
+    if (event.key === 'End') show(slides.length - 1)
+  })
+  document.addEventListener('click', (event) => {
+    show(event.clientX < window.innerWidth / 3 ? current - 1 : current + 1)
+  })
+  window.addEventListener('hashchange', () => show(fromHash()))
+  show(fromHash())
+</script>
+</body>
+</html>

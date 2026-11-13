@@ -126,44 +126,41 @@ export function targetGapLines(data: GlobalGap, daysRemaining: number | null): {
   if (data.estimate == null) return null
   if (data.target == null || data.gap == null) {
     return {
-      headline: 'Ponte una meta de puntaje global',
-      detail: 'Con una meta, Hoy te dice cuánto te falta y si vas a tiempo.',
+      headline: 'Sin meta de puntaje',
+      detail: '',
       verdict: null,
     }
   }
   if (data.gap <= 0) {
     return {
       headline: `Ya alcanzaste tu meta de ${data.target}`,
-      detail: 'Súbela si quieres apuntar más alto.',
+      detail: '',
       verdict: null,
     }
   }
 
-  const headline = `Te faltan ${data.gap} puntos para tu meta de ${data.target}`
+  const headline = `Meta ${data.target}: faltan ${data.gap} puntos`
   if (daysRemaining != null && daysRemaining < 0) {
-    return { headline, detail: 'Tu examen ya pasó: actualiza la fecha si vas a presentarlo de nuevo.', verdict: null }
+    return { headline, detail: '', verdict: null }
   }
   if (daysRemaining != null && daysRemaining <= LIGHT_DAYS_BEFORE_EXAM) {
-    return { headline, detail: 'Tu examen ya está encima: repasa lo que ya sabes y descansa.', verdict: null }
+    return { headline, detail: 'Repasa y descansa', verdict: null }
   }
 
   const detail =
     daysRemaining == null || data.weeksRemaining == null
-      ? 'Pon la fecha de tu examen para saber a qué ritmo subir.'
+      ? ''
       : data.weeksRemaining <= 0
-        ? 'Tu examen es esta semana: repasa lo que ya sabes.'
-        : `Quedan ${data.weeksRemaining} ${data.weeksRemaining === 1 ? 'semana' : 'semanas'}: unos ${Math.ceil(data.gap / data.weeksRemaining)} puntos por semana.`
+        ? 'Repasa lo que ya sabes'
+        : `~${Math.ceil(data.gap / data.weeksRemaining)} puntos por semana`
 
   const pace = data.pointsPerWeek == null ? null : Math.round(data.pointsPerWeek)
   const verdict =
     data.onTrack == null || pace == null
       ? null
       : data.onTrack
-        ? { onTrack: true, text: `Vas a tiempo: subes unos ${pace} puntos por semana.` }
-        : {
-            onTrack: false,
-            text: `A tu ritmo actual (${pace} puntos por semana) no llegas. Sube la dosis de práctica.`,
-          }
+        ? { onTrack: true, text: `Vas a tiempo (${pace} puntos por semana)` }
+        : { onTrack: false, text: `A este ritmo no llegas (${pace} puntos por semana)` }
 
   return { headline, detail, verdict }
 }

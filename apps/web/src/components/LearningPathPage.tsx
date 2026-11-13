@@ -5,7 +5,6 @@ import { Play } from 'lucide-react'
 import { useState, type CSSProperties } from 'react'
 import { api } from '@aprendo/convex/api'
 import type { MasteryLevel } from '@aprendo/convex/mastery'
-import { SESSION_KIND_CONFIG, getConfiguredQuestionCount } from '@aprendo/convex/sessionKinds'
 import { learningPathQuery, pathSubjectsQuery, studentProgressQuery, todayDashboardQuery } from '../lib/student-queries.ts'
 import { getSubjectTheme } from '../lib/subject-theme.ts'
 import { focusSubjectId } from '../lib/progress-display.ts'
@@ -23,7 +22,6 @@ import { PageLoader } from './FullScreenLoader.tsx'
 import { MasteryBadge, MasteryLegend } from './MasteryBadge.tsx'
 
 const DEFAULT_SUBJECT_ID = 'lectura_critica'
-const TOPIC_QUESTIONS = getConfiguredQuestionCount(SESSION_KIND_CONFIG.topic)
 
 type PathNode = {
   subtopicId: string
@@ -96,7 +94,7 @@ export function LearningPathPage({ studentId, initialSubjectId = null }: { stude
             <span className="aprende-bar" aria-hidden>
               <span style={{ width: `${mastery.subtopicCount === 0 ? 0 : (mastery.competenteOrAbove / mastery.subtopicCount) * 100}%` }} />
             </span>
-            <p className="aprende-count">{mastery.competenteOrAbove} de {mastery.subtopicCount} temas en Competente o más</p>
+            <p className="aprende-count">{mastery.competenteOrAbove}/{mastery.subtopicCount} temas</p>
           </>
         ) : null}
         {path.data != null ? <LevelNote level={path.data.level} /> : null}
@@ -106,11 +104,12 @@ export function LearningPathPage({ studentId, initialSubjectId = null }: { stude
             type="button"
             className="btn-primary aprende-go"
             disabled={startTopic.isPending}
+            aria-label={`Practicar ${nextTopic.label}`}
             onClick={() => startTopic.mutate(nextTopic.subtopicId)}
           >
             {startTopic.isPending && startTopic.variables === nextTopic.subtopicId
               ? 'Preparando…'
-              : `Practicar ${nextTopic.label} · ${TOPIC_QUESTIONS} preguntas`}
+              : <><Play size={16} aria-hidden /> {nextTopic.label}</>}
           </button>
         ) : null}
       </section>
@@ -124,11 +123,11 @@ export function LearningPathPage({ studentId, initialSubjectId = null }: { stude
       {nodes == null ? (
         <PageLoader message="Cargando tus temas…" />
       ) : nodes.length === 0 ? (
-        <EmptyState title="Esta área aún no tiene temas">Prueba con otra mientras tanto.</EmptyState>
+        <EmptyState title="Esta área aún no tiene temas" />
       ) : (
         <section className="aprende-topics" aria-label="Temas">
           <details className="aprende-more">
-            <summary>¿Cómo se sube de nivel en un tema?</summary>
+            <summary>Niveles</summary>
             <MasteryLegend />
           </details>
           {byCategory(nodes).map((group) => (
@@ -183,17 +182,8 @@ type SubjectLevel = {
 
 function LevelNote({ level }: { level: SubjectLevel }) {
   const placement = level.hasEnoughEvidence ? level.placement : null
-  if (placement == null) {
-    return <p className="aprende-note">Te faltan {level.attemptsNeeded} preguntas en esta área para calcular tu nivel ICFES.</p>
-  }
-  return (
-    <p className="aprende-note">
-      {placement.band.descriptorEs}
-      {placement.nextBand != null && placement.pointsToNextBand != null
-        ? ` Te faltan ${placement.pointsToNextBand} puntos para ${placement.nextBand.labelEs}.`
-        : ' Estás en el nivel más alto de esta área.'}
-    </p>
-  )
+  if (placement?.nextBand == null || placement.pointsToNextBand == null) return null
+  return <p className="aprende-note">{placement.pointsToNextBand} puntos para {placement.nextBand.labelEs}</p>
 }
 
 /** A topic: its name, level and evidence (opens the lesson), and its practice button. */

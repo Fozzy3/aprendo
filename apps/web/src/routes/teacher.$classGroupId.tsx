@@ -97,16 +97,14 @@ function ClassOverviewPage() {
               <p className="page-lede">Grado {overview.classGroup.grade}</p>
               {!overview.organization.licenseActive ? (
                 <p role="status" className="notice is-danger">
-                  La licencia del colegio venció: nadie puede unirse a este curso hasta que se renueve. Los
-                  datos del curso siguen aquí.
+                  La licencia del colegio venció: nadie puede unirse.
                 </p>
               ) : null}
             </header>
 
             {overview.students.length === 0 ? (
               <EmptyState title="Este curso aún no tiene estudiantes">
-                Comparte el código del curso ({overview.classGroup.inviteCode}). Cada estudiante crea su cuenta
-                en Aprendo y lo escribe en «Unirme a un curso».
+                Comparte el código {overview.classGroup.inviteCode}.
               </EmptyState>
             ) : (
               <>
@@ -182,7 +180,7 @@ function InviteCode({ code }: { code: string }) {
   const link = typeof window === 'undefined' ? '' : `${window.location.origin}/join?codigo=${code}`
   return (
     <div className="invite-code">
-      <p className="invite-code-label">Código para unirse</p>
+      <p className="invite-code-label">Código</p>
       <p className="invite-code-value">{code}</p>
       <button
         type="button"
@@ -239,7 +237,7 @@ function WeekActions({
           )
         }}
       >
-        {copyState === 'copied' ? 'Mensaje copiado' : copyState === 'failed' ? 'No se pudo copiar' : 'Copiar mensaje para las familias'}
+        {copyState === 'copied' ? 'Mensaje copiado' : copyState === 'failed' ? 'No se pudo copiar' : 'Copiar mensaje a familias'}
       </button>
       {openDuel.error != null ? (
         <p role="alert" className="notice is-danger w-full">{readConvexError(openDuel.error, 'No se pudo abrir el duelo.')}</p>
@@ -310,7 +308,7 @@ function ClassLevelsChart({ overview }: { overview: Overview }) {
         ))}
         <span className="inline-flex items-center gap-1.5">
           <span aria-hidden className="level-swatch level-none" />
-          sin nivel aún
+          sin nivel
         </span>
       </p>
     </section>
@@ -323,7 +321,7 @@ function StudentsGrid({ overview, now, classGroupId }: { overview: Overview; now
     <section className="ruled-section" aria-labelledby="levels-title">
       <div className="section-head">
         <h2 id="levels-title" className="section-title">Cada estudiante</h2>
-        <span className="section-meta">— : aún sin evidencia suficiente</span>
+        <span className="section-meta">— sin evidencia</span>
       </div>
       <div className="overflow-x-auto">
         <table className="data-table level-grid">

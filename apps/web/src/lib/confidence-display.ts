@@ -30,29 +30,13 @@ export const CONFIDENCE_OPTIONS: Array<{
   },
 ]
 
-/** How each diagnosed state is named and explained to the student. */
+/** How each diagnosed state is named to the student. */
 export const LEARNING_STATE_DISPLAY: Record<
   LearningState,
-  { label: string; description: string; tone: 'good' | 'warn' | 'danger' | 'neutral' }
+  { label: string; tone: 'good' | 'warn' | 'danger' | 'neutral' }
 > = {
-  mastered: {
-    label: 'Seguro y bien',
-    description: 'Respondiste bien y sabías por qué.',
-    tone: 'good',
-  },
-  fragile: {
-    label: 'Frágil',
-    description: 'Acertaste, pero sin estar seguro. En el examen puede no repetirse.',
-    tone: 'warn',
-  },
-  misconception: {
-    label: 'Error de concepto',
-    description: 'Estabas seguro y fallaste. Esto es lo más urgente de revisar.',
-    tone: 'danger',
-  },
-  gap: {
-    label: 'Por aprender',
-    description: 'Fallaste y ya sabías que no lo dominabas.',
-    tone: 'neutral',
-  },
+  mastered: { label: 'Seguro y bien', tone: 'good' },
+  fragile: { label: 'Acertaste dudando', tone: 'warn' },
+  misconception: { label: 'Seguro y mal', tone: 'danger' },
+  gap: { label: 'Por aprender', tone: 'neutral' },
 }

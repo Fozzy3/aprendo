@@ -37,10 +37,7 @@ export function ClassWeekPlan({ plan, now, classGroupId, canWrite }: { plan: Wee
       <section className="ruled-section" aria-labelledby="week-class-title">
         <h2 id="week-class-title" className="section-title">Esta semana con todo el curso</h2>
         {plan.wholeClass.length === 0 ? (
-          <p className="text-sm text-[var(--text-secondary)]">
-            Ningún tema deja atrás al 40% del curso, o aún no hay evidencia suficiente (5 estudiantes con 3
-            respuestas en el tema). Trabaja con los grupos de abajo.
-          </p>
+          <p className="text-sm text-[var(--text-secondary)]">Ningún tema para todo el curso esta semana.</p>
         ) : (
           <ol className="ruled-list">
             {plan.wholeClass.map((item) => (
@@ -48,12 +45,10 @@ export function ClassWeekPlan({ plan, now, classGroupId, canWrite }: { plan: Wee
                 <span className="ruled-row-main">
                   <SubtopicName subtopicId={item.subtopicId} subjectId={item.subjectId} />
                   <span className="ruled-row-note">
-                    {item.belowCount} de {item.evidencedCount} ({percent(item.belowCount, item.evidencedCount)}) están por
-                    debajo de Familiar
+                    {item.belowCount} de {item.evidencedCount} ({percent(item.belowCount, item.evidencedCount)}) bajo Familiar
                     {item.misconceptionShare >= 0.2
-                      ? ` · ${percent(item.misconceptionShare, 1)} de sus errores fueron "seguros": hay un error de concepto`
+                      ? ` · error de concepto (${percent(item.misconceptionShare, 1)} de errores seguros)`
                       : ''}
-                    . Clase corta de 15–20 min y una votación en parejas con una de las preguntas de Resultados.
                   </span>
                   <span className="mt-2 flex flex-wrap gap-2">
                     {canWrite ? (
@@ -91,10 +86,7 @@ export function ClassWeekPlan({ plan, now, classGroupId, canWrite }: { plan: Wee
                   <span className="ruled-row-note [overflow-wrap:anywhere]">
                     {group.students.map((student) => studentDisplayName({ name: student.name ?? null, email: student.email ?? '' })).join(', ')}
                   </span>
-                  <span className="margin-note">
-                    10–15 min mientras el resto practica: tú resuelves un ejemplo en voz alta, luego uno juntos, luego
-                    cada uno solo.
-                  </span>
+                  <span className="margin-note">10–15 min</span>
                   <span className="mt-2 flex flex-wrap gap-2">
                     {canWrite ? (
                       <AssignButton
@@ -124,9 +116,7 @@ export function ClassWeekPlan({ plan, now, classGroupId, canWrite }: { plan: Wee
       <section className="ruled-section" aria-labelledby="week-individual-title">
         <h2 id="week-individual-title" className="section-title">Uno a uno</h2>
         {plan.individual.length === 0 ? (
-          <p className="text-sm text-[var(--text-secondary)]">
-            Nadie por ahora: todos están nivelados, practican y ninguno está en el nivel 1 de un área.
-          </p>
+          <p className="text-sm text-[var(--text-secondary)]">Nadie por ahora.</p>
         ) : (
           <ul className="ruled-list">
             {plan.individual.map((student) => (
@@ -209,10 +199,9 @@ export function ClassAssignments({ classGroupId, canWrite }: { classGroupId: str
               <span className="font-semibold">{getSubtopicLabel(assignment.subtopicId)}</span>
               <span className="ruled-row-note">
                 {ASSIGNMENT_KIND_LABEL[assignment.kind]}
-                {assignment.isGroup ? ' · grupo' : ' · todo el curso'} · {assignment.doneCount} de {assignment.targetCount} la
-                hicieron
+                {assignment.isGroup ? ' · grupo' : ' · curso'} · {assignment.doneCount}/{assignment.targetCount} hechas
                 {assignment.inProgressCount > 0 ? ` · ${assignment.inProgressCount} en curso` : ''}
-                {assignment.accuracy != null ? ` · ${Math.round(assignment.accuracy * 100)}% de acierto` : ''}
+                {assignment.accuracy != null ? ` · ${Math.round(assignment.accuracy * 100)}% acierto` : ''}
               </span>
             </span>
             {canWrite ? <RemoveAssignment assignmentId={assignment.assignmentId} subtopicId={assignment.subtopicId} /> : null}

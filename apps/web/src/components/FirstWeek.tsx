@@ -36,7 +36,7 @@ export function FirstWeekCommit({
   return (
     <div className="first-week-commit">
       <h2 className="first-week-title">¿Cuántos días esta semana?</h2>
-      <p className="first-week-note">Unos {minutesPerDay} minutos cada día.</p>
+      <p className="first-week-note">{minutesPerDay} min al día</p>
       <div className="first-week-choices">
         {COMMIT_DAYS.map((days) => (
           <button

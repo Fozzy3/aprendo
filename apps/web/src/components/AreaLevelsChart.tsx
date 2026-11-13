@@ -33,7 +33,7 @@ export function AreaLevelsChart({
               </span>
               {row.score == null ? (
                 <span className="area-chart-empty">
-                  Sin nivel aún · {row.attemptCount} {row.attemptCount === 1 ? 'respuesta' : 'respuestas'}
+                  Sin nivel · {row.attemptCount} resp.
                   {emptyAction?.(row.subjectId)}
                 </span>
               ) : (
@@ -67,8 +67,8 @@ export function AreaLevelsChart({
       </ul>
       <p className="area-chart-legend">
         <span className="area-chart-legend-fill" aria-hidden /> hoy
-        <span className="area-chart-legend-start" aria-hidden /> al nivelarte
-        <span className="area-chart-legend-cut" aria-hidden /> cortes de nivel del ICFES
+        <span className="area-chart-legend-start" aria-hidden /> inicio
+        <span className="area-chart-legend-cut" aria-hidden /> cortes ICFES
       </p>
       {rows.some((row) => row.nationalNote != null) ? (
         <ul className="area-chart-national">

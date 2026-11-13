@@ -30,7 +30,6 @@ export function DiagnosticResult({
   studentId: string
 }) {
   const areas = diagnosticAreas(session.summary?.subjectScores ?? [])
-  const weakest = areas[0]
   const t = motionTokens()
   // Bars stagger at twice the step rhythm so each reads as its own area.
   const barDelay = (index: number) => index * t.stagger * 2
@@ -44,7 +43,7 @@ export function DiagnosticResult({
           <h1 className="page-title mt-1 text-balance">Tu punto de partida</h1>
           {session.summary != null ? (
             <p className="page-lede tabular-nums">
-              Acertaste {session.summary.correctCount} de {session.summary.questionCount}. Así quedaste en cada área.
+              {session.summary.correctCount} de {session.summary.questionCount} correctas
             </p>
           ) : null}
         </header>
@@ -75,10 +74,7 @@ export function DiagnosticResult({
               )
             })}
           </ul>
-          <p className="notice">
-            <strong className="text-[var(--text-primary)]">Niveles preliminares.</strong> Salen de pocas preguntas
-            por área; tu práctica los confirma o los corrige.
-          </p>
+          <p className="notice">Niveles preliminares</p>
         </section>
 
         <motion.section
@@ -89,11 +85,6 @@ export function DiagnosticResult({
           transition={{ duration: t.step, ease: t.ease, delay: planDelay }}
         >
           <h2 id="diagnostic-plan-title" className="section-title">Tu plan está listo</h2>
-          {weakest != null ? (
-            <p className="mb-3 text-sm text-[var(--text-secondary)]">
-              Empezamos por {getSubjectTheme(weakest.subjectId).label}: ahí es donde más puedes subir.
-            </p>
-          ) : null}
           <Link to="/today" className="btn-primary no-underline">
             Ver mi plan de hoy <ArrowRight size={16} aria-hidden />
           </Link>

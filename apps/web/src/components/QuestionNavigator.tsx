@@ -55,13 +55,6 @@ export function QuestionNavigator({
             </Dialog.Close>
           </header>
 
-          <ul className="solve-map-legend" aria-label="Leyenda">
-            <li><span className="solve-map-key is-answered" aria-hidden /> respondida</li>
-            <li><span className="solve-map-key" aria-hidden /> sin responder</li>
-            <li><Flag size={12} className="solve-map-flag-key" aria-hidden /> marcada</li>
-            <li><span className="solve-map-key is-current" aria-hidden /> actual</li>
-          </ul>
-
           <nav className="solve-map-grid" aria-label="Ir a una pregunta">
             {navigatorRuns(questions.map((question) => question.groupId)).map((run) => {
               const cells = run.indexes.flatMap((index) => {

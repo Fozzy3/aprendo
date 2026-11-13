@@ -413,8 +413,8 @@ describe('/path, Aprende', () => {
     const head = container.querySelector<HTMLElement>('.aprende-head')!
     expect(head.style.getPropertyValue('--area')).toBe('var(--subject-matematicas)')
     expect(container.querySelector('h1')?.textContent).toBe('Matemáticas')
-    expect(head.textContent).toContain('1 de 2 temas en Competente o más')
-    expect(head.textContent).toContain('Te faltan 8 preguntas')
+    expect(head.textContent).toContain('1/2 temas')
+    expect(head.textContent).not.toContain('Te faltan')
   })
 
   it('opens on the area Hoy linked to', async () => {
@@ -449,7 +449,7 @@ describe('/path, Aprende', () => {
     expect(container.querySelector('.aprende-slot')).toBeNull()
     expect(container.querySelector('.aprende-topic.is-current')?.textContent).toContain('Siguiente')
     expect(hrefs('a')).not.toContain('/syllabus')
-    expect(container.textContent).toContain('12 respondidas · 75 % de acierto')
+    expect(container.textContent).toContain('75 % de 12')
   })
 
   it('starts any topic from its own row', async () => {
@@ -469,16 +469,16 @@ describe('/path, Aprende', () => {
 
 function seedHoy(tasks: object[] = [
   {
-    id: 'practice:b', kind: 'practice', title: 'Practica Proporciones', minutes: 10,
-    reason: 'Proporciones (Matemáticas) es donde más puntos del global puedes ganar.',
+    id: 'practice:b', kind: 'practice', title: 'Proporciones', minutes: 10,
+    reason: 'Donde más puntos ganas',
     action: { type: 'session', kind: 'topic', subtopicId: 'matematicas.number_proportionality.ratios_proportions_percent' },
   },
   {
-    id: 'lesson:a', kind: 'lesson', title: 'Lección: Fracciones', minutes: 5, reason: 'Primero la idea.',
+    id: 'lesson:a', kind: 'lesson', title: 'Lección: Fracciones', minutes: 5, reason: 'Primero la idea',
     action: { type: 'lesson', subtopicId: 'a' },
   },
   {
-    id: 'simulacro', kind: 'simulacro', title: 'Simulacro · Sesión 1', minutes: 270, reason: 'Tu punto de partida.',
+    id: 'simulacro', kind: 'simulacro', title: 'Simulacro · Sesión 1', minutes: 270, reason: 'Tu punto de partida',
     action: { type: 'session', kind: 'simulacro', simulacroSessionNumber: 1 },
   },
 ]) {
@@ -521,8 +521,8 @@ describe('/today, Hoy', () => {
     seedHoy()
     await render('../routes/today.tsx')
     const next = container.querySelector('[aria-labelledby="hoy-next-title"]')!
-    expect(next.textContent).toContain('Practica Proporciones')
-    expect(next.textContent).toContain('donde más puntos del global puedes ganar')
+    expect(next.textContent).toContain('Proporciones')
+    expect(next.textContent).toContain('Donde más puntos ganas')
     expect(container.querySelectorAll('.btn-primary')).toHaveLength(1)
   })
 
@@ -544,7 +544,7 @@ describe('/today, Hoy', () => {
     await render('../routes/today.tsx')
     const rest = container.querySelector('[aria-labelledby="hoy-rest-title"]')!
     expect(rest.textContent).toContain('Lección: Fracciones')
-    expect(rest.textContent).toContain('Primero la idea.')
+    expect(rest.textContent).toContain('Primero la idea')
     expect([...rest.querySelectorAll('a')].map((link) => link.getAttribute('href'))).toEqual(['/lesson/$subtopicId', '/practice'])
   })
 
@@ -553,9 +553,9 @@ describe('/today, Hoy', () => {
     await render('../routes/today.tsx')
     const areas = container.querySelector('[aria-labelledby="hoy-areas-title"]')!
     expect(areas.textContent).toContain('Matemáticas')
-    expect(areas.textContent).toContain('1 de 3 temas')
+    expect(areas.textContent).toContain('1/3 temas')
     expect(areas.textContent).toContain('Nivel 2')
-    expect(areas.textContent).toContain('Sin nivel aún')
+    expect(areas.textContent).toContain('Sin nivel')
     expect(container.querySelector('.sticker')).toBeNull()
   })
 
@@ -582,7 +582,7 @@ describe('/today, Hoy', () => {
     seedHoy()
     await render('../routes/today.tsx')
     const meter = container.querySelector('.goal-meter')!
-    expect(meter.textContent).toContain('2 de 5 preguntas')
+    expect(meter.textContent).toContain('2/5')
     expect(meter.classList.contains('is-met')).toBe(false)
 
     act(() => root.unmount())
@@ -625,7 +625,7 @@ describe('/today, Hoy', () => {
     seedHoy()
     dashboard().practicedToday = false
     await render('../routes/today.tsx')
-    expect(container.querySelector('.next-card')?.textContent).toContain('Tu racha de 4 días sigue viva: 5 preguntas la cuidan')
+    expect(container.querySelector('.next-card')?.textContent).toContain('Cuida tu racha de 4 días')
     vi.useRealTimers()
   })
 
@@ -635,7 +635,7 @@ describe('/today, Hoy', () => {
     seedHoy()
     dashboard().practicedToday = false
     await render('../routes/today.tsx')
-    expect(container.querySelector('.next-card')?.textContent).not.toContain('sigue viva')
+    expect(container.querySelector('.next-card')?.textContent).not.toContain('Cuida tu racha')
     vi.useRealTimers()
   })
 
@@ -645,7 +645,7 @@ describe('/today, Hoy', () => {
     state.mutation.mockResolvedValue('new-session')
     await render('../routes/today.tsx')
     const next = container.querySelector('[aria-labelledby="hoy-next-title"]')!
-    expect(next.textContent).toContain('¡Qué bueno verte! Empecemos suave')
+    expect(next.textContent).toContain('¡Qué bueno verte!')
     expect(container.querySelectorAll('.btn-primary')).toHaveLength(1)
     await act(async () => (next.querySelector('.btn-primary') as HTMLButtonElement).click())
     expect(state.mutation).toHaveBeenCalledWith({
@@ -667,7 +667,7 @@ describe('/today, Hoy', () => {
     seedHoy()
     dashboard().surveyDue = true
     await render('../routes/today.tsx')
-    const card = [...container.querySelectorAll('a')].find((link) => link.textContent?.includes('Cuéntanos cómo te va (4 min)'))
+    const card = [...container.querySelectorAll('a')].find((link) => link.textContent?.includes('Cuéntanos cómo te va'))
     expect(card?.getAttribute('href')).toBe('/encuesta')
     expect(state.track).toHaveBeenCalledWith('survey_shown')
     expect(container.querySelectorAll('.btn-primary')).toHaveLength(1)
@@ -728,7 +728,7 @@ describe('/progress, Yo', () => {
     seedYo()
     await render('../routes/progress.tsx')
     expect(container.querySelector('h1')?.textContent).toBe('Ana Ruiz')
-    expect(container.querySelector('.yo-cover')?.textContent).toContain('2 temas en Competente o más')
+    expect(container.querySelector('.yo-cover')?.textContent).toContain('2 temas en Competente+')
     expect(container.querySelector('.student-tabbar [aria-current="page"]')?.textContent).toBe('Yo')
   })
 
@@ -759,6 +759,24 @@ describe('/progress, Yo', () => {
     await render('../routes/progress.tsx')
     expect(container.textContent).toContain('Hacer el diagnóstico')
     expect(container.querySelector('[aria-labelledby="yo-settings-title"]')?.textContent).toContain('Salir')
+  })
+
+  it('offers the pilot survey in the settings until it is answered', async () => {
+    seedYo()
+    state.queries['pilotSurvey:getMine'] = { isPending: false, data: null }
+    await render('../routes/progress.tsx')
+    const settings = container.querySelector('[aria-labelledby="yo-settings-title"]')!
+    const row = [...settings.querySelectorAll('a')].find((link) => link.getAttribute('href') === '/encuesta')
+    expect(row?.textContent).toBe('¿Qué te pareció Aprendo?')
+  })
+
+  it('hides the survey row once answered, or while it loads', async () => {
+    seedYo()
+    await render('../routes/progress.tsx')
+    expect(container.querySelector('a[href="/encuesta"]')).toBeNull()
+    state.queries['pilotSurvey:getMine'] = { isPending: false, data: { submittedAt: 1 } }
+    await render('../routes/progress.tsx')
+    expect(container.querySelector('a[href="/encuesta"]')).toBeNull()
   })
 })
 
@@ -971,19 +989,10 @@ describe('/cuenta', () => {
     expect(toggle.checked).toBe(false)
   })
 
-  it('invites to the pilot survey until it is answered', async () => {
+  it('no longer carries the pilot survey', async () => {
     state.queries['pilotSurvey:getMine'] = { isPending: false, data: null }
     await render('../routes/cuenta.tsx')
-    const section = container.querySelector('[aria-labelledby="cuenta-survey-title"]')!
-    expect(section.querySelector('h2')?.textContent).toBe('Encuesta del piloto')
-    expect(section.querySelector('a')?.getAttribute('href')).toBe('/encuesta')
-  })
-
-  it('thanks the student once the survey is answered', async () => {
-    state.queries['pilotSurvey:getMine'] = { isPending: false, data: { submittedAt: 1 } }
-    await render('../routes/cuenta.tsx')
-    const section = container.querySelector('[aria-labelledby="cuenta-survey-title"]')!
-    expect(section.textContent).toContain('Ya la respondiste, gracias')
-    expect(section.querySelector('a')).toBeNull()
+    expect(container.querySelector('[aria-labelledby="cuenta-survey-title"]')).toBeNull()
+    expect(container.querySelector('a[href="/encuesta"]')).toBeNull()
   })
 })

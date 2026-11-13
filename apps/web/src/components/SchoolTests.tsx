@@ -31,7 +31,7 @@ export function SchoolTests({ orgId }: { orgId: string }) {
         ) : rounds.isError ? (
           <p role="alert" className="notice is-danger">{readConvexError(rounds.error, 'No pudimos cargar las pruebas.')}</p>
         ) : rounds.data.length === 0 ? (
-          <p className="text-sm text-[var(--text-tertiary)]">Todavía no hay rondas. Cree la primera arriba.</p>
+          <p className="text-sm text-[var(--text-tertiary)]">Todavía no hay rondas.</p>
         ) : (
           <ul className="ruled-list">
             {rounds.data.map((round) => (
@@ -89,10 +89,7 @@ function CreateRounds({ orgId }: { orgId: string }) {
   return (
     <section className="ruled-section" aria-labelledby="new-rounds-title">
       <h2 id="new-rounds-title" className="section-title">Programar una prueba</h2>
-      <p className="text-sm text-[var(--text-secondary)]">
-        Las rondas se crean de una vez, con la misma forma para todo el grado. Cada ronda queda abierta tres días y los
-        resultados salen al cerrar.
-      </p>
+      <p className="text-sm text-[var(--text-secondary)]">Cada ronda abre 3 días; resultados al cerrar.</p>
       <form
         className="form-grid"
         onSubmit={(event: FormEvent) => {
@@ -160,7 +157,7 @@ function RoundReport({ schoolTestId }: { schoolTestId: string }) {
         </button>
       </div>
       {!data.isClosed ? (
-        <p className="text-sm text-[var(--text-secondary)]">Los resultados salen cuando la ronda cierre, el {formatDay(data.closesAt)}.</p>
+        <p className="text-sm text-[var(--text-secondary)]">Resultados el {formatDay(data.closesAt)}.</p>
       ) : null}
       <div className="overflow-x-auto">
         <table className="data-table">

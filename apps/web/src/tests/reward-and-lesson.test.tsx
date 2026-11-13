@@ -147,7 +147,7 @@ describe('RewardScreen', () => {
 
     it('says so when the session earned a shield', () => {
       renderReward({ ...REWARD, shieldEarned: true })
-      expect(container.querySelector('.reward-gains')?.textContent).toContain('Ganaste un escudo')
+      expect(container.querySelector('.reward-gains')?.textContent).toContain('escudo de racha')
       renderReward({ ...REWARD, shieldEarned: false })
       expect(container.querySelector('.reward-gains')?.textContent).not.toContain('escudo')
     })
@@ -191,8 +191,9 @@ describe('LessonSteps', () => {
     expect(speech.stopSpeaking).toHaveBeenCalled()
   })
 
-  it('names the step it is on', () => {
-    expect(container.textContent).toContain('Paso 1 de 2')
+  it('names the step it is on, to assistive tech only', () => {
+    expect(container.querySelector('.lesson-step')?.getAttribute('aria-label')).toBe('Paso 1 de 2')
+    expect(container.textContent).not.toContain('Paso 1 de 2')
   })
 
   it('has no "Siguiente" on the last step, and points to practice instead', () => {

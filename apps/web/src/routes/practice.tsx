@@ -174,7 +174,6 @@ function PracticeHubPage() {
     <StudentAppShell session={guard.session} activeSection="practice">
       <div className="retos fade-in">
         <h1 className="page-title">Retos</h1>
-        <p className="page-lede">Repasa lo que toca, mide tu nivel o ensaya el examen con reloj.</p>
 
         {(pendingSecondSitting != null && sittingTwo != null) || inProgress.length > 0 ? (
           <section className="ruled-section" aria-labelledby="hub-resume-title">
@@ -199,9 +198,9 @@ function PracticeHubPage() {
                       })
                     }}
                   >
-                    <span className="ruled-row-label">Día de examen</span>
+                    <span className="ruled-row-label">Simulacro</span>
                     <span className="ruled-row-main">
-                      <span className="font-semibold">Te falta la Sesión 2</span>
+                      <span className="font-semibold">Sesión 2</span>
                       <span className="ruled-row-note">
                         {getSimulacroSessionQuestionCount(sittingTwo)} preguntas · {formatTimeLimit(sittingTwo.timeLimitMs)}
                       </span>
@@ -407,21 +406,15 @@ function PracticeHubPage() {
 function tileNote(kind: SessionKind, repasoDue: number | null, retoLocked: boolean): string {
   const config = SESSION_KIND_CONFIG[kind]
   if (kind === 'repaso') {
-    if (repasoDue === 0) return 'Nada por repasar hoy.'
+    if (repasoDue === 0) return 'Nada hoy'
     const questions = repasoDue != null ? Math.min(repasoDue * 2, getConfiguredQuestionCount(config)) : getConfiguredQuestionCount(config)
-    return repasoDue == null
-      ? `${questions} preguntas de lo que toca hoy.`
-      : `${repasoDue} ${repasoDue === 1 ? 'tema toca' : 'temas tocan'} repaso: ${questions} preguntas nuevas.`
+    return `${questions} preguntas`
   }
   if (kind === 'reto') {
-    return retoLocked
-      ? 'Se abre cuando practiques 3 temas.'
-      : `${getConfiguredQuestionCount(config)} preguntas de temas que ya practicaste. Sube o baja de nivel.`
+    return retoLocked ? 'Practica 3 temas' : `${getConfiguredQuestionCount(config)} preguntas`
   }
   const sittings = config.simulacroSessions ?? []
-  return sittings.length === 0
-    ? 'Como el examen real, con reloj.'
-    : `Como el examen real: ${sittings.length} sesiones con reloj, ${sittings.map((sitting) => `${getSimulacroSessionQuestionCount(sitting)} preguntas en ${formatTimeLimit(sitting.timeLimitMs)}`).join(' y ')}.`
+  return sittings.length === 0 ? 'Con reloj' : `${sittings.length} sesiones con reloj`
 }
 
 /** A launch line: a `.ruled-row` that is a button. */

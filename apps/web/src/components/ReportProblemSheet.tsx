@@ -11,10 +11,10 @@ type Reason = 'respuesta_incorrecta' | 'enunciado_confuso' | 'imagen_ilegible' |
 // Worded for someone mid-exam, who cannot see the key: "the answer is wrong"
 // is what they can tell as "no option works, or several do".
 const REASONS: { value: Reason; label: string }[] = [
-  { value: 'respuesta_incorrecta', label: 'Ninguna opción sirve, o sirve más de una' },
-  { value: 'enunciado_confuso', label: 'El enunciado es confuso o le falta información' },
-  { value: 'imagen_ilegible', label: 'No se lee la imagen o el texto' },
-  { value: 'otro', label: 'Otro problema' },
+  { value: 'respuesta_incorrecta', label: 'Ninguna o varias opciones sirven' },
+  { value: 'enunciado_confuso', label: 'Enunciado confuso o incompleto' },
+  { value: 'imagen_ilegible', label: 'No se lee' },
+  { value: 'otro', label: 'Otro' },
 ]
 
 const NOTE_LIMIT = 500
@@ -65,7 +65,7 @@ export function ReportProblemSheet({
           <header className="solve-sheet-head">
             <div>
               <Dialog.Title className="solve-sheet-title">Reportar un problema</Dialog.Title>
-              <Dialog.Description className="solve-sheet-sub">
+              <Dialog.Description className="sr-only">
                 Lo revisamos para corregir la pregunta. Tu sesión no cambia.
               </Dialog.Description>
             </div>
@@ -76,7 +76,7 @@ export function ReportProblemSheet({
 
           {mutation.isSuccess ? (
             <div className="solve-report-done" role="status">
-              <p>Gracias. Ya quedó registrado.</p>
+              <p>Gracias.</p>
               <button type="button" className="btn-primary" onClick={() => change(false)}>
                 Seguir
               </button>
@@ -109,7 +109,7 @@ export function ReportProblemSheet({
               </fieldset>
 
               <label className="solve-report-note">
-                <span>Cuéntanos más (opcional)</span>
+                <span>Detalle (opcional)</span>
                 <textarea
                   value={note}
                   maxLength={NOTE_LIMIT}

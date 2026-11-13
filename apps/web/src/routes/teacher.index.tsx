@@ -34,10 +34,6 @@ function TeacherHomePage() {
       <div className="page-sheet">
         <header className="ruled-page-head">
           <h1 className="page-title">Tus cursos</h1>
-          <p className="page-lede">
-            Abre un curso para ver el nivel de cada estudiante por área, quién necesita apoyo y qué
-            competencias le cuestan al grupo.
-          </p>
         </header>
 
         {classesQuery.isPending || schoolsQuery.isPending ? (
@@ -53,8 +49,7 @@ function TeacherHomePage() {
               </Link>
             }
           >
-            Si eres docente, pídele al administrador de tu colegio que te agregue con este correo:{' '}
-            <strong>{session.email}</strong>. Si eres estudiante, únete con el código que te dio tu docente.
+            Pide al administrador del colegio que agregue <strong>{session.email}</strong>.
           </EmptyState>
         ) : classes.length === 0 ? (
           <EmptyState
@@ -66,24 +61,21 @@ function TeacherHomePage() {
                 </Link>
               ) : undefined
             }
-          >
-            El administrador de tu colegio crea los cursos y te los asigna.
-          </EmptyState>
+          />
         ) : (
           [...bySchool].map(([schoolName, schoolClasses]) => (
             <section key={schoolName} className="ruled-section" aria-label={schoolName}>
               {bySchool.size > 1 ? <h2 className="section-title">{schoolName}</h2> : null}
               {schoolClasses[0]?.nextTest != null ? (
                 <p className="ruled-row-note">
-                  Próxima prueba del colegio: {schoolClasses[0].nextTest.title}, del{' '}
-                  {new Date(schoolClasses[0].nextTest.opensAt).toLocaleDateString('es-CO', { day: 'numeric', month: 'short' })} al{' '}
-                  {new Date(schoolClasses[0].nextTest.closesAt).toLocaleDateString('es-CO', { day: 'numeric', month: 'short' })}.
+                  Próxima prueba: {schoolClasses[0].nextTest.title} ·{' '}
+                  {new Date(schoolClasses[0].nextTest.opensAt).toLocaleDateString('es-CO', { day: 'numeric', month: 'short' })} –{' '}
+                  {new Date(schoolClasses[0].nextTest.closesAt).toLocaleDateString('es-CO', { day: 'numeric', month: 'short' })}
                 </p>
               ) : null}
               {schoolClasses[0]?.licenseActive === false ? (
                 <p role="status" className="notice is-danger">
-                  La licencia de {schoolName} venció: los estudiantes no pueden unirse a cursos nuevos. Los
-                  datos siguen disponibles.
+                  La licencia de {schoolName} venció: nadie puede unirse.
                 </p>
               ) : null}
               <ul className="ruled-list">
@@ -99,7 +91,7 @@ function TeacherHomePage() {
                         <span className="font-display text-lg font-semibold">{classGroup.name}</span>
                         <span className="ruled-row-note">
                           {classGroup.studentCount === 0
-                            ? 'Sin estudiantes todavía'
+                            ? 'Sin estudiantes'
                             : `${classGroup.studentCount} ${classGroup.studentCount === 1 ? 'estudiante' : 'estudiantes'}`}
                         </span>
                       </span>

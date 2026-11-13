@@ -136,24 +136,15 @@ export function TimedSessionRules() {
     <ul className="timed-intro-rules">
       <li>
         <BotOff size={18} aria-hidden />
-        <span>
-          <strong>Sin tutor y sin explicaciones hasta el final.</strong> Las
-          respuestas correctas y el tutor llegan en la revisión.
-        </span>
+        <strong>Sin tutor y sin explicaciones hasta el final.</strong>
       </li>
       <li>
         <Hourglass size={18} aria-hidden />
-        <span>
-          <strong>El reloj sigue corriendo si sales.</strong> Puedes volver y
-          seguir mientras quede tiempo.
-        </span>
+        <strong>El reloj sigue corriendo si sales.</strong>
       </li>
       <li>
         <Flag size={18} aria-hidden />
-        <span>
-          <strong>Si se acaba el tiempo, se entrega sola</strong> con lo que
-          hayas respondido.
-        </span>
+        <strong>Si se acaba el tiempo, se entrega sola.</strong>
       </li>
     </ul>
   )

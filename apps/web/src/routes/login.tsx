@@ -67,7 +67,6 @@ function LoginPage() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
-  const [unverified, setUnverified] = useState(false)
   const [notice, setNotice] = useState<Notice>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
 
@@ -89,14 +88,12 @@ function LoginPage() {
   const switchMode = (value: AuthMode) => {
     setMode(value)
     setErrorMessage(null)
-    setUnverified(false)
     setNotice(null)
   }
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     setErrorMessage(null)
-    setUnverified(false)
     const trimmedEmail = email.trim()
     if (trimmedEmail.length === 0) {
       setErrorMessage('Escribe tu correo electrónico.')
@@ -107,7 +104,7 @@ function LoginPage() {
       return
     }
     if (mode === 'sign-up' && name.trim().length === 0) {
-      setErrorMessage('Escribe tu nombre: así te reconoce tu docente.')
+      setErrorMessage('Escribe tu nombre.')
       return
     }
 
@@ -126,8 +123,7 @@ function LoginPage() {
         const { error } = await authClient.signIn.email({ email: trimmedEmail, password, callbackURL: next })
         if (error) {
           if (error.code === 'EMAIL_NOT_VERIFIED') {
-            setUnverified(true)
-            setErrorMessage('Primero confirma tu correo: te acabamos de enviar el enlace otra vez.')
+            setErrorMessage('Confirma tu correo: te reenviamos el enlace (mira en spam).')
             return
           }
           setErrorMessage(
@@ -173,11 +169,9 @@ function LoginPage() {
       <AuthFrame>
         <h1 className="page-title">Revisa tu correo</h1>
         <p className="page-lede">
-          {notice === 'verify-sent'
-            ? `Te enviamos un enlace a ${email.trim()} para confirmar tu cuenta. Ábrelo y entrarás directo.`
-            : `Si hay una cuenta con ${email.trim()}, te llegará un enlace para elegir una contraseña nueva. Vence en una hora.`}
+          {notice === 'verify-sent' ? `Abre el enlace que enviamos a ${email.trim()}.` : `Si ${email.trim()} tiene cuenta, te llega un enlace. Vence en 1 hora.`}
         </p>
-        <p className="mt-3 text-sm text-[var(--text-tertiary)]">¿No llega? Revisa la carpeta de spam.</p>
+        <p className="mt-3 text-sm text-[var(--text-tertiary)]">¿No llega? Mira en spam.</p>
         <button type="button" className="btn-secondary mt-6" onClick={() => switchMode('sign-in')}>
           Volver a iniciar sesión
         </button>
@@ -193,13 +187,6 @@ function LoginPage() {
   return (
     <AuthFrame>
       <h1 className="page-title">{title}</h1>
-      <p className="page-lede">
-        {mode === 'sign-in'
-          ? 'Con el correo y la contraseña de tu cuenta.'
-          : mode === 'sign-up'
-            ? 'Tu progreso se guarda en tu cuenta. Si tu colegio usa Aprendo, después te unes a tu curso con un código.'
-            : 'Escribe tu correo y te enviamos un enlace para elegir una contraseña nueva.'}
-      </p>
 
       <form onSubmit={handleSubmit} className="mt-6 grid gap-4" noValidate>
         {mode === 'sign-up' ? (
@@ -245,9 +232,6 @@ function LoginPage() {
           <p role="alert" className="m-0 text-sm font-medium text-[var(--danger-text)]">
             {errorMessage}
           </p>
-        ) : null}
-        {unverified ? (
-          <p className="m-0 text-sm text-[var(--text-secondary)]">Revisa también la carpeta de spam.</p>
         ) : null}
 
         <button type="submit" disabled={isSubmitting} className="btn-primary w-full">

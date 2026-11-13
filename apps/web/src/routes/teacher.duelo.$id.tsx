@@ -82,7 +82,7 @@ function DuelHostPage() {
               </ul>
               <p className="m-0 text-sm text-[var(--text-secondary)]">
                 {data.answeredCount} de {playerCount} respondieron
-                {data.closedQuestion != null ? ` · La pregunta anterior era la ${data.closedQuestion.correctOption}` : ''}
+                {data.closedQuestion != null ? ` · Anterior: ${data.closedQuestion.correctOption}` : ''}
               </p>
             </>
           ) : null}
@@ -99,7 +99,7 @@ function DuelHostPage() {
                 </button>
               )}
               <button type="button" className="btn-ghost" disabled={finish.isPending} onClick={() => finish.mutate(duelId)}>
-                Terminar el duelo
+                Terminar
               </button>
             </div>
           ) : null}

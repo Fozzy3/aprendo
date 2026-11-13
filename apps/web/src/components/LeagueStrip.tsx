@@ -22,7 +22,7 @@ export function LeagueStrip({ studentId }: { studentId: string }) {
   if (data.status === 'no_xp_yet') {
     return (
       <section className="league" aria-label="Liga de tu curso">
-        <p className="league-note">Termina una sesión y entras a la liga de tu curso.</p>
+        <p className="league-note">Termina una sesión para entrar a la liga de tu curso</p>
       </section>
     )
   }
@@ -32,8 +32,8 @@ export function LeagueStrip({ studentId }: { studentId: string }) {
       <header className="league-head">
         <h2 id="league-title" className="league-title">Liga de tu curso</h2>
         <p className="league-note">
-          {data.you.rank != null ? `Vas en el puesto ${data.you.rank} · ` : ''}
-          {data.you.gapToNext != null ? `a ${data.you.gapToNext} XP del siguiente` : 'vas adelante'}
+          {data.you.rank != null ? `Puesto ${data.you.rank} · ` : ''}
+          {data.you.gapToNext != null ? `${data.you.gapToNext} XP para subir` : 'vas adelante'}
         </p>
       </header>
       <ol className="league-list">

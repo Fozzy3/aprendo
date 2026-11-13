@@ -34,7 +34,7 @@ export function GuidedPath({
     headingRef.current?.focus({ preventScroll: true })
   }, [stepKey])
 
-  const prompt = guide.phase === 'retry' ? '¿Cuál eliges ahora?' : guide.prompt
+  const prompt = guide.phase === 'retry' ? 'Toca otra opción.' : guide.prompt
   const choices = guide.phase === 'retry' ? [] : guide.choices
 
   return (
@@ -47,8 +47,6 @@ export function GuidedPath({
           ) : null}
         </p>
         <h2 ref={headingRef} tabIndex={-1} className="ask-prompt"><MarkdownBlock markdown={prompt} /></h2>
-
-        {guide.phase === 'retry' ? <p className="ask-note">Toca otra opción arriba.</p> : null}
 
         <div className="ask-chips">
           {choices.map((choice, index) => (

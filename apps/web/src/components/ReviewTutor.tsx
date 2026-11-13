@@ -387,12 +387,7 @@ export default function ReviewTutor({
           {tutorMessages.length === 0 && pendingPrompt == null ? (
             <ConversationEmptyState className="items-stretch gap-[0.7rem] px-[1.1rem] pt-[1.6rem] pb-4 text-left" icon={null}>
               <div className="tutor-empty-mark" aria-hidden><Bot size={20} /></div>
-              <h3 className="tutor-empty-title">Pregunta lo que necesites.</h3>
-              <p className="tutor-empty-copy">
-                {mode === 'solve'
-                  ? 'Este chat es solo de esta pregunta. No te doy la respuesta: te ayudo a llegar a ella con pistas y preguntas.'
-                  : 'Este chat es solo de esta pregunta. Pídeme que la explique, te la muestre en una demo, te dé otra parecida o te diga qué repasar.'}
-              </p>
+              <h3 className="tutor-empty-title">¿En qué te ayudo?</h3>
               <div className="mt-[0.65rem] flex flex-col gap-[0.4rem]" role="group" aria-label="Sugerencias">
                 {QUICK_PROMPTS[mode].map((prompt) => (
                   <button key={prompt} type="button" disabled={!canSendTutorMessage} onClick={() => sendTutorPrompt(prompt)} className="tutor-quick-prompt">
@@ -427,11 +422,11 @@ export default function ReviewTutor({
                       className="tutor-artifact-cta"
                     >
                       <SquarePlay size={14} aria-hidden />
-                      <span>Ver demostración interactiva</span>
+                      <span>Ver demo</span>
                     </button>
                   ) : null}
                   {message.role === 'assistant' && message.artifactPending && message.artifactRef == null ? (
-                    <span className="tutor-artifact-pending text-xs inline-flex items-center gap-2"><span className="page-loader-dots" aria-hidden><span /><span /><span /></span>Preparando demostración…</span>
+                    <span className="tutor-artifact-pending text-xs inline-flex items-center gap-2"><span className="page-loader-dots" aria-hidden><span /><span /><span /></span>Preparando demo…</span>
                   ) : null}
                 </MessageContent>
               </Message>
@@ -462,7 +457,7 @@ export default function ReviewTutor({
             data-tutor-input
             value={draft}
             onChange={(event) => onDraftChange(event.target.value)}
-            placeholder="Escribe un mensaje para el tutor…"
+            placeholder="Escribe tu pregunta…"
             enterKeyHint="send"
           />
         </PromptInputBody>

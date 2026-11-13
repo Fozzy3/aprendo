@@ -20,7 +20,7 @@ export function WeeklyCoach({ studentId, activeDaysThisWeek }: { studentId: stri
   if (summary.data?.status === 'ready' && summary.data.body) {
     return (
       <details className="yo-more">
-        <summary>Tu semana, en resumen</summary>
+        <summary>Tu semana</summary>
         <MarkdownBlock markdown={summary.data.body} />
       </details>
     )

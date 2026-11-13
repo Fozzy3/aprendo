@@ -11,14 +11,6 @@ import { MasteryBadge } from './MasteryBadge.tsx'
 /** Topic labels like "histórica/cultural/situacional" have no spaces: let them wrap after a slash, not mid-word. */
 const breakAtSlashes = (label: string) => label.replaceAll('/', '/​')
 
-/** One line under each streak milestone: effort, never a promise about the score. */
-const MILESTONE_NOTE: Record<number, string> = {
-  3: 'Así se arma un hábito.',
-  7: 'Una semana completa, día tras día.',
-  14: 'Dos semanas sin parar.',
-  30: 'Un mes entero practicando cada día.',
-}
-
 type Reward = { xp: number; medals: string[]; streakDays: number; previousStreakDays?: number; shieldEarned?: boolean }
 
 /**
@@ -85,7 +77,6 @@ export function RewardScreen({
                       {line.moved === 'up' ? <span className="reward-up">Subiste</span> : null}
                       {line.moved === 'down' ? <span className="reward-down">Bajó</span> : null}
                     </span>
-                    <span className="reward-change-note">{line.text}</span>
                   </li>
                 )
               })}
@@ -101,7 +92,7 @@ export function RewardScreen({
               <StreakCount streakDays={reward.streakDays} from={isFresh ? previous : undefined} />
             </li>
             {reward.shieldEarned === true ? (
-              <li><Shield size={16} aria-hidden /> Ganaste un escudo para tu racha</li>
+              <li><Shield size={16} aria-hidden /> +1 escudo de racha</li>
             ) : null}
             {reward.medals.map((medal) => (
               <li key={medal}><Medal size={16} aria-hidden /> {MEDAL_LABELS[medal as MedalId] ?? medal}</li>
@@ -164,7 +155,6 @@ function StreakMoment({ days }: { days: number }) {
       <Flame className="streak-moment-icon" size={28} strokeWidth={2.25} aria-hidden />
       <p className="streak-moment-count">{days}</p>
       <p className="streak-moment-label">días seguidos</p>
-      <p className="streak-moment-note">{MILESTONE_NOTE[days]}</p>
     </motion.section>
   )
 }

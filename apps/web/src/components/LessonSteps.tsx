@@ -22,7 +22,6 @@ export function LessonSteps({ steps }: { steps: Step[] }) {
 
   return (
     <section className="lesson-step" aria-label={`Paso ${index + 1} de ${steps.length}`}>
-      <p className="lesson-step-count">Paso {index + 1} de {steps.length}</p>
       <div className="lesson-beads" aria-hidden>
         {steps.map((item, position) => (
           <i key={item.predict} className={position <= index ? 'is-done' : undefined} />

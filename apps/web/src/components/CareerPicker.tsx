@@ -28,7 +28,7 @@ export function CareerPicker({ onChoose, onSkip }: { onChoose: (familyId: string
     return (
       <div key="quiz" className="career-picker">
         <button type="button" className="back-link" onClick={() => setStep('families')}>
-          <ArrowLeft size={14} aria-hidden /> Volver a las familias
+          <ArrowLeft size={14} aria-hidden /> Volver
         </button>
         <p className="text-sm text-[var(--text-secondary)]">¿Qué tanto te gusta cada actividad?</p>
         {INTEREST_ITEMS.map((item) => (
@@ -57,7 +57,7 @@ export function CareerPicker({ onChoose, onSkip }: { onChoose: (familyId: string
   if (step === 'result') {
     return (
       <div key="result" className="career-picker">
-        <p className="text-sm text-[var(--text-secondary)]">Por lo que te gusta, podrías explorar:</p>
+        <p className="text-sm text-[var(--text-secondary)]">Podrías explorar:</p>
         <ul className="ruled-list">
           {suggestFamilies(answers).map((familyId) => {
             const family = getCareerFamily(familyId)!
@@ -75,7 +75,7 @@ export function CareerPicker({ onChoose, onSkip }: { onChoose: (familyId: string
           })}
         </ul>
         <p className="text-xs text-[var(--text-tertiary)]">
-          Esto orienta, no decide. Habla también con el orientador de tu colegio y mira los programas en{' '}
+          Orienta, no decide. Habla con tu orientador o mira{' '}
           <a href={BUSCANDO_CARRERA} target="_blank" rel="noreferrer">Buscando carrera (MEN)</a>.
         </p>
         <button type="button" className="btn-ghost" onClick={() => setStep('families')}>
@@ -144,14 +144,10 @@ export function CareerCard({
       <h2 id={`career-${mode}-title`} className="section-title">
         {mode === 'invite' ? '¿Para qué carrera es este puntaje?' : 'Tu carrera'}
       </h2>
-      {mode === 'invite' ? (
-        <p className="text-sm text-[var(--text-secondary)]">
-          Las universidades públicas ponderan las áreas según la carrera. Con tu carrera, tu plan pone primero lo que más te suma.
-        </p>
-      ) : current != null ? (
+      {mode === 'invite' ? null : current != null ? (
         <p className="text-sm text-[var(--text-secondary)]">
           <strong className="text-[var(--text-primary)]">{current.label}</strong>
-          {career?.score != null ? ` · ponderado típico ${career.score}/100 (${career.source})` : ' · el ponderado aparece con las cinco áreas niveladas'}
+          {career?.score != null ? ` · ponderado ${career.score}/100 (${career.source})` : ''}
           {' · '}
           <button type="button" className="btn-ghost btn-sm" onClick={() => setIsOpen((open) => !open)}>
             {isOpen ? 'Cerrar' : 'Cambiar'}

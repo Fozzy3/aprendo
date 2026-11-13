@@ -234,7 +234,7 @@ export function Welcome({
             {step === 'hello' ? (
               <>
                 <motion.p className="page-lede" variants={variants.item}>
-                  Aquí te preparas para el Saber 11. Te hacemos unas preguntas rápidas y armamos tu plan.
+                  Unas preguntas rápidas y armamos tu plan.
                 </motion.p>
                 <motion.ul className="welcome-areas" aria-label="Las cinco áreas del examen" variants={variants.list}>
                   {getAllSubjectThemes().map((subject) => (
@@ -324,7 +324,7 @@ export function Welcome({
             {step === 'avatar' ? (
               <>
                 <motion.p className="page-lede" variants={variants.item}>
-                  Así te ven en la liga de tu clase. Lo puedes cambiar en Yo.
+                  Así te ve tu clase.
                 </motion.p>
                 <motion.div variants={variants.item}>
                   <AvatarEditor studentId={studentId} avatar={student.avatar ?? null} nickname={student.nickname ?? null} />
@@ -334,9 +334,6 @@ export function Welcome({
 
             {step === 'reminders' ? (
               <>
-                <motion.p className="page-lede" variants={variants.item}>
-                  Te escribimos cuando tu racha está por cortarse o si llevas unos días sin practicar.
-                </motion.p>
                 <motion.label className="welcome-switch" variants={variants.item}>
                   <span>Recordatorios por correo</span>
                   <input
@@ -360,7 +357,7 @@ export function Welcome({
                   </span>
                 </motion.p>
                 <motion.p className="page-lede" variants={variants.item}>
-                  Preguntas de las cinco áreas, sin ayuda. Con ellas vemos tu nivel y armamos tu plan.
+                  Cinco áreas, sin ayuda.
                 </motion.p>
                 <motion.div variants={variants.item}>
                   <TimedSessionRules />

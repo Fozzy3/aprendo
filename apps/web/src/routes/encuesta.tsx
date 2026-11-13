@@ -11,7 +11,7 @@ export const Route = createFileRoute('/encuesta')({
   component: SurveyPage,
 })
 
-/** The pilot survey, reached from Hoy and from Cuenta; answered once. */
+/** The pilot survey, reached from Hoy and from Yo's settings; answered once. */
 function SurveyPage() {
   const guard = useStudentGuard()
   const mine = useQuery({

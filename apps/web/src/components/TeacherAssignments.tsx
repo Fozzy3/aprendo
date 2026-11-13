@@ -49,7 +49,7 @@ export function TeacherAssignments({ studentId }: { studentId: string }) {
                   {assignment.testTitle ?? `${KIND_LABEL[assignment.kind]}: ${getSubtopicLabel(assignment.subtopicId ?? '')}`}
                 </b>
                 <span>
-                  De tu profe · {assignment.status === 'en_curso' ? 'ya la empezaste' : dueLabel(assignment.dueAt, now)}
+                  {assignment.status === 'en_curso' ? 'Empezada' : dueLabel(assignment.dueAt, now)}
                 </span>
               </span>
               <ChevronRight size={20} aria-hidden />

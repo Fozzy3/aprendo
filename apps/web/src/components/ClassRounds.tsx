@@ -39,7 +39,7 @@ export function ClassRoundDetail({ classGroupId, schoolTestId }: { classGroupId:
   if (detail.data == null || detail.data.items.length === 0) return null
   return (
     <div className="mt-4">
-      <h3 className="m-0 mb-1 text-sm font-semibold">Las preguntas que más falló el curso</h3>
+      <h3 className="m-0 mb-1 text-sm font-semibold">Más falladas</h3>
       <MissedQuestions items={detail.data.items} />
     </div>
   )
@@ -70,8 +70,7 @@ export function ClassRounds({ classGroupId, canWrite }: { classGroupId: string; 
             <span className="ruled-row-main">
               <span className="font-semibold">{round.title}</span>
               <span className="ruled-row-note">
-                Del {formatDay(round.opensAt)} al {formatDay(round.closesAt)} · {round.doneCount} de {round.targetCount} la presentaron
-                {round.isClosed ? '' : ' · los resultados salen al cerrar'}
+                {formatDay(round.opensAt)} – {formatDay(round.closesAt)} · {round.doneCount} de {round.targetCount} la presentaron
               </span>
             </span>
             {round.isClosed ? (

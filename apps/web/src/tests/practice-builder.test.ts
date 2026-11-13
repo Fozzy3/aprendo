@@ -96,7 +96,7 @@ describe('builder status', () => {
   it('says the minimum when even the smallest practice does not fit', () => {
     const status = builderStatus({ ...DEFAULT_BUILDER, count: 5 }, { available: 3, error: null })
     expect(status.canStart).toBe(false)
-    expect(status.message).toMatch(/al menos 5/)
+    expect(status.message).toMatch(/mínimo 5/)
   })
 })
 

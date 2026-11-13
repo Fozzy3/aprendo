@@ -17,7 +17,6 @@ import {
   X,
 } from 'lucide-react'
 import { api } from '@aprendo/convex/api'
-import { MIN_STATS_SAMPLE } from '@aprendo/convex/answerStats'
 import { MarkdownBlock } from '../components/MarkdownBlock.tsx'
 import { DiagnosticResult } from '../components/DiagnosticResult.tsx'
 import { NivelacionResult } from '../components/NivelacionResult.tsx'
@@ -40,19 +39,13 @@ import { formatClock, hasResultScreen } from '../lib/result-display.ts'
 import { useCurrentStudent } from '../lib/student-session.ts'
 import { getSubjectLabel, getSubtopicLabel } from '@aprendo/convex/taxonomy'
 import { indexOfPosition } from '../lib/review-position.ts'
-import { isSealedAttempt, missedCount, optionExplanations, reviewDotStatus, timeVersusMedian } from '../lib/review-explanations.ts'
+import { isSealedAttempt, missedCount, optionExplanations, reviewDotStatus } from '../lib/review-explanations.ts'
 import { readConvexError } from '../lib/convex-error.ts'
 import { reviewIsSealed, reviewShowsAnswer } from '../lib/solve-view.ts'
 import { FullScreenLoader, PageLoader } from '../components/FullScreenLoader.tsx'
 
 // The whole chat stack lives behind this import; see ReviewTutor.
 const ReviewTutor = lazy(() => import('../components/ReviewTutor.tsx'))
-
-const TIME_VERSUS_MEDIAN_COPY = {
-  faster: 'más rápido que la mayoría',
-  slower: 'más lento que la mayoría',
-  similar: 'como la mayoría',
-} as const
 
 const TUTOR_COLLAPSED_STORAGE_KEY = 'aprendo:review:tutor-collapsed'
 const LAYOUT_STORAGE_KEY = 'aprendo:review:workspace-layout-v3'
@@ -307,7 +300,7 @@ function ReviewPage() {
           correctCount={correctCount}
           questionCount={gradedCount}
           isFresh={sessionDoc.completedAt != null && Date.now() - sessionDoc.completedAt < FRESH_CLOSE_MS}
-          sealedNote={isSealed ? 'Tus resultados llegan cuando cierre la prueba.' : undefined}
+          sealedNote={isSealed ? 'Resultados al cerrar la prueba.' : undefined}
         >
           {isSealed ? (
             <Link to="/today" className="btn-primary reward-go no-underline">Ver lo que sigue</Link>
@@ -393,7 +386,6 @@ function ReviewPage() {
     currentQuestion.question.explanationSource === 'ai_generated'
     && (explanations.length > 0 || Boolean(solutionMarkdown))
   const stats = statsQuery.data?.find((item) => item.questionId === currentQuestion.question._id) ?? null
-  const versusMedian = timeVersusMedian(currentQuestion.timeSpentMs, stats?.medianTimeMs)
   const missed = missedCount(questions)
 
   const eliminatedOptions = new Set(currentQuestion.eliminatedOptions)
@@ -493,7 +485,7 @@ function ReviewPage() {
           <article className="stage-question sheet">
             <div className="stage-question-body">
               {currentQuestion.question.voidedAt != null ? (
-                <p role="note" className="question-source">Retiramos esta pregunta del banco. Ya no cuenta en tu progreso.</p>
+                <p role="note" className="question-source">Pregunta retirada · no cuenta</p>
               ) : null}
               {currentQuestion.stemImageUrl != null ? (
                 <>
@@ -513,10 +505,10 @@ function ReviewPage() {
 
             {currentQuestion.flagged || currentQuestion.timeSpentMs != null || !hasAnswered ? (
               <div className="mb-3 flex flex-wrap gap-1.5" aria-label="Cómo la respondiste">
-                {!hasAnswered ? <span className="chip">La dejaste en blanco</span> : null}
+                {!hasAnswered ? <span className="chip">En blanco</span> : null}
                 {currentQuestion.flagged ? (
                   <span className="chip">
-                    <Flag size={11} aria-hidden /> La marcaste para revisar
+                    <Flag size={11} aria-hidden /> Marcada
                   </span>
                 ) : null}
                 {currentQuestion.timeSpentMs != null ? (
@@ -524,7 +516,7 @@ function ReviewPage() {
                     className={`chip tabular-nums${currentQuestion.timeSpentMs > officialMs ? ' border-transparent bg-[var(--danger-soft)] text-[var(--danger-text)]' : ''}`}
                   >
                     <Clock3 size={11} aria-hidden /> {formatClock(currentQuestion.timeSpentMs)}
-                    <span className="font-medium">· ritmo oficial {formatClock(officialMs)}</span>
+                    <span className="font-medium">· oficial {formatClock(officialMs)}</span>
                   </span>
                 ) : null}
               </div>
@@ -600,22 +592,9 @@ function ReviewPage() {
             ) : null}
             {!showsAnswer && reviewGuide === undefined ? <p className="solve-waiting" role="status">Un momento…</p> : null}
 
-            {stats != null && showsAnswer ? (
+            {stats?.medianTimeMs != null && showsAnswer ? (
               <p className="mt-2 text-xs text-[var(--text-tertiary)]">
-                {stats.hasEnoughData
-                  ? `La respondieron ${stats.sampleSize} estudiantes.`
-                  : `Aún pocos datos para mostrar qué eligieron los demás (${stats.sampleSize} de ${MIN_STATS_SAMPLE} respuestas).`}
-                {stats.medianTimeMs != null ? (
-                  <>
-                    {' '}Tiempo mediano <span className="tabular-nums">{formatClock(stats.medianTimeMs)}</span>
-                    {currentQuestion.timeSpentMs != null && versusMedian != null ? (
-                      <>
-                        ; el tuyo <span className="tabular-nums">{formatClock(currentQuestion.timeSpentMs)}</span>,{' '}
-                        {TIME_VERSUS_MEDIAN_COPY[versusMedian]}.
-                      </>
-                    ) : '.'}
-                  </>
-                ) : null}
+                Tiempo mediano <span className="tabular-nums">{formatClock(stats.medianTimeMs)}</span>
               </p>
             ) : null}
 
@@ -627,7 +606,7 @@ function ReviewPage() {
 
             {showsAnswer && isAiExplanation ? (
               <p className="chip mt-3">
-                <Sparkles size={11} aria-hidden /> Explicación generada con IA: si ves un error, repórtalo.
+                <Sparkles size={11} aria-hidden /> Explicación con IA
               </p>
             ) : null}
 
@@ -659,7 +638,6 @@ function ReviewPage() {
             {learningState != null ? (
               <div className={`review-state review-state-${LEARNING_STATE_DISPLAY[learningState].tone}`}>
                 <strong>{LEARNING_STATE_DISPLAY[learningState].label}</strong>
-                <span>{LEARNING_STATE_DISPLAY[learningState].description}</span>
               </div>
             ) : null}
 
@@ -698,12 +676,6 @@ function ReviewPage() {
               questionId={currentQuestion.question._id}
               sessionId={sessionDoc._id}
             />
-
-            <p className="stage-shortcuts" aria-hidden>
-              <kbd>←</kbd><kbd>→</kbd><span>navegar</span>
-              <span className="stage-shortcuts-sep">·</span>
-              <kbd>⌘</kbd><kbd>K</kbd><span>tutor</span>
-            </p>
           </article>
         </div>
 

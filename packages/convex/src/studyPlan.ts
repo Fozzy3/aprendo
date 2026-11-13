@@ -173,8 +173,8 @@ function buildTasks(input: StudyPlanInput): {
           id: `practice:${quickWin.subtopicId}`,
           kind: 'practice',
           quickWin: true,
-          title: `Victoria rápida: ${getSubtopicLabel(quickWin.subtopicId)}`,
-          reason: `Estás a un paso de ${MASTERY_LEVEL_LABELS.competente} en ${getSubtopicLabel(quickWin.subtopicId)}.`,
+          title: getSubtopicLabel(quickWin.subtopicId),
+          reason: `Casi ${MASTERY_LEVEL_LABELS.competente}`,
           minutes: TOPIC_MINUTES,
           action: { type: 'session', kind: 'topic', subtopicId: quickWin.subtopicId },
         }
@@ -187,11 +187,8 @@ function buildTasks(input: StudyPlanInput): {
       : {
           id: 'repaso',
           kind: 'repaso',
-          title: 'Repaso espaciado',
-          reason:
-            input.reviewDueCount === 1
-              ? '1 tema toca repaso hoy: vuelve con preguntas nuevas.'
-              : `${input.reviewDueCount} temas tocan repaso hoy: vuelven con preguntas nuevas.`,
+          title: 'Repaso',
+          reason: input.reviewDueCount === 1 ? '1 tema' : `${input.reviewDueCount} temas`,
           minutes: practiceMinutes(reviewQuestions),
           action: { type: 'session', kind: 'repaso' },
         }
@@ -230,7 +227,7 @@ function buildTasks(input: StudyPlanInput): {
     if (sesion1 != null && (sesion2 == null || sesion2 < sesion1)) {
       // Half a simulacro, without Inglés. Sesión 2 on another day, like the exam.
       if (input.today > sesion1) {
-        simulacro = simulacroTask(2, 'Ya hiciste la Sesión 1. La Sesión 2 trae Inglés y completa tu puntaje global.')
+        simulacro = simulacroTask(2, 'Con Inglés: cierra tu global')
       }
     } else {
       // Only both sittings make a simulacro; Sesión 2 dates it.
@@ -240,8 +237,8 @@ function buildTasks(input: StudyPlanInput): {
         simulacro = simulacroTask(
           1,
           daysSince == null
-            ? 'Tu punto de partida: un simulacro completo te da el puntaje global de referencia.'
-            : `Han pasado ${daysSince} días desde tu último simulacro: mide cuánto has avanzado.`,
+            ? 'Tu punto de partida'
+            : `El último fue hace ${daysSince} días`,
         )
       }
     }
@@ -255,7 +252,7 @@ function buildTasks(input: StudyPlanInput): {
       id: `nivelacion:${pendingArea.subjectId}`,
       kind: 'nivelacion',
       title: `Nivelación de ${label}`,
-      reason: `Aún no tienes nivel en ${label}. Sin él no hay puntaje global.`,
+      reason: 'Sin nivel aún',
       minutes: (SESSION_KIND_CONFIG.nivelacion.timeLimitMs ?? 0) / 60_000,
       action: { type: 'session', kind: 'nivelacion', subjectId: pendingArea.subjectId },
     })
@@ -263,15 +260,13 @@ function buildTasks(input: StudyPlanInput): {
 
   if (main != null) {
     const label = getSubtopicLabel(main.subtopicId)
-    const why = input.subjectWeights != null
-      ? `${label} (${getSubjectLabel(main.subjectId)}) es donde más puntos ganas para tu carrera.`
-      : `${label} (${getSubjectLabel(main.subjectId)}) es donde más puntos del global puedes ganar.`
+    const why = input.subjectWeights != null ? 'Más puntos para tu carrera' : 'Donde más puntos ganas'
     if (main.level === 'sin_empezar' || main.level === 'intentado') {
       candidates.push({
         id: `lesson:${main.subtopicId}`,
         kind: 'lesson',
         title: `Lección: ${label}`,
-        reason: `Primero la idea. ${why}`,
+        reason: 'Primero la idea',
         minutes: LESSON_MINUTES,
         action: { type: 'lesson', subtopicId: main.subtopicId },
       })
@@ -279,7 +274,7 @@ function buildTasks(input: StudyPlanInput): {
     candidates.push({
       id: `practice:${main.subtopicId}`,
       kind: 'practice',
-      title: `Practica ${label}`,
+      title: label,
       reason: why,
       minutes: TOPIC_MINUTES,
       action: { type: 'session', kind: 'topic', subtopicId: main.subtopicId },
@@ -294,8 +289,8 @@ function buildTasks(input: StudyPlanInput): {
       candidates.push({
         id: `practice:${area.subjectId}`,
         kind: 'practice',
-        title: `Practica ${label}`,
-        reason: `${label} es el área donde más puntos del global puedes ganar.`,
+        title: label,
+        reason: 'Donde más puntos ganas',
         minutes: TOPIC_MINUTES,
         action: { type: 'session', kind: 'topic', subjectId: area.subjectId },
       })
@@ -314,7 +309,7 @@ function buildTasks(input: StudyPlanInput): {
           id: 'reto',
           kind: 'reto',
           title: 'Reto de dominio',
-          reason: 'Preguntas de varios subtemas que ya practicaste: sube de nivel lo que ya casi dominas.',
+          reason: 'Sube lo que casi dominas',
           minutes: practiceMinutes(SESSION_KIND_CONFIG.reto.totalQuestions ?? 6),
           action: { type: 'session', kind: 'reto' },
         }
@@ -322,7 +317,7 @@ function buildTasks(input: StudyPlanInput): {
           id: 'recommended',
           kind: 'practice',
           title: 'Práctica recomendada',
-          reason: 'Preguntas de varios temas, enfocadas en tus áreas más débiles.',
+          reason: 'Tus áreas más débiles',
           minutes: practiceMinutes(SESSION_KIND_CONFIG.recommended.totalQuestions ?? 10),
           action: { type: 'session', kind: 'recommended' },
         },

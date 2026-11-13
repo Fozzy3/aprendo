@@ -75,11 +75,11 @@ export function resolvePathStates(
 
 // What each level needs to climb, in the rules of `mastery.ts`.
 const NEXT_STEP: Record<MasteryLevel, string> = {
-  sin_empezar: 'Para Familiar: acierta 7 de cada 10 en una práctica del tema.',
-  intentado: 'Para Familiar: acierta 7 de cada 10 en una práctica del tema.',
-  familiar: 'Para Competente: una práctica perfecta de 4 o más preguntas, sin pedir ayuda al tutor.',
-  competente: 'Para Dominado: acierta todo el tema en un reto, una nivelación o un simulacro.',
-  dominado: 'Es el nivel más alto: el repaso y los retos lo mantienen.',
+  sin_empezar: 'Para Familiar: acierta 7 de cada 10.',
+  intentado: 'Para Familiar: acierta 7 de cada 10.',
+  familiar: 'Para Competente: práctica perfecta, sin tutor.',
+  competente: 'Para Dominado: acierta todo en un reto.',
+  dominado: 'Nivel más alto.',
 }
 
 /** One line of a session's close: the step it took, or what the next one needs. */
@@ -96,6 +96,5 @@ export function closingLine(change: { from: MasteryLevel; to: MasteryLevel }): {
 /** A topic's evidence in one line, or nothing before the first answer. */
 export function topicStats(node: { attemptCount: number; accuracy: number | null }): string | null {
   if (node.attemptCount === 0 || node.accuracy == null) return null
-  const answers = `${node.attemptCount} ${node.attemptCount === 1 ? 'respondida' : 'respondidas'}`
-  return `${answers} · ${Math.round(node.accuracy * 100)} % de acierto`
+  return `${Math.round(node.accuracy * 100)} % de ${node.attemptCount}`
 }

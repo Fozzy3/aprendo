@@ -25,7 +25,7 @@ function ResetPasswordPage() {
     return (
       <AuthFrame>
         <h1 className="page-title">Este enlace ya no sirve</h1>
-        <p className="page-lede">Los enlaces vencen en una hora y sirven una sola vez. Pide uno nuevo.</p>
+        <p className="page-lede">Pide uno nuevo.</p>
         <a href="/login" className="btn-primary mt-6 no-underline">
           Volver a iniciar sesión
         </a>
@@ -54,7 +54,7 @@ function ResetPasswordPage() {
     const { error } = await authClient.resetPassword({ newPassword: password, token })
     setIsSubmitting(false)
     if (error) {
-      setErrorMessage('No pudimos cambiarla: puede que el enlace haya vencido. Pide uno nuevo.')
+      setErrorMessage('No pudimos cambiarla. Pide un enlace nuevo.')
       return
     }
     setIsDone(true)

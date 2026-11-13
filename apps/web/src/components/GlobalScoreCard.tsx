@@ -61,15 +61,12 @@ export function GlobalScoreCard({
         <h2 id={titleId} className="section-title">Tu puntaje global estimado</h2>
         {data.provisional != null ? (
           <p className="m-0 mb-2 text-sm text-[var(--text-secondary)]">
-            Con lo que sabemos hoy estarías entre{' '}
-            <strong className="text-[var(--text-primary)] tabular-nums">{data.provisional.low}</strong> y{' '}
-            <strong className="text-[var(--text-primary)] tabular-nums">{data.provisional.high}</strong> de {MAX_GLOBAL_SCORE}.
-            El rango se afina con cada área que nivelas.
+            Hoy:{' '}
+            <strong className="text-[var(--text-primary)] tabular-nums">{data.provisional.low}–{data.provisional.high}</strong> /{MAX_GLOBAL_SCORE}
           </p>
         ) : null}
         <p className="m-0 text-sm text-[var(--text-secondary)]">
-          Te {missing === 1 ? 'falta' : 'faltan'} <strong className="text-[var(--text-primary)]">{missing}</strong>{' '}
-          {missing === 1 ? 'área' : 'áreas'} por medir:
+          Falta{missing === 1 ? '' : 'n'} por medir:
         </p>
         <ul className="m-0 mt-2 flex list-none flex-wrap gap-x-4 gap-y-1 p-0 text-sm text-[var(--text-primary)]">
           {data.missingSubjectIds.map((subjectId) => {
@@ -82,14 +79,11 @@ export function GlobalScoreCard({
             )
           })}
         </ul>
-        <p className="mt-3 mb-0 text-xs text-[var(--text-tertiary)]">
-          El puntaje global va de 0 a {MAX_GLOBAL_SCORE} y solo tiene sentido con las cinco áreas.
-        </p>
       </section>
     )
   }
 
-  const { score, margin, low, high, attemptCount } = data.estimate
+  const { score, low, high, attemptCount } = data.estimate
   const leverageTheme = data.leverage == null ? null : getSubjectTheme(data.leverage.subjectId)
 
   return (
@@ -104,7 +98,7 @@ export function GlobalScoreCard({
         <span className="text-sm text-[var(--text-tertiary)]"> /{MAX_GLOBAL_SCORE}</span>
       </p>
       <p className="mt-1 mb-0 text-sm text-[var(--text-secondary)]">
-        Rango probable: <strong className="text-[var(--text-primary)]">{low}–{high}</strong> (± {margin})
+        Rango: <strong className="text-[var(--text-primary)]">{low}–{high}</strong>
       </p>
 
       {/* The band, drawn to scale against the full 0-500 range; the meta is a
@@ -146,7 +140,7 @@ export function GlobalScoreCard({
             }}
           >
             <label className="field">
-              <span>Tu meta de puntaje global</span>
+              <span>Meta (0–{MAX_GLOBAL_SCORE})</span>
               <input
                 type="number"
                 min={0}
@@ -166,15 +160,15 @@ export function GlobalScoreCard({
           </form>
         ) : data.target == null ? (
           <button type="button" className="btn-secondary" onClick={() => setIsEditingTarget(true)}>
-            Ponerme una meta
+            Poner meta
           </button>
         ) : (
           <p className="m-0 flex flex-wrap items-baseline gap-x-3 text-sm text-[var(--text-secondary)]">
             <span>
-              Tu meta: <strong className="text-[var(--text-primary)]">{data.target}</strong>
+              Meta: <strong className="text-[var(--text-primary)]">{data.target}</strong>
               {data.pointsToTarget != null && data.pointsToTarget > 0
-                ? ` · te faltan ${data.pointsToTarget} puntos`
-                : ' · ya la alcanzaste'}
+                ? ` · faltan ${data.pointsToTarget}`
+                : ' · alcanzada'}
             </span>
             <button type="button" className="btn-ghost btn-sm" onClick={() => setIsEditingTarget(true)}>
               Cambiar
@@ -186,14 +180,13 @@ export function GlobalScoreCard({
       {data.leverage != null && leverageTheme != null ? (
         <p className="notice">
           <span aria-hidden="true" className="subject-dot" style={{ '--subject-color': leverageTheme.color } as CSSProperties} />{' '}
-          Cada punto que subas en <strong className="text-[var(--text-primary)]">{leverageTheme.label}</strong> vale{' '}
-          <strong className="text-[var(--text-primary)]">{data.leverage.pointsPerAreaPoint.toFixed(2)}</strong> puntos
-          globales: es donde más rinde tu esfuerzo.
+          Más rinde: <strong className="text-[var(--text-primary)]">{leverageTheme.label}</strong>{' '}
+          (×{data.leverage.pointsPerAreaPoint.toFixed(2)})
         </p>
       ) : null}
 
       <p className="mt-3 mb-0 text-xs text-[var(--text-tertiary)]">
-        Estimado con tus respuestas en Aprendo, no es un puntaje oficial del ICFES.
+        No es un puntaje oficial del ICFES.
       </p>
     </section>
   )

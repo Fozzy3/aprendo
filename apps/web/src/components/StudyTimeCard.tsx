@@ -48,7 +48,7 @@ export function StudyTimeCard({ studentId, studyTime }: { studentId: string; stu
     <section className="ruled-section" aria-labelledby="study-time-title">
       <div className="section-head">
         <h2 id="study-time-title" className="section-title">
-          Tu tiempo de estudio
+          Tiempo de estudio
         </h2>
         {!isEditing ? (
           <button
@@ -90,7 +90,7 @@ export function StudyTimeCard({ studentId, studyTime }: { studentId: string; stu
             Cancelar
           </button>
           <p id="study-goal-hint" className="w-full text-xs text-[var(--text-tertiary)]">
-            Entre media hora y 20 horas. Unas 3 horas por semana es un buen ritmo.
+            De 0,5 a 20 h.
           </p>
           {save.error ? (
             <p role="alert" className="w-full text-sm text-[var(--danger-text)]">
@@ -120,9 +120,7 @@ export function StudyTimeCard({ studentId, studyTime }: { studentId: string; stu
         />
       </div>
       <p className="mt-1.5 text-xs text-[var(--text-tertiary)]">
-        {reached
-          ? 'Cumpliste tu meta de la semana.'
-          : `Te faltan ${formatMinutes(goalMinutes - minutesThisWeek)} para tu meta.`}
+        {reached ? 'Meta cumplida' : `Faltan ${formatMinutes(goalMinutes - minutesThisWeek)}`}
       </p>
 
       {/* Six calendar weeks, this one last; the dashed line is the goal. */}
